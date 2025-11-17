@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/appColors.dart';
-import 'package:frontend/services/auth_service.dart';
-import 'package:frontend/components/error_snack_bar.dart';
+import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/services/auth_service.dart';
+import 'package:thisjowi/components/error_snack_bar.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});

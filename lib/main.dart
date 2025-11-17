@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/appColors.dart';
-import 'package:frontend/core/api_config.dart';
-import 'package:frontend/core/env_loader.dart';
-import 'package:frontend/screens/auth/loginScreen.dart';
-import 'package:frontend/screens/auth/registerScreen.dart';
-import 'package:frontend/screens/splash/splash_screen.dart';
-import 'package:frontend/screens/onboarding/onboarding_screen.dart';
+import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/api_config.dart';
+import 'package:thisjowi/core/env_loader.dart';
+import 'package:thisjowi/screens/auth/loginScreen.dart';
+import 'package:thisjowi/screens/auth/registerScreen.dart';
+import 'package:thisjowi/screens/splash/splash_screen.dart';
+import 'package:thisjowi/screens/onboarding/onboarding_screen.dart';
 
 
 void main() async {
