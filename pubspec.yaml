@@ -1,0 +1,44 @@
+name: frontend
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^0.13.6
+  rename: ^3.1.0
+  shared_preferences: ^2.1.1
+  url_launcher: ^6.3.2
+  provider: ^6.0.0
+  local_auth_darwin: ^2.0.0
+
+  # OAuth2 opcional (descomentar si quieres OAuth2 completo con flutter_appauth)
+  # flutter_appauth: ^6.1.1
+  # url_launcher: ^6.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.13.1
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/logo.png
+    - .env
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  macos: 
+    generate: true
+    remove_alpha_ios: false
+  windows: true
+  web: true
+  image_path: assets/logo.png
+  adaptive_icon_foreground: assets/logo.png
