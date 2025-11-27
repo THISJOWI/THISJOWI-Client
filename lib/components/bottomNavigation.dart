@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/screens/main/TOPT.dart';
-import 'package:thisjowi/screens/main/PasswordScreen.dart';
-import 'package:thisjowi/screens/main/NotesScreen.dart';
-import 'package:thisjowi/screens/main/SettingScreen.dart';
+import 'package:thisjowi/screens/otp/TOPT.dart';
+import 'package:thisjowi/screens/password/PasswordScreen.dart';
+import 'package:thisjowi/screens/notes/NotesScreen.dart';
+import 'package:thisjowi/screens/settings/SettingScreen.dart';
 class MyBottomNavigation extends StatefulWidget {
   const MyBottomNavigation({super.key});
 
@@ -32,7 +32,7 @@ class _MyBottomNavigationState extends State<MyBottomNavigation> {
       body: _pages[_currentIndex],
       bottomNavigationBar: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           child: Container(
             height: 60,
             decoration: BoxDecoration(
