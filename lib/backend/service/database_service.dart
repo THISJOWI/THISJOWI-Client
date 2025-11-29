@@ -60,13 +60,32 @@ class Users extends Table {
   Set<Column> get primaryKey => {email};
 }
 
+class OtpEntries extends Table {
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+  TextColumn get issuer => text().nullable()();
+  TextColumn get secret => text()();
+  IntColumn get digits => integer().withDefault(const Constant(6))();
+  IntColumn get period => integer().withDefault(const Constant(30))();
+  TextColumn get algorithm => text().withDefault(const Constant('SHA1'))();
+  TextColumn get userId => text().nullable()();
+  TextColumn get createdAt => text()();
+  TextColumn get updatedAt => text()();
+  TextColumn get syncStatus => text().withDefault(const Constant('pending'))();
+  TextColumn get lastSyncedAt => text().nullable()();
+  TextColumn get serverId => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 /// Database class using Drift - compatible with all platforms
-@DriftDatabase(tables: [Notes, Passwords, SyncQueue, Users])
+@DriftDatabase(tables: [Notes, Passwords, SyncQueue, Users, OtpEntries])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -83,6 +102,9 @@ class AppDatabase extends _$AppDatabase {
           await customStatement(
             "UPDATE notes SET user_email = 'unknown@local' WHERE user_email IS NULL",
           );
+        }
+        if (from < 4) {
+          await m.createTable(otpEntries);
         }
       },
     );
@@ -512,11 +534,130 @@ class DatabaseService {
 
   // ============ UTILITY OPERATIONS ============
 
+  // ============ OTP ENTRIES OPERATIONS ============
+
+  /// Get all OTP entries from local database (filtered by current user)
+  Future<List<Map<String, dynamic>>> getAllOtpEntries() async {
+    final db = await database;
+    final userEmail = await getCurrentUserEmail();
+    
+    if (userEmail == null) {
+      print('⚠️ No user logged in, returning empty OTP entries list');
+      return [];
+    }
+    
+    final query = db.select(db.otpEntries)
+      ..where((o) => o.userId.equals(userEmail))
+      ..orderBy([(o) => OrderingTerm.asc(o.name)]);
+    
+    final results = await query.get();
+    return results.map((otp) => {
+      'id': otp.id,
+      'name': otp.name,
+      'issuer': otp.issuer,
+      'secret': otp.secret,
+      'digits': otp.digits,
+      'period': otp.period,
+      'algorithm': otp.algorithm,
+      'userId': otp.userId,
+      'createdAt': otp.createdAt,
+      'updatedAt': otp.updatedAt,
+      'syncStatus': otp.syncStatus,
+      'lastSyncedAt': otp.lastSyncedAt,
+      'serverId': otp.serverId,
+    }).toList();
+  }
+
+  /// Get an OTP entry by ID
+  Future<Map<String, dynamic>?> getOtpEntryById(String id) async {
+    final db = await database;
+    final query = db.select(db.otpEntries)
+      ..where((o) => o.id.equals(id))
+      ..limit(1);
+    
+    final results = await query.get();
+    if (results.isEmpty) return null;
+    
+    final otp = results.first;
+    return {
+      'id': otp.id,
+      'name': otp.name,
+      'issuer': otp.issuer,
+      'secret': otp.secret,
+      'digits': otp.digits,
+      'period': otp.period,
+      'algorithm': otp.algorithm,
+      'userId': otp.userId,
+      'createdAt': otp.createdAt,
+      'updatedAt': otp.updatedAt,
+      'syncStatus': otp.syncStatus,
+      'lastSyncedAt': otp.lastSyncedAt,
+      'serverId': otp.serverId,
+    };
+  }
+
+  /// Insert a new OTP entry
+  Future<int> insertOtpEntry(Map<String, dynamic> otpEntry) async {
+    final db = await database;
+    final userEmail = await getCurrentUserEmail();
+    
+    if (userEmail == null) {
+      throw Exception('No user logged in. Cannot create OTP entry.');
+    }
+    
+    return await db.into(db.otpEntries).insert(OtpEntriesCompanion.insert(
+      id: otpEntry['id'] ?? '',
+      name: otpEntry['name'] ?? '',
+      issuer: Value(otpEntry['issuer']),
+      secret: otpEntry['secret'] ?? '',
+      digits: Value(otpEntry['digits'] ?? 6),
+      period: Value(otpEntry['period'] ?? 30),
+      algorithm: Value(otpEntry['algorithm'] ?? 'SHA1'),
+      userId: Value(userEmail),
+      createdAt: otpEntry['createdAt'] ?? DateTime.now().toIso8601String(),
+      updatedAt: otpEntry['updatedAt'] ?? DateTime.now().toIso8601String(),
+      syncStatus: Value(otpEntry['syncStatus'] ?? 'pending'),
+      lastSyncedAt: Value(otpEntry['lastSyncedAt']),
+      serverId: Value(otpEntry['serverId']),
+    ));
+  }
+
+  /// Update an OTP entry
+  Future<int> updateOtpEntry(String id, Map<String, dynamic> otpEntry) async {
+    final db = await database;
+    
+    return await (db.update(db.otpEntries)
+      ..where((o) => o.id.equals(id)))
+      .write(OtpEntriesCompanion(
+        name: otpEntry.containsKey('name') ? Value(otpEntry['name']) : const Value.absent(),
+        issuer: otpEntry.containsKey('issuer') ? Value(otpEntry['issuer']) : const Value.absent(),
+        secret: otpEntry.containsKey('secret') ? Value(otpEntry['secret']) : const Value.absent(),
+        digits: otpEntry.containsKey('digits') ? Value(otpEntry['digits']) : const Value.absent(),
+        period: otpEntry.containsKey('period') ? Value(otpEntry['period']) : const Value.absent(),
+        algorithm: otpEntry.containsKey('algorithm') ? Value(otpEntry['algorithm']) : const Value.absent(),
+        updatedAt: otpEntry.containsKey('updatedAt') ? Value(otpEntry['updatedAt']) : const Value.absent(),
+        syncStatus: otpEntry.containsKey('syncStatus') ? Value(otpEntry['syncStatus']) : const Value.absent(),
+        lastSyncedAt: otpEntry.containsKey('lastSyncedAt') ? Value(otpEntry['lastSyncedAt']) : const Value.absent(),
+        serverId: otpEntry.containsKey('serverId') ? Value(otpEntry['serverId']) : const Value.absent(),
+      ));
+  }
+
+  /// Delete an OTP entry
+  Future<int> deleteOtpEntry(String id) async {
+    final db = await database;
+    return await (db.delete(db.otpEntries)
+      ..where((o) => o.id.equals(id)))
+      .go();
+  }
+
+  // ============ END OTP ENTRIES OPERATIONS ============
+
   /// Clear all data (for logout)
   Future<void> clearAllData() async {
     final db = await database;
     await db.delete(db.notes).go();
     await db.delete(db.passwords).go();
+    await db.delete(db.otpEntries).go();
     await db.delete(db.syncQueue).go();
     await db.delete(db.users).go();
   }

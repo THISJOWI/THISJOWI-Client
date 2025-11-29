@@ -177,12 +177,8 @@ flutter doctor -v
 
 ```bash
 # If cloning the entire project
-git clone https://github.com/THISJowi/THISJOWI.git
+git clone https://github.com/THISJOWI/client.git
 cd THISJOWI/application
-
-# Or if only the frontend
-git clone https://github.com/THISJowi/THISJOWI-Frontend.git
-cd THISJOWI-Frontend
 ```
 
 ### 2️⃣ Install Dependencies
@@ -283,18 +279,6 @@ DEBUG_MODE=true
 LOCAL_NETWORK_IP=192.168.1.100
 GATEWAY_PORT=8080
 DEBUG_MODE=true
-```
-
-</details>
-
-<details>
-<summary><b>Production</b></summary>
-
-```bash
-LOCAL_NETWORK_IP=api.thisjowi.com
-GATEWAY_PORT=443
-DEBUG_MODE=false
-REQUEST_TIMEOUT=30
 ```
 
 </details>

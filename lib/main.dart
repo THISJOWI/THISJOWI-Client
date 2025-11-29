@@ -6,6 +6,7 @@ import 'package:thisjowi/core/api_config.dart';
 import 'package:thisjowi/core/env_loader.dart';
 import 'package:thisjowi/screens/auth/loginScreen.dart';
 import 'package:thisjowi/screens/auth/registerScreen.dart';
+import 'package:thisjowi/screens/otp/OtpQrScannerScreen.dart';
 import 'package:thisjowi/screens/splash/splash_screen.dart';
 import 'package:thisjowi/screens/onboarding/onboarding_screen.dart';
 import 'package:thisjowi/backend/service/database_service.dart';
@@ -98,6 +99,7 @@ class MainApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
+        '/otp/qrscan': (context) => const OtpQrScannerScreen(),
       },
       home: const SplashScreen(),
     );

@@ -1746,6 +1746,637 @@ class UsersCompanion extends UpdateCompanion<User> {
   }
 }
 
+class $OtpEntriesTable extends OtpEntries
+    with TableInfo<$OtpEntriesTable, OtpEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OtpEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _issuerMeta = const VerificationMeta('issuer');
+  @override
+  late final GeneratedColumn<String> issuer = GeneratedColumn<String>(
+      'issuer', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _secretMeta = const VerificationMeta('secret');
+  @override
+  late final GeneratedColumn<String> secret = GeneratedColumn<String>(
+      'secret', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _digitsMeta = const VerificationMeta('digits');
+  @override
+  late final GeneratedColumn<int> digits = GeneratedColumn<int>(
+      'digits', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(6));
+  static const VerificationMeta _periodMeta = const VerificationMeta('period');
+  @override
+  late final GeneratedColumn<int> period = GeneratedColumn<int>(
+      'period', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(30));
+  static const VerificationMeta _algorithmMeta =
+      const VerificationMeta('algorithm');
+  @override
+  late final GeneratedColumn<String> algorithm = GeneratedColumn<String>(
+      'algorithm', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('SHA1'));
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+      'user_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _syncStatusMeta =
+      const VerificationMeta('syncStatus');
+  @override
+  late final GeneratedColumn<String> syncStatus = GeneratedColumn<String>(
+      'sync_status', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('pending'));
+  static const VerificationMeta _lastSyncedAtMeta =
+      const VerificationMeta('lastSyncedAt');
+  @override
+  late final GeneratedColumn<String> lastSyncedAt = GeneratedColumn<String>(
+      'last_synced_at', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _serverIdMeta =
+      const VerificationMeta('serverId');
+  @override
+  late final GeneratedColumn<String> serverId = GeneratedColumn<String>(
+      'server_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        name,
+        issuer,
+        secret,
+        digits,
+        period,
+        algorithm,
+        userId,
+        createdAt,
+        updatedAt,
+        syncStatus,
+        lastSyncedAt,
+        serverId
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'otp_entries';
+  @override
+  VerificationContext validateIntegrity(Insertable<OtpEntry> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('issuer')) {
+      context.handle(_issuerMeta,
+          issuer.isAcceptableOrUnknown(data['issuer']!, _issuerMeta));
+    }
+    if (data.containsKey('secret')) {
+      context.handle(_secretMeta,
+          secret.isAcceptableOrUnknown(data['secret']!, _secretMeta));
+    } else if (isInserting) {
+      context.missing(_secretMeta);
+    }
+    if (data.containsKey('digits')) {
+      context.handle(_digitsMeta,
+          digits.isAcceptableOrUnknown(data['digits']!, _digitsMeta));
+    }
+    if (data.containsKey('period')) {
+      context.handle(_periodMeta,
+          period.isAcceptableOrUnknown(data['period']!, _periodMeta));
+    }
+    if (data.containsKey('algorithm')) {
+      context.handle(_algorithmMeta,
+          algorithm.isAcceptableOrUnknown(data['algorithm']!, _algorithmMeta));
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('sync_status')) {
+      context.handle(
+          _syncStatusMeta,
+          syncStatus.isAcceptableOrUnknown(
+              data['sync_status']!, _syncStatusMeta));
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+          _lastSyncedAtMeta,
+          lastSyncedAt.isAcceptableOrUnknown(
+              data['last_synced_at']!, _lastSyncedAtMeta));
+    }
+    if (data.containsKey('server_id')) {
+      context.handle(_serverIdMeta,
+          serverId.isAcceptableOrUnknown(data['server_id']!, _serverIdMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  OtpEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OtpEntry(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      issuer: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}issuer']),
+      secret: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}secret'])!,
+      digits: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}digits'])!,
+      period: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}period'])!,
+      algorithm: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}algorithm'])!,
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_id']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
+      syncStatus: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}sync_status'])!,
+      lastSyncedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}last_synced_at']),
+      serverId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}server_id']),
+    );
+  }
+
+  @override
+  $OtpEntriesTable createAlias(String alias) {
+    return $OtpEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class OtpEntry extends DataClass implements Insertable<OtpEntry> {
+  final String id;
+  final String name;
+  final String? issuer;
+  final String secret;
+  final int digits;
+  final int period;
+  final String algorithm;
+  final String? userId;
+  final String createdAt;
+  final String updatedAt;
+  final String syncStatus;
+  final String? lastSyncedAt;
+  final String? serverId;
+  const OtpEntry(
+      {required this.id,
+      required this.name,
+      this.issuer,
+      required this.secret,
+      required this.digits,
+      required this.period,
+      required this.algorithm,
+      this.userId,
+      required this.createdAt,
+      required this.updatedAt,
+      required this.syncStatus,
+      this.lastSyncedAt,
+      this.serverId});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || issuer != null) {
+      map['issuer'] = Variable<String>(issuer);
+    }
+    map['secret'] = Variable<String>(secret);
+    map['digits'] = Variable<int>(digits);
+    map['period'] = Variable<int>(period);
+    map['algorithm'] = Variable<String>(algorithm);
+    if (!nullToAbsent || userId != null) {
+      map['user_id'] = Variable<String>(userId);
+    }
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    map['sync_status'] = Variable<String>(syncStatus);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<String>(lastSyncedAt);
+    }
+    if (!nullToAbsent || serverId != null) {
+      map['server_id'] = Variable<String>(serverId);
+    }
+    return map;
+  }
+
+  OtpEntriesCompanion toCompanion(bool nullToAbsent) {
+    return OtpEntriesCompanion(
+      id: Value(id),
+      name: Value(name),
+      issuer:
+          issuer == null && nullToAbsent ? const Value.absent() : Value(issuer),
+      secret: Value(secret),
+      digits: Value(digits),
+      period: Value(period),
+      algorithm: Value(algorithm),
+      userId:
+          userId == null && nullToAbsent ? const Value.absent() : Value(userId),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      syncStatus: Value(syncStatus),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      serverId: serverId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(serverId),
+    );
+  }
+
+  factory OtpEntry.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OtpEntry(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      issuer: serializer.fromJson<String?>(json['issuer']),
+      secret: serializer.fromJson<String>(json['secret']),
+      digits: serializer.fromJson<int>(json['digits']),
+      period: serializer.fromJson<int>(json['period']),
+      algorithm: serializer.fromJson<String>(json['algorithm']),
+      userId: serializer.fromJson<String?>(json['userId']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      syncStatus: serializer.fromJson<String>(json['syncStatus']),
+      lastSyncedAt: serializer.fromJson<String?>(json['lastSyncedAt']),
+      serverId: serializer.fromJson<String?>(json['serverId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'issuer': serializer.toJson<String?>(issuer),
+      'secret': serializer.toJson<String>(secret),
+      'digits': serializer.toJson<int>(digits),
+      'period': serializer.toJson<int>(period),
+      'algorithm': serializer.toJson<String>(algorithm),
+      'userId': serializer.toJson<String?>(userId),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+      'syncStatus': serializer.toJson<String>(syncStatus),
+      'lastSyncedAt': serializer.toJson<String?>(lastSyncedAt),
+      'serverId': serializer.toJson<String?>(serverId),
+    };
+  }
+
+  OtpEntry copyWith(
+          {String? id,
+          String? name,
+          Value<String?> issuer = const Value.absent(),
+          String? secret,
+          int? digits,
+          int? period,
+          String? algorithm,
+          Value<String?> userId = const Value.absent(),
+          String? createdAt,
+          String? updatedAt,
+          String? syncStatus,
+          Value<String?> lastSyncedAt = const Value.absent(),
+          Value<String?> serverId = const Value.absent()}) =>
+      OtpEntry(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        issuer: issuer.present ? issuer.value : this.issuer,
+        secret: secret ?? this.secret,
+        digits: digits ?? this.digits,
+        period: period ?? this.period,
+        algorithm: algorithm ?? this.algorithm,
+        userId: userId.present ? userId.value : this.userId,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        syncStatus: syncStatus ?? this.syncStatus,
+        lastSyncedAt:
+            lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+        serverId: serverId.present ? serverId.value : this.serverId,
+      );
+  OtpEntry copyWithCompanion(OtpEntriesCompanion data) {
+    return OtpEntry(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      issuer: data.issuer.present ? data.issuer.value : this.issuer,
+      secret: data.secret.present ? data.secret.value : this.secret,
+      digits: data.digits.present ? data.digits.value : this.digits,
+      period: data.period.present ? data.period.value : this.period,
+      algorithm: data.algorithm.present ? data.algorithm.value : this.algorithm,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      syncStatus:
+          data.syncStatus.present ? data.syncStatus.value : this.syncStatus,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      serverId: data.serverId.present ? data.serverId.value : this.serverId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OtpEntry(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('issuer: $issuer, ')
+          ..write('secret: $secret, ')
+          ..write('digits: $digits, ')
+          ..write('period: $period, ')
+          ..write('algorithm: $algorithm, ')
+          ..write('userId: $userId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverId: $serverId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      name,
+      issuer,
+      secret,
+      digits,
+      period,
+      algorithm,
+      userId,
+      createdAt,
+      updatedAt,
+      syncStatus,
+      lastSyncedAt,
+      serverId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OtpEntry &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.issuer == this.issuer &&
+          other.secret == this.secret &&
+          other.digits == this.digits &&
+          other.period == this.period &&
+          other.algorithm == this.algorithm &&
+          other.userId == this.userId &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.syncStatus == this.syncStatus &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.serverId == this.serverId);
+}
+
+class OtpEntriesCompanion extends UpdateCompanion<OtpEntry> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String?> issuer;
+  final Value<String> secret;
+  final Value<int> digits;
+  final Value<int> period;
+  final Value<String> algorithm;
+  final Value<String?> userId;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<String> syncStatus;
+  final Value<String?> lastSyncedAt;
+  final Value<String?> serverId;
+  final Value<int> rowid;
+  const OtpEntriesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.issuer = const Value.absent(),
+    this.secret = const Value.absent(),
+    this.digits = const Value.absent(),
+    this.period = const Value.absent(),
+    this.algorithm = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OtpEntriesCompanion.insert({
+    required String id,
+    required String name,
+    this.issuer = const Value.absent(),
+    required String secret,
+    this.digits = const Value.absent(),
+    this.period = const Value.absent(),
+    this.algorithm = const Value.absent(),
+    this.userId = const Value.absent(),
+    required String createdAt,
+    required String updatedAt,
+    this.syncStatus = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.serverId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        name = Value(name),
+        secret = Value(secret),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
+  static Insertable<OtpEntry> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? issuer,
+    Expression<String>? secret,
+    Expression<int>? digits,
+    Expression<int>? period,
+    Expression<String>? algorithm,
+    Expression<String>? userId,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<String>? syncStatus,
+    Expression<String>? lastSyncedAt,
+    Expression<String>? serverId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (issuer != null) 'issuer': issuer,
+      if (secret != null) 'secret': secret,
+      if (digits != null) 'digits': digits,
+      if (period != null) 'period': period,
+      if (algorithm != null) 'algorithm': algorithm,
+      if (userId != null) 'user_id': userId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (serverId != null) 'server_id': serverId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OtpEntriesCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? name,
+      Value<String?>? issuer,
+      Value<String>? secret,
+      Value<int>? digits,
+      Value<int>? period,
+      Value<String>? algorithm,
+      Value<String?>? userId,
+      Value<String>? createdAt,
+      Value<String>? updatedAt,
+      Value<String>? syncStatus,
+      Value<String?>? lastSyncedAt,
+      Value<String?>? serverId,
+      Value<int>? rowid}) {
+    return OtpEntriesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      issuer: issuer ?? this.issuer,
+      secret: secret ?? this.secret,
+      digits: digits ?? this.digits,
+      period: period ?? this.period,
+      algorithm: algorithm ?? this.algorithm,
+      userId: userId ?? this.userId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      syncStatus: syncStatus ?? this.syncStatus,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      serverId: serverId ?? this.serverId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (issuer.present) {
+      map['issuer'] = Variable<String>(issuer.value);
+    }
+    if (secret.present) {
+      map['secret'] = Variable<String>(secret.value);
+    }
+    if (digits.present) {
+      map['digits'] = Variable<int>(digits.value);
+    }
+    if (period.present) {
+      map['period'] = Variable<int>(period.value);
+    }
+    if (algorithm.present) {
+      map['algorithm'] = Variable<String>(algorithm.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(syncStatus.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<String>(lastSyncedAt.value);
+    }
+    if (serverId.present) {
+      map['server_id'] = Variable<String>(serverId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OtpEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('issuer: $issuer, ')
+          ..write('secret: $secret, ')
+          ..write('digits: $digits, ')
+          ..write('period: $period, ')
+          ..write('algorithm: $algorithm, ')
+          ..write('userId: $userId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('serverId: $serverId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1753,12 +2384,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PasswordsTable passwords = $PasswordsTable(this);
   late final $SyncQueueTable syncQueue = $SyncQueueTable(this);
   late final $UsersTable users = $UsersTable(this);
+  late final $OtpEntriesTable otpEntries = $OtpEntriesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [notes, passwords, syncQueue, users];
+      [notes, passwords, syncQueue, users, otpEntries];
 }
 
 typedef $$NotesTableCreateCompanionBuilder = NotesCompanion Function({
@@ -2611,6 +3243,292 @@ typedef $$UsersTableProcessedTableManager = ProcessedTableManager<
     (User, BaseReferences<_$AppDatabase, $UsersTable, User>),
     User,
     PrefetchHooks Function()>;
+typedef $$OtpEntriesTableCreateCompanionBuilder = OtpEntriesCompanion Function({
+  required String id,
+  required String name,
+  Value<String?> issuer,
+  required String secret,
+  Value<int> digits,
+  Value<int> period,
+  Value<String> algorithm,
+  Value<String?> userId,
+  required String createdAt,
+  required String updatedAt,
+  Value<String> syncStatus,
+  Value<String?> lastSyncedAt,
+  Value<String?> serverId,
+  Value<int> rowid,
+});
+typedef $$OtpEntriesTableUpdateCompanionBuilder = OtpEntriesCompanion Function({
+  Value<String> id,
+  Value<String> name,
+  Value<String?> issuer,
+  Value<String> secret,
+  Value<int> digits,
+  Value<int> period,
+  Value<String> algorithm,
+  Value<String?> userId,
+  Value<String> createdAt,
+  Value<String> updatedAt,
+  Value<String> syncStatus,
+  Value<String?> lastSyncedAt,
+  Value<String?> serverId,
+  Value<int> rowid,
+});
+
+class $$OtpEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $OtpEntriesTable> {
+  $$OtpEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get issuer => $composableBuilder(
+      column: $table.issuer, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get secret => $composableBuilder(
+      column: $table.secret, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get digits => $composableBuilder(
+      column: $table.digits, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get period => $composableBuilder(
+      column: $table.period, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get algorithm => $composableBuilder(
+      column: $table.algorithm, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get syncStatus => $composableBuilder(
+      column: $table.syncStatus, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get serverId => $composableBuilder(
+      column: $table.serverId, builder: (column) => ColumnFilters(column));
+}
+
+class $$OtpEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $OtpEntriesTable> {
+  $$OtpEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get issuer => $composableBuilder(
+      column: $table.issuer, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get secret => $composableBuilder(
+      column: $table.secret, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get digits => $composableBuilder(
+      column: $table.digits, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get period => $composableBuilder(
+      column: $table.period, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get algorithm => $composableBuilder(
+      column: $table.algorithm, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get syncStatus => $composableBuilder(
+      column: $table.syncStatus, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get serverId => $composableBuilder(
+      column: $table.serverId, builder: (column) => ColumnOrderings(column));
+}
+
+class $$OtpEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OtpEntriesTable> {
+  $$OtpEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get issuer =>
+      $composableBuilder(column: $table.issuer, builder: (column) => column);
+
+  GeneratedColumn<String> get secret =>
+      $composableBuilder(column: $table.secret, builder: (column) => column);
+
+  GeneratedColumn<int> get digits =>
+      $composableBuilder(column: $table.digits, builder: (column) => column);
+
+  GeneratedColumn<int> get period =>
+      $composableBuilder(column: $table.period, builder: (column) => column);
+
+  GeneratedColumn<String> get algorithm =>
+      $composableBuilder(column: $table.algorithm, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get syncStatus => $composableBuilder(
+      column: $table.syncStatus, builder: (column) => column);
+
+  GeneratedColumn<String> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get serverId =>
+      $composableBuilder(column: $table.serverId, builder: (column) => column);
+}
+
+class $$OtpEntriesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $OtpEntriesTable,
+    OtpEntry,
+    $$OtpEntriesTableFilterComposer,
+    $$OtpEntriesTableOrderingComposer,
+    $$OtpEntriesTableAnnotationComposer,
+    $$OtpEntriesTableCreateCompanionBuilder,
+    $$OtpEntriesTableUpdateCompanionBuilder,
+    (OtpEntry, BaseReferences<_$AppDatabase, $OtpEntriesTable, OtpEntry>),
+    OtpEntry,
+    PrefetchHooks Function()> {
+  $$OtpEntriesTableTableManager(_$AppDatabase db, $OtpEntriesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OtpEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OtpEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OtpEntriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String?> issuer = const Value.absent(),
+            Value<String> secret = const Value.absent(),
+            Value<int> digits = const Value.absent(),
+            Value<int> period = const Value.absent(),
+            Value<String> algorithm = const Value.absent(),
+            Value<String?> userId = const Value.absent(),
+            Value<String> createdAt = const Value.absent(),
+            Value<String> updatedAt = const Value.absent(),
+            Value<String> syncStatus = const Value.absent(),
+            Value<String?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverId = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              OtpEntriesCompanion(
+            id: id,
+            name: name,
+            issuer: issuer,
+            secret: secret,
+            digits: digits,
+            period: period,
+            algorithm: algorithm,
+            userId: userId,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            syncStatus: syncStatus,
+            lastSyncedAt: lastSyncedAt,
+            serverId: serverId,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String name,
+            Value<String?> issuer = const Value.absent(),
+            required String secret,
+            Value<int> digits = const Value.absent(),
+            Value<int> period = const Value.absent(),
+            Value<String> algorithm = const Value.absent(),
+            Value<String?> userId = const Value.absent(),
+            required String createdAt,
+            required String updatedAt,
+            Value<String> syncStatus = const Value.absent(),
+            Value<String?> lastSyncedAt = const Value.absent(),
+            Value<String?> serverId = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              OtpEntriesCompanion.insert(
+            id: id,
+            name: name,
+            issuer: issuer,
+            secret: secret,
+            digits: digits,
+            period: period,
+            algorithm: algorithm,
+            userId: userId,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            syncStatus: syncStatus,
+            lastSyncedAt: lastSyncedAt,
+            serverId: serverId,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$OtpEntriesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $OtpEntriesTable,
+    OtpEntry,
+    $$OtpEntriesTableFilterComposer,
+    $$OtpEntriesTableOrderingComposer,
+    $$OtpEntriesTableAnnotationComposer,
+    $$OtpEntriesTableCreateCompanionBuilder,
+    $$OtpEntriesTableUpdateCompanionBuilder,
+    (OtpEntry, BaseReferences<_$AppDatabase, $OtpEntriesTable, OtpEntry>),
+    OtpEntry,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2623,4 +3541,6 @@ class $AppDatabaseManager {
       $$SyncQueueTableTableManager(_db, _db.syncQueue);
   $$UsersTableTableManager get users =>
       $$UsersTableTableManager(_db, _db.users);
+  $$OtpEntriesTableTableManager get otpEntries =>
+      $$OtpEntriesTableTableManager(_db, _db.otpEntries);
 }
