@@ -126,7 +126,7 @@
 
 | Login Screen | Notes Dashboard | Password Manager |
 |--------------|----------------|------------------|
-| ![Login](docs/screenshots/login.png) | ![Notes](docs/screenshots/notes.png) | ![Passwords](docs/screenshots/passwords.png) |
+| ![Home](https://pub-9030d6e053cc40b380e0f63662daf8ed.r2.dev/Captura%20de%20pantalla%202025-11-29%20a%20las%2018.13.11.png) | ![OTP](https://pub-9030d6e053cc40b380e0f63662daf8ed.r2.dev/Captura%20de%20pantalla%202025-11-29%20a%20las%2018.13.26.png) | ![Passwords](https://pub-9030d6e053cc40b380e0f63662daf8ed.r2.dev/Captura%20de%20pantalla%202025-11-29%20a%20las%2018.18.58.png) |
 
 </div>
 
