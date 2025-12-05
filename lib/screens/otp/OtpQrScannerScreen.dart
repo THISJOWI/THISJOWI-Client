@@ -19,7 +19,7 @@ class _OtpQrScannerScreenState extends State<OtpQrScannerScreen> {
   @override
   void initState() {
     super.initState();
-    // Inicializar repositorio (local-first)
+    // Initialize repository (local-first)
     _otpRepository = OtpRepository();
   }
 
@@ -38,14 +38,14 @@ class _OtpQrScannerScreenState extends State<OtpQrScannerScreen> {
       if (code.startsWith('otpauth://')) {
         final result = await _otpRepository.addOtpFromUri(code, '');
         if (result['success'] == true) {
-          ErrorSnackBar.showSuccess(context, 'OTP añadido');
+          ErrorSnackBar.showSuccess(context, 'OTP added');
           Navigator.pop(context, true);
         } else {
           ErrorSnackBar.show(context, result['message'] ?? 'Error');
           Navigator.pop(context, false);
         }
       } else {
-        ErrorSnackBar.show(context, 'QR inválido');
+        ErrorSnackBar.show(context, 'Invalid QR');
         Navigator.pop(context, false);
       }
     });
@@ -54,7 +54,7 @@ class _OtpQrScannerScreenState extends State<OtpQrScannerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Escanear QR OTP')),
+      appBar: AppBar(title: const Text('Scan OTP QR')),
       body: QRView(
         key: qrKey,
         onQRViewCreated: _onQRViewCreated,

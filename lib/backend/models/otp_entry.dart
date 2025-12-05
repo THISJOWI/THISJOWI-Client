@@ -1,4 +1,4 @@
-/// Modelo para una entrada OTP (Time-based One-Time Password)
+/// Model for an OTP entry (Time-based One-Time Password)
 class OtpEntry {
   final String id;
   final String name;

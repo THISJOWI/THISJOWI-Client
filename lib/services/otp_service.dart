@@ -1,16 +1,17 @@
 import 'dart:typed_data';
+import 'dart:math';
 import 'package:crypto/crypto.dart';
 
-/// Servicio para generar códigos TOTP (Time-based One-Time Password)
-/// Implementación según RFC 6238 (TOTP) y RFC 4226 (HOTP)
+/// Service for generating TOTP codes (Time-based One-Time Password)
+/// Implementation according to RFC 6238 (TOTP) and RFC 4226 (HOTP)
 class OtpService {
-  /// Genera un código TOTP basado en el secreto proporcionado
+  /// Generates a TOTP code based on the provided secret
   /// 
-  /// [secret] - Clave secreta en Base32
-  /// [digits] - Número de dígitos del código (por defecto 6)
-  /// [period] - Período de validez en segundos (por defecto 30)
-  /// [algorithm] - Algoritmo hash (SHA1, SHA256, SHA512)
-  /// [timestamp] - Timestamp opcional para generar código en momento específico
+  /// [secret] - Secret key in Base32
+  /// [digits] - Number of code digits (default 6)
+  /// [period] - Validity period in seconds (default 30)
+  /// [algorithm] - Hash algorithm (SHA1, SHA256, SHA512)
+  /// [timestamp] - Optional timestamp to generate code at specific moment
   String generateTotp({
     required String secret,
     int digits = 6,
@@ -29,59 +30,59 @@ class OtpService {
     );
   }
 
-  /// Genera un código HOTP (HMAC-based One-Time Password)
+  /// Generates an HOTP code (HMAC-based One-Time Password)
   String _generateHotp({
     required String secret,
     required int counter,
     int digits = 6,
     String algorithm = 'SHA1',
   }) {
-    // Decodificar secreto Base32
+    // Decode Base32 secret
     final key = _base32Decode(secret);
     
-    // Convertir counter a bytes (8 bytes, big-endian)
+    // Convert counter to bytes (8 bytes, big-endian)
     final counterBytes = _intToBytes(counter);
     
-    // Calcular HMAC
+    // Calculate HMAC
     final hmacResult = _calculateHmac(key, counterBytes, algorithm);
     
-    // Truncamiento dinámico
+    // Dynamic truncation
     final offset = hmacResult[hmacResult.length - 1] & 0x0f;
     final binary = ((hmacResult[offset] & 0x7f) << 24) |
         ((hmacResult[offset + 1] & 0xff) << 16) |
         ((hmacResult[offset + 2] & 0xff) << 8) |
         (hmacResult[offset + 3] & 0xff);
     
-    // Generar código con el número de dígitos especificado
+    // Generate code with specified number of digits
     final otp = binary % _pow10(digits);
     
     return otp.toString().padLeft(digits, '0');
   }
 
-  /// Calcula el tiempo restante antes de que el código expire
+  /// Calculates the remaining time before the code expires
   int getRemainingSeconds({int period = 30}) {
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     return period - (now % period);
   }
 
-  /// Calcula el progreso del período actual (0.0 a 1.0)
+  /// Calculates the progress of the current period (0.0 to 1.0)
   double getProgress({int period = 30}) {
     final remaining = getRemainingSeconds(period: period);
     return remaining / period;
   }
 
-  /// Decodifica una cadena Base32 a bytes
+  /// Decodes a Base32 string to bytes
   Uint8List _base32Decode(String input) {
     const base32Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
     
-    // Limpiar input (mayúsculas, sin espacios ni guiones)
+    // Clean input (uppercase, remove spaces and hyphens)
     final cleaned = input.toUpperCase().replaceAll(RegExp(r'[\s=-]'), '');
     
     if (cleaned.isEmpty) {
       throw FormatException('Empty Base32 string');
     }
     
-    // Validar caracteres
+    // Validate characters
     for (final char in cleaned.split('')) {
       if (!base32Chars.contains(char)) {
         throw FormatException('Invalid Base32 character: $char');
@@ -104,7 +105,7 @@ class OtpService {
     return Uint8List.fromList(bytes);
   }
 
-  /// Convierte un entero a bytes (8 bytes, big-endian)
+  /// Converts an integer to bytes (8 bytes, big-endian)
   Uint8List _intToBytes(int value) {
     final bytes = Uint8List(8);
     for (var i = 7; i >= 0; i--) {
@@ -114,7 +115,7 @@ class OtpService {
     return bytes;
   }
 
-  /// Calcula HMAC usando el algoritmo especificado
+  /// Calculates HMAC using the specified algorithm
   List<int> _calculateHmac(Uint8List key, Uint8List data, String algorithm) {
     Hmac hmac;
     
@@ -134,7 +135,7 @@ class OtpService {
     return hmac.convert(data).bytes;
   }
 
-  /// Calcula 10^n
+  /// Calculates 10^n
   int _pow10(int n) {
     var result = 1;
     for (var i = 0; i < n; i++) {
@@ -143,22 +144,20 @@ class OtpService {
     return result;
   }
 
-  /// Genera un secreto aleatorio en Base32
+  /// Generates a cryptographically secure random secret in Base32
   String generateSecret({int length = 32}) {
     const base32Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-    final random = DateTime.now().millisecondsSinceEpoch;
+    final random = Random.secure();
     final buffer = StringBuffer();
     
-    var seed = random;
     for (var i = 0; i < length; i++) {
-      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-      buffer.write(base32Chars[seed % 32]);
+      buffer.write(base32Chars[random.nextInt(32)]);
     }
     
     return buffer.toString();
   }
 
-  /// Valida si un secreto Base32 es válido
+  /// Validates if a Base32 secret is valid
   bool isValidSecret(String secret) {
     const base32Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
     final cleaned = secret.toUpperCase().replaceAll(RegExp(r'[\s=-]'), '');
@@ -174,7 +173,7 @@ class OtpService {
     return true;
   }
 
-  /// Formatea el código OTP para mostrar (ej: "123 456")
+  /// Formats the OTP code for display (e.g.: "123 456")
   String formatCode(String code) {
     if (code.length <= 3) return code;
     

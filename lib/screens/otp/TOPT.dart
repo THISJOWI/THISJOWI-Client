@@ -29,10 +29,10 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   void initState() {
     super.initState();
-    // Inicializar repositorio (local-first con sync en segundo plano)
+    // Initialize repository (local-first with background sync)
     _otpRepository = OtpRepository();
     _loadEntries();
-    // Actualizar códigos cada segundo
+    // Update codes every second
     _refreshTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() {});
     });
