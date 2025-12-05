@@ -49,11 +49,18 @@ class _SyncDebugPanelState extends State<SyncDebugPanel> {
         .get();
       final queueCount = pendingRegistrations.length;
       
+      // Contar OTP pendientes
+      final pendingOtp = await (db.select(db.otpEntries)
+        ..where((o) => o.syncStatus.isIn(['pending', 'error', 'deleted'])))
+        .get();
+      final otpCount = pendingOtp.length;
+      
       setState(() {
         _pendingCounts = {
           'notes': notesCount,
           'passwords': passwordsCount,
           'registrations': queueCount,
+          'otp': otpCount,
         };
         _isLoading = false;
       });
@@ -144,6 +151,8 @@ class _SyncDebugPanelState extends State<SyncDebugPanel> {
             const SizedBox(height: 8),
             _buildPendingItem('Passwords', _pendingCounts['passwords'] ?? 0, Icons.lock),
             const SizedBox(height: 8),
+            _buildPendingItem('OTP', _pendingCounts['otp'] ?? 0, Icons.security),
+            const SizedBox(height: 8),
             _buildPendingItem('Registros', _pendingCounts['registrations'] ?? 0, Icons.person_add),
           ],
           
@@ -230,6 +239,12 @@ class _SyncDebugPanelState extends State<SyncDebugPanel> {
                   if (_syncResult!['registrations'] != null) ...[
                     Text(
                       'Registros: ${_syncResult!['registrations']['synced'] ?? 0} sync, ${_syncResult!['registrations']['failed'] ?? 0} fail',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
+                  if (_syncResult!['otp'] != null) ...[
+                    Text(
+                      'OTP: ${_syncResult!['otp']['synced'] ?? 0} sync, ${_syncResult!['otp']['failed'] ?? 0} fail',
                       style: const TextStyle(fontSize: 12),
                     ),
                   ],

@@ -147,7 +147,7 @@ class _BiometricLockSettingsState extends State<BiometricLockSettings> {
       trailing: Switch(
         value: _isLockEnabled,
         onChanged: _toggleBiometricLock,
-        activeColor: AppColors.primary,
+        activeThumbColor: AppColors.primary,
       ),
     );
   }
@@ -283,7 +283,7 @@ class _BiometricLockSettingsCardState extends State<BiometricLockSettingsCard> {
             Switch(
               value: _isLockEnabled,
               onChanged: _toggleBiometricLock,
-              activeColor: AppColors.primary,
+              activeThumbColor: AppColors.primary,
             ),
           ],
         ),

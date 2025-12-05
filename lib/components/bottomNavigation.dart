@@ -4,14 +4,17 @@ import 'package:thisjowi/screens/otp/TOPT.dart';
 import 'package:thisjowi/screens/home/HomeScreen.dart';
 import 'package:thisjowi/screens/settings/SettingScreen.dart';
 
+// GlobalKey para acceder al estado de la navegación
+final GlobalKey<MyBottomNavigationState> bottomNavigationKey = GlobalKey<MyBottomNavigationState>();
+
 class MyBottomNavigation extends StatefulWidget {
   const MyBottomNavigation({super.key});
 
   @override
-  State<MyBottomNavigation> createState() => _MyBottomNavigationState();
+  State<MyBottomNavigation> createState() => MyBottomNavigationState();
 }
 
-class _MyBottomNavigationState extends State<MyBottomNavigation> with SingleTickerProviderStateMixin {
+class MyBottomNavigationState extends State<MyBottomNavigation> with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
@@ -19,6 +22,16 @@ class _MyBottomNavigationState extends State<MyBottomNavigation> with SingleTick
     const OtpScreen(),
     const SettingScreen(),
   ];
+
+  /// Método público para cambiar de pestaña
+  void navigateToTab(int index) {
+    if (index >= 0 && index < _pages.length) {
+      setState(() => _currentIndex = index);
+    }
+  }
+
+  /// Navegar a la pestaña de OTP (índice 1)
+  void navigateToOtp() => navigateToTab(1);
 
   @override
   Widget build(BuildContext context) {

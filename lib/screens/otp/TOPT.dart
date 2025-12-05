@@ -6,13 +6,9 @@ import 'package:thisjowi/backend/models/otp_entry.dart';
 import 'package:thisjowi/backend/repository/otp_repository.dart';
 import 'package:thisjowi/i18n/translation_service.dart';
 import 'package:thisjowi/services/otp_service.dart';
-import 'package:thisjowi/services/otp_backend_service.dart';
-import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/components/error_snack_bar.dart';
-import 'package:thisjowi/i18n/translations.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io' show Platform;
-import 'package:thisjowi/screens/otp/OtpQrScannerScreen.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
@@ -33,10 +29,8 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   void initState() {
     super.initState();
-    // Inicializar repositorio con servicios backend
-    final authService = AuthService();
-    final otpBackendService = OtpBackendService(authService);
-    _otpRepository = OtpRepository(otpBackendService);
+    // Inicializar repositorio (local-first con sync en segundo plano)
+    _otpRepository = OtpRepository();
     _loadEntries();
     // Actualizar códigos cada segundo
     _refreshTimer = Timer.periodic(const Duration(seconds: 1), (_) {

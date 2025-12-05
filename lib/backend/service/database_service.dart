@@ -650,6 +650,109 @@ class DatabaseService {
       .go();
   }
 
+  /// Get OTP entries that need to be synced
+  Future<List<Map<String, dynamic>>> getUnsyncedOtpEntries() async {
+    final db = await database;
+    final query = db.select(db.otpEntries)
+      ..where((o) => o.syncStatus.isIn(['pending', 'error']));
+    
+    final results = await query.get();
+    return results.map((otp) => {
+      'id': otp.id,
+      'name': otp.name,
+      'issuer': otp.issuer,
+      'secret': otp.secret,
+      'digits': otp.digits,
+      'period': otp.period,
+      'algorithm': otp.algorithm,
+      'userId': otp.userId,
+      'createdAt': otp.createdAt,
+      'updatedAt': otp.updatedAt,
+      'syncStatus': otp.syncStatus,
+      'lastSyncedAt': otp.lastSyncedAt,
+      'serverId': otp.serverId,
+    }).toList();
+  }
+
+  /// Update OTP entry sync status
+  Future<int> updateOtpEntrySyncStatus(
+    String id,
+    String status, {
+    String? serverId,
+  }) async {
+    final db = await database;
+    
+    return await (db.update(db.otpEntries)
+      ..where((o) => o.id.equals(id)))
+      .write(OtpEntriesCompanion(
+        syncStatus: Value(status),
+        lastSyncedAt: Value(DateTime.now().toIso8601String()),
+        serverId: serverId != null ? Value(serverId) : const Value.absent(),
+      ));
+  }
+
+  /// Get an OTP entry by server ID
+  Future<Map<String, dynamic>?> getOtpEntryByServerId(String serverId) async {
+    final db = await database;
+    final query = db.select(db.otpEntries)
+      ..where((o) => o.serverId.equals(serverId))
+      ..limit(1);
+    
+    final results = await query.get();
+    if (results.isEmpty) return null;
+    
+    final otp = results.first;
+    return {
+      'id': otp.id,
+      'name': otp.name,
+      'issuer': otp.issuer,
+      'secret': otp.secret,
+      'digits': otp.digits,
+      'period': otp.period,
+      'algorithm': otp.algorithm,
+      'userId': otp.userId,
+      'createdAt': otp.createdAt,
+      'updatedAt': otp.updatedAt,
+      'syncStatus': otp.syncStatus,
+      'lastSyncedAt': otp.lastSyncedAt,
+      'serverId': otp.serverId,
+    };
+  }
+
+  /// Mark OTP entry as deleted (soft delete for sync)
+  Future<int> markOtpEntryAsDeleted(String id) async {
+    final db = await database;
+    return await (db.update(db.otpEntries)
+      ..where((o) => o.id.equals(id)))
+      .write(const OtpEntriesCompanion(
+        syncStatus: Value('deleted'),
+      ));
+  }
+
+  /// Get deleted OTP entries that need to be synced
+  Future<List<Map<String, dynamic>>> getDeletedOtpEntries() async {
+    final db = await database;
+    final query = db.select(db.otpEntries)
+      ..where((o) => o.syncStatus.equals('deleted'));
+    
+    final results = await query.get();
+    return results.map((otp) => {
+      'id': otp.id,
+      'name': otp.name,
+      'issuer': otp.issuer,
+      'secret': otp.secret,
+      'digits': otp.digits,
+      'period': otp.period,
+      'algorithm': otp.algorithm,
+      'userId': otp.userId,
+      'createdAt': otp.createdAt,
+      'updatedAt': otp.updatedAt,
+      'syncStatus': otp.syncStatus,
+      'lastSyncedAt': otp.lastSyncedAt,
+      'serverId': otp.serverId,
+    }).toList();
+  }
+
   // ============ END OTP ENTRIES OPERATIONS ============
 
   /// Clear all data (for logout)

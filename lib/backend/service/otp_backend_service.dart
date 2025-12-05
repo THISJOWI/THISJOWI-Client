@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:http/http.dart' as http;
-import '../backend/models/otp_entry.dart';
-import '../core/api_config.dart';
-import 'auth_service.dart';
+import '../models/otp_entry.dart';
+import '../../core/api_config.dart';
+import '../../services/auth_service.dart';
 
 /// Service to connect with the OTP API backend.
 ///

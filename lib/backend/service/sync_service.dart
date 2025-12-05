@@ -78,6 +78,7 @@ class SyncService {
       final registrationsResult = await syncRegistrations();
       final notesResult = await syncNotes();
       final passwordsResult = await syncPasswords();
+      final otpResult = await syncOtpEntries();
 
       _isSyncing = false;
       
@@ -85,12 +86,14 @@ class SyncService {
       print('   - Registros: ${registrationsResult['synced'] ?? 0} sync, ${registrationsResult['failed'] ?? 0} fail');
       print('   - Notas: ${notesResult['synced'] ?? 0} sync, ${notesResult['failed'] ?? 0} fail');
       print('   - Passwords: ${passwordsResult['synced'] ?? 0} sync, ${passwordsResult['failed'] ?? 0} fail');
+      print('   - OTP: ${otpResult['synced'] ?? 0} sync, ${otpResult['failed'] ?? 0} fail');
 
       return {
-        'success': registrationsResult['success'] && notesResult['success'] && passwordsResult['success'],
+        'success': registrationsResult['success'] && notesResult['success'] && passwordsResult['success'] && otpResult['success'],
         'registrations': registrationsResult,
         'notes': notesResult,
         'passwords': passwordsResult,
+        'otp': otpResult,
       };
     } catch (e) {
       _isSyncing = false;
@@ -515,6 +518,289 @@ class SyncService {
       };
     } catch (e) {
       return {'success': false, 'message': 'Failed to sync registrations: $e'};
+    }
+  }
+
+  /// Sync OTP entries with backend
+  Future<Map<String, dynamic>> syncOtpEntries() async {
+    print('🔄 OTP SYNC: Iniciando sincronización de OTP...');
+    try {
+      final token = await _authService.getToken();
+      if (token == null) {
+        print('❌ OTP SYNC: No hay token de autenticación');
+        return {'success': false, 'message': 'No authentication token'};
+      }
+      print('✅ OTP SYNC: Token obtenido');
+
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+
+      // First, fetch all OTP entries from server to check for updates
+      print('🔄 OTP SYNC: Obteniendo entradas del servidor...');
+      final serverOtpEntries = await _fetchOtpEntriesFromServer(headers);
+      print('📥 OTP SYNC: ${serverOtpEntries.length} entradas del servidor');
+      
+      // Get local OTP entries that need syncing
+      final unsyncedOtpEntries = await _dbService.getUnsyncedOtpEntries();
+      print('📤 OTP SYNC: ${unsyncedOtpEntries.length} entradas locales pendientes');
+      
+      // Get deleted OTP entries that need to be synced
+      final deletedOtpEntries = await _dbService.getDeletedOtpEntries();
+      print('🗑️ OTP SYNC: ${deletedOtpEntries.length} entradas eliminadas pendientes');
+      
+      int synced = 0;
+      int failed = 0;
+
+      // Sync local changes to server (create/update)
+      for (final localOtp in unsyncedOtpEntries) {
+        try {
+          print('📤 OTP SYNC: Sincronizando ${localOtp['name']}...');
+          final success = await _syncOtpEntryToServer(localOtp, headers);
+          if (success) {
+            synced++;
+            print('✅ OTP SYNC: ${localOtp['name']} sincronizado');
+          } else {
+            failed++;
+            print('❌ OTP SYNC: ${localOtp['name']} falló');
+          }
+        } catch (e) {
+          failed++;
+          print('❌ OTP SYNC: Error sincronizando ${localOtp['name']}: $e');
+        }
+      }
+
+      // Sync deletions to server
+      for (final deletedOtp in deletedOtpEntries) {
+        try {
+          final success = await _deleteOtpEntryFromServer(deletedOtp, headers);
+          if (success) {
+            synced++;
+          } else {
+            failed++;
+          }
+        } catch (e) {
+          failed++;
+          print('Failed to sync OTP deletion: $e');
+        }
+      }
+
+      // Update local database with server changes
+      await _updateLocalOtpEntriesFromServer(serverOtpEntries);
+
+      print('✅ OTP SYNC COMPLETADO: $synced sincronizados, $failed fallidos');
+      return {
+        'success': failed == 0,
+        'synced': synced,
+        'failed': failed,
+        'message': 'OTP entries sync completed'
+      };
+    } catch (e) {
+      print('❌ OTP SYNC ERROR: $e');
+      return {'success': false, 'message': 'Failed to sync OTP entries: $e'};
+    }
+  }
+
+  /// Fetch OTP entries from server
+  Future<List<Map<String, dynamic>>> _fetchOtpEntriesFromServer(
+    Map<String, String> headers,
+  ) async {
+    try {
+      final uri = Uri.parse(ApiConfig.otpUrl);
+      print('🌐 OTP FETCH: GET $uri');
+      final res = await http.get(uri, headers: headers)
+          .timeout(const Duration(seconds: 30));
+
+      print('🌐 OTP FETCH: Status ${res.statusCode}');
+      if (res.statusCode == 200) {
+        final body = jsonDecode(res.body);
+        if (body is List) {
+          print('🌐 OTP FETCH: Recibidas ${body.length} entradas');
+          return body.map((e) => e as Map<String, dynamic>).toList();
+        }
+      } else {
+        print('🌐 OTP FETCH: Error - ${res.body}');
+      }
+      return [];
+    } catch (e) {
+      print('❌ OTP FETCH ERROR: $e');
+      return [];
+    }
+  }
+
+  /// Sync a single OTP entry to server
+  Future<bool> _syncOtpEntryToServer(
+    Map<String, dynamic> localOtp,
+    Map<String, String> headers,
+  ) async {
+    try {
+      final serverId = localOtp['serverId'] as String?;
+      final localId = localOtp['id'] as String;
+
+      // El backend usa @RequestParam, no @RequestBody
+      // POST espera: user, type, validitySeconds (query params)
+      // PUT espera: @RequestBody otp
+      final username = (localOtp['name'] ?? localOtp['issuer'] ?? 'OTP').toString();
+      final secret = (localOtp['secret'] ?? '').toString();
+      
+      print('📤 OTP SYNC: user=$username, secret=$secret');
+
+      http.Response res;
+      
+      if (serverId != null && serverId.isNotEmpty) {
+        // Update existing OTP entry on server (uses @RequestBody)
+        final otpData = {
+          'id': int.tryParse(serverId) ?? 0,
+          'username': username,
+          'secret': secret,
+          'expiresAt': DateTime.now().add(const Duration(days: 365)).millisecondsSinceEpoch,
+          'type': 'TOTP',
+          'valid': true,
+        };
+        final uri = Uri.parse('${ApiConfig.otpUrl}/$serverId');
+        print('📤 OTP PUT: $uri');
+        print('📤 OTP PUT Body: ${jsonEncode(otpData)}');
+        res = await http.put(
+          uri,
+          headers: headers,
+          body: jsonEncode(otpData),
+        ).timeout(const Duration(seconds: 30));
+      } else {
+        // Create new OTP entry on server (uses @RequestParam)
+        // POST /api/v1/otp?user=xxx&type=TOTP&validitySeconds=31536000
+        final uri = Uri.parse(ApiConfig.otpUrl).replace(
+          queryParameters: {
+            'user': username,
+            'type': 'TOTP',
+            'validitySeconds': '31536000', // 1 año en segundos
+          },
+        );
+        print('📤 OTP POST: $uri');
+        res = await http.post(
+          uri,
+          headers: headers,
+        ).timeout(const Duration(seconds: 30));
+      }
+
+      print('📤 OTP RESPONSE: Status ${res.statusCode}');
+      print('📤 OTP RESPONSE: Body ${res.body}');
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final responseBody = jsonDecode(res.body);
+        final newServerId = responseBody['id']?.toString();
+        
+        await _dbService.updateOtpEntrySyncStatus(
+          localId,
+          'synced',
+          serverId: newServerId ?? serverId,
+        );
+        print('✅ OTP SYNC: Sincronizado con serverId: ${newServerId ?? serverId}');
+        return true;
+      }
+      
+      // Intentar parsear el mensaje de error del servidor
+      try {
+        final errorBody = jsonDecode(res.body);
+        print('❌ OTP SYNC: Error del servidor: ${errorBody['message'] ?? errorBody}');
+      } catch (_) {
+        print('❌ OTP SYNC: Código de error ${res.statusCode}');
+      }
+      return false;
+    } catch (e) {
+      print('❌ OTP SYNC ERROR: $e');
+      return false;
+    }
+  }
+
+  /// Delete OTP entry from server
+  Future<bool> _deleteOtpEntryFromServer(
+    Map<String, dynamic> deletedOtp,
+    Map<String, String> headers,
+  ) async {
+    try {
+      final serverId = deletedOtp['serverId'] as String?;
+      final localId = deletedOtp['id'] as String;
+
+      if (serverId != null && serverId.isNotEmpty) {
+        // Delete from server
+        final uri = Uri.parse('${ApiConfig.otpUrl}/$serverId');
+        final res = await http.delete(uri, headers: headers)
+            .timeout(const Duration(seconds: 30));
+
+        if (res.statusCode == 200 || res.statusCode == 204 || res.statusCode == 404) {
+          // Successfully deleted or already deleted on server
+          await _dbService.deleteOtpEntry(localId);
+          return true;
+        }
+        return false;
+      } else {
+        // Never synced to server, just delete locally
+        await _dbService.deleteOtpEntry(localId);
+        return true;
+      }
+    } catch (e) {
+      print('Failed to delete OTP entry from server: $e');
+      return false;
+    }
+  }
+
+  /// Update local OTP entries from server data
+  Future<void> _updateLocalOtpEntriesFromServer(
+    List<Map<String, dynamic>> serverOtpEntries,
+  ) async {
+    for (final serverOtp in serverOtpEntries) {
+      try {
+        final serverId = serverOtp['id']?.toString();
+        if (serverId == null) continue;
+
+        final existingOtp = await _dbService.getOtpEntryByServerId(serverId);
+        
+        // Mapear campos del servidor a campos locales
+        // Servidor: username, secret, expiresAt, type, valid
+        // Local: name, issuer, secret, digits, period, algorithm
+        final otpData = {
+          'id': existingOtp?['id'] ?? 'server_$serverId',
+          'name': serverOtp['username'] ?? '', // username -> name
+          'issuer': '', // El servidor no tiene issuer
+          'secret': serverOtp['secret'] ?? '',
+          'digits': 6, // Valor por defecto
+          'period': 30, // Valor por defecto
+          'algorithm': 'SHA1', // Valor por defecto
+          'userId': serverOtp['userId']?.toString() ?? '',
+          'createdAt': DateTime.now().toIso8601String(),
+          'updatedAt': DateTime.now().toIso8601String(),
+          'syncStatus': 'synced',
+          'lastSyncedAt': DateTime.now().toIso8601String(),
+          'serverId': serverId,
+        };
+
+        if (existingOtp == null) {
+          // Insert new OTP entry from server
+          await _dbService.insertOtpEntry(otpData);
+        } else {
+          // Update existing OTP entry if server version is newer
+          final localUpdatedAt = DateTime.tryParse(
+            existingOtp['updatedAt'] ?? '',
+          );
+          final serverUpdatedAt = DateTime.tryParse(
+            serverOtp['updatedAt'] ?? '',
+          );
+
+          // Only update if server version is newer AND local is already synced
+          if (existingOtp['syncStatus'] == 'synced' &&
+              serverUpdatedAt != null && 
+              (localUpdatedAt == null || 
+               serverUpdatedAt.isAfter(localUpdatedAt))) {
+            await _dbService.updateOtpEntry(
+              existingOtp['id'],
+              otpData,
+            );
+          }
+        }
+      } catch (e) {
+        print('Failed to update local OTP entry from server: $e');
+      }
     }
   }
 

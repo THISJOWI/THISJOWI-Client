@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class ExpandableActionButton extends StatefulWidget {
   final VoidCallback onCreatePassword;
   final VoidCallback onCreateNote;
+  final VoidCallback? onCreateOtp;
 
   const ExpandableActionButton({
     super.key,
     required this.onCreatePassword,
     required this.onCreateNote,
+    this.onCreateOtp,
   });
 
   @override
@@ -68,6 +70,14 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
     _animationController?.reverse();
     Future.delayed(const Duration(milliseconds: 150), () {
       if (mounted) widget.onCreateNote();
+    });
+  }
+
+  void _handleCreateOtp() {
+    setState(() => _isExpanded = false);
+    _animationController?.reverse();
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted && widget.onCreateOtp != null) widget.onCreateOtp!();
     });
   }
 
@@ -146,6 +156,14 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
     return Stack(
       alignment: Alignment.bottomRight,
       children: [
+        // Option: Create OTP
+        if (_isExpanded && widget.onCreateOtp != null)
+          _buildOptionButton(
+            onTap: _handleCreateOtp,
+            icon: Icons.security_rounded,
+            label: 'OTP',
+            bottomPadding: 185.0,
+          ),
         // Option: Create Password
         if (_isExpanded)
           _buildOptionButton(

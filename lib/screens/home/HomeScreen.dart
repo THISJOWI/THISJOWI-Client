@@ -5,14 +5,18 @@ import 'package:thisjowi/backend/models/password_entry.dart';
 import 'package:thisjowi/backend/models/note.dart';
 import 'package:thisjowi/backend/repository/passwords_repository.dart';
 import 'package:thisjowi/backend/repository/notes_repository.dart';
+import 'package:thisjowi/backend/repository/otp_repository.dart';
 import 'package:thisjowi/services/password_service.dart';
 import 'package:thisjowi/services/notes_service.dart';
 import 'package:thisjowi/services/auth_service.dart';
+import 'package:thisjowi/services/otp_service.dart';
 import 'package:thisjowi/components/button.dart';
 import 'package:thisjowi/components/error_snack_bar.dart';
 import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
 import 'package:thisjowi/i18n/translations.dart';
+import 'package:thisjowi/i18n/translation_service.dart';
+import 'package:thisjowi/components/bottomNavigation.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -113,6 +117,124 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
     if (created == true) _loadData();
+  }
+
+  Future<void> _createOtp() async {
+    final otpRepository = OtpRepository();
+    final otpService = OtpService();
+    
+    final nameController = TextEditingController();
+    final issuerController = TextEditingController();
+    final secretController = TextEditingController();
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('Add OTP'.tr(context), style: const TextStyle(color: AppColors.text)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildOtpTextField(
+                controller: nameController,
+                label: 'Account name'.tr(context),
+                hint: 'user@example.com',
+              ),
+              const SizedBox(height: 16),
+              _buildOtpTextField(
+                controller: issuerController,
+                label: 'Issuer'.tr(context),
+                hint: 'Google, GitHub...',
+              ),
+              const SizedBox(height: 16),
+              _buildOtpTextField(
+                controller: secretController,
+                label: 'Secret key'.tr(context),
+                hint: 'JBSWY3DPEHPK3PXP',
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Cancel'.tr(context), style: TextStyle(color: AppColors.text.withOpacity(0.6))),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.black,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text('Add'.tr(context)),
+          ),
+        ],
+      ),
+    );
+    
+    if (result == true) {
+      final name = nameController.text.trim();
+      final secret = secretController.text.trim().replaceAll(' ', '');
+      
+      if (name.isEmpty || secret.isEmpty) {
+        ErrorSnackBar.show(context, 'Name and secret are required'.tr(context));
+        return;
+      }
+      
+      if (!otpService.isValidSecret(secret)) {
+        ErrorSnackBar.show(context, 'Invalid secret key'.tr(context));
+        return;
+      }
+      
+      final addResult = await otpRepository.addOtpEntry({
+        'name': name,
+        'issuer': issuerController.text.trim(),
+        'secret': secret,
+      });
+      
+      if (addResult['success'] == true) {
+        ErrorSnackBar.showSuccess(context, 'OTP added'.tr(context));
+        // Navegar a la pestaña de OTP usando la key global
+        if (mounted) {
+          bottomNavigationKey.currentState?.navigateToOtp();
+        }
+      } else {
+        ErrorSnackBar.show(context, addResult['message'] ?? 'Error');
+      }
+    }
+  }
+  
+  Widget _buildOtpTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+  }) {
+    return TextField(
+      controller: controller,
+      style: const TextStyle(color: AppColors.text),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: AppColors.text.withOpacity(0.6)),
+        hintText: hint,
+        hintStyle: TextStyle(color: AppColors.text.withOpacity(0.3)),
+        filled: true,
+        fillColor: AppColors.text.withOpacity(0.05),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.text.withOpacity(0.1)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.text.withOpacity(0.1)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+        ),
+      ),
+    );
   }
 
   Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
@@ -425,6 +547,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ExpandableActionButton(
             onCreatePassword: _createPassword,
             onCreateNote: _createNote,
+            onCreateOtp: _createOtp,
           ),
         ),
       ],

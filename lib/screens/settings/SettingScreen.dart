@@ -546,7 +546,7 @@ class _SettingScreenState extends State<SettingScreen> {
               trailing: Switch(
                 value: _biometricEnabled,
                 onChanged: _toggleBiometric,
-                activeColor: AppColors.text,
+                activeThumbColor: AppColors.text,
                 activeTrackColor: AppColors.text.withOpacity(0.3),
                 inactiveThumbColor: AppColors.text.withOpacity(0.5),
                 inactiveTrackColor: AppColors.text.withOpacity(0.1),
@@ -568,7 +568,7 @@ class _SettingScreenState extends State<SettingScreen> {
           _buildSettingItem(
             icon: Icons.info_outline,
             title: 'Application Version'.i18n,
-            subtitle: '2.0.1',
+            subtitle: '2.0.2',
           ),
           _buildSettingItem(
             icon: Icons.help_outline,
