@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../backend/service/sync_service.dart';
-import '../backend/service/database_service.dart';
-import '../backend/service/connectivity_service.dart';
+import '../data/local/app_database.dart';
+import '../services/connectivity_service.dart';
 
 class SyncDebugPanel extends StatefulWidget {
   const SyncDebugPanel({super.key});
@@ -11,8 +10,7 @@ class SyncDebugPanel extends StatefulWidget {
 }
 
 class _SyncDebugPanelState extends State<SyncDebugPanel> {
-  final SyncService _syncService = SyncService();
-  final DatabaseService _dbService = DatabaseService();
+  final AppDatabase _db = AppDatabase.instance();
   final ConnectivityService _connectivityService = ConnectivityService();
   
   bool _isLoading = false;
@@ -29,28 +27,26 @@ class _SyncDebugPanelState extends State<SyncDebugPanel> {
     setState(() => _isLoading = true);
     
     try {
-      final db = await _dbService.database;
-      
       // Contar notas pendientes
-      final pendingNotes = await (db.select(db.notes)
+      final pendingNotes = await (_db.select(_db.notes)
         ..where((n) => n.syncStatus.equals('pending')))
         .get();
       final notesCount = pendingNotes.length;
       
       // Contar passwords pendientes
-      final pendingPasswords = await (db.select(db.passwords)
+      final pendingPasswords = await (_db.select(_db.passwords)
         ..where((p) => p.syncStatus.equals('pending')))
         .get();
       final passwordsCount = pendingPasswords.length;
       
       // Contar registros en queue
-      final pendingRegistrations = await (db.select(db.syncQueue)
+      final pendingRegistrations = await (_db.select(_db.syncQueue)
         ..where((s) => s.entityType.equals('registration')))
         .get();
       final queueCount = pendingRegistrations.length;
       
       // Contar OTP pendientes
-      final pendingOtp = await (db.select(db.otpEntries)
+      final pendingOtp = await (_db.select(_db.otpEntries)
         ..where((o) => o.syncStatus.isIn(['pending', 'error', 'deleted'])))
         .get();
       final otpCount = pendingOtp.length;
@@ -76,9 +72,12 @@ class _SyncDebugPanelState extends State<SyncDebugPanel> {
       _syncResult = null;
     });
     
-    print('🔄 Forzando sincronización manual...');
+    print('🔄 Forzando sincronización manual... (DISABLED)');
     
-    final result = await _syncService.syncAll();
+    // Simulate sync delay
+    await Future.delayed(const Duration(seconds: 1));
+    
+    final result = {'success': true, 'message': 'Sync is disabled'};
     
     setState(() {
       _syncResult = result;
@@ -88,7 +87,6 @@ class _SyncDebugPanelState extends State<SyncDebugPanel> {
     // Recargar contadores
     await _loadPendingCounts();
   }
-
   @override
   Widget build(BuildContext context) {
     final isOnline = _connectivityService.isOnline;

@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'database_service.dart';
+part of 'app_database.dart';
 
 // ignore_for_file: type=lint
 class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
@@ -1794,6 +1794,13 @@ class $OtpEntriesTable extends OtpEntries
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultValue: const Constant('SHA1'));
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+      'type', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('totp'));
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
   late final GeneratedColumn<String> userId = GeneratedColumn<String>(
@@ -1840,6 +1847,7 @@ class $OtpEntriesTable extends OtpEntries
         digits,
         period,
         algorithm,
+        type,
         userId,
         createdAt,
         updatedAt,
@@ -1889,6 +1897,10 @@ class $OtpEntriesTable extends OtpEntries
     if (data.containsKey('algorithm')) {
       context.handle(_algorithmMeta,
           algorithm.isAcceptableOrUnknown(data['algorithm']!, _algorithmMeta));
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+          _typeMeta, type.isAcceptableOrUnknown(data['type']!, _typeMeta));
     }
     if (data.containsKey('user_id')) {
       context.handle(_userIdMeta,
@@ -1945,6 +1957,8 @@ class $OtpEntriesTable extends OtpEntries
           .read(DriftSqlType.int, data['${effectivePrefix}period'])!,
       algorithm: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}algorithm'])!,
+      type: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}type'])!,
       userId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}user_id']),
       createdAt: attachedDatabase.typeMapping
@@ -1974,6 +1988,7 @@ class OtpEntry extends DataClass implements Insertable<OtpEntry> {
   final int digits;
   final int period;
   final String algorithm;
+  final String type;
   final String? userId;
   final String createdAt;
   final String updatedAt;
@@ -1988,6 +2003,7 @@ class OtpEntry extends DataClass implements Insertable<OtpEntry> {
       required this.digits,
       required this.period,
       required this.algorithm,
+      required this.type,
       this.userId,
       required this.createdAt,
       required this.updatedAt,
@@ -2006,6 +2022,7 @@ class OtpEntry extends DataClass implements Insertable<OtpEntry> {
     map['digits'] = Variable<int>(digits);
     map['period'] = Variable<int>(period);
     map['algorithm'] = Variable<String>(algorithm);
+    map['type'] = Variable<String>(type);
     if (!nullToAbsent || userId != null) {
       map['user_id'] = Variable<String>(userId);
     }
@@ -2031,6 +2048,7 @@ class OtpEntry extends DataClass implements Insertable<OtpEntry> {
       digits: Value(digits),
       period: Value(period),
       algorithm: Value(algorithm),
+      type: Value(type),
       userId:
           userId == null && nullToAbsent ? const Value.absent() : Value(userId),
       createdAt: Value(createdAt),
@@ -2056,6 +2074,7 @@ class OtpEntry extends DataClass implements Insertable<OtpEntry> {
       digits: serializer.fromJson<int>(json['digits']),
       period: serializer.fromJson<int>(json['period']),
       algorithm: serializer.fromJson<String>(json['algorithm']),
+      type: serializer.fromJson<String>(json['type']),
       userId: serializer.fromJson<String?>(json['userId']),
       createdAt: serializer.fromJson<String>(json['createdAt']),
       updatedAt: serializer.fromJson<String>(json['updatedAt']),
@@ -2075,6 +2094,7 @@ class OtpEntry extends DataClass implements Insertable<OtpEntry> {
       'digits': serializer.toJson<int>(digits),
       'period': serializer.toJson<int>(period),
       'algorithm': serializer.toJson<String>(algorithm),
+      'type': serializer.toJson<String>(type),
       'userId': serializer.toJson<String?>(userId),
       'createdAt': serializer.toJson<String>(createdAt),
       'updatedAt': serializer.toJson<String>(updatedAt),
@@ -2092,6 +2112,7 @@ class OtpEntry extends DataClass implements Insertable<OtpEntry> {
           int? digits,
           int? period,
           String? algorithm,
+          String? type,
           Value<String?> userId = const Value.absent(),
           String? createdAt,
           String? updatedAt,
@@ -2106,6 +2127,7 @@ class OtpEntry extends DataClass implements Insertable<OtpEntry> {
         digits: digits ?? this.digits,
         period: period ?? this.period,
         algorithm: algorithm ?? this.algorithm,
+        type: type ?? this.type,
         userId: userId.present ? userId.value : this.userId,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
@@ -2123,6 +2145,7 @@ class OtpEntry extends DataClass implements Insertable<OtpEntry> {
       digits: data.digits.present ? data.digits.value : this.digits,
       period: data.period.present ? data.period.value : this.period,
       algorithm: data.algorithm.present ? data.algorithm.value : this.algorithm,
+      type: data.type.present ? data.type.value : this.type,
       userId: data.userId.present ? data.userId.value : this.userId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -2145,6 +2168,7 @@ class OtpEntry extends DataClass implements Insertable<OtpEntry> {
           ..write('digits: $digits, ')
           ..write('period: $period, ')
           ..write('algorithm: $algorithm, ')
+          ..write('type: $type, ')
           ..write('userId: $userId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -2164,6 +2188,7 @@ class OtpEntry extends DataClass implements Insertable<OtpEntry> {
       digits,
       period,
       algorithm,
+      type,
       userId,
       createdAt,
       updatedAt,
@@ -2181,6 +2206,7 @@ class OtpEntry extends DataClass implements Insertable<OtpEntry> {
           other.digits == this.digits &&
           other.period == this.period &&
           other.algorithm == this.algorithm &&
+          other.type == this.type &&
           other.userId == this.userId &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
@@ -2197,6 +2223,7 @@ class OtpEntriesCompanion extends UpdateCompanion<OtpEntry> {
   final Value<int> digits;
   final Value<int> period;
   final Value<String> algorithm;
+  final Value<String> type;
   final Value<String?> userId;
   final Value<String> createdAt;
   final Value<String> updatedAt;
@@ -2212,6 +2239,7 @@ class OtpEntriesCompanion extends UpdateCompanion<OtpEntry> {
     this.digits = const Value.absent(),
     this.period = const Value.absent(),
     this.algorithm = const Value.absent(),
+    this.type = const Value.absent(),
     this.userId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -2228,6 +2256,7 @@ class OtpEntriesCompanion extends UpdateCompanion<OtpEntry> {
     this.digits = const Value.absent(),
     this.period = const Value.absent(),
     this.algorithm = const Value.absent(),
+    this.type = const Value.absent(),
     this.userId = const Value.absent(),
     required String createdAt,
     required String updatedAt,
@@ -2248,6 +2277,7 @@ class OtpEntriesCompanion extends UpdateCompanion<OtpEntry> {
     Expression<int>? digits,
     Expression<int>? period,
     Expression<String>? algorithm,
+    Expression<String>? type,
     Expression<String>? userId,
     Expression<String>? createdAt,
     Expression<String>? updatedAt,
@@ -2264,6 +2294,7 @@ class OtpEntriesCompanion extends UpdateCompanion<OtpEntry> {
       if (digits != null) 'digits': digits,
       if (period != null) 'period': period,
       if (algorithm != null) 'algorithm': algorithm,
+      if (type != null) 'type': type,
       if (userId != null) 'user_id': userId,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -2282,6 +2313,7 @@ class OtpEntriesCompanion extends UpdateCompanion<OtpEntry> {
       Value<int>? digits,
       Value<int>? period,
       Value<String>? algorithm,
+      Value<String>? type,
       Value<String?>? userId,
       Value<String>? createdAt,
       Value<String>? updatedAt,
@@ -2297,6 +2329,7 @@ class OtpEntriesCompanion extends UpdateCompanion<OtpEntry> {
       digits: digits ?? this.digits,
       period: period ?? this.period,
       algorithm: algorithm ?? this.algorithm,
+      type: type ?? this.type,
       userId: userId ?? this.userId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -2330,6 +2363,9 @@ class OtpEntriesCompanion extends UpdateCompanion<OtpEntry> {
     }
     if (algorithm.present) {
       map['algorithm'] = Variable<String>(algorithm.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
     }
     if (userId.present) {
       map['user_id'] = Variable<String>(userId.value);
@@ -2365,6 +2401,7 @@ class OtpEntriesCompanion extends UpdateCompanion<OtpEntry> {
           ..write('digits: $digits, ')
           ..write('period: $period, ')
           ..write('algorithm: $algorithm, ')
+          ..write('type: $type, ')
           ..write('userId: $userId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -2385,6 +2422,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SyncQueueTable syncQueue = $SyncQueueTable(this);
   late final $UsersTable users = $UsersTable(this);
   late final $OtpEntriesTable otpEntries = $OtpEntriesTable(this);
+  late final NotesDao notesDao = NotesDao(this as AppDatabase);
+  late final PasswordsDao passwordsDao = PasswordsDao(this as AppDatabase);
+  late final OtpDao otpDao = OtpDao(this as AppDatabase);
+  late final AuthDao authDao = AuthDao(this as AppDatabase);
+  late final SyncQueueDao syncQueueDao = SyncQueueDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3251,6 +3293,7 @@ typedef $$OtpEntriesTableCreateCompanionBuilder = OtpEntriesCompanion Function({
   Value<int> digits,
   Value<int> period,
   Value<String> algorithm,
+  Value<String> type,
   Value<String?> userId,
   required String createdAt,
   required String updatedAt,
@@ -3267,6 +3310,7 @@ typedef $$OtpEntriesTableUpdateCompanionBuilder = OtpEntriesCompanion Function({
   Value<int> digits,
   Value<int> period,
   Value<String> algorithm,
+  Value<String> type,
   Value<String?> userId,
   Value<String> createdAt,
   Value<String> updatedAt,
@@ -3305,6 +3349,9 @@ class $$OtpEntriesTableFilterComposer
 
   ColumnFilters<String> get algorithm => $composableBuilder(
       column: $table.algorithm, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get userId => $composableBuilder(
       column: $table.userId, builder: (column) => ColumnFilters(column));
@@ -3354,6 +3401,9 @@ class $$OtpEntriesTableOrderingComposer
 
   ColumnOrderings<String> get algorithm => $composableBuilder(
       column: $table.algorithm, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get userId => $composableBuilder(
       column: $table.userId, builder: (column) => ColumnOrderings(column));
@@ -3405,6 +3455,9 @@ class $$OtpEntriesTableAnnotationComposer
   GeneratedColumn<String> get algorithm =>
       $composableBuilder(column: $table.algorithm, builder: (column) => column);
 
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
   GeneratedColumn<String> get userId =>
       $composableBuilder(column: $table.userId, builder: (column) => column);
 
@@ -3454,6 +3507,7 @@ class $$OtpEntriesTableTableManager extends RootTableManager<
             Value<int> digits = const Value.absent(),
             Value<int> period = const Value.absent(),
             Value<String> algorithm = const Value.absent(),
+            Value<String> type = const Value.absent(),
             Value<String?> userId = const Value.absent(),
             Value<String> createdAt = const Value.absent(),
             Value<String> updatedAt = const Value.absent(),
@@ -3470,6 +3524,7 @@ class $$OtpEntriesTableTableManager extends RootTableManager<
             digits: digits,
             period: period,
             algorithm: algorithm,
+            type: type,
             userId: userId,
             createdAt: createdAt,
             updatedAt: updatedAt,
@@ -3486,6 +3541,7 @@ class $$OtpEntriesTableTableManager extends RootTableManager<
             Value<int> digits = const Value.absent(),
             Value<int> period = const Value.absent(),
             Value<String> algorithm = const Value.absent(),
+            Value<String> type = const Value.absent(),
             Value<String?> userId = const Value.absent(),
             required String createdAt,
             required String updatedAt,
@@ -3502,6 +3558,7 @@ class $$OtpEntriesTableTableManager extends RootTableManager<
             digits: digits,
             period: period,
             algorithm: algorithm,
+            type: type,
             userId: userId,
             createdAt: createdAt,
             updatedAt: updatedAt,

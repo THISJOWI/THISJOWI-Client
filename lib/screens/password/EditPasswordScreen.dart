@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/appColors.dart';
-import '../../backend/models/password_entry.dart';
-import '../../backend/repository/passwords_repository.dart';
+import '../../data/models/password_entry.dart';
+import '../../data/repository/passwords_repository.dart';
 import '../../components/error_snack_bar.dart';
 import '../../i18n/translations.dart';
 

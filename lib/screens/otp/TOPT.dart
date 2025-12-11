@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/backend/models/otp_entry.dart';
-import 'package:thisjowi/backend/repository/otp_repository.dart';
+import 'package:thisjowi/data/models/otp_entry.dart';
+import 'package:thisjowi/data/repository/otp_repository.dart';
 import 'package:thisjowi/i18n/translation_service.dart';
 import 'package:thisjowi/services/otp_service.dart';
 import 'package:thisjowi/components/error_snack_bar.dart';
@@ -72,15 +72,19 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void _copyCode(OtpEntry entry) {
-    final code = _otpService.generateTotp(
-      secret: entry.secret,
-      digits: entry.digits,
-      period: entry.period,
-      algorithm: entry.algorithm,
-    );
-    
-    Clipboard.setData(ClipboardData(text: code));
-    ErrorSnackBar.showSuccess(context, 'Code copied'.tr(context));
+    try {
+      final code = _otpService.generateTotp(
+        secret: entry.secret,
+        digits: entry.digits,
+        period: entry.period,
+        algorithm: entry.algorithm,
+      );
+      
+      Clipboard.setData(ClipboardData(text: code));
+      ErrorSnackBar.showSuccess(context, 'Code copied'.tr(context));
+    } catch (e) {
+      ErrorSnackBar.show(context, 'Invalid secret key'.tr(context));
+    }
   }
 
   Future<void> _showAddDialog() async {
@@ -460,12 +464,85 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   Widget _buildOtpCard(OtpEntry entry) {
-    final code = _otpService.generateTotp(
-      secret: entry.secret,
-      digits: entry.digits,
-      period: entry.period,
-      algorithm: entry.algorithm,
-    );
+    String code;
+    bool isValidSecret = true;
+    
+    try {
+      code = _otpService.generateTotp(
+        secret: entry.secret,
+        digits: entry.digits,
+        period: entry.period,
+        algorithm: entry.algorithm,
+      );
+    } catch (e) {
+      code = 'INVALID';
+      isValidSecret = false;
+    }
+    
+    // Si el secreto es inválido, mostrar una tarjeta de error sin información sensible
+    if (!isValidSecret) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: const Color.fromRGBO(40, 30, 30, 1.0),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.red.withOpacity(0.3)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.error_outline,
+                    color: Colors.red,
+                    size: 24,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Invalid OTP Entry'.tr(context),
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Secret key is corrupted'.tr(context),
+                      style: TextStyle(
+                        color: Colors.red.withOpacity(0.7),
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                onPressed: () => _deleteEntry(entry),
+                icon: Icon(
+                  Icons.delete_outline,
+                  color: Colors.red.withOpacity(0.5),
+                  size: 20,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     
     final formattedCode = _otpService.formatCode(code);
     final remainingSeconds = _otpService.getRemainingSeconds(period: entry.period);

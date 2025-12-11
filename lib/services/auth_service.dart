@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/api_config.dart';
@@ -22,11 +23,13 @@ class AuthService {
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final uri = Uri.parse('$baseUrl/login');
+      
       final res = await http.post(
         uri,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),
       ).timeout(const Duration(seconds: 30));
+
 
       final body = _tryDecode(res.body);
 

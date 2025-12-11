@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:thisjowi/backend/repository/otp_repository.dart';
+import 'package:thisjowi/data/repository/otp_repository.dart';
 import 'package:thisjowi/components/error_snack_bar.dart';
 
 class OtpQrScannerScreen extends StatefulWidget {

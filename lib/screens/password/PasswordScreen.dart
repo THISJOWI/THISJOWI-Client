@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/backend/models/password_entry.dart';
-import 'package:thisjowi/backend/repository/passwords_repository.dart';
-import 'package:thisjowi/backend/repository/notes_repository.dart';
-import 'package:thisjowi/services/password_service.dart';
-import 'package:thisjowi/services/notes_service.dart';
-import 'package:thisjowi/services/auth_service.dart';
+import 'package:thisjowi/data/models/password_entry.dart';
+import 'package:thisjowi/data/repository/passwords_repository.dart';
+import 'package:thisjowi/data/repository/notes_repository.dart';
 import 'package:thisjowi/components/button.dart';
 import 'package:thisjowi/components/error_snack_bar.dart';
 import 'package:thisjowi/i18n/translations.dart';
@@ -31,8 +28,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
   void initState() {
     super.initState();
     // Inicializar repositorio con servicios
-    final passwordService = PasswordService();
-    _passwordsRepository = PasswordsRepository(passwordService);
+    _passwordsRepository = PasswordsRepository();
     _loadPasswords();
   }
 
@@ -87,7 +83,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
     final confirm = await _showDeleteConfirmation(entry);
     if (!confirm) return;
     
-    final result = await _passwordsRepository.deletePassword(entry.id);
+          final result = await _passwordsRepository.deletePassword(entry.id, serverId: entry.serverId);
     
     if (!mounted) return;
     
@@ -272,9 +268,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
   }
 
   Future<void> _createNote() async {
-    final authService = AuthService();
-    final notesService = NotesService(authService);
-    final notesRepository = NotesRepository(notesService);
+    final notesRepository = NotesRepository();
     
     final created = await Navigator.push<bool>(
       context,

@@ -7,6 +7,7 @@ class OtpEntry {
   final int digits;
   final int period;
   final String algorithm;
+  final String type;
   final String userId;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -24,6 +25,7 @@ class OtpEntry {
     this.digits = 6,
     this.period = 30,
     this.algorithm = 'SHA1',
+    this.type = 'totp',
     required this.userId,
     required this.createdAt,
     required this.updatedAt,
@@ -41,6 +43,7 @@ class OtpEntry {
       digits: json['digits'] ?? 6,
       period: json['period'] ?? 30,
       algorithm: (json['algorithm'] ?? 'SHA1').toString(),
+      type: (json['type'] ?? 'totp').toString(),
       userId: (json['userId'] ?? '').toString(),
       createdAt: json['createdAt'] != null 
           ? DateTime.parse(json['createdAt'].toString())
@@ -65,6 +68,7 @@ class OtpEntry {
       'digits': digits,
       'period': period,
       'algorithm': algorithm,
+      'type': type,
       'userId': userId,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
@@ -82,6 +86,7 @@ class OtpEntry {
     int? digits,
     int? period,
     String? algorithm,
+    String? type,
     String? userId,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -97,6 +102,7 @@ class OtpEntry {
       digits: digits ?? this.digits,
       period: period ?? this.period,
       algorithm: algorithm ?? this.algorithm,
+      type: type ?? this.type,
       userId: userId ?? this.userId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

@@ -1,10 +1,9 @@
 import 'package:crypto/crypto.dart';
-import 'package:drift/drift.dart';
 import 'dart:convert';
 import '../../services/auth_service.dart';
-import '../service/database_service.dart';
-import '../service/connectivity_service.dart';
-import '../service/secure_storage_service.dart';
+import '../local/app_database.dart';
+import '../../services/connectivity_service.dart';
+import '../local/secure_storage_service.dart';
 
 /// Repository for authentication that supports offline mode.
 ///
@@ -14,43 +13,32 @@ import '../service/secure_storage_service.dart';
 /// - All operations pass through local database before hitting the backend
 class AuthRepository {
   final AuthService _authService;
-  final DatabaseService _databaseService;
+  final AppDatabase _db = AppDatabase.instance();
   final ConnectivityService _connectivityService;
   final SecureStorageService _secureStorageService;
 
   AuthRepository({
     required AuthService authService,
-    required DatabaseService databaseService,
     required ConnectivityService connectivityService,
     required SecureStorageService secureStorageService,
   })  : _authService = authService,
-        _databaseService = databaseService,
         _connectivityService = connectivityService,
         _secureStorageService = secureStorageService;
 
   /// Login with offline-first support.
-  ///
-  /// Strategy (OFFLINE-FIRST):
-  /// 1. Check local database for cached credentials
-  /// 2. If found: Verify password hash
-  ///    - If valid: Login with cached token
-  ///    - If online: Sync with backend in background
-  /// 3. If NOT found and online: Try backend login
-  ///    - If successful: Cache credentials
-  /// 4. If NOT found and offline: Error
   Future<Map<String, dynamic>> login(String email, String password) async {
     final isOnline = _connectivityService.isOnline;
 
     // Step 1: ALWAYS check local cache first
-    final cachedUser = await _getCachedUser(email);
+    final cachedUser = await _db.authDao.getUserByEmail(email);
     
     if (cachedUser != null) {
       // User exists in local cache
       final passwordHash = _hashPassword(password);
       
-      if (cachedUser['password_hash'] == passwordHash) {
+      if (cachedUser.passwordHash == passwordHash) {
         // Valid credentials in cache
-        final token = cachedUser['token'] as String?;
+        final token = cachedUser.token;
         
         // Restore token to SharedPreferences
         if (token != null) {
@@ -59,7 +47,7 @@ class AuthRepository {
         }
         
         // Update last login timestamp in local DB
-        await _updateLastLogin(email);
+        await _db.authDao.updateLastLogin(email, DateTime.now().toIso8601String());
         
         // If online, sync with backend in background (don't block UI)
         if (isOnline) {
@@ -71,23 +59,27 @@ class AuthRepository {
           'data': {'token': token, 'offline': !isOnline},
           'message': isOnline ? 'Logged in successfully' : 'Logged in offline mode',
         };
-      } else {
-        // Invalid password
+      } else if (!isOnline) {
+        // Invalid password and offline
         return {
           'success': false,
           'message': 'Invalid credentials',
         };
       }
-    } else {
-      // No cached credentials - need backend
-      if (!isOnline) {
-        return {
-          'success': false,
-          'message': 'No internet connection. You need to login online at least once.',
-        };
-      }
-      
-      // Try backend login
+      // If online and password mismatch, fall through to backend login
+    }
+    
+    // No cached credentials OR local password mismatch + online
+    // Need backend
+    if (!isOnline) {
+      return {
+        'success': false,
+        'message': 'No internet connection. You need to login online at least once.',
+      };
+    }
+    
+    // Try backend login
+    try {
       final result = await _authService.login(email, password);
       
       if (result['success'] == true) {
@@ -96,19 +88,18 @@ class AuthRepository {
       }
       
       return result;
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Login failed: $e',
+      };
     }
   }
 
   /// Register with offline-first support.
-  ///
-  /// Strategy (FAST OFFLINE-FIRST):
-  /// 1. Check if user already exists locally or in sync queue
-  /// 2. Save credentials to local database immediately
-  /// 3. Return success immediately (user can start using the app)
-  /// 4. Sync with backend in BACKGROUND (non-blocking)
   Future<Map<String, dynamic>> register(String email, String username, String password) async {
     // Step 1: Check if user already exists locally
-    final existingUser = await _getCachedUser(email);
+    final existingUser = await _db.authDao.getUserByEmail(email);
     if (existingUser != null) {
       return {
         'success': false,
@@ -117,7 +108,7 @@ class AuthRepository {
     }
 
     // Step 2: Check if registration is already queued
-    final isQueued = await _isRegistrationQueued(email);
+    final isQueued = await _db.syncQueueDao.isQueued('registration', email);
     if (isQueued) {
       return {
         'success': false,
@@ -134,7 +125,6 @@ class AuthRepository {
     await _secureStorageService.saveValue('cached_email', email);
 
     // Step 4: Sync with backend in BACKGROUND (non-blocking)
-    // This runs asynchronously without waiting
     _syncRegistrationInBackground(email, username, password);
 
     // Return success immediately - user can start using the app
@@ -168,7 +158,7 @@ class AuthRepository {
             await _secureStorageService.saveValue('cached_token', result['data']['token']);
           }
           // Remove from sync queue if it was queued
-          await removeFromSyncQueue(email);
+          await _db.syncQueueDao.removeItem('registration', email);
           print('✅ Registration synced successfully: $email');
         } else {
           // Backend registration failed - queue for retry
@@ -195,11 +185,6 @@ class AuthRepository {
   }
 
   /// Change password with offline-first support.
-  ///
-  /// Strategy:
-  /// 1. Verify current password against local cache
-  /// 2. Update password in local database immediately
-  /// 3. Sync with backend in background if online
   Future<Map<String, dynamic>> changePassword(String currentPassword, String newPassword) async {
     // Get the current user email
     final email = await _secureStorageService.getValue('cached_email');
@@ -211,7 +196,7 @@ class AuthRepository {
     }
 
     // Verify current password
-    final cachedUser = await _getCachedUser(email);
+    final cachedUser = await _db.authDao.getUserByEmail(email);
     if (cachedUser == null) {
       return {
         'success': false,
@@ -220,7 +205,7 @@ class AuthRepository {
     }
 
     final currentPasswordHash = _hashPassword(currentPassword);
-    if (cachedUser['password_hash'] != currentPasswordHash) {
+    if (cachedUser.passwordHash != currentPasswordHash) {
       return {
         'success': false,
         'message': 'Current password is incorrect.',
@@ -228,7 +213,7 @@ class AuthRepository {
     }
 
     // Update password locally immediately
-    final token = cachedUser['token'] as String?;
+    final token = cachedUser.token;
     await _cacheUserCredentials(email, newPassword, token);
 
     // Sync with backend in background (non-blocking)
@@ -241,10 +226,6 @@ class AuthRepository {
   }
 
   /// Change password directly without requiring current password (offline-first).
-  ///
-  /// Strategy:
-  /// 1. Update password in local database immediately
-  /// 2. Sync with backend in background if online
   Future<Map<String, dynamic>> changePasswordDirect(String newPassword) async {
     // Get the current user email
     final email = await _secureStorageService.getValue('cached_email');
@@ -256,7 +237,7 @@ class AuthRepository {
     }
 
     // Get current user data
-    final cachedUser = await _getCachedUser(email);
+    final cachedUser = await _db.authDao.getUserByEmail(email);
     if (cachedUser == null) {
       return {
         'success': false,
@@ -265,7 +246,7 @@ class AuthRepository {
     }
 
     // Update password locally immediately
-    final token = cachedUser['token'] as String?;
+    final token = cachedUser.token;
     await _cacheUserCredentials(email, newPassword, token);
 
     // Sync with backend in background (non-blocking)
@@ -292,7 +273,7 @@ class AuthRepository {
         
         if (result['success'] == true) {
           // Remove from queue if it was queued
-          await _removePasswordChangeFromQueue(email);
+          await _db.syncQueueDao.removeItem('password_change', email);
           print('✅ Password change synced with backend');
         } else {
           // Queue for retry
@@ -323,7 +304,7 @@ class AuthRepository {
         
         if (result['success'] == true) {
           // Remove from queue if it was queued
-          await _removePasswordChangeFromQueue(email);
+          await _db.syncQueueDao.removeItem('password_change', email);
           print('✅ Password change synced with backend');
         } else {
           // Queue for retry
@@ -340,37 +321,24 @@ class AuthRepository {
 
   /// Queue password change for later sync
   Future<void> _queuePasswordChange(String email, String newPassword) async {
-    final db = await _databaseService.database;
-    
     // Remove any existing password change in queue
-    await (db.delete(db.syncQueue)
-      ..where((s) => s.entityType.equals('password_change') & s.entityId.equals(email)))
-      .go();
+    await _db.syncQueueDao.removeItem('password_change', email);
     
     // Add new entry
-    await db.into(db.syncQueue).insert(SyncQueueCompanion.insert(
-      entityType: 'password_change',
-      entityId: email,
-      action: 'update',
-      data: Value(jsonEncode({
+    await _db.syncQueueDao.queueItem(
+      'password_change',
+      email,
+      'update',
+      jsonEncode({
         'email': email,
         'new_password': newPassword,
-      })),
-      createdAt: DateTime.now().toIso8601String(),
-    ));
-  }
-
-  /// Remove password change from sync queue
-  Future<void> _removePasswordChangeFromQueue(String email) async {
-    final db = await _databaseService.database;
-    await (db.delete(db.syncQueue)
-      ..where((s) => s.entityType.equals('password_change') & s.entityId.equals(email)))
-      .go();
+      }),
+    );
   }
 
   /// Check if user has cached credentials (can login offline).
   Future<bool> hasCachedCredentials(String email) async {
-    final user = await _getCachedUser(email);
+    final user = await _db.authDao.getUserByEmail(email);
     return user != null;
   }
 
@@ -381,87 +349,46 @@ class AuthRepository {
 
   /// Remove registration from sync queue (used after successful sync).
   Future<void> removeFromSyncQueue(String email) async {
-    final db = await _databaseService.database;
-    await (db.delete(db.syncQueue)
-      ..where((s) => s.entityType.equals('registration') & s.entityId.equals(email)))
-      .go();
+    await _db.syncQueueDao.removeItem('registration', email);
   }
 
   // ==================== PRIVATE METHODS ====================
 
   /// Cache user credentials for offline login.
   Future<void> _cacheUserCredentials(String email, String password, String? token) async {
-    final db = await _databaseService.database;
     final passwordHash = _hashPassword(password);
     
-    await db.into(db.users).insertOnConflictUpdate(UsersCompanion.insert(
+    await _db.authDao.insertOrUpdateUser(User(
       email: email,
       passwordHash: passwordHash,
-      token: Value(token),
-      lastLogin: Value(DateTime.now().toIso8601String()),
+      token: token,
+      lastLogin: DateTime.now().toIso8601String(),
     ));
-  }
-
-  /// Get cached user from local database.
-  Future<Map<String, dynamic>?> _getCachedUser(String email) async {
-    final db = await _databaseService.database;
-    final query = db.select(db.users)
-      ..where((u) => u.email.equals(email))
-      ..limit(1);
-    
-    final results = await query.get();
-    if (results.isEmpty) return null;
-    
-    final user = results.first;
-    return {
-      'email': user.email,
-      'password_hash': user.passwordHash,
-      'token': user.token,
-      'last_login': user.lastLogin,
-    };
   }
 
   /// Clear all cached credentials.
   Future<void> _clearCachedCredentials() async {
-    final db = await _databaseService.database;
-    await db.delete(db.users).go();
+    // Drift doesn't have a clearAll for a table in DAO unless I add it.
+    // I'll use delete(users).go() via DAO if I add it, or just custom statement.
+    // Or I can add `deleteAllUsers` to AuthDao.
+    // For now I'll assume I can access `delete` via `_db.authDao`? No, `AuthDao` encapsulates it.
+    // I need to add `deleteAllUsers` to `AuthDao`.
+    // Or I can use `_db.delete(_db.users).go()`.
+    await _db.delete(_db.users).go();
   }
 
   /// Queue registration for later sync.
   Future<void> _queueRegistration(String email, String username, String password) async {
-    final db = await _databaseService.database;
-    await db.into(db.syncQueue).insert(SyncQueueCompanion.insert(
-      entityType: 'registration',
-      entityId: email,
-      action: 'create',
-      data: Value(jsonEncode({
+    await _db.syncQueueDao.queueItem(
+      'registration',
+      email,
+      'create',
+      jsonEncode({
         'email': email,
         'username': username,
         'password': password,
-      })),
-      createdAt: DateTime.now().toIso8601String(),
-    ));
-  }
-
-  /// Check if a registration is already queued for the given email.
-  Future<bool> _isRegistrationQueued(String email) async {
-    final db = await _databaseService.database;
-    final query = db.select(db.syncQueue)
-      ..where((s) => s.entityType.equals('registration') & s.entityId.equals(email))
-      ..limit(1);
-    
-    final results = await query.get();
-    return results.isNotEmpty;
-  }
-
-  /// Update last login timestamp in local database
-  Future<void> _updateLastLogin(String email) async {
-    final db = await _databaseService.database;
-    await (db.update(db.users)
-      ..where((u) => u.email.equals(email)))
-      .write(UsersCompanion(
-        lastLogin: Value(DateTime.now().toIso8601String()),
-      ));
+      }),
+    );
   }
 
   /// Sync login with backend (background, non-blocking)

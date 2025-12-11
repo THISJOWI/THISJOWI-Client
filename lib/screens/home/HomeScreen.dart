@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/backend/models/password_entry.dart';
-import 'package:thisjowi/backend/models/note.dart';
-import 'package:thisjowi/backend/repository/passwords_repository.dart';
-import 'package:thisjowi/backend/repository/notes_repository.dart';
-import 'package:thisjowi/backend/repository/otp_repository.dart';
-import 'package:thisjowi/services/password_service.dart';
-import 'package:thisjowi/services/notes_service.dart';
-import 'package:thisjowi/services/auth_service.dart';
+import 'package:thisjowi/data/models/password_entry.dart';
+import 'package:thisjowi/data/models/note.dart';
+import 'package:thisjowi/data/repository/passwords_repository.dart';
+import 'package:thisjowi/data/repository/notes_repository.dart';
+import 'package:thisjowi/data/repository/otp_repository.dart';
 import 'package:thisjowi/services/otp_service.dart';
 import 'package:thisjowi/components/button.dart';
 import 'package:thisjowi/components/error_snack_bar.dart';
@@ -42,12 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _initRepositories() {
-    final passwordService = PasswordService();
-    _passwordsRepository = PasswordsRepository(passwordService);
-    
-    final authService = AuthService();
-    final notesService = NotesService(authService);
-    _notesRepository = NotesRepository(notesService);
+    _passwordsRepository = PasswordsRepository();
+    _notesRepository = NotesRepository();
   }
 
   Future<void> _loadData() async {
@@ -262,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final confirm = await _showDeletePasswordConfirmation(entry);
     if (!confirm) return;
     
-    final result = await _passwordsRepository.deletePassword(entry.id);
+        final result = await _passwordsRepository.deletePassword(entry.id, serverId: entry.serverId);
     
     if (!mounted) return;
     
@@ -302,7 +295,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final noteId = note.localId ?? note.id?.toString() ?? '';
     if (noteId.isEmpty) return;
     
-    final result = await _notesRepository.deleteNote(noteId, note.serverId ?? note.id);
+    final result = await _notesRepository.deleteNote(noteId, serverId: note.serverId?.toString() ?? note.id?.toString());
     
     if (!mounted) return;
     

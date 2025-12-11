@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/appColors.dart';
-import '../../backend/models/note.dart';
-import '../../backend/repository/notes_repository.dart';
+import '../../data/models/note.dart';
+import '../../data/repository/notes_repository.dart';
 import '../../components/error_snack_bar.dart';
 import '../../i18n/translations.dart';
 

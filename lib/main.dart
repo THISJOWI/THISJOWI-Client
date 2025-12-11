@@ -9,9 +9,7 @@ import 'package:thisjowi/screens/auth/registerScreen.dart';
 import 'package:thisjowi/screens/otp/OtpQrScannerScreen.dart';
 import 'package:thisjowi/screens/splash/splash_screen.dart';
 import 'package:thisjowi/screens/onboarding/onboarding_screen.dart';
-import 'package:thisjowi/backend/service/database_service.dart';
-import 'package:thisjowi/backend/service/connectivity_service.dart';
-import 'package:thisjowi/backend/service/sync_service.dart';
+
 
 
 void main() async {
@@ -29,21 +27,6 @@ void main() async {
   await EnvLoader.load();
   
   ApiConfig.printConfig();
-  
-  try {
-    await DatabaseService().database;
-    print('✅ Base de datos local inicializada correctamente');
-  } catch (e) {
-    print('⚠️ Error al inicializar base de datos: $e');
-  }
-  
-  // 4️⃣ Inicializar servicios de conectividad y sincronización
-  final connectivityService = ConnectivityService();
-  // ignore: unused_local_variable
-  final syncService = SyncService();
-  
-  print('✅ Servicios de offline mode inicializados');
-  print('📡 Estado de conexión: ${connectivityService.isOnline ? "Online" : "Offline"}');
   
   runApp(const MainApp());
 }

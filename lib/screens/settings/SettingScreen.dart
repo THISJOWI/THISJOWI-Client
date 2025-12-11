@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:thisjowi/core/appColors.dart';
 import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/services/biometric_service.dart';
-import 'package:thisjowi/backend/repository/auth_repository.dart';
-import 'package:thisjowi/backend/service/database_service.dart';
-import 'package:thisjowi/backend/service/connectivity_service.dart';
-import 'package:thisjowi/backend/service/secure_storage_service.dart';
+import 'package:thisjowi/data/repository/auth_repository.dart';
+import 'package:thisjowi/services/connectivity_service.dart';
+import 'package:thisjowi/data/local/secure_storage_service.dart';
 import 'package:thisjowi/components/error_snack_bar.dart';
 import 'package:thisjowi/i18n/translations.dart';
 
@@ -39,7 +38,6 @@ class _SettingScreenState extends State<SettingScreen> {
   void _initRepository() {
     _authRepository = AuthRepository(
       authService: _authService,
-      databaseService: DatabaseService(),
       connectivityService: ConnectivityService(),
       secureStorageService: SecureStorageService(),
     );

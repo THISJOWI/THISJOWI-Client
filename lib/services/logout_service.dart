@@ -1,7 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import '../backend/service/database_service.dart';
-import '../backend/service/secure_storage_service.dart';
-import '../backend/service/sync_service.dart';
+import '../data/local/app_database.dart';
+import '../data/local/secure_storage_service.dart';
 
 /// Helper service to manage user logout
 /// 
@@ -27,14 +26,18 @@ class LogoutService {
   /// 5. Close database connection
   Future<void> logout() async {
     try {
-      // 1. Stop sync service
-      final syncService = SyncService();
-      syncService.dispose();
+      // 1. Stop sync service (Disabled)
 
       // 2. Clear local database
-      final dbService = DatabaseService();
-      await dbService.clearAllData();
-      await dbService.close();
+      final db = AppDatabase.instance();
+      await db.delete(db.notes).go();
+      await db.delete(db.passwords).go();
+      await db.delete(db.otpEntries).go();
+      await db.delete(db.users).go();
+      await db.delete(db.syncQueue).go();
+      
+      // Don't close the database instance as it's a singleton and might be used again if user logs back in
+      // await db.close();
 
       // 3. Clear authentication tokens
       final prefs = await SharedPreferences.getInstance();
@@ -46,28 +49,6 @@ class LogoutService {
       await secureStorage.clearSecureData();
 
       print('✅ Logout completed successfully');
-    } catch (e) {
-      print('⚠️ Error during logout: $e');
-      rethrow;
-    }
-  }
-
-  /// Logout without clearing encryption key
-  /// 
-  /// Use this if you want to keep the database for the next login
-  /// of the same user
-  Future<void> logoutKeepDatabase() async {
-    try {
-      // Stop sync service
-      final syncService = SyncService();
-      syncService.dispose();
-
-      // Clear authentication tokens only
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('token');
-      await prefs.remove('email');
-
-      print('✅ Logout completed (database kept)');
     } catch (e) {
       print('⚠️ Error during logout: $e');
       rethrow;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/appColors.dart';
-import '../backend/service/connectivity_service.dart';
+import '../services/connectivity_service.dart';
 
 /// Widget to display connectivity and sync status
 /// 

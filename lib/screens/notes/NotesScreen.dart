@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/backend/models/note.dart';
-import 'package:thisjowi/backend/repository/notes_repository.dart';
-import 'package:thisjowi/backend/repository/passwords_repository.dart';
-import 'package:thisjowi/services/notes_service.dart';
-import 'package:thisjowi/services/auth_service.dart';
-import 'package:thisjowi/services/password_service.dart';
+import 'package:thisjowi/data/models/note.dart';
+import 'package:thisjowi/data/repository/notes_repository.dart';
+import 'package:thisjowi/data/repository/passwords_repository.dart';
 import 'package:thisjowi/components/button.dart';
 import 'package:thisjowi/components/error_snack_bar.dart';
 import 'package:thisjowi/i18n/translations.dart';
@@ -30,9 +27,7 @@ class _NotesScreenState extends State<NotesScreen> {
   void initState() {
     super.initState();
     // Inicializar repositorio con servicios
-    final authService = AuthService();
-    final notesService = NotesService(authService);
-    _notesRepository = NotesRepository(notesService);
+    _notesRepository = NotesRepository();
     _loadNotes();
   }
 
@@ -108,7 +103,7 @@ class _NotesScreenState extends State<NotesScreen> {
         throw StateError('La nota no tiene ID');
       }
       
-      final result = await _notesRepository.deleteNote(noteId, note.serverId ?? note.id);
+      final result = await _notesRepository.deleteNote(noteId, serverId: note.serverId?.toString() ?? note.id?.toString());
 
       if (!mounted) return;
 
@@ -144,8 +139,7 @@ class _NotesScreenState extends State<NotesScreen> {
   }
 
   Future<void> _createPassword() async {
-    final passwordService = PasswordService();
-    final passwordsRepository = PasswordsRepository(passwordService);
+    final passwordsRepository = PasswordsRepository();
     
     final created = await Navigator.push<bool>(
       context,
