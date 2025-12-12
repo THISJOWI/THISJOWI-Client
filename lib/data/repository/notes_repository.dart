@@ -23,6 +23,7 @@ class NotesRepository {
       // Trigger background sync if online
       if (_connectivityService.isOnline) {
         _syncFromServer();
+        _syncPendingToServer();
       }
 
       final localNotes = await _db.notesDao.getAllNotes();
@@ -57,7 +58,7 @@ class NotesRepository {
           // Check if exists locally by serverId
           final existingLocal = allLocalNotes.firstWhere(
             (n) => n['serverId'] == serverNote.id,
-            orElse: () => {},
+            orElse: () => <String, dynamic>{},
           );
           
           if (existingLocal.isNotEmpty) {
@@ -71,18 +72,22 @@ class NotesRepository {
             });
           } else {
             // Check for pending match to avoid duplicates
+            // We match by title only because title is unique on server
             final pendingMatch = allLocalNotes.firstWhere(
               (n) => n['syncStatus'] == 'pending' && 
-                     n['title'] == serverNote.title && 
-                     n['content'] == serverNote.content,
-              orElse: () => {},
+                     n['title'] == serverNote.title,
+              orElse: () => <String, dynamic>{},
             );
 
             if (pendingMatch.isNotEmpty) {
-               // Found a pending note that matches content. Link it!
+               // Found a pending note that matches title. Link it!
+               // We keep syncStatus as 'pending' if content differs so we push our local changes
+               // But if content is same, we mark as synced.
+               final isContentSame = pendingMatch['content'] == serverNote.content;
+               
                await _db.notesDao.updateNote(pendingMatch['localId'], {
                  'serverId': serverNote.id,
-                 'syncStatus': 'synced',
+                 'syncStatus': isContentSame ? 'synced' : 'pending',
                  'lastSyncedAt': DateTime.now().toIso8601String(),
                });
             } else {
@@ -99,6 +104,21 @@ class NotesRepository {
                 'lastSyncedAt': DateTime.now().toIso8601String(),
               });
             }
+          }
+        }
+
+        // Handle Deletions from Server
+        // If a note exists locally with a serverId but is missing from server response,
+        // it means it was deleted on another device.
+        final serverIds = serverNotes.map((n) => n.id).toSet();
+        
+        for (final localNote in allLocalNotes) {
+          final localServerId = localNote['serverId'];
+          
+          if (localServerId != null && 
+              !serverIds.contains(localServerId)) {
+            // Delete locally (Hard delete because it's gone from server)
+            await _db.notesDao.hardDeleteNote(localNote['localId']);
           }
         }
       }
@@ -248,12 +268,12 @@ class NotesRepository {
   /// Delete a note (FAST - deleted locally, synced in background)
   Future<Map<String, dynamic>> deleteNote(String localId, {String? serverId}) async {
     try {
-      // Delete from local database first (FAST)
+      // Delete from local database first (FAST - Soft delete if synced)
       await _db.notesDao.deleteNote(localId);
 
       // Sync with backend in BACKGROUND (non-blocking)
       if (serverId != null && _connectivityService.isOnline) {
-        _syncNoteDeletionInBackground(serverId);
+        _syncNoteDeletionInBackground(localId, serverId);
       }
 
       return {
@@ -269,15 +289,15 @@ class NotesRepository {
   }
 
   /// Sync a note deletion with backend
-  Future<void> _syncNoteDeletionInBackground(String serverId) async {
+  Future<void> _syncNoteDeletionInBackground(String localId, String serverId) async {
     try {
-      // We don't need to update local DB as the record is already deleted
-      // Just try to delete from server
-      await _notesService.deleteNote(int.parse(serverId));
+      final result = await _notesService.deleteNote(int.parse(serverId));
+      if (result['success'] == true) {
+        // If successful, hard delete locally
+        await _db.notesDao.hardDeleteNote(localId);
+      }
     } catch (e) {
       print('Background deletion sync failed: $e');
-      // In a real app, we might want to store this deletion in a "deleted_queue" table
-      // to retry later. For now, we just log it.
     }
   }
 
@@ -303,9 +323,42 @@ class NotesRepository {
 
   /// Force sync all pending changes
   Future<Map<String, dynamic>> syncAll() async {
-    return {
-      'success': true,
-      'message': 'Sync is disabled'
-    };
+    if (!_connectivityService.isOnline) {
+      return {'success': false, 'message': 'No internet connection'};
+    }
+    
+    await _syncFromServer();
+    await _syncPendingToServer();
+    
+    return {'success': true, 'message': 'Sync completed'};
+  }
+
+  /// Sync pending local changes to server
+  Future<void> _syncPendingToServer() async {
+    try {
+      // Sync updates/creates
+      final pendingNotes = await _db.notesDao.getUnsyncedNotes();
+      for (final noteData in pendingNotes) {
+        final note = models.Note.fromJson(noteData);
+        if (note.serverId != null) {
+           await _syncNoteUpdateInBackground(note.localId!, note);
+        } else {
+           await _syncNoteInBackground(note.localId!, note);
+        }
+      }
+
+      // Sync deletions
+      final deletedNotes = await _db.notesDao.getDeletedNotes();
+      for (final noteData in deletedNotes) {
+        final note = models.Note.fromJson(noteData);
+        if (note.serverId != null) {
+          await _syncNoteDeletionInBackground(note.localId!, note.serverId.toString());
+        } else {
+          await _db.notesDao.hardDeleteNote(note.localId!);
+        }
+      }
+    } catch (e) {
+      print('Pending sync failed: $e');
+    }
   }
 }

@@ -47,5 +47,7 @@
 	</array>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Use Face ID to unlock the app and protect your passwords</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to scan QR codes for OTP setup</string>
 </dict>
 </plist>

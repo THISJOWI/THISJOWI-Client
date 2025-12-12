@@ -22,7 +22,7 @@ class PasswordsDao extends DatabaseAccessor<AppDatabase> with _$PasswordsDaoMixi
     }
     
     final query = select(passwords)
-      ..where((p) => p.userId.equals(userEmail))
+      ..where((p) => p.userId.equals(userEmail) & p.syncStatus.isNotValue('deleted'))
       ..orderBy([(p) => OrderingTerm.desc(p.updatedAt)]);
     
     final results = await query.get();
@@ -132,9 +132,42 @@ class PasswordsDao extends DatabaseAccessor<AppDatabase> with _$PasswordsDaoMixi
   }
 
   Future<int> deletePassword(String id) async {
-    return await (delete(passwords)
-      ..where((p) => p.id.equals(id)))
-      .go();
+    final entry = await (select(passwords)..where((p) => p.id.equals(id))).getSingleOrNull();
+    if (entry == null) return 0;
+
+    if (entry.serverId != null && entry.serverId!.isNotEmpty) {
+      // Soft delete if synced
+      return await (update(passwords)..where((p) => p.id.equals(id))).write(
+        PasswordsCompanion(
+          syncStatus: const Value('deleted'),
+          lastSyncedAt: Value(DateTime.now().toIso8601String()),
+        ),
+      );
+    } else {
+      // Hard delete if not synced yet
+      return await (delete(passwords)..where((p) => p.id.equals(id))).go();
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getDeletedPasswords() async {
+    final query = select(passwords)
+      ..where((p) => p.syncStatus.equals('deleted'));
+    
+    final results = await query.get();
+    return results.map((pwd) => {
+      'id': pwd.id,
+      'title': pwd.title,
+      'username': pwd.username,
+      'password': pwd.password,
+      'website': pwd.website,
+      'notes': pwd.notes,
+      'userId': pwd.userId,
+      'createdAt': pwd.createdAt,
+      'updatedAt': pwd.updatedAt,
+      'syncStatus': pwd.syncStatus,
+      'lastSyncedAt': pwd.lastSyncedAt,
+      'serverId': pwd.serverId,
+    }).toList();
   }
 
   Future<List<Map<String, dynamic>>> getUnsyncedPasswords() async {
@@ -156,6 +189,10 @@ class PasswordsDao extends DatabaseAccessor<AppDatabase> with _$PasswordsDaoMixi
       'lastSyncedAt': pwd.lastSyncedAt,
       'serverId': pwd.serverId,
     }).toList();
+  }
+
+  Future<int> hardDeletePassword(String id) async {
+    return await (delete(passwords)..where((p) => p.id.equals(id))).go();
   }
 
   Future<int> updatePasswordSyncStatus(

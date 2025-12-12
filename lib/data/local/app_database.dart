@@ -111,7 +111,7 @@ class AppDatabase extends _$AppDatabase {
         if (from < 4) {
           await m.createTable(otpEntries);
         }
-        if (from < 5) {
+        if (from == 4) {
           await m.addColumn(otpEntries, otpEntries.type);
         }
       },

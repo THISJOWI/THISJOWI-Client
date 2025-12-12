@@ -22,7 +22,7 @@ class OtpDao extends DatabaseAccessor<AppDatabase> with _$OtpDaoMixin {
     }
     
     final query = select(otpEntries)
-      ..where((o) => o.userId.equals(userEmail))
+      ..where((o) => o.userId.equals(userEmail) & o.syncStatus.isNotValue('deleted'))
       ..orderBy([(o) => OrderingTerm.asc(o.name)]);
     
     final results = await query.get();
@@ -142,9 +142,25 @@ class OtpDao extends DatabaseAccessor<AppDatabase> with _$OtpDaoMixin {
   }
 
   Future<int> deleteOtpEntry(String id) async {
-    return await (delete(otpEntries)
-      ..where((o) => o.id.equals(id)))
-      .go();
+    final entry = await (select(otpEntries)..where((o) => o.id.equals(id))).getSingleOrNull();
+    if (entry == null) return 0;
+
+    if (entry.serverId != null && entry.serverId!.isNotEmpty) {
+      // Soft delete if synced
+      return await (update(otpEntries)..where((o) => o.id.equals(id))).write(
+        OtpEntriesCompanion(
+          syncStatus: const Value('deleted'),
+          lastSyncedAt: Value(DateTime.now().toIso8601String()),
+        ),
+      );
+    } else {
+      // Hard delete if not synced yet
+      return await (delete(otpEntries)..where((o) => o.id.equals(id))).go();
+    }
+  }
+
+  Future<int> hardDeleteOtpEntry(String id) async {
+    return await (delete(otpEntries)..where((o) => o.id.equals(id))).go();
   }
 
   Future<List<Map<String, dynamic>>> getUnsyncedOtpEntries() async {

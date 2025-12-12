@@ -22,7 +22,7 @@ class NotesDao extends DatabaseAccessor<AppDatabase> with _$NotesDaoMixin {
     }
     
     final query = select(notes)
-      ..where((n) => n.userEmail.equals(userEmail))
+      ..where((n) => n.userEmail.equals(userEmail) & n.syncStatus.isNotValue('deleted'))
       ..orderBy([(n) => OrderingTerm.desc(n.updatedAt)]);
     
     final results = await query.get();
@@ -120,9 +120,40 @@ class NotesDao extends DatabaseAccessor<AppDatabase> with _$NotesDaoMixin {
   }
 
   Future<int> deleteNote(String localId) async {
-    return await (delete(notes)
-      ..where((n) => n.localId.equals(localId)))
-      .go();
+    final entry = await (select(notes)..where((n) => n.localId.equals(localId))).getSingleOrNull();
+    if (entry == null) return 0;
+
+    if (entry.serverId != null) {
+      // Soft delete if synced
+      return await (update(notes)..where((n) => n.localId.equals(localId))).write(
+        NotesCompanion(
+          syncStatus: const Value('deleted'),
+          lastSyncedAt: Value(DateTime.now().toIso8601String()),
+        ),
+      );
+    } else {
+      // Hard delete if not synced yet
+      return await (delete(notes)..where((n) => n.localId.equals(localId))).go();
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getDeletedNotes() async {
+    final query = select(notes)
+      ..where((n) => n.syncStatus.equals('deleted'));
+    
+    final results = await query.get();
+    return results.map((note) => {
+      'id': note.id,
+      'title': note.title,
+      'content': note.content,
+      'user_email': note.userEmail,
+      'createdAt': note.createdAt,
+      'updatedAt': note.updatedAt,
+      'syncStatus': note.syncStatus,
+      'lastSyncedAt': note.lastSyncedAt,
+      'localId': note.localId,
+      'serverId': note.serverId,
+    }).toList();
   }
 
   Future<List<Map<String, dynamic>>> getUnsyncedNotes() async {
@@ -142,6 +173,10 @@ class NotesDao extends DatabaseAccessor<AppDatabase> with _$NotesDaoMixin {
       'localId': note.localId,
       'serverId': note.serverId,
     }).toList();
+  }
+
+  Future<int> hardDeleteNote(String localId) async {
+    return await (delete(notes)..where((n) => n.localId.equals(localId))).go();
   }
 
   Future<int> updateNoteSyncStatus(

@@ -21,8 +21,7 @@ class PasswordsRepository {
     try {
       // Trigger background sync if online
       if (_connectivityService.isOnline) {
-        _syncFromServer();
-      }
+        _syncFromServer();        _syncPendingToServer();      }
 
       final localPasswords = await _db.passwordsDao.getAllPasswords();
       final passwords = localPasswords
@@ -61,7 +60,7 @@ class PasswordsRepository {
           // Check if exists locally by serverId
           final existingLocal = allLocalPasswords.firstWhere(
             (p) => p['serverId'] == serverId,
-            orElse: () => {},
+            orElse: () => <String, String?>{},
           );
           
           if (existingLocal.isNotEmpty) {
@@ -78,18 +77,21 @@ class PasswordsRepository {
             });
           } else {
             // Check for pending match
+            // Match by title and username
             final pendingMatch = allLocalPasswords.firstWhere(
               (p) => p['syncStatus'] == 'pending' && 
                      p['title'] == (item['title'] ?? '') && 
                      p['username'] == (item['username'] ?? ''),
-              orElse: () => {},
+              orElse: () => <String, String?>{},
             );
 
             if (pendingMatch.isNotEmpty) {
                // Found a pending password that matches. Link it!
                await _db.passwordsDao.updatePassword(pendingMatch['id'], {
                  'serverId': serverId,
-                 'syncStatus': 'synced',
+                 // Keep pending if other fields differ, but for now just link it
+                 // Ideally we should check all fields, but let's assume if title/user match it's the same
+                 'syncStatus': 'synced', 
                  'lastSyncedAt': DateTime.now().toIso8601String(),
                });
             } else {
@@ -110,6 +112,20 @@ class PasswordsRepository {
                 'lastSyncedAt': DateTime.now().toIso8601String(),
               });
             }
+          }
+        }
+
+        // Handle Deletions from Server
+        final serverIds = serverPasswords.map((p) => p['id']?.toString()).where((id) => id != null).toSet();
+        
+        for (final localPassword in allLocalPasswords) {
+          final localServerId = localPassword['serverId'];
+          
+          if (localServerId != null && 
+              !serverIds.contains(localServerId)) {
+            
+            print('Deleting local password ${localPassword['id']} as it was deleted on server');
+            await _db.passwordsDao.hardDeletePassword(localPassword['id']);
           }
         }
       }
@@ -257,12 +273,12 @@ class PasswordsRepository {
   /// Delete a password (FAST - deleted locally, synced in background)
   Future<Map<String, dynamic>> deletePassword(String id, {String? serverId}) async {
     try {
-      // Delete from local database first (FAST)
+      // Delete from local database first (FAST - Soft delete if synced)
       await _db.passwordsDao.deletePassword(id);
 
       // Sync with backend in BACKGROUND (non-blocking)
       if (serverId != null && _connectivityService.isOnline) {
-        _syncPasswordDeletionInBackground(serverId);
+        _syncPasswordDeletionInBackground(id, serverId);
       }
 
       return {
@@ -278,9 +294,13 @@ class PasswordsRepository {
   }
 
   /// Sync a password deletion with backend
-  Future<void> _syncPasswordDeletionInBackground(String serverId) async {
+  Future<void> _syncPasswordDeletionInBackground(String localId, String serverId) async {
     try {
-      await _passwordService.deletePassword(serverId);
+      final result = await _passwordService.deletePassword(serverId);
+      if (result['success'] == true) {
+        // If successful, hard delete locally
+        await _db.passwordsDao.hardDeletePassword(localId);
+      }
     } catch (e) {
       print('Background password deletion sync failed: $e');
     }
@@ -310,9 +330,44 @@ class PasswordsRepository {
 
   /// Force sync all pending changes
   Future<Map<String, dynamic>> syncAll() async {
-    return {
-      'success': true,
-      'message': 'Sync is disabled'
-    };
+    if (!_connectivityService.isOnline) {
+      return {'success': false, 'message': 'No internet connection'};
+    }
+    
+    await _syncFromServer();
+    await _syncPendingToServer();
+    
+    return {'success': true, 'message': 'Sync completed'};
+  }
+
+  /// Sync pending local changes to server
+  Future<void> _syncPendingToServer() async {
+    try {
+      // Sync updates/creates
+      final pendingPasswords = await _db.passwordsDao.getUnsyncedPasswords();
+      for (final pwdData in pendingPasswords) {
+        final serverId = pwdData['serverId'];
+        final localId = pwdData['id'];
+        if (serverId != null && serverId.isNotEmpty) {
+           await _syncPasswordUpdateInBackground(localId, serverId, pwdData);
+        } else {
+           await _syncPasswordInBackground(localId, pwdData);
+        }
+      }
+
+      // Sync deletions
+      final deletedPasswords = await _db.passwordsDao.getDeletedPasswords();
+      for (final pwdData in deletedPasswords) {
+        final serverId = pwdData['serverId'];
+        final localId = pwdData['id'];
+        if (serverId != null && serverId.isNotEmpty) {
+          await _syncPasswordDeletionInBackground(localId, serverId);
+        } else {
+          await _db.passwordsDao.hardDeletePassword(localId);
+        }
+      }
+    } catch (e) {
+      print('Pending sync failed: $e');
+    }
   }
 }

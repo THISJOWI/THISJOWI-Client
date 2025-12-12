@@ -24,6 +24,7 @@ class OtpRepository {
       // Trigger background sync if online
       if (_connectivityService.isOnline) {
         _syncFromServer();
+        _syncPendingToServer();
       }
 
       final localEntries = await _db.otpDao.getAllOtpEntries();
@@ -65,7 +66,7 @@ class OtpRepository {
           // Check if exists locally by serverId
           final existingLocal = allLocalEntries.firstWhere(
             (e) => e['serverId'] == serverEntry.id,
-            orElse: () => {},
+            orElse: () => <String, dynamic>{},
           );
           
           if (existingLocal.isNotEmpty) {
@@ -93,7 +94,7 @@ class OtpRepository {
             final pendingMatch = allLocalEntries.firstWhere(
               (e) => e['syncStatus'] == 'pending' && 
                      e['secret'] == serverEntry.secret,
-              orElse: () => {},
+              orElse: () => <String, dynamic>{},
             );
 
             if (pendingMatch.isNotEmpty) {
@@ -123,6 +124,20 @@ class OtpRepository {
                 'lastSyncedAt': DateTime.now().toIso8601String(),
               });
             }
+          }
+        }
+
+        // Handle Deletions from Server
+        final serverIds = serverEntries.map((e) => e.id).where((id) => id.isNotEmpty).toSet();
+        
+        for (final localEntry in allLocalEntries) {
+          final localServerId = localEntry['serverId'];
+          
+          if (localServerId != null && 
+              !serverIds.contains(localServerId)) {
+            
+            print('Deleting local OTP ${localEntry['id']} as it was deleted on server');
+            await _db.otpDao.hardDeleteOtpEntry(localEntry['id']);
           }
         }
       }
@@ -324,12 +339,12 @@ class OtpRepository {
   /// Eliminar una entrada OTP (FAST - deleted locally)
   Future<Map<String, dynamic>> deleteOtpEntry(String id, {String? serverId}) async {
     try {
-      // Delete from local database first (FAST)
+      // Delete from local database first (FAST - Soft delete if synced)
       await _db.otpDao.deleteOtpEntry(id);
 
       // Sync with backend in BACKGROUND (non-blocking)
       if (serverId != null && _connectivityService.isOnline) {
-        _syncOtpDeletionInBackground(serverId);
+        _syncOtpDeletionInBackground(id, serverId);
       }
 
       return {
@@ -345,9 +360,13 @@ class OtpRepository {
   }
 
   /// Sync an OTP deletion with backend
-  Future<void> _syncOtpDeletionInBackground(String serverId) async {
+  Future<void> _syncOtpDeletionInBackground(String localId, String serverId) async {
     try {
-      await _otpApiService.deleteOtpEntry(serverId);
+      final result = await _otpApiService.deleteOtpEntry(serverId);
+      if (result['success'] == true) {
+        // If successful, hard delete locally
+        await _db.otpDao.hardDeleteOtpEntry(localId);
+      }
     } catch (e) {
       print('Background deletion sync failed: $e');
     }
@@ -396,9 +415,39 @@ class OtpRepository {
     }
     
     await _syncFromServer();
-    // Also sync pending changes (not implemented fully here, but could iterate pending items)
+    await _syncPendingToServer();
     
     return {'success': true, 'message': 'Sync completed'};
+  }
+
+  /// Sync pending local changes to server
+  Future<void> _syncPendingToServer() async {
+    try {
+      // Sync updates/creates
+      final pendingEntries = await _db.otpDao.getUnsyncedOtpEntries();
+      for (final entryData in pendingEntries) {
+        final entry = model.OtpEntry.fromJson(entryData);
+        if (entry.serverId != null && entry.serverId!.isNotEmpty) {
+           await _syncOtpUpdateInBackground(entry.id, entry);
+        } else {
+           await _syncOtpInBackground(entry.id, entry);
+        }
+      }
+
+      // Sync deletions
+      final deletedEntries = await _db.otpDao.getDeletedOtpEntries();
+      for (final entryData in deletedEntries) {
+        final entry = model.OtpEntry.fromJson(entryData);
+        if (entry.serverId != null && entry.serverId!.isNotEmpty) {
+          await _syncOtpDeletionInBackground(entry.id, entry.serverId!);
+        } else {
+          // If no serverId, just hard delete
+          await _db.otpDao.hardDeleteOtpEntry(entry.id);
+        }
+      }
+    } catch (e) {
+      print('Pending sync failed: $e');
+    }
   }
 
   /// Get sync status for an OTP entry

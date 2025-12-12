@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:thisjowi/data/repository/otp_repository.dart';
@@ -27,6 +28,15 @@ class _OtpQrScannerScreenState extends State<OtpQrScannerScreen> {
   void dispose() {
     controller?.dispose();
     super.dispose();
+  }
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    if (Platform.isAndroid) {
+      controller!.pauseCamera();
+    }
+    controller!.resumeCamera();
   }
 
   void _onQRViewCreated(QRViewController ctrl) {

@@ -31,9 +31,7 @@ class EnvLoader {
       }
       
       _initialized = true;
-      debugPrint('✅ .env loaded: ${_env.keys.toList()}');
     } catch (e) {
-      debugPrint('❌ Error loading .env: $e');
       rethrow;
     }
   }

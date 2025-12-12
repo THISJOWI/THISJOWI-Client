@@ -26,7 +26,7 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen> {
   late final OtpRepository _otpRepository;
   final OtpService _otpService = OtpService();
-  
+
   List<OtpEntry> _entries = [];
   bool _isLoading = true;
   String _searchQuery = '';
@@ -52,20 +52,33 @@ class _OtpScreenState extends State<OtpScreen> {
 
   Future<void> _loadEntries() async {
     setState(() => _isLoading = true);
-    
+
     final result = await _otpRepository.getAllOtpEntries();
-    
+
     if (!mounted) return;
-    
+
     if (result['success'] == true) {
-      final entries = result['data'] as List<OtpEntry>? ?? [];
+      var entries = result['data'] as List<OtpEntry>? ?? [];
+      
+      // Deduplicate entries based on secret to prevent UI duplicates
+      final seenSecrets = <String>{};
+      final uniqueEntries = <OtpEntry>[];
+      for (final entry in entries) {
+        if (!seenSecrets.contains(entry.secret)) {
+          seenSecrets.add(entry.secret);
+          uniqueEntries.add(entry);
+        }
+      }
+      entries = uniqueEntries;
+
       setState(() {
         _entries = _searchQuery.isEmpty
             ? entries
-            : entries.where((e) => 
-                e.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-                e.issuer.toLowerCase().contains(_searchQuery.toLowerCase())
-              ).toList();
+            : entries
+                .where((e) =>
+                    e.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                    e.issuer.toLowerCase().contains(_searchQuery.toLowerCase()))
+                .toList();
         _isLoading = false;
       });
     } else {
@@ -73,7 +86,8 @@ class _OtpScreenState extends State<OtpScreen> {
         _entries = [];
         _isLoading = false;
       });
-      ErrorSnackBar.show(context, result['message'] ?? 'Error loading OTP entries');
+      ErrorSnackBar.show(
+          context, result['message'] ?? 'Error loading OTP entries');
     }
   }
 
@@ -85,7 +99,7 @@ class _OtpScreenState extends State<OtpScreen> {
         period: entry.period,
         algorithm: entry.algorithm,
       );
-      
+
       Clipboard.setData(ClipboardData(text: code));
       ErrorSnackBar.showSuccess(context, 'Code copied'.tr(context));
     } catch (e) {
@@ -121,7 +135,7 @@ class _OtpScreenState extends State<OtpScreen> {
     final nameController = TextEditingController();
     final issuerController = TextEditingController();
     final secretController = TextEditingController();
-    
+
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -129,7 +143,8 @@ class _OtpScreenState extends State<OtpScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            Text('Add OTP'.tr(context), style: const TextStyle(color: AppColors.text)),
+            Text('Add OTP'.tr(context),
+                style: const TextStyle(color: AppColors.text)),
             const Spacer(),
             IconButton(
               icon: const Icon(Icons.qr_code, color: AppColors.text),
@@ -139,15 +154,20 @@ class _OtpScreenState extends State<OtpScreen> {
                 _showImportDialog();
               },
             ),
-            IconButton(
-              icon: const Icon(Icons.camera_alt, color: AppColors.text),
-              tooltip: 'Scan QR'.tr(context),
-              onPressed: () async {
-                Navigator.pop(context);
-                final result = await Navigator.pushNamed(context, '/otp/qrscan');
-                if (result == true) _loadEntries();
-              },
-            ),
+            if (!(kIsWeb ||
+                Platform.isWindows ||
+                Platform.isMacOS ||
+                Platform.isLinux))
+              IconButton(
+                icon: const Icon(Icons.camera_alt, color: AppColors.text),
+                tooltip: 'Scan QR'.tr(context),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  final result =
+                      await Navigator.pushNamed(context, '/otp/qrscan');
+                  if (result == true) _loadEntries();
+                },
+              ),
           ],
         ),
         content: SingleChildScrollView(
@@ -177,7 +197,8 @@ class _OtpScreenState extends State<OtpScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'.tr(context), style: TextStyle(color: AppColors.text.withOpacity(0.6))),
+            child: Text('Cancel'.tr(context),
+                style: TextStyle(color: AppColors.text.withOpacity(0.6))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -190,27 +211,27 @@ class _OtpScreenState extends State<OtpScreen> {
         ],
       ),
     );
-    
+
     if (result == true) {
       final name = nameController.text.trim();
       final secret = secretController.text.trim().replaceAll(' ', '');
-      
+
       if (name.isEmpty || secret.isEmpty) {
         ErrorSnackBar.show(context, 'Name and secret are required'.tr(context));
         return;
       }
-      
+
       if (!_otpService.isValidSecret(secret)) {
         ErrorSnackBar.show(context, 'Invalid secret key'.tr(context));
         return;
       }
-      
+
       final addResult = await _otpRepository.addOtpEntry({
         'name': name,
         'issuer': issuerController.text.trim(),
         'secret': secret,
       });
-      
+
       if (addResult['success'] == true) {
         ErrorSnackBar.showSuccess(context, 'OTP added'.tr(context));
         _loadEntries();
@@ -222,21 +243,24 @@ class _OtpScreenState extends State<OtpScreen> {
 
   Future<void> _showImportDialog() async {
     final uriController = TextEditingController();
-    
+
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Import OTP URI'.tr(context), style: const TextStyle(color: AppColors.text)),
+        title: Text('Import OTP URI'.tr(context),
+            style: const TextStyle(color: AppColors.text)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Paste the otpauth:// URI from your authenticator app'.tr(context),
-                style: TextStyle(color: AppColors.text.withOpacity(0.7), fontSize: 13),
+                'Paste the otpauth:// URI from your authenticator app'
+                    .tr(context),
+                style: TextStyle(
+                    color: AppColors.text.withOpacity(0.7), fontSize: 13),
               ),
               const SizedBox(height: 16),
               _buildTextField(
@@ -251,7 +275,8 @@ class _OtpScreenState extends State<OtpScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'.tr(context), style: TextStyle(color: AppColors.text.withOpacity(0.6))),
+            child: Text('Cancel'.tr(context),
+                style: TextStyle(color: AppColors.text.withOpacity(0.6))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -264,17 +289,17 @@ class _OtpScreenState extends State<OtpScreen> {
         ],
       ),
     );
-    
+
     if (result == true) {
       final uri = uriController.text.trim();
-      
+
       if (!uri.startsWith('otpauth://')) {
         ErrorSnackBar.show(context, 'Invalid OTP URI'.tr(context));
         return;
       }
-      
+
       final addResult = await _otpRepository.addOtpFromUri(uri, '');
-      
+
       if (addResult['success'] == true) {
         ErrorSnackBar.showSuccess(context, 'OTP imported'.tr(context));
         _loadEntries();
@@ -289,7 +314,8 @@ class _OtpScreenState extends State<OtpScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
-        title: Text('Delete OTP?'.tr(context), style: const TextStyle(color: AppColors.text)),
+        title: Text('Delete OTP?'.tr(context),
+            style: const TextStyle(color: AppColors.text)),
         content: Text(
           'Are you sure you want to delete "${entry.issuer.isNotEmpty ? entry.issuer : entry.name}"?',
           style: const TextStyle(color: AppColors.text),
@@ -297,22 +323,24 @@ class _OtpScreenState extends State<OtpScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'.tr(context), style: TextStyle(color: AppColors.text.withOpacity(0.6))),
+            child: Text('Cancel'.tr(context),
+                style: TextStyle(color: AppColors.text.withOpacity(0.6))),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Delete'.tr(context), style: const TextStyle(color: Colors.red)),
+            child: Text('Delete'.tr(context),
+                style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
     );
-    
+
     if (confirm == true) {
       final result = await _otpRepository.deleteOtpEntry(
         entry.id,
         serverId: entry.serverId,
       );
-      
+
       if (result['success'] == true) {
         ErrorSnackBar.showSuccess(context, 'OTP deleted'.tr(context));
         _loadEntries();
@@ -364,7 +392,8 @@ class _OtpScreenState extends State<OtpScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                 child: Row(
                   children: [
-                    const Icon(Icons.security, color: AppColors.primary, size: 28),
+                    const Icon(Icons.security,
+                        color: AppColors.primary, size: 28),
                     const SizedBox(width: 12),
                     Text(
                       'Authenticator'.tr(context),
@@ -394,28 +423,35 @@ class _OtpScreenState extends State<OtpScreen> {
                     style: const TextStyle(color: AppColors.text, fontSize: 16),
                     decoration: InputDecoration(
                       labelText: 'Search'.i18n,
-                      prefixIcon: Icon(Icons.search, color: AppColors.text.withOpacity(0.6), size: 20),
+                      prefixIcon: Icon(Icons.search,
+                          color: AppColors.text.withOpacity(0.6), size: 20),
                       suffixIcon: _searchQuery.isNotEmpty
                           ? IconButton(
-                              icon: Icon(Icons.close, color: AppColors.text.withOpacity(0.6), size: 20),
+                              icon: Icon(Icons.close,
+                                  color: AppColors.text.withOpacity(0.6),
+                                  size: 20),
                               onPressed: () {
                                 setState(() => _searchQuery = '');
                                 _loadEntries();
                               },
                             )
                           : null,
-                      labelStyle: TextStyle(color: AppColors.text.withOpacity(0.6), fontSize: 16),
+                      labelStyle: TextStyle(
+                          color: AppColors.text.withOpacity(0.6), fontSize: 16),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                     ),
                   ),
                 ),
               ),
-              
+
               // List
               Expanded(
                 child: _isLoading
-                    ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                    ? const Center(
+                        child:
+                            CircularProgressIndicator(color: AppColors.primary))
                     : _entries.isEmpty
                         ? _buildEmptyState()
                         : RefreshIndicator(
@@ -424,13 +460,14 @@ class _OtpScreenState extends State<OtpScreen> {
                             child: ListView.builder(
                               padding: const EdgeInsets.fromLTRB(20, 0, 20, 80),
                               itemCount: _entries.length,
-                              itemBuilder: (context, index) => _buildOtpCard(_entries[index]),
+                              itemBuilder: (context, index) =>
+                                  _buildOtpCard(_entries[index]),
                             ),
                           ),
               ),
             ],
           ),
-          
+
           // FAB
           Positioned(
             bottom: 16.0,
@@ -496,10 +533,14 @@ class _OtpScreenState extends State<OtpScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              if (!(kIsWeb || Platform.isWindows || Platform.isMacOS || Platform.isLinux))
+              if (!(kIsWeb ||
+                  Platform.isWindows ||
+                  Platform.isMacOS ||
+                  Platform.isLinux))
                 ElevatedButton.icon(
                   onPressed: () async {
-                    final result = await Navigator.pushNamed(context, '/otp/qrscan');
+                    final result =
+                        await Navigator.pushNamed(context, '/otp/qrscan');
                     if (result == true) _loadEntries();
                   },
                   icon: const Icon(Icons.camera_alt),
@@ -519,7 +560,7 @@ class _OtpScreenState extends State<OtpScreen> {
   Widget _buildOtpCard(OtpEntry entry) {
     String code;
     bool isValidSecret = true;
-    
+
     try {
       code = _otpService.generateTotp(
         secret: entry.secret,
@@ -531,7 +572,7 @@ class _OtpScreenState extends State<OtpScreen> {
       code = 'INVALID';
       isValidSecret = false;
     }
-    
+
     // Si el secreto es inválido, mostrar una tarjeta de error sin información sensible
     if (!isValidSecret) {
       return Container(
@@ -596,11 +637,12 @@ class _OtpScreenState extends State<OtpScreen> {
         ),
       );
     }
-    
+
     final formattedCode = _otpService.formatCode(code);
-    final remainingSeconds = _otpService.getRemainingSeconds(period: entry.period);
+    final remainingSeconds =
+        _otpService.getRemainingSeconds(period: entry.period);
     final progress = _otpService.getProgress(period: entry.period);
-    
+
     // Color del progreso: verde > amarillo > rojo
     Color progressColor;
     if (remainingSeconds > 10) {
@@ -610,7 +652,7 @@ class _OtpScreenState extends State<OtpScreen> {
     } else {
       progressColor = Colors.red;
     }
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -641,8 +683,12 @@ class _OtpScreenState extends State<OtpScreen> {
                       child: Center(
                         child: Text(
                           () {
-                            final text = entry.issuer.isNotEmpty ? entry.issuer : entry.name;
-                            return text.isNotEmpty ? text.substring(0, 1).toUpperCase() : '?';
+                            final text = entry.issuer.isNotEmpty
+                                ? entry.issuer
+                                : entry.name;
+                            return text.isNotEmpty
+                                ? text.substring(0, 1).toUpperCase()
+                                : '?';
                           }(),
                           style: const TextStyle(
                             color: AppColors.primary,
@@ -653,7 +699,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    
+
                     // Info
                     Expanded(
                       child: Column(
@@ -678,7 +724,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         ],
                       ),
                     ),
-                    
+
                     // Delete button
                     IconButton(
                       onPressed: () => _deleteEntry(entry),
@@ -690,9 +736,9 @@ class _OtpScreenState extends State<OtpScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Code and timer
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -710,7 +756,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                       ),
                     ),
-                    
+
                     // Timer
                     Stack(
                       alignment: Alignment.center,
@@ -722,7 +768,8 @@ class _OtpScreenState extends State<OtpScreen> {
                             value: progress,
                             strokeWidth: 3,
                             backgroundColor: AppColors.text.withOpacity(0.1),
-                            valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(progressColor),
                           ),
                         ),
                         Text(
@@ -737,9 +784,9 @@ class _OtpScreenState extends State<OtpScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 // Copy hint
                 Row(
                   children: [

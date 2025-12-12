@@ -16,6 +16,8 @@ import 'package:thisjowi/i18n/translation_service.dart';
 import 'package:thisjowi/components/bottomNavigation.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'dart:io' show Platform;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,7 +29,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late final PasswordsRepository _passwordsRepository;
   late final NotesRepository _notesRepository;
-  
+
   List<PasswordEntry> _passwords = [];
   List<Note> _notes = [];
   bool _isLoading = true;
@@ -47,42 +49,61 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    
+
     // Load both in parallel
     final results = await Future.wait([
       _passwordsRepository.getAllPasswords(),
       _notesRepository.getAllNotes(),
     ]);
-    
+
     if (!mounted) return;
-    
+
     final passwordResult = results[0];
     final notesResult = results[1];
-    
+
     List<PasswordEntry> passwords = [];
     List<Note> notes = [];
-    
+
     if (passwordResult['success'] == true) {
-      passwords = passwordResult['data'] as List<PasswordEntry>? ?? [];
+      final rawPasswords = passwordResult['data'] as List<PasswordEntry>? ?? [];
+      // Deduplicate passwords to prevent UI duplicates
+      final seenPasswords = <String>{};
+      for (final p in rawPasswords) {
+        final key = '${p.title}|${p.username}';
+        if (!seenPasswords.contains(key)) {
+          seenPasswords.add(key);
+          passwords.add(p);
+        }
+      }
     }
-    
+
     if (notesResult['success'] == true) {
-      notes = notesResult['data'] as List<Note>? ?? [];
+      final rawNotes = notesResult['data'] as List<Note>? ?? [];
+      // Deduplicate notes to prevent UI duplicates
+      final seenNotes = <String>{};
+      for (final n in rawNotes) {
+        if (!seenNotes.contains(n.title)) {
+          seenNotes.add(n.title);
+          notes.add(n);
+        }
+      }
     }
-    
+
     // Apply search filter
     if (_searchQuery.isNotEmpty) {
       final query = _searchQuery.toLowerCase();
-      passwords = passwords.where((p) => 
-        p.title.toLowerCase().contains(query) ||
-        p.username.toLowerCase().contains(query)
-      ).toList();
-      notes = notes.where((n) => 
-        n.title.toLowerCase().contains(query) ||
-        n.content.toLowerCase().contains(query)
-      ).toList();
+      passwords = passwords
+          .where((p) =>
+              p.title.toLowerCase().contains(query) ||
+              p.username.toLowerCase().contains(query))
+          .toList();
+      notes = notes
+          .where((n) =>
+              n.title.toLowerCase().contains(query) ||
+              n.content.toLowerCase().contains(query))
+          .toList();
     }
-    
+
     setState(() {
       _passwords = passwords;
       _notes = notes;
@@ -117,11 +138,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _createOtp() async {
     final otpRepository = OtpRepository();
     final otpService = OtpService();
-    
+
     final nameController = TextEditingController();
     final issuerController = TextEditingController();
     final secretController = TextEditingController();
-    
+
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -129,7 +150,8 @@ class _HomeScreenState extends State<HomeScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            Text('Add OTP'.tr(context), style: const TextStyle(color: AppColors.text)),
+            Text('Add OTP'.tr(context),
+                style: const TextStyle(color: AppColors.text)),
             const Spacer(),
             IconButton(
               icon: const Icon(Icons.qr_code, color: AppColors.text),
@@ -139,17 +161,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 _showImportDialog();
               },
             ),
-            IconButton(
-              icon: const Icon(Icons.camera_alt, color: AppColors.text),
-              tooltip: 'Scan QR'.tr(context),
-              onPressed: () async {
-                Navigator.pop(context);
-                final result = await Navigator.pushNamed(context, '/otp/qrscan');
-                if (result == true && mounted) {
-                  bottomNavigationKey.currentState?.navigateToOtp();
-                }
-              },
-            ),
+            if (!(kIsWeb ||
+                Platform.isWindows ||
+                Platform.isMacOS ||
+                Platform.isLinux))
+              IconButton(
+                icon: const Icon(Icons.camera_alt, color: AppColors.text),
+                tooltip: 'Scan QR'.tr(context),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  final result =
+                      await Navigator.pushNamed(context, '/otp/qrscan');
+                  if (result == true && mounted) {
+                    bottomNavigationKey.currentState?.navigateToOtp();
+                  }
+                },
+              ),
           ],
         ),
         content: SingleChildScrollView(
@@ -179,7 +206,8 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'.tr(context), style: TextStyle(color: AppColors.text.withOpacity(0.6))),
+            child: Text('Cancel'.tr(context),
+                style: TextStyle(color: AppColors.text.withOpacity(0.6))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -192,27 +220,27 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
-    
+
     if (result == true) {
       final name = nameController.text.trim();
       final secret = secretController.text.trim().replaceAll(' ', '');
-      
+
       if (name.isEmpty || secret.isEmpty) {
         ErrorSnackBar.show(context, 'Name and secret are required'.tr(context));
         return;
       }
-      
+
       if (!otpService.isValidSecret(secret)) {
         ErrorSnackBar.show(context, 'Invalid secret key'.tr(context));
         return;
       }
-      
+
       final addResult = await otpRepository.addOtpEntry({
         'name': name,
         'issuer': issuerController.text.trim(),
         'secret': secret,
       });
-      
+
       if (addResult['success'] == true) {
         ErrorSnackBar.showSuccess(context, 'OTP added'.tr(context));
         // Navegar a la pestaña de OTP usando la key global
@@ -228,21 +256,24 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _showImportDialog() async {
     final otpRepository = OtpRepository();
     final uriController = TextEditingController();
-    
+
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Import OTP URI'.tr(context), style: const TextStyle(color: AppColors.text)),
+        title: Text('Import OTP URI'.tr(context),
+            style: const TextStyle(color: AppColors.text)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Paste the otpauth:// URI from your authenticator app'.tr(context),
-                style: TextStyle(color: AppColors.text.withOpacity(0.7), fontSize: 13),
+                'Paste the otpauth:// URI from your authenticator app'
+                    .tr(context),
+                style: TextStyle(
+                    color: AppColors.text.withOpacity(0.7), fontSize: 13),
               ),
               const SizedBox(height: 16),
               _buildOtpTextField(
@@ -256,7 +287,8 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'.tr(context), style: TextStyle(color: AppColors.text.withOpacity(0.6))),
+            child: Text('Cancel'.tr(context),
+                style: TextStyle(color: AppColors.text.withOpacity(0.6))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -269,17 +301,17 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
-    
+
     if (result == true) {
       final uri = uriController.text.trim();
-      
+
       if (!uri.startsWith('otpauth://')) {
         ErrorSnackBar.show(context, 'Invalid OTP URI'.tr(context));
         return;
       }
-      
+
       final addResult = await otpRepository.addOtpFromUri(uri, '');
-      
+
       if (addResult['success'] == true) {
         ErrorSnackBar.showSuccess(context, 'OTP imported'.tr(context));
         if (mounted) {
@@ -290,7 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
   }
-  
+
   Widget _buildOtpTextField({
     required TextEditingController controller,
     required String label,
@@ -324,33 +356,38 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
     return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.background,
-        title: Text('Delete password?'.i18n, style: TextStyle(color: AppColors.text)),
-        content: Text('Are you sure you want to delete "${entry.title}"?', style: TextStyle(color: AppColors.text)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'.i18n, style: TextStyle(color: AppColors.text)),
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: AppColors.background,
+            title: Text('Delete password?'.i18n,
+                style: TextStyle(color: AppColors.text)),
+            content: Text('Are you sure you want to delete "${entry.title}"?',
+                style: TextStyle(color: AppColors.text)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text('Cancel'.i18n,
+                    style: TextStyle(color: AppColors.text)),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text('Delete'.i18n, style: TextStyle(color: Colors.red)),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('Delete'.i18n, style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    ) ?? false;
+        ) ??
+        false;
   }
 
   Future<void> _deletePassword(PasswordEntry entry) async {
     final confirm = await _showDeletePasswordConfirmation(entry);
     if (!confirm) return;
-    
-        final result = await _passwordsRepository.deletePassword(entry.id, serverId: entry.serverId);
-    
+
+    final result = await _passwordsRepository.deletePassword(entry.id,
+        serverId: entry.serverId);
+
     if (!mounted) return;
-    
+
     if (result['success'] == true) {
       setState(() => _passwords.removeWhere((p) => p.id == entry.id));
       ErrorSnackBar.showSuccess(context, 'Password deleted'.i18n);
@@ -361,44 +398,50 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<bool> _showDeleteNoteConfirmation(Note note) async {
     return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.background,
-        title: Text('Delete Note?'.i18n, style: TextStyle(color: AppColors.text)),
-        content: Text('${'Are you sure you want to delete'.i18n} "${note.title}"?', style: TextStyle(color: AppColors.text)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'.i18n, style: TextStyle(color: AppColors.text)),
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: AppColors.background,
+            title: Text('Delete Note?'.i18n,
+                style: TextStyle(color: AppColors.text)),
+            content: Text(
+                '${'Are you sure you want to delete'.i18n} "${note.title}"?',
+                style: TextStyle(color: AppColors.text)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text('Cancel'.i18n,
+                    style: TextStyle(color: AppColors.text)),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text('Delete'.i18n, style: TextStyle(color: Colors.red)),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('Delete'.i18n, style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    ) ?? false;
+        ) ??
+        false;
   }
 
   Future<void> _deleteNote(Note note) async {
     final confirm = await _showDeleteNoteConfirmation(note);
     if (!confirm) return;
-    
+
     final noteId = note.localId ?? note.id?.toString() ?? '';
     if (noteId.isEmpty) return;
-    
-    final result = await _notesRepository.deleteNote(noteId, serverId: note.serverId?.toString() ?? note.id?.toString());
-    
+
+    final result = await _notesRepository.deleteNote(noteId,
+        serverId: note.serverId?.toString() ?? note.id?.toString());
+
     if (!mounted) return;
-    
+
     if (result['success'] == true) {
-      setState(() => _notes.removeWhere((n) => 
-        (n.localId != null && n.localId == note.localId) || 
-        (n.id != null && n.id == note.id)
-      ));
+      setState(() => _notes.removeWhere((n) =>
+          (n.localId != null && n.localId == note.localId) ||
+          (n.id != null && n.id == note.id)));
       ErrorSnackBar.showSuccess(context, 'Note deleted'.i18n);
     } else {
-      ErrorSnackBar.show(context, result['message'] ?? 'Error deleting note'.i18n);
+      ErrorSnackBar.show(
+          context, result['message'] ?? 'Error deleting note'.i18n);
     }
   }
 
@@ -410,58 +453,143 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => Dialog(
           backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 340),
             child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          entry.title,
-                          style: const TextStyle(color: AppColors.text, fontSize: 22, fontWeight: FontWeight.bold),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            entry.title,
+                            style: const TextStyle(
+                                color: AppColors.text,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Icon(Icons.close,
+                              color: AppColors.text.withOpacity(0.6), size: 24),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    if (entry.website.isNotEmpty) ...[
+                      Text('Website'.i18n,
+                          style: TextStyle(
+                              color: AppColors.text.withOpacity(0.6),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500)),
+                      const SizedBox(height: 6),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                            color: AppColors.text.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(8)),
+                        child: Text(entry.website,
+                            style: const TextStyle(
+                                color: AppColors.text, fontSize: 14)),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    if (entry.username.isNotEmpty) ...[
+                      Text('User',
+                          style: TextStyle(
+                              color: AppColors.text.withOpacity(0.6),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500)),
+                      const SizedBox(height: 6),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                            color: AppColors.text.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(8)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                                child: Text(entry.username,
+                                    style: const TextStyle(
+                                        color: AppColors.text, fontSize: 14))),
+                            IconButton(
+                              icon: Icon(Icons.copy,
+                                  color: AppColors.text.withOpacity(0.7),
+                                  size: 18),
+                              onPressed: () {
+                                Clipboard.setData(
+                                    ClipboardData(text: entry.username));
+                                ErrorSnackBar.showInfo(
+                                    context, 'User copied'.i18n);
+                              },
+                              constraints: const BoxConstraints(),
+                              padding: EdgeInsets.zero,
+                            ),
+                          ],
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Icon(Icons.close, color: AppColors.text.withOpacity(0.6), size: 24),
-                      ),
+                      const SizedBox(height: 16),
                     ],
-                  ),
-                  const SizedBox(height: 24),
-                  if (entry.website.isNotEmpty) ...[
-                    Text('Website'.i18n, style: TextStyle(color: AppColors.text.withOpacity(0.6), fontSize: 13, fontWeight: FontWeight.w500)),
+                    Text('Password'.i18n,
+                        style: TextStyle(
+                            color: AppColors.text.withOpacity(0.6),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500)),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(color: AppColors.text.withOpacity(0.05), borderRadius: BorderRadius.circular(8)),
-                      child: Text(entry.website, style: const TextStyle(color: AppColors.text, fontSize: 14)),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                  if (entry.username.isNotEmpty) ...[
-                    Text('User', style: TextStyle(color: AppColors.text.withOpacity(0.6), fontSize: 13, fontWeight: FontWeight.w500)),
-                    const SizedBox(height: 6),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(color: AppColors.text.withOpacity(0.05), borderRadius: BorderRadius.circular(8)),
+                      decoration: BoxDecoration(
+                          color: AppColors.text.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(8)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(child: Text(entry.username, style: const TextStyle(color: AppColors.text, fontSize: 14))),
+                          Expanded(
+                            child: Text(
+                              showPassword
+                                  ? entry.password
+                                  : '•' * entry.password.length,
+                              style: const TextStyle(
+                                  color: AppColors.text,
+                                  fontSize: 14,
+                                  letterSpacing: 1),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                           IconButton(
-                            icon: Icon(Icons.copy, color: AppColors.text.withOpacity(0.7), size: 18),
+                            icon: Icon(
+                                showPassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: AppColors.text.withOpacity(0.7),
+                                size: 18),
+                            onPressed: () =>
+                                setState(() => showPassword = !showPassword),
+                            constraints: const BoxConstraints(),
+                            padding: const EdgeInsets.only(right: 8),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: Icon(Icons.copy,
+                                color: AppColors.text.withOpacity(0.7),
+                                size: 18),
                             onPressed: () {
-                              Clipboard.setData(ClipboardData(text: entry.username));
-                              ErrorSnackBar.showInfo(context, 'User copied'.i18n);
+                              Clipboard.setData(
+                                  ClipboardData(text: entry.password));
+                              ErrorSnackBar.showInfo(
+                                  context, 'Password copied'.i18n);
                             },
                             constraints: const BoxConstraints(),
                             padding: EdgeInsets.zero,
@@ -469,62 +597,28 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
-                  ],
-                  Text('Password'.i18n, style: TextStyle(color: AppColors.text.withOpacity(0.6), fontSize: 13, fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: AppColors.text.withOpacity(0.05), borderRadius: BorderRadius.circular(8)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            showPassword ? entry.password : '•' * entry.password.length,
-                            style: const TextStyle(color: AppColors.text, fontSize: 14, letterSpacing: 1),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.text.withOpacity(0.1),
+                          foregroundColor: AppColors.text,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          elevation: 0,
                         ),
-                        IconButton(
-                          icon: Icon(showPassword ? Icons.visibility : Icons.visibility_off, color: AppColors.text.withOpacity(0.7), size: 18),
-                          onPressed: () => setState(() => showPassword = !showPassword),
-                          constraints: const BoxConstraints(),
-                          padding: const EdgeInsets.only(right: 8),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          icon: Icon(Icons.copy, color: AppColors.text.withOpacity(0.7), size: 18),
-                          onPressed: () {
-                            Clipboard.setData(ClipboardData(text: entry.password));
-                            ErrorSnackBar.showInfo(context, 'Password copied'.i18n);
-                          },
-                          constraints: const BoxConstraints(),
-                          padding: EdgeInsets.zero,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.text.withOpacity(0.1),
-                        foregroundColor: AppColors.text,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        elevation: 0,
+                        onPressed: () => Navigator.pop(context),
+                        child: Text('Close'.i18n,
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w600)),
                       ),
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('Close'.i18n, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
           ),
         ),
       ),
@@ -543,7 +637,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 children: [
                   const Image(
-                    image: NetworkImage("https://pub-9030d6e053cc40b380e0f63662daf8ed.r2.dev/logo-removebg-preview_resized.png"),
+                    image: NetworkImage(
+                        "https://pub-9030d6e053cc40b380e0f63662daf8ed.r2.dev/logo-removebg-preview_resized.png"),
                     height: 40,
                   ),
                   const SizedBox(width: 12),
@@ -571,19 +666,24 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: const TextStyle(color: AppColors.text, fontSize: 16),
                   decoration: InputDecoration(
                     labelText: 'Search'.i18n,
-                    prefixIcon: Icon(Icons.search, color: AppColors.text.withOpacity(0.6), size: 20),
+                    prefixIcon: Icon(Icons.search,
+                        color: AppColors.text.withOpacity(0.6), size: 20),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
-                            icon: Icon(Icons.close, color: AppColors.text.withOpacity(0.6), size: 20),
+                            icon: Icon(Icons.close,
+                                color: AppColors.text.withOpacity(0.6),
+                                size: 20),
                             onPressed: () {
                               setState(() => _searchQuery = '');
                               _loadData();
                             },
                           )
                         : null,
-                    labelStyle: TextStyle(color: AppColors.text.withOpacity(0.6), fontSize: 16),
+                    labelStyle: TextStyle(
+                        color: AppColors.text.withOpacity(0.6), fontSize: 16),
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                   ),
                   onChanged: (value) {
                     setState(() => _searchQuery = value);
@@ -595,7 +695,8 @@ class _HomeScreenState extends State<HomeScreen> {
             // Content
             Expanded(
               child: _isLoading
-                  ? Center(child: CircularProgressIndicator(color: AppColors.text))
+                  ? Center(
+                      child: CircularProgressIndicator(color: AppColors.text))
                   : RefreshIndicator(
                       onRefresh: _loadData,
                       color: AppColors.text,
@@ -616,19 +717,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                     title: 'Passwords'.i18n,
                                     count: _passwords.length,
                                   ),
-                                  ..._passwords.map((entry) => _buildPasswordItem(entry)),
+                                  ..._passwords.map(
+                                      (entry) => _buildPasswordItem(entry)),
                                 ],
-                                
+
                                 // Divider between sections
                                 if (_passwords.isNotEmpty && _notes.isNotEmpty)
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24, vertical: 8),
                                     child: Divider(
                                       color: AppColors.text.withOpacity(0.1),
                                       thickness: 1,
                                     ),
                                   ),
-                                
+
                                 // Notes Section
                                 if (_notes.isNotEmpty) ...[
                                   _buildSectionHeader(
@@ -714,7 +817,8 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () => _showPasswordDetails(entry),
             borderRadius: BorderRadius.circular(12),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
               child: Row(
                 children: [
                   Container(
@@ -723,7 +827,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: AppColors.text.withOpacity(0.08),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(Icons.key, color: AppColors.text.withOpacity(0.6), size: 18),
+                    child: Icon(Icons.key,
+                        color: AppColors.text.withOpacity(0.6), size: 18),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -732,13 +837,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Text(
                           entry.title,
-                          style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w600, fontSize: 15),
+                          style: const TextStyle(
+                              color: AppColors.text,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15),
                         ),
                         if (entry.username.isNotEmpty) ...[
                           const SizedBox(height: 2),
                           Text(
                             entry.username,
-                            style: TextStyle(color: AppColors.text.withOpacity(0.5), fontSize: 13),
+                            style: TextStyle(
+                                color: AppColors.text.withOpacity(0.5),
+                                fontSize: 13),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -747,7 +857,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.edit_outlined, color: AppColors.text.withOpacity(0.5), size: 18),
+                    icon: Icon(Icons.edit_outlined,
+                        color: AppColors.text.withOpacity(0.5), size: 18),
                     onPressed: () async {
                       final edited = await Navigator.push<bool>(
                         context,
@@ -764,7 +875,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.all(8),
                   ),
                   IconButton(
-                    icon: Icon(Icons.delete_outline, color: AppColors.text.withOpacity(0.5), size: 18),
+                    icon: Icon(Icons.delete_outline,
+                        color: AppColors.text.withOpacity(0.5), size: 18),
                     onPressed: () => _deletePassword(entry),
                     constraints: const BoxConstraints(),
                     padding: const EdgeInsets.all(8),
@@ -804,7 +916,8 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             borderRadius: BorderRadius.circular(12),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
               child: Row(
                 children: [
                   Container(
@@ -813,7 +926,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: AppColors.text.withOpacity(0.08),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(Icons.description_outlined, color: AppColors.text.withOpacity(0.6), size: 18),
+                    child: Icon(Icons.description_outlined,
+                        color: AppColors.text.withOpacity(0.6), size: 18),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -822,12 +936,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Text(
                           note.title,
-                          style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w600, fontSize: 15),
+                          style: const TextStyle(
+                              color: AppColors.text,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           note.content,
-                          style: TextStyle(color: AppColors.text.withOpacity(0.5), fontSize: 13),
+                          style: TextStyle(
+                              color: AppColors.text.withOpacity(0.5),
+                              fontSize: 13),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -835,7 +954,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.delete_outline, color: AppColors.text.withOpacity(0.5), size: 18),
+                    icon: Icon(Icons.delete_outline,
+                        color: AppColors.text.withOpacity(0.5), size: 18),
                     onPressed: () => _deleteNote(note),
                     constraints: const BoxConstraints(),
                     padding: const EdgeInsets.all(8),
