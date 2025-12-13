@@ -13,7 +13,7 @@ class NotesDao extends DatabaseAccessor<AppDatabase> with _$NotesDaoMixin {
     return await secureStorage.getValue('cached_email');
   }
 
-  Future<List<Map<String, dynamic>>> getAllNotes() async {
+  Future<List<Map<String, dynamic>>> getAllNotes({bool includeDeleted = false}) async {
     final userEmail = await _getCurrentUserEmail();
     
     if (userEmail == null) {
@@ -22,8 +22,13 @@ class NotesDao extends DatabaseAccessor<AppDatabase> with _$NotesDaoMixin {
     }
     
     final query = select(notes)
-      ..where((n) => n.userEmail.equals(userEmail) & n.syncStatus.isNotValue('deleted'))
-      ..orderBy([(n) => OrderingTerm.desc(n.updatedAt)]);
+      ..where((n) => n.userEmail.equals(userEmail));
+      
+    if (!includeDeleted) {
+      query.where((n) => n.syncStatus.isNotValue('deleted'));
+    }
+      
+    query.orderBy([(n) => OrderingTerm.desc(n.updatedAt)]);
     
     final results = await query.get();
     return results.map((note) => {
@@ -123,18 +128,13 @@ class NotesDao extends DatabaseAccessor<AppDatabase> with _$NotesDaoMixin {
     final entry = await (select(notes)..where((n) => n.localId.equals(localId))).getSingleOrNull();
     if (entry == null) return 0;
 
-    if (entry.serverId != null) {
-      // Soft delete if synced
-      return await (update(notes)..where((n) => n.localId.equals(localId))).write(
-        NotesCompanion(
-          syncStatus: const Value('deleted'),
-          lastSyncedAt: Value(DateTime.now().toIso8601String()),
-        ),
-      );
-    } else {
-      // Hard delete if not synced yet
-      return await (delete(notes)..where((n) => n.localId.equals(localId))).go();
-    }
+    // Always soft delete to allow sync to catch up
+    return await (update(notes)..where((n) => n.localId.equals(localId))).write(
+      NotesCompanion(
+        syncStatus: const Value('deleted'),
+        lastSyncedAt: Value(DateTime.now().toIso8601String()),
+      ),
+    );
   }
 
   Future<List<Map<String, dynamic>>> getDeletedNotes() async {

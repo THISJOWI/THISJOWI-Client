@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:http/http.dart' as http;
 import '../core/api_config.dart';
+import '../core/encryption_helper.dart';
 import 'auth_service.dart';
 import '../data/models/otp_entry.dart';
 
@@ -46,7 +47,14 @@ class OtpApiService {
 
       if (res.statusCode == 200) {
         if (body is List) {
-          final entries = body.map((json) => OtpEntry.fromJson(json)).toList();
+          final entries = body.map((json) {
+            if (json is Map<String, dynamic> && json['secret'] != null) {
+              final mutableJson = Map<String, dynamic>.from(json);
+              mutableJson['secret'] = EncryptionHelper.decrypt(json['secret'].toString());
+              return OtpEntry.fromJson(mutableJson);
+            }
+            return OtpEntry.fromJson(json);
+          }).toList();
           return {'success': true, 'data': entries, 'message': 'OTP entries retrieved successfully'};
         }
         return {'success': true, 'data': <OtpEntry>[], 'message': 'No entries found'};
@@ -87,7 +95,7 @@ class OtpApiService {
       final entryData = {
         'name': entry.name,
         'issuer': entry.issuer,
-        'secret': entry.secret,
+        'secret': EncryptionHelper.encrypt(entry.secret),
         'digits': entry.digits,
         'period': entry.period,
         'algorithm': entry.algorithm,
@@ -103,6 +111,9 @@ class OtpApiService {
       final body = _tryDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
+        if (body != null && body['secret'] != null) {
+          body['secret'] = EncryptionHelper.decrypt(body['secret'].toString());
+        }
         final createdEntry = OtpEntry.fromJson(body);
         return {'success': true, 'data': createdEntry};
       } else {
@@ -122,7 +133,7 @@ class OtpApiService {
       final entryData = {
         'name': entry.name,
         'issuer': entry.issuer,
-        'secret': entry.secret,
+        'secret': EncryptionHelper.encrypt(entry.secret),
         'digits': entry.digits,
         'period': entry.period,
         'algorithm': entry.algorithm,
@@ -138,6 +149,9 @@ class OtpApiService {
       final body = _tryDecode(res.body);
 
       if (res.statusCode == 200) {
+        if (body != null && body['secret'] != null) {
+          body['secret'] = EncryptionHelper.decrypt(body['secret'].toString());
+        }
         final updatedEntry = OtpEntry.fromJson(body);
         return {'success': true, 'data': updatedEntry};
       } else {

@@ -13,7 +13,7 @@ class PasswordsDao extends DatabaseAccessor<AppDatabase> with _$PasswordsDaoMixi
     return await secureStorage.getValue('cached_email');
   }
 
-  Future<List<Map<String, dynamic>>> getAllPasswords() async {
+  Future<List<Map<String, dynamic>>> getAllPasswords({bool includeDeleted = false}) async {
     final userEmail = await _getCurrentUserEmail();
     
     if (userEmail == null) {
@@ -22,8 +22,13 @@ class PasswordsDao extends DatabaseAccessor<AppDatabase> with _$PasswordsDaoMixi
     }
     
     final query = select(passwords)
-      ..where((p) => p.userId.equals(userEmail) & p.syncStatus.isNotValue('deleted'))
-      ..orderBy([(p) => OrderingTerm.desc(p.updatedAt)]);
+      ..where((p) => p.userId.equals(userEmail));
+      
+    if (!includeDeleted) {
+      query.where((p) => p.syncStatus.isNotValue('deleted'));
+    }
+      
+    query.orderBy([(p) => OrderingTerm.desc(p.updatedAt)]);
     
     final results = await query.get();
     return results.map((pwd) => {
@@ -135,18 +140,13 @@ class PasswordsDao extends DatabaseAccessor<AppDatabase> with _$PasswordsDaoMixi
     final entry = await (select(passwords)..where((p) => p.id.equals(id))).getSingleOrNull();
     if (entry == null) return 0;
 
-    if (entry.serverId != null && entry.serverId!.isNotEmpty) {
-      // Soft delete if synced
-      return await (update(passwords)..where((p) => p.id.equals(id))).write(
-        PasswordsCompanion(
-          syncStatus: const Value('deleted'),
-          lastSyncedAt: Value(DateTime.now().toIso8601String()),
-        ),
-      );
-    } else {
-      // Hard delete if not synced yet
-      return await (delete(passwords)..where((p) => p.id.equals(id))).go();
-    }
+    // Always soft delete to allow sync to catch up
+    return await (update(passwords)..where((p) => p.id.equals(id))).write(
+      PasswordsCompanion(
+        syncStatus: const Value('deleted'),
+        lastSyncedAt: Value(DateTime.now().toIso8601String()),
+      ),
+    );
   }
 
   Future<List<Map<String, dynamic>>> getDeletedPasswords() async {

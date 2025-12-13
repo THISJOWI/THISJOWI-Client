@@ -15,12 +15,16 @@ class ApiConfig {
     }
     
     final ip = EnvLoader.getRequired('LOCAL_NETWORK_IP');
-    final port = EnvLoader.getRequiredInt('GATEWAY_PORT');
+    final port = EnvLoader.get('GATEWAY_PORT');
     
     // Limpiar IP si tiene protocolo
     var cleanIp = ip.replaceAll('http://', '').replaceAll('https://', '');
     
-    return 'http://$cleanIp:$port';
+    if (port != null && port.isNotEmpty) {
+      return 'http://$cleanIp:$port';
+    }
+
+    return 'http://$cleanIp';
   }
   
   /// URL completa para el servicio de autenticación

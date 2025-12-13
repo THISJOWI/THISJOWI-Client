@@ -50,7 +50,7 @@ class NotesRepository {
       
       if (result['success'] == true && result['data'] != null) {
         final serverNotes = result['data'] as List<models.Note>;
-        final allLocalNotes = await _db.notesDao.getAllNotes();
+        final allLocalNotes = await _db.notesDao.getAllNotes(includeDeleted: true);
         
         for (final serverNote in serverNotes) {
           if (serverNote.id == null) continue;
@@ -62,6 +62,11 @@ class NotesRepository {
           );
           
           if (existingLocal.isNotEmpty) {
+            // Check if local item is marked for deletion
+            if (existingLocal['syncStatus'] == 'deleted') {
+              continue;
+            }
+
             // Update existing
             await _db.notesDao.updateNote(existingLocal['localId'], {
               'title': serverNote.title,
@@ -74,7 +79,7 @@ class NotesRepository {
             // Check for pending match to avoid duplicates
             // We match by title only because title is unique on server
             final pendingMatch = allLocalNotes.firstWhere(
-              (n) => n['syncStatus'] == 'pending' && 
+              (n) => (n['syncStatus'] == 'pending' || n['syncStatus'] == 'error' || n['syncStatus'] == 'deleted') && 
                      n['title'] == serverNote.title,
               orElse: () => <String, dynamic>{},
             );
@@ -84,10 +89,11 @@ class NotesRepository {
                // We keep syncStatus as 'pending' if content differs so we push our local changes
                // But if content is same, we mark as synced.
                final isContentSame = pendingMatch['content'] == serverNote.content;
+               final isDeleted = pendingMatch['syncStatus'] == 'deleted';
                
                await _db.notesDao.updateNote(pendingMatch['localId'], {
                  'serverId': serverNote.id,
-                 'syncStatus': isContentSame ? 'synced' : 'pending',
+                 'syncStatus': isDeleted ? 'deleted' : (isContentSame ? 'synced' : 'pending'),
                  'lastSyncedAt': DateTime.now().toIso8601String(),
                });
             } else {

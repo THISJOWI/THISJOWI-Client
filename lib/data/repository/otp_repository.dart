@@ -15,6 +15,7 @@ class OtpRepository {
   final OtpApiService _otpApiService = OtpApiService(AuthService());
   final ConnectivityService _connectivityService = ConnectivityService();
   final SecureStorageService _secureStorageService = SecureStorageService();
+  final Set<String> _syncingIds = {};
 
   OtpRepository();
 
@@ -58,7 +59,7 @@ class OtpRepository {
         final userEmail = await _secureStorageService.getValue('cached_email');
         if (userEmail == null) return;
 
-        final allLocalEntries = await _db.otpDao.getAllOtpEntries();
+        final allLocalEntries = await _db.otpDao.getAllOtpEntries(includeDeleted: true);
 
         for (final serverEntry in serverEntries) {
           if (serverEntry.id.isEmpty) continue;
@@ -70,6 +71,11 @@ class OtpRepository {
           );
           
           if (existingLocal.isNotEmpty) {
+            // Check if local item is marked for deletion
+            if (existingLocal['syncStatus'] == 'deleted') {
+              continue;
+            }
+
             // Update existing
             final updateData = {
               'name': serverEntry.name,
@@ -92,16 +98,18 @@ class OtpRepository {
           } else {
             // Check for pending match
             final pendingMatch = allLocalEntries.firstWhere(
-              (e) => e['syncStatus'] == 'pending' && 
+              (e) => (e['syncStatus'] == 'pending' || e['syncStatus'] == 'error' || e['syncStatus'] == 'deleted') && 
                      e['secret'] == serverEntry.secret,
               orElse: () => <String, dynamic>{},
             );
 
             if (pendingMatch.isNotEmpty) {
                // Found a pending entry that matches secret. Link it!
+               final isDeleted = pendingMatch['syncStatus'] == 'deleted';
+               
                await _db.otpDao.updateOtpEntry(pendingMatch['id'], {
                  'serverId': serverEntry.id,
-                 'syncStatus': 'synced',
+                 'syncStatus': isDeleted ? 'deleted' : 'synced',
                  'lastSyncedAt': DateTime.now().toIso8601String(),
                });
             } else {
@@ -184,6 +192,9 @@ class OtpRepository {
 
   /// Sync a newly created OTP entry with backend
   Future<void> _syncOtpInBackground(String localId, model.OtpEntry entry) async {
+    if (_syncingIds.contains(localId)) return;
+    _syncingIds.add(localId);
+
     try {
       final result = await _otpApiService.createOtpEntry(entry);
       
@@ -208,6 +219,8 @@ class OtpRepository {
       await _db.otpDao.updateOtpEntry(localId, {
         'syncStatus': 'error',
       });
+    } finally {
+      _syncingIds.remove(localId);
     }
   }
 
@@ -313,6 +326,8 @@ class OtpRepository {
   Future<void> _syncOtpUpdateInBackground(String localId, model.OtpEntry entry) async {
     // If entry doesn't have server ID, we can't update it on server yet
     if (entry.serverId == null) return;
+    if (_syncingIds.contains(localId)) return;
+    _syncingIds.add(localId);
 
     try {
       final result = await _otpApiService.updateOtpEntry(entry.serverId!, entry);
@@ -333,6 +348,8 @@ class OtpRepository {
       await _db.otpDao.updateOtpEntry(localId, {
         'syncStatus': 'error',
       });
+    } finally {
+      _syncingIds.remove(localId);
     }
   }
 
@@ -361,6 +378,9 @@ class OtpRepository {
 
   /// Sync an OTP deletion with backend
   Future<void> _syncOtpDeletionInBackground(String localId, String serverId) async {
+    if (_syncingIds.contains(localId)) return;
+    _syncingIds.add(localId);
+
     try {
       final result = await _otpApiService.deleteOtpEntry(serverId);
       if (result['success'] == true) {
@@ -369,6 +389,8 @@ class OtpRepository {
       }
     } catch (e) {
       print('Background deletion sync failed: $e');
+    } finally {
+      _syncingIds.remove(localId);
     }
   }
 

@@ -49,7 +49,7 @@ class PasswordsRepository {
       
       if (result['success'] == true && result['data'] != null) {
         final serverPasswords = result['data'] as List;
-        final allLocalPasswords = await _db.passwordsDao.getAllPasswords();
+        final allLocalPasswords = await _db.passwordsDao.getAllPasswords(includeDeleted: true);
         
         for (final item in serverPasswords) {
           // The server returns JSON with 'id' as the server ID.
@@ -64,6 +64,11 @@ class PasswordsRepository {
           );
           
           if (existingLocal.isNotEmpty) {
+            // Check if local item is marked for deletion
+            if (existingLocal['syncStatus'] == 'deleted') {
+              continue;
+            }
+
             // Update existing
             await _db.passwordsDao.updatePassword(existingLocal['id'], {
               'title': item['title'] ?? '',
@@ -79,7 +84,7 @@ class PasswordsRepository {
             // Check for pending match
             // Match by title and username
             final pendingMatch = allLocalPasswords.firstWhere(
-              (p) => p['syncStatus'] == 'pending' && 
+              (p) => (p['syncStatus'] == 'pending' || p['syncStatus'] == 'error' || p['syncStatus'] == 'deleted') && 
                      p['title'] == (item['title'] ?? '') && 
                      p['username'] == (item['username'] ?? ''),
               orElse: () => <String, String?>{},
@@ -87,11 +92,13 @@ class PasswordsRepository {
 
             if (pendingMatch.isNotEmpty) {
                // Found a pending password that matches. Link it!
+               final isDeleted = pendingMatch['syncStatus'] == 'deleted';
+               
                await _db.passwordsDao.updatePassword(pendingMatch['id'], {
                  'serverId': serverId,
                  // Keep pending if other fields differ, but for now just link it
                  // Ideally we should check all fields, but let's assume if title/user match it's the same
-                 'syncStatus': 'synced', 
+                 'syncStatus': isDeleted ? 'deleted' : 'synced', 
                  'lastSyncedAt': DateTime.now().toIso8601String(),
                });
             } else {
