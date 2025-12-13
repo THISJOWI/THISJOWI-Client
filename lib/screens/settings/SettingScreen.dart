@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:thisjowi/core/appColors.dart';
 import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/services/biometric_service.dart';
@@ -498,25 +499,36 @@ class _SettingScreenState extends State<SettingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        title: Text(
-          'Settings'.i18n,
-          style: const TextStyle(
-            color: AppColors.text,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-        foregroundColor: AppColors.text,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+      body: Stack(
         children: [
+          SafeArea(
+            child: Column(
+              children: [
+                // Header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.settings,
+                          color: AppColors.primary, size: 28),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Settings'.i18n,
+                        style: const TextStyle(
+                          color: AppColors.text,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    children: [
 
-          // Security Section
+                      // Security Section
           Padding(
             padding: const EdgeInsets.only(left: 20.0, top: 24.0, bottom: 12.0),
             child: Text(
@@ -566,7 +578,7 @@ class _SettingScreenState extends State<SettingScreen> {
           _buildSettingItem(
             icon: Icons.info_outline,
             title: 'Application Version'.i18n,
-            subtitle: '3.0.0',
+            subtitle: '1.0.0',
           ),
           _buildSettingItem(
             icon: Icons.help_outline,
@@ -601,7 +613,13 @@ class _SettingScreenState extends State<SettingScreen> {
             iconColor: Colors.red,
             onTap: _handleDeleteAccount,
           ),
-          const SizedBox(height: 24, width: 20,),
+                      const SizedBox(height: 24, width: 20,),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

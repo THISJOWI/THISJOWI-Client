@@ -627,129 +627,134 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Row(
-                children: [
-                  const Image(
-                    image: NetworkImage(
-                        "https://pub-9030d6e053cc40b380e0f63662daf8ed.r2.dev/logo-removebg-preview_resized.png"),
-                    height: 40,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'THISJOWI'.i18n,
-                    style: const TextStyle(
-                      color: AppColors.text,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      ),
+      child: Stack(
+        children: [
+          SafeArea(
+            child: Column(
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                child: Row(
+                  children: [
+                    const Image(
+                      image: NetworkImage(
+                          "https://pub-9030d6e053cc40b380e0f63662daf8ed.r2.dev/logo-removebg-preview_resized.png"),
+                      height: 40,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 12),
+                    Text(
+                      'THISJOWI'.i18n,
+                      style: const TextStyle(
+                        color: AppColors.text,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            // Search bar
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.text.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                child: TextField(
-                  style: const TextStyle(color: AppColors.text, fontSize: 16),
-                  decoration: InputDecoration(
-                    labelText: 'Search'.i18n,
-                    prefixIcon: Icon(Icons.search,
-                        color: AppColors.text.withOpacity(0.6), size: 20),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: Icon(Icons.close,
-                                color: AppColors.text.withOpacity(0.6),
-                                size: 20),
-                            onPressed: () {
-                              setState(() => _searchQuery = '');
-                              _loadData();
-                            },
-                          )
-                        : null,
-                    labelStyle: TextStyle(
-                        color: AppColors.text.withOpacity(0.6), fontSize: 16),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
+              // Search bar
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.text.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(25),
                   ),
-                  onChanged: (value) {
-                    setState(() => _searchQuery = value);
-                    _loadData();
-                  },
-                ),
-              ),
-            ),
-            // Content
-            Expanded(
-              child: _isLoading
-                  ? Center(
-                      child: CircularProgressIndicator(color: AppColors.text))
-                  : RefreshIndicator(
-                      onRefresh: _loadData,
-                      color: AppColors.text,
-                      child: _passwords.isEmpty && _notes.isEmpty
-                          ? Center(
-                              child: Text(
-                                'No data yet'.i18n,
-                                style: TextStyle(color: AppColors.text),
-                              ),
+                  child: TextField(
+                    style: const TextStyle(color: AppColors.text, fontSize: 16),
+                    decoration: InputDecoration(
+                      labelText: 'Search'.i18n,
+                      prefixIcon: Icon(Icons.search,
+                          color: AppColors.text.withOpacity(0.6), size: 20),
+                      suffixIcon: _searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: Icon(Icons.close,
+                                  color: AppColors.text.withOpacity(0.6),
+                                  size: 20),
+                              onPressed: () {
+                                setState(() => _searchQuery = '');
+                                _loadData();
+                              },
                             )
-                          : ListView(
-                              padding: const EdgeInsets.only(bottom: 80),
-                              children: [
-                                // Passwords Section
-                                if (_passwords.isNotEmpty) ...[
-                                  _buildSectionHeader(
-                                    icon: Icons.lock_outline,
-                                    title: 'Passwords'.i18n,
-                                    count: _passwords.length,
-                                  ),
-                                  ..._passwords.map(
-                                      (entry) => _buildPasswordItem(entry)),
-                                ],
-
-                                // Divider between sections
-                                if (_passwords.isNotEmpty && _notes.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 24, vertical: 8),
-                                    child: Divider(
-                                      color: AppColors.text.withOpacity(0.1),
-                                      thickness: 1,
-                                    ),
-                                  ),
-
-                                // Notes Section
-                                if (_notes.isNotEmpty) ...[
-                                  _buildSectionHeader(
-                                    icon: Icons.description_outlined,
-                                    title: 'Notes'.i18n,
-                                    count: _notes.length,
-                                  ),
-                                  ..._notes.map((note) => _buildNoteItem(note)),
-                                ],
-                              ],
-                            ),
+                          : null,
+                      labelStyle: TextStyle(
+                          color: AppColors.text.withOpacity(0.6), fontSize: 16),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                     ),
-            ),
-          ],
+                    onChanged: (value) {
+                      setState(() => _searchQuery = value);
+                      _loadData();
+                    },
+                  ),
+                ),
+              ),
+              // Content
+              Expanded(
+                child: _isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(color: AppColors.text))
+                    : RefreshIndicator(
+                        onRefresh: _loadData,
+                        color: AppColors.text,
+                        child: _passwords.isEmpty && _notes.isEmpty
+                            ? _buildEmptyState()
+                            : ListView(
+                              padding: const EdgeInsets.only(bottom: 150),
+                                children: [
+                                  // Passwords Section
+                                  if (_passwords.isNotEmpty) ...[
+                                    _buildSectionHeader(
+                                      icon: Icons.lock_outline,
+                                      title: 'Passwords'.i18n,
+                                      count: _passwords.length,
+                                    ),
+                                    ..._passwords.map(
+                                        (entry) => _buildPasswordItem(entry)),
+                                  ],
+
+                                  // Divider between sections
+                                  if (_passwords.isNotEmpty &&
+                                      _notes.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 24, vertical: 8),
+                                      child: Divider(
+                                        color: AppColors.text.withOpacity(0.1),
+                                        thickness: 1,
+                                      ),
+                                    ),
+
+                                  // Notes Section
+                                  if (_notes.isNotEmpty) ...[
+                                    _buildSectionHeader(
+                                      icon: Icons.description_outlined,
+                                      title: 'Notes'.i18n,
+                                      count: _notes.length,
+                                    ),
+                                    ..._notes
+                                        .map((note) => _buildNoteItem(note)),
+                                  ],
+                                ],
+                              ),
+                      ),
+              ),
+            ],
+          ),
         ),
         // FAB
         Positioned(
-          bottom: 16.0,
+          bottom: 110.0,
           right: 16.0,
           child: ExpandableActionButton(
             onCreatePassword: _createPassword,
@@ -758,6 +763,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ],
+    ),
     );
   }
 
@@ -965,6 +971,40 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Opacity(
+            opacity: 0.2,
+            child: const Icon(
+              Icons.house_rounded,
+              size: 100,
+              color: AppColors.text,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No data yet'.i18n,
+            style: TextStyle(
+              color: AppColors.text.withOpacity(0.5),
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Add your first password or note'.i18n,
+            style: TextStyle(
+              color: AppColors.text.withOpacity(0.3),
+              fontSize: 14,
+            ),
+          ),
+        ],
       ),
     );
   }

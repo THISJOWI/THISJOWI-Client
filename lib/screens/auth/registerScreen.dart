@@ -20,6 +20,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final FocusNode _passwordFocusNode = FocusNode();
   AuthRepository? _authRepository;
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   @override
   void initState() {
@@ -84,184 +85,214 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        child: SizedBox(
-          width: double.infinity,
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 32),
-                child: Column(
-                  children: [
-                    Text(
-                      "Create Account".i18n,
-                      style: TextStyle(
-                        fontSize: 28,
-                        color: AppColors.text,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "Sign up to get started".i18n,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.text.withOpacity(0.6),
-                      ),
-                    ),
-                  ],
-                ),
+      body: Stack(
+        children: [
+          // Decorative background elements
+          Positioned(
+            top: -100,
+            left: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.secondary.withOpacity(0.1),
               ),
-
-              /* EMAIL */
-              SizedBox(
-                width: 300,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.text.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppColors.text.withOpacity(0.1),
-                      width: 1,
+            ),
+          ),
+          Positioned(
+            bottom: -50,
+            right: -50,
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primary.withOpacity(0.05),
+              ),
+            ),
+          ),
+          
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Logo/Icon
+                  Icon(
+                    Icons.person_add_rounded,
+                    size: 80,
+                    color: AppColors.secondary,
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // Welcome Text
+                  Text(
+                    "Create Account".i18n,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 32,
+                      color: AppColors.text,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
                     ),
                   ),
-                  child: TextFormField(
-                    controller: _emailController,
-                    style: const TextStyle(color: AppColors.text, fontSize: 16),
-                    textInputAction: TextInputAction.next,
-                    onFieldSubmitted: (_) => _passwordFocusNode.requestFocus(),
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(
-                        Icons.email,
-                        color: AppColors.text.withOpacity(0.6),
-                        size: 20,
-                      ),
-                      labelText: "Email".i18n,
-                      labelStyle: TextStyle(
-                        color: AppColors.text.withOpacity(0.6),
-                        fontSize: 14,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Sign up to get started".i18n,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.text.withOpacity(0.7),
                     ),
                   ),
-                ),
-              ),
+                  const SizedBox(height: 48),
 
-              /* PASSWORD */
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: SizedBox(
-                  width: 300,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.text.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
+                  // Register Form
+                  Card(
+                    elevation: 8,
+                    color: const Color.fromRGBO(32, 32, 32, 1.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(
                         color: AppColors.text.withOpacity(0.1),
                         width: 1,
                       ),
                     ),
-                    child: TextFormField(
-                      controller: _passwordController,
-                      style: const TextStyle(color: AppColors.text, fontSize: 16),
-                      obscureText: true,
-                      focusNode: _passwordFocusNode,
-                      textInputAction: TextInputAction.done,
-                      onFieldSubmitted: (_) => _isLoading ? null : _handleRegister(),
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(
-                          Icons.lock,
-                          color: AppColors.text.withOpacity(0.6),
-                          size: 20,
-                        ),
-                        labelText: "Password".i18n,
-                        labelStyle: TextStyle(
-                          color: AppColors.text.withOpacity(0.6),
-                          fontSize: 14,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        children: [
+                          // Email Field
+                          TextFormField(
+                            controller: _emailController,
+                            style: const TextStyle(color: AppColors.text),
+                            textInputAction: TextInputAction.next,
+                            keyboardType: TextInputType.emailAddress,
+                            onFieldSubmitted: (_) => _passwordFocusNode.requestFocus(),
+                            decoration: InputDecoration(
+                              prefixIcon: Icon(Icons.email_outlined, color: AppColors.secondary),
+                              labelText: "Email".i18n,
+                              labelStyle: TextStyle(color: AppColors.text.withOpacity(0.6)),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: AppColors.text.withOpacity(0.2)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: AppColors.secondary, width: 2),
+                              ),
+                              filled: true,
+                              fillColor: AppColors.background.withOpacity(0.5),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Password Field
+                          TextFormField(
+                            controller: _passwordController,
+                            focusNode: _passwordFocusNode,
+                            obscureText: _obscurePassword,
+                            style: const TextStyle(color: AppColors.text),
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (_) => _isLoading ? null : _handleRegister(),
+                            decoration: InputDecoration(
+                              prefixIcon: Icon(Icons.lock_outline, color: AppColors.secondary),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                  color: AppColors.text.withOpacity(0.6),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
+                              labelText: "Password".i18n,
+                              labelStyle: TextStyle(color: AppColors.text.withOpacity(0.6)),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: AppColors.text.withOpacity(0.2)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: AppColors.secondary, width: 2),
+                              ),
+                              filled: true,
+                              fillColor: AppColors.background.withOpacity(0.5),
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+
+                          // Register Button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 56,
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _handleRegister,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.secondary,
+                                foregroundColor: AppColors.background,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 4,
+                              ),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      height: 24,
+                                      width: 24,
+                                      child: CircularProgressIndicator(
+                                        color: AppColors.background,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(
+                                      "Create Account".i18n,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ),
-              ),
+                  
+                  const SizedBox(height: 24),
 
-              /* REGISTER BUTTON */
-              SizedBox(
-                width: 300,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _handleRegister,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.text,
-                    foregroundColor: AppColors.background,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(
-                          "Create account".i18n,
+                  // Login Link
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Already have an account? ".i18n,
+                        style: TextStyle(color: AppColors.text.withOpacity(0.7)),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Sign In".i18n,
                           style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                            color: AppColors.secondary,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                ),
-              ),
-
-              /* LOGIN LINK */
-              Padding(
-                padding: const EdgeInsets.only(top: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Already have an account? ".i18n,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.text.withOpacity(0.7),
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, "/login");
-                      },
-                      child: Text(
-                        "Sign In".i18n,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.text,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

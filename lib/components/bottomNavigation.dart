@@ -37,9 +37,10 @@ class MyBottomNavigationState extends State<MyBottomNavigation> with SingleTicke
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+      extendBody: true,
       body: _pages[_currentIndex],
       bottomNavigationBar: Container(
-        color: AppColors.background,
+        color: Colors.transparent,
         child: SafeArea(
           top: false,
           child: Padding(

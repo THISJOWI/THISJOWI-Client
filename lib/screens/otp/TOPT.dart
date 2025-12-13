@@ -59,7 +59,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
     if (result['success'] == true) {
       var entries = result['data'] as List<OtpEntry>? ?? [];
-      
+
       // Deduplicate entries based on secret to prevent UI duplicates
       final seenSecrets = <String>{};
       final uniqueEntries = <OtpEntry>[];
@@ -381,96 +381,107 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              // Header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                child: Row(
-                  children: [
-                    const Icon(Icons.security,
-                        color: AppColors.primary, size: 28),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Authenticator'.tr(context),
-                      style: const TextStyle(
-                        color: AppColors.text,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      ),
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: Stack(
+          children: [
+          SafeArea(
+            child: Column(
+              children: [
+                // Header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.security,
+                          color: AppColors.primary, size: 28),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Authenticator'.tr(context),
+                        style: const TextStyle(
+                          color: AppColors.text,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Search bar
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.text.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: TextField(
+                      onChanged: (value) {
+                        _searchQuery = value;
+                        _loadEntries();
+                      },
+                      style:
+                          const TextStyle(color: AppColors.text, fontSize: 16),
+                      decoration: InputDecoration(
+                        labelText: 'Search'.i18n,
+                        prefixIcon: Icon(Icons.search,
+                            color: AppColors.text.withOpacity(0.6), size: 20),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: Icon(Icons.close,
+                                    color: AppColors.text.withOpacity(0.6),
+                                    size: 20),
+                                onPressed: () {
+                                  setState(() => _searchQuery = '');
+                                  _loadEntries();
+                                },
+                              )
+                            : null,
+                        labelStyle: TextStyle(
+                            color: AppColors.text.withOpacity(0.6),
+                            fontSize: 16),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
                       ),
                     ),
-                  ],
-                ),
-              ),
-
-              // Search bar
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.text.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: TextField(
-                    onChanged: (value) {
-                      _searchQuery = value;
-                      _loadEntries();
-                    },
-                    style: const TextStyle(color: AppColors.text, fontSize: 16),
-                    decoration: InputDecoration(
-                      labelText: 'Search'.i18n,
-                      prefixIcon: Icon(Icons.search,
-                          color: AppColors.text.withOpacity(0.6), size: 20),
-                      suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: Icon(Icons.close,
-                                  color: AppColors.text.withOpacity(0.6),
-                                  size: 20),
-                              onPressed: () {
-                                setState(() => _searchQuery = '');
-                                _loadEntries();
-                              },
-                            )
-                          : null,
-                      labelStyle: TextStyle(
-                          color: AppColors.text.withOpacity(0.6), fontSize: 16),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                    ),
                   ),
                 ),
-              ),
 
-              // List
-              Expanded(
-                child: _isLoading
-                    ? const Center(
-                        child:
-                            CircularProgressIndicator(color: AppColors.primary))
-                    : _entries.isEmpty
-                        ? _buildEmptyState()
-                        : RefreshIndicator(
-                            onRefresh: _loadEntries,
-                            color: AppColors.primary,
-                            child: ListView.builder(
-                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 80),
-                              itemCount: _entries.length,
-                              itemBuilder: (context, index) =>
-                                  _buildOtpCard(_entries[index]),
+                // List
+                Expanded(
+                  child: _isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                              color: AppColors.primary))
+                      : _entries.isEmpty
+                          ? _buildEmptyState()
+                          : RefreshIndicator(
+                              onRefresh: _loadEntries,
+                              color: AppColors.primary,
+                              child: ListView.builder(
+                                padding:
+                                    const EdgeInsets.fromLTRB(20, 0, 20, 150),
+                                itemCount: _entries.length,
+                                itemBuilder: (context, index) =>
+                                    _buildOtpCard(_entries[index]),
+                              ),
                             ),
-                          ),
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
 
           // FAB
           Positioned(
-            bottom: 16.0,
+            bottom: 110.0,
             right: 16.0,
             child: ExpandableActionButton(
               onCreatePassword: _createPassword,
@@ -480,6 +491,7 @@ class _OtpScreenState extends State<OtpScreen> {
           ),
         ],
       ),
+    ),
     );
   }
 
@@ -508,49 +520,6 @@ class _OtpScreenState extends State<OtpScreen> {
               color: AppColors.text.withOpacity(0.3),
               fontSize: 14,
             ),
-          ),
-          const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              OutlinedButton.icon(
-                onPressed: _showImportDialog,
-                icon: const Icon(Icons.qr_code),
-                label: Text('Import URI'.tr(context)),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.text,
-                  side: BorderSide(color: AppColors.text.withOpacity(0.3)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              ElevatedButton.icon(
-                onPressed: _showAddDialog,
-                icon: const Icon(Icons.add),
-                label: Text('Add manually'.tr(context)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.black,
-                ),
-              ),
-              const SizedBox(width: 12),
-              if (!(kIsWeb ||
-                  Platform.isWindows ||
-                  Platform.isMacOS ||
-                  Platform.isLinux))
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    final result =
-                        await Navigator.pushNamed(context, '/otp/qrscan');
-                    if (result == true) _loadEntries();
-                  },
-                  icon: const Icon(Icons.camera_alt),
-                  label: Text('Scan QR'.tr(context)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.black,
-                  ),
-                ),
-            ],
           ),
         ],
       ),
