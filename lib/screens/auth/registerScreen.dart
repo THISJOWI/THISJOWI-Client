@@ -44,12 +44,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  String? _validatePassword(String password) {
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters long'.i18n;
+    }
+    if (!password.contains(RegExp(r'[A-Z]'))) {
+      return 'Password must contain at least one uppercase letter'.i18n;
+    }
+    if (!password.contains(RegExp(r'[0-9]'))) {
+      return 'Password must contain at least one number'.i18n;
+    }
+    if (!password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+      return 'Password must contain at least one special character'.i18n;
+    }
+    return null;
+  }
+
   Future<void> _handleRegister() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
       ErrorSnackBar.show(context, 'Please complete all fields'.i18n);
+      return;
+    }
+
+    final passwordError = _validatePassword(password);
+    if (passwordError != null) {
+      ErrorSnackBar.show(context, passwordError);
       return;
     }
 
