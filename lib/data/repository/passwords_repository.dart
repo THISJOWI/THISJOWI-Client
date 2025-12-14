@@ -286,6 +286,9 @@ class PasswordsRepository {
       // Sync with backend in BACKGROUND (non-blocking)
       if (serverId != null && _connectivityService.isOnline) {
         _syncPasswordDeletionInBackground(id, serverId);
+      } else if (serverId == null) {
+        // If not synced yet, hard delete immediately
+        await _db.passwordsDao.hardDeletePassword(id);
       }
 
       return {
@@ -306,7 +309,10 @@ class PasswordsRepository {
       final result = await _passwordService.deletePassword(serverId);
       if (result['success'] == true) {
         // If successful, hard delete locally
-        await _db.passwordsDao.hardDeletePassword(localId);
+        final count = await _db.passwordsDao.hardDeletePassword(localId);
+        if (count == 0) {
+           print('⚠️ Hard delete failed for $localId after server delete');
+        }
       }
     } catch (e) {
       print('Background password deletion sync failed: $e');

@@ -280,6 +280,9 @@ class NotesRepository {
       // Sync with backend in BACKGROUND (non-blocking)
       if (serverId != null && _connectivityService.isOnline) {
         _syncNoteDeletionInBackground(localId, serverId);
+      } else if (serverId == null) {
+        // If not synced yet, hard delete immediately
+        await _db.notesDao.hardDeleteNote(localId);
       }
 
       return {
@@ -300,7 +303,10 @@ class NotesRepository {
       final result = await _notesService.deleteNote(int.parse(serverId));
       if (result['success'] == true) {
         // If successful, hard delete locally
-        await _db.notesDao.hardDeleteNote(localId);
+        final count = await _db.notesDao.hardDeleteNote(localId);
+        if (count == 0) {
+           print('⚠️ Hard delete failed for $localId after server delete');
+        }
       }
     } catch (e) {
       print('Background deletion sync failed: $e');

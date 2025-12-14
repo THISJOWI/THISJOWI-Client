@@ -46,6 +46,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/logo.png
+    - assets/removed.png
     - .env
 
 flutter_launcher_icons:

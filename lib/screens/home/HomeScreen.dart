@@ -644,8 +644,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   children: [
                     const Image(
-                      image: NetworkImage(
-                          "https://pub-9030d6e053cc40b380e0f63662daf8ed.r2.dev/logo-removebg-preview_resized.png"),
+                      image: AssetImage("assets/removed.png"),
                       height: 40,
                     ),
                     const SizedBox(width: 12),

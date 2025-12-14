@@ -114,19 +114,10 @@ class _SplashScreenState extends State<SplashScreen>
   
   /// Navigate to the appropriate screen based on authentication status
   void _navigateToMainScreen() {
-    _authService.getToken().then((token) {
-      if (!mounted) return;
-      
-      if (token != null && token.isNotEmpty) {
-        // User has valid session, go to Home
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
-        );
-      } else {
-        // No session, go to Login
-        Navigator.of(context).pushReplacementNamed('/login');
-      }
-    });
+    // Always navigate to login screen to prevent auto-login
+    // User must authenticate every time they open the app
+    if (!mounted) return;
+    Navigator.of(context).pushReplacementNamed('/login');
   }
   
   void _showBiometricAuth() {

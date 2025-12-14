@@ -45,6 +45,8 @@ class AuthRepository {
         if (token != null) {
           await _secureStorageService.saveValue('cached_token', token);
           await _secureStorageService.saveValue('cached_email', email);
+          // Also restore session for AuthService to use in API calls
+          await _authService.setSession(token, email);
         }
         
         // Update last login timestamp in local DB
@@ -99,6 +101,9 @@ class AuthRepository {
 
   /// Register with offline-first support.
   Future<Map<String, dynamic>> register(String email, String username, String password) async {
+    // Ensure no stale session exists from previous user
+    await _authService.logout();
+
     // Step 1: Check if user already exists locally
     final existingUser = await _db.authDao.getUserByEmail(email);
     if (existingUser != null) {
@@ -124,6 +129,8 @@ class AuthRepository {
     // Save token for immediate use
     await _secureStorageService.saveValue('cached_token', token);
     await _secureStorageService.saveValue('cached_email', email);
+    // Also set session for AuthService (even if temp token, it prevents using old user's token)
+    await _authService.setSession(token, email);
 
     // Step 4: Sync with backend in BACKGROUND (non-blocking)
     _syncRegistrationInBackground(email, username, password);
@@ -348,8 +355,8 @@ class AuthRepository {
         await _db.otpDao.deleteOtpEntriesByUser(email);
         
         // Delete user record
-        await _db.authDao.deleteUser(email);
-        print('✅ Local user data deleted');
+        final deletedCount = await _db.authDao.deleteUser(email);
+        print('✅ Local user data deleted. Users removed: $deletedCount');
         
         // Clear cached credentials
         await _secureStorageService.clearCachedCredentials();

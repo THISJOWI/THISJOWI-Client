@@ -105,8 +105,8 @@ class BiometricService {
   /// Check if biometric app lock is enabled
   Future<bool> isBiometricLockEnabled() async {
     final prefs = await SharedPreferences.getInstance();
-    // Default to true - enabled by default after first app open
-    return prefs.getBool(_biometricLockEnabledKey) ?? true;
+    // Default to false - user must explicitly enable it
+    return prefs.getBool(_biometricLockEnabledKey) ?? false;
   }
 
   /// Enable or disable biometric app lock

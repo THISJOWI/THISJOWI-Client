@@ -90,6 +90,12 @@ class AuthService {
     await prefs.remove('email');
   }
 
+  Future<void> setSession(String token, String email) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', token);
+    await prefs.setString('email', email);
+  }
+
   Future<Map<String, dynamic>> changePassword(String currentPassword, String newPassword, String confirmPassword) async {
     try {
       final token = await getToken();
