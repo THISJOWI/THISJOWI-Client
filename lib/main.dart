@@ -26,6 +26,7 @@ void main() async {
   ));
   
   await EnvLoader.load();
+  await ApiConfig.init();
   
   ApiConfig.printConfig();
   

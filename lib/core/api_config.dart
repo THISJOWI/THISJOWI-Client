@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thisjowi/core/env_loader.dart';
 
 
@@ -96,11 +97,25 @@ class ApiConfig {
   /// Permite sobreescribir manualmente la URL base (útil para testing)
   static String? _manualBaseUrl;
   
+  static Future<void> init() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedUrl = prefs.getString('custom_api_url');
+    if (savedUrl != null && savedUrl.isNotEmpty) {
+      _manualBaseUrl = savedUrl;
+    }
+  }
+
   static void setManualBaseUrl(String url) {
     _manualBaseUrl = url;
     if (kDebugMode) {
       debugPrint('API Base URL manually set to: $url');
     }
+  }
+
+  static Future<void> saveManualBaseUrl(String url) async {
+    setManualBaseUrl(url);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('custom_api_url', url);
   }
   
   static void clearManualBaseUrl() {

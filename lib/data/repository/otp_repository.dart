@@ -16,6 +16,7 @@ class OtpRepository {
   final ConnectivityService _connectivityService = ConnectivityService();
   final SecureStorageService _secureStorageService = SecureStorageService();
   final Set<String> _syncingIds = {};
+  bool _isSyncing = false;
 
   OtpRepository();
 
@@ -49,6 +50,9 @@ class OtpRepository {
 
   /// Sync OTP entries from server to local database
   Future<void> _syncFromServer() async {
+    if (_isSyncing) return;
+    _isSyncing = true;
+
     try {
       final result = await _otpApiService.getAllOtpEntries();
       
@@ -151,6 +155,8 @@ class OtpRepository {
       }
     } catch (e) {
       print('Server sync failed: $e');
+    } finally {
+      _isSyncing = false;
     }
   }
 

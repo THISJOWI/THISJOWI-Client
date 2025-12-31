@@ -14,6 +14,8 @@ class NotesRepository {
   final Uuid _uuid = const Uuid();
   final NotesService _notesService = NotesService(AuthService());
   final ConnectivityService _connectivityService = ConnectivityService();
+  final Set<String> _syncingIds = {};
+  bool _isSyncing = false;
 
   NotesRepository();
 
@@ -45,6 +47,9 @@ class NotesRepository {
 
   /// Sync notes from server to local database
   Future<void> _syncFromServer() async {
+    if (_isSyncing) return;
+    _isSyncing = true;
+
     try {
       final result = await _notesService.getAllNotes();
       
@@ -130,6 +135,8 @@ class NotesRepository {
       }
     } catch (e) {
       print('Server sync failed: $e');
+    } finally {
+      _isSyncing = false;
     }
   }
 
@@ -178,6 +185,9 @@ class NotesRepository {
 
   /// Sync a newly created note with backend
   Future<void> _syncNoteInBackground(String localId, models.Note note) async {
+    if (_syncingIds.contains(localId)) return;
+    _syncingIds.add(localId);
+
     try {
       final result = await _notesService.createNote(note);
       
@@ -202,6 +212,8 @@ class NotesRepository {
       await _db.notesDao.updateNote(localId, {
         'syncStatus': 'error',
       });
+    } finally {
+      _syncingIds.remove(localId);
     }
   }
 
@@ -248,6 +260,9 @@ class NotesRepository {
     // If note doesn't have server ID, we can't update it on server yet
     // It will be handled by the create sync or a full sync
     if (note.serverId == null) return;
+    
+    if (_syncingIds.contains(localId)) return;
+    _syncingIds.add(localId);
 
     try {
       final result = await _notesService.updateNote(note.title, note);
@@ -268,6 +283,8 @@ class NotesRepository {
       await _db.notesDao.updateNote(localId, {
         'syncStatus': 'error',
       });
+    } finally {
+      _syncingIds.remove(localId);
     }
   }
 
@@ -299,6 +316,9 @@ class NotesRepository {
 
   /// Sync a note deletion with backend
   Future<void> _syncNoteDeletionInBackground(String localId, String serverId) async {
+    if (_syncingIds.contains(localId)) return;
+    _syncingIds.add(localId);
+
     try {
       final result = await _notesService.deleteNote(int.parse(serverId));
       if (result['success'] == true) {
@@ -310,6 +330,8 @@ class NotesRepository {
       }
     } catch (e) {
       print('Background deletion sync failed: $e');
+    } finally {
+      _syncingIds.remove(localId);
     }
   }
 

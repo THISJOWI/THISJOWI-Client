@@ -558,8 +558,8 @@ extension Localization on String {
         "es": "Autentícate para continuar",
       } +
       {
-        "en": "Authenticate to access ThisJowi",
-        "es": "Autentícate para acceder a ThisJowi",
+        "en": "Authenticate to access THISJOWI",
+        "es": "Autentícate para acceder a THISJOWI",
       } +
       {
         "en": "Authenticate to enable biometric lock",
@@ -600,12 +600,12 @@ extension Localization on String {
 
       // ==================== ONBOARDING ====================
       {
-        "en": "Welcome to ThisJowi",
-        "es": "Bienvenido a ThisJowi",
+        "en": "Welcome to THISJOWI",
+        "es": "Bienvenido a THISJOWI",
       } +
       {
-        "en": "Your secure password manager",
-        "es": "Tu gestor de contraseñas seguro",
+        "en": "Your productivity secured manager",
+        "es": "Tu gestor de productividad seguro",
       } +
       {
         "en": "Secure Storage",
@@ -624,16 +624,16 @@ extension Localization on String {
         "es": "Accede en cualquier momento y lugar",
       } +
       {
-        "en": "Cloud Sync",
-        "es": "Sincronización en la nube",
+        "en": "Synchronization",
+        "es": "Sincronización",
       } +
       {
         "en": "Add your first password or note",
         "es": "Agregar tu primera contraseña o nota",
       } +
       {
-        "en": "Keep your data synced across all devices",
-        "es": "Mantén tus datos sincronizados en todos tus dispositivos",
+        "en": "Keep your data synced",
+        "es": "Mantén tus datos sincronizados",
       } +
       {
         "en": "Biometric Security",

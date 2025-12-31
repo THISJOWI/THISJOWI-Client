@@ -9,7 +9,7 @@ import '../core/api_config.dart';
 ///
 /// Contract:
 /// - login(email, password) -> Future<Map> { success: bool, data?: Map, message?: String }
-/// - register(email, username, password) -> Future<Map> { success: bool, data?: Map, message?: String }
+/// - register(email, password) -> Future<Map> { success: bool, data?: Map, message?: String }
 /// - changePassword(current, new, confirm) -> Future<Map> { success: bool, message?: String, data?: Map }
 /// - deleteAccount() -> Future<Map> { success: bool, message?: String }
 /// - getToken() -> Future<String?>
@@ -50,13 +50,30 @@ class AuthService {
     }
   }
 
-  Future<Map<String, dynamic>> register(String email, String username, String password) async {
+  Future<Map<String, dynamic>> register(
+    String email, 
+    String password, {
+    String? country,
+    String? accountType,
+    String? hostingMode,
+    String? birthdate,
+  }) async {
     try {
       final uri = Uri.parse('$baseUrl/register');
+      final bodyData = {
+        'email': email, 
+        'password': password,
+      };
+      
+      if (country != null) bodyData['country'] = country;
+      if (accountType != null) bodyData['accountType'] = accountType;
+      if (hostingMode != null) bodyData['hostingMode'] = hostingMode;
+      if (birthdate != null) bodyData['birthdate'] = birthdate;
+
       final res = await http.post(
         uri,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'username': username, 'password': password}),
+        body: jsonEncode(bodyData),
       ).timeout(const Duration(seconds: 30));
 
       final body = _tryDecode(res.body);
@@ -66,6 +83,47 @@ class AuthService {
       }
 
   return {'success': false, 'message': body?['message'] ?? 'Error: ${res.statusCode}'};
+    } on TimeoutException {
+      return {'success': false, 'message': 'Connection timeout. Please try again.'};
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> updateUser({
+    String? country,
+    String? accountType,
+    String? hostingMode,
+    String? birthdate,
+  }) async {
+    try {
+      final token = await getToken();
+      if (token == null) return {'success': false, 'message': 'Not authenticated'};
+
+      final uri = Uri.parse('$baseUrl/user');
+      final bodyData = <String, String>{};
+      
+      if (country != null) bodyData['country'] = country;
+      if (accountType != null) bodyData['accountType'] = accountType;
+      if (hostingMode != null) bodyData['hostingMode'] = hostingMode;
+      if (birthdate != null) bodyData['birthdate'] = birthdate;
+
+      final res = await http.put(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(bodyData),
+      ).timeout(const Duration(seconds: 30));
+
+      final body = _tryDecode(res.body);
+
+      if (res.statusCode == 200) {
+        return {'success': true, 'data': body};
+      }
+
+      return {'success': false, 'message': body?['message'] ?? 'Error: ${res.statusCode}'};
     } on TimeoutException {
       return {'success': false, 'message': 'Connection timeout. Please try again.'};
     } catch (e) {

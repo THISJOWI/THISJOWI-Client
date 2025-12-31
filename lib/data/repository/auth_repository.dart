@@ -100,7 +100,14 @@ class AuthRepository {
   }
 
   /// Register with offline-first support.
-  Future<Map<String, dynamic>> register(String email, String username, String password) async {
+  Future<Map<String, dynamic>> register(
+    String email, 
+    String password, {
+    String? country,
+    String? accountType,
+    String? hostingMode,
+    String? birthdate,
+  }) async {
     // Ensure no stale session exists from previous user
     await _authService.logout();
 
@@ -133,7 +140,14 @@ class AuthRepository {
     await _authService.setSession(token, email);
 
     // Step 4: Sync with backend in BACKGROUND (non-blocking)
-    _syncRegistrationInBackground(email, username, password);
+    _syncRegistrationInBackground(
+      email, 
+      password,
+      country: country,
+      accountType: accountType,
+      hostingMode: hostingMode,
+      birthdate: birthdate,
+    );
 
     // Return success immediately - user can start using the app
     return {
@@ -143,21 +157,76 @@ class AuthRepository {
     };
   }
 
+  /// Update user profile.
+  Future<Map<String, dynamic>> updateUser({
+    String? country,
+    String? accountType,
+    String? hostingMode,
+    String? birthdate,
+  }) async {
+    final isOnline = _connectivityService.isOnline;
+    
+    if (!isOnline) {
+      // TODO: Implement offline queue for updates
+      return {
+        'success': false,
+        'message': 'Update requires internet connection currently.',
+      };
+    }
+
+    try {
+      final result = await _authService.updateUser(
+        country: country,
+        accountType: accountType,
+        hostingMode: hostingMode,
+        birthdate: birthdate,
+      );
+
+      return result;
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Update failed: $e',
+      };
+    }
+  }
+
   /// Sync registration with backend in background (non-blocking)
-  void _syncRegistrationInBackground(String email, String username, String password) {
+  void _syncRegistrationInBackground(
+    String email, 
+    String password, {
+    String? country,
+    String? accountType,
+    String? hostingMode,
+    String? birthdate,
+  }) {
     // Fire and forget - don't await
     Future(() async {
       final isOnline = _connectivityService.isOnline;
       
       if (!isOnline) {
         // Queue for later sync when connection is restored
-        await _queueRegistration(email, username, password);
+        await _queueRegistration(
+          email, 
+          password,
+          country: country,
+          accountType: accountType,
+          hostingMode: hostingMode,
+          birthdate: birthdate,
+        );
         print('📝 Registration queued for later sync: $email');
         return;
       }
 
       try {
-        final result = await _authService.register(email, username, password);
+        final result = await _authService.register(
+          email, 
+          password,
+          country: country,
+          accountType: accountType,
+          hostingMode: hostingMode,
+          birthdate: birthdate,
+        );
         
         if (result['success'] == true) {
           // Backend registration successful - update with real token
@@ -170,12 +239,26 @@ class AuthRepository {
           print('✅ Registration synced successfully: $email');
         } else {
           // Backend registration failed - queue for retry
-          await _queueRegistration(email, username, password);
+          await _queueRegistration(
+            email, 
+            password,
+            country: country,
+            accountType: accountType,
+            hostingMode: hostingMode,
+            birthdate: birthdate,
+          );
           print('⚠️ Registration queued for retry: $email - ${result['message']}');
         }
       } catch (e) {
         // Network error - queue for retry
-        await _queueRegistration(email, username, password);
+        await _queueRegistration(
+          email, 
+          password,
+          country: country,
+          accountType: accountType,
+          hostingMode: hostingMode,
+          birthdate: birthdate,
+        );
         print('❌ Registration sync failed, queued for retry: $email - $e');
       }
     });
@@ -433,16 +516,28 @@ class AuthRepository {
   }
 
   /// Queue registration for later sync.
-  Future<void> _queueRegistration(String email, String username, String password) async {
+  Future<void> _queueRegistration(
+    String email, 
+    String password, {
+    String? country,
+    String? accountType,
+    String? hostingMode,
+    String? birthdate,
+  }) async {
+    final data = {
+      'email': email,
+      'password': password,
+    };
+    if (country != null) data['country'] = country;
+    if (accountType != null) data['accountType'] = accountType;
+    if (hostingMode != null) data['hostingMode'] = hostingMode;
+    if (birthdate != null) data['birthdate'] = birthdate;
+
     await _db.syncQueueDao.queueItem(
       'registration',
       email,
       'create',
-      jsonEncode({
-        'email': email,
-        'username': username,
-        'password': password,
-      }),
+      jsonEncode(data),
     );
   }
 

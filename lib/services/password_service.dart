@@ -101,7 +101,11 @@ class PasswordService {
       if (res.statusCode == 200 || res.statusCode == 201) {
         // Sync with iOS AutoFill after adding password
         _syncPasswordsWithAutofill();
-        return {'success': true, 'message': 'Password added successfully'};
+        return {
+          'success': true, 
+          'message': 'Password added successfully',
+          'data': body
+        };
       } else if (res.statusCode == 401) {
         return {'success': false, 'message': 'Invalid or expired token. Please log in again.'};
       } else if (res.statusCode == 400) {

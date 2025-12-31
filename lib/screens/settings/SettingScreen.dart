@@ -7,6 +7,8 @@ import 'package:thisjowi/services/connectivity_service.dart';
 import 'package:thisjowi/data/local/secure_storage_service.dart';
 import 'package:thisjowi/components/error_snack_bar.dart';
 import 'package:thisjowi/i18n/translations.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -492,6 +494,252 @@ class _SettingScreenState extends State<SettingScreen> {
     }
   }
 
+  void _showEditCountryDialog() {
+    LatLng? selectedLocation;
+    
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Dialog(
+          backgroundColor: AppColors.background,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Container(
+            width: 400,
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Select Country'.i18n,
+                  style: const TextStyle(
+                    color: AppColors.text,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Container(
+                  height: 300,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.text.withOpacity(0.2)),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: FlutterMap(
+                      options: MapOptions(
+                        initialCenter: const LatLng(20.0, 0.0),
+                        initialZoom: 2.0,
+                        onTap: (tapPosition, point) {
+                          setState(() {
+                            selectedLocation = point;
+                          });
+                        },
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          userAgentPackageName: 'uk.thisjowi.client',
+                        ),
+                        if (selectedLocation != null)
+                          MarkerLayer(
+                            markers: [
+                              Marker(
+                                point: selectedLocation!,
+                                width: 40,
+                                height: 40,
+                                child: const Icon(
+                                  Icons.location_on,
+                                  color: Colors.red,
+                                  size: 40,
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('Cancel'.i18n, style: TextStyle(color: AppColors.text.withOpacity(0.7))),
+                    ),
+                    const SizedBox(width: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (selectedLocation == null) return;
+                        final countryString = "${selectedLocation!.latitude}, ${selectedLocation!.longitude}";
+                        
+                        try {
+                          final result = await _authRepository!.updateUser(country: countryString);
+                          if (!mounted) return;
+                          if (result['success'] == true) {
+                            Navigator.pop(context);
+                            ErrorSnackBar.showSuccess(context, 'Country updated'.i18n);
+                          } else {
+                            ErrorSnackBar.show(context, result['message'] ?? 'Failed'.i18n);
+                          }
+                        } catch (e) {
+                          if (!mounted) return;
+                          ErrorSnackBar.show(context, 'Error: $e');
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: Text('Save'.i18n),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showEditBirthdateDialog() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: AppColors.primary,
+              onPrimary: Colors.white,
+              surface: AppColors.background,
+              onSurface: AppColors.text,
+            ), dialogTheme: DialogThemeData(backgroundColor: AppColors.background),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      final dateString = "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+      try {
+        final result = await _authRepository!.updateUser(birthdate: dateString);
+        if (!mounted) return;
+        if (result['success'] == true) {
+          ErrorSnackBar.showSuccess(context, 'Birthdate updated'.i18n);
+        } else {
+          ErrorSnackBar.show(context, result['message'] ?? 'Failed'.i18n);
+        }
+      } catch (e) {
+        if (!mounted) return;
+        ErrorSnackBar.show(context, 'Error: $e');
+      }
+    }
+  }
+
+  void _showEditAccountTypeDialog() {
+    String? accountType;
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          backgroundColor: AppColors.background,
+          title: Text('Account Type'.i18n, style: const TextStyle(color: AppColors.text)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: ['Business', 'Community'].map((type) => RadioListTile<String>(
+              title: Text(type, style: const TextStyle(color: AppColors.text)),
+              value: type,
+              groupValue: accountType,
+              activeColor: AppColors.primary,
+              onChanged: (value) => setState(() => accountType = value),
+            )).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel'.i18n, style: TextStyle(color: AppColors.text.withOpacity(0.7))),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (accountType == null) return;
+                try {
+                  final result = await _authRepository!.updateUser(accountType: accountType);
+                  if (!mounted) return;
+                  if (result['success'] == true) {
+                    Navigator.pop(context);
+                    ErrorSnackBar.showSuccess(context, 'Account Type updated'.i18n);
+                  } else {
+                    ErrorSnackBar.show(context, result['message'] ?? 'Failed'.i18n);
+                  }
+                } catch (e) {
+                  if (!mounted) return;
+                  ErrorSnackBar.show(context, 'Error: $e');
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+              child: Text('Save'.i18n),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showEditHostingModeDialog() {
+    String? hostingMode;
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          backgroundColor: AppColors.background,
+          title: Text('Hosting Mode'.i18n, style: const TextStyle(color: AppColors.text)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: ['Cloud', 'Self-Hosted'].map((mode) => RadioListTile<String>(
+              title: Text(mode, style: const TextStyle(color: AppColors.text)),
+              value: mode,
+              groupValue: hostingMode,
+              activeColor: AppColors.primary,
+              onChanged: (value) => setState(() => hostingMode = value),
+            )).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel'.i18n, style: TextStyle(color: AppColors.text.withOpacity(0.7))),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (hostingMode == null) return;
+                try {
+                  final result = await _authRepository!.updateUser(hostingMode: hostingMode);
+                  if (!mounted) return;
+                  if (result['success'] == true) {
+                    Navigator.pop(context);
+                    ErrorSnackBar.showSuccess(context, 'Hosting Mode updated'.i18n);
+                  } else {
+                    ErrorSnackBar.show(context, result['message'] ?? 'Failed'.i18n);
+                  }
+                } catch (e) {
+                  if (!mounted) return;
+                  ErrorSnackBar.show(context, 'Error: $e');
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+              child: Text('Save'.i18n),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _newPasswordController.dispose();
@@ -531,6 +779,43 @@ class _SettingScreenState extends State<SettingScreen> {
                   child: ListView(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     children: [
+
+                      // Profile Section
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20.0, top: 24.0, bottom: 12.0),
+                        child: Text(
+                          'Profile'.i18n,
+                          style: TextStyle(
+                            color: AppColors.text.withOpacity(0.6),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      _buildSettingItem(
+                        icon: Icons.public,
+                        title: 'Country'.i18n,
+                        subtitle: 'Update your country'.i18n,
+                        onTap: _showEditCountryDialog,
+                      ),
+                      _buildSettingItem(
+                        icon: Icons.cake,
+                        title: 'Birthdate'.i18n,
+                        subtitle: 'Update your birthdate'.i18n,
+                        onTap: _showEditBirthdateDialog,
+                      ),
+                      _buildSettingItem(
+                        icon: Icons.business,
+                        title: 'Account Type'.i18n,
+                        subtitle: 'Update account type'.i18n,
+                        onTap: _showEditAccountTypeDialog,
+                      ),
+                      _buildSettingItem(
+                        icon: Icons.cloud_queue,
+                        title: 'Hosting Mode'.i18n,
+                        subtitle: 'Update hosting mode'.i18n,
+                        onTap: _showEditHostingModeDialog,
+                      ),
 
                       // Security Section
           Padding(
