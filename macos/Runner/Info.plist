@@ -35,5 +35,19 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.874520303548-4rgi8toprafuqmv6nvjnl68h1vqqhb4t</string>
+				<string>thisjowi</string>
+			</array>
+		</dict>
+	</array>
+	<key>GIDClientID</key>
+	<string>874520303548-4rgi8toprafuqmv6nvjnl68h1vqqhb4t.apps.googleusercontent.com</string>
 </dict>
 </plist>

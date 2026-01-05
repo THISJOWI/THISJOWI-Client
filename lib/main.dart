@@ -54,13 +54,16 @@ class MainApp extends StatelessWidget {
       ],
       localeResolutionCallback: (locale, supportedLocales) {
         // Si el idioma del dispositivo es español (cualquier variante), usar 'es'
-        if (locale?.languageCode == 'es') {
+        if (locale != null && locale.languageCode == 'es') {
           return const Locale('es');
         }
         // Por defecto, usar inglés
         return const Locale('en');
       },
-      builder: (context, child) => I18n(child: child!),
+      builder: (context, child) => I18n(
+        initialLocale: const Locale('en'),
+        child: child!
+      ),
       
       theme: ThemeData(
         scaffoldBackgroundColor: AppColors.background,

@@ -7,6 +7,7 @@ import 'package:thisjowi/services/connectivity_service.dart';
 import 'package:thisjowi/data/local/secure_storage_service.dart';
 import 'package:thisjowi/components/bottomNavigation.dart';
 import 'package:thisjowi/components/error_snack_bar.dart';
+import 'package:thisjowi/components/social_login_button.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/i18n/translation_service.dart';
 
@@ -86,6 +87,44 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  Future<void> _handleGoogleLogin() async {
+    setState(() => _isLoading = true);
+    
+    final authService = AuthService();
+    final result = await authService.loginWithGoogle();
+    
+    if (mounted) {
+      setState(() => _isLoading = false);
+      
+      if (result['success'] == true) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
+        );
+      } else {
+        ErrorSnackBar.show(context, result['message'] ?? 'Google Sign In failed');
+      }
+    }
+  }
+  Future<void> _handleGitHubLogin() async {
+    setState(() => _isLoading = true);
+    
+    final authService = AuthService();
+    final result = await authService.loginWithGitHub();
+    
+    if (mounted) {
+      setState(() => _isLoading = false);
+      
+      if (result['success'] == true) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
+        );
+      } else {
+        ErrorSnackBar.show(context, result['message'] ?? 'GitHub login failed');
+      }
+    }
+  }
   Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
@@ -301,6 +340,27 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                             ),
                           ),
+                          const SizedBox(height: 16),
+
+                          // Social Login Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Google
+                              SocialLoginButton(
+                                imagePath: 'assets/google_logo.png',
+                                onTap: _isLoading ? null : _handleGoogleLogin,
+                                color: Colors.red,
+                              ),
+                              const SizedBox(width: 20),
+                              // GitHub
+                              SocialLoginButton(
+                                imagePath: 'assets/github_logo.png',
+                                onTap: _isLoading ? null : _handleGitHubLogin,
+                                color: Colors.black,
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -388,3 +448,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+

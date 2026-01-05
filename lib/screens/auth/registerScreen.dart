@@ -4,7 +4,9 @@ import 'package:thisjowi/components/error_snack_bar.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/screens/auth/register_form.dart';
 
+import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/components/bottomNavigation.dart';
+import 'package:thisjowi/components/social_login_button.dart';
 import 'package:thisjowi/screens/auth/email_verification_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -62,6 +64,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
             builder: (context) => EmailVerificationScreen(email: email),
           ),
         );
+      }
+    }
+  }
+
+  Future<void> _handleGoogleRegister() async {
+    final authService = AuthService();
+    final result = await authService.loginWithGoogle();
+    
+    if (mounted) {
+      if (result['success'] == true) {
+        _handleSuccess(result['data'] ?? {});
+      } else {
+        ErrorSnackBar.show(context, result['message'] ?? 'Google Sign Up failed');
+      }
+    }
+  }
+
+  Future<void> _handleGitHubRegister() async {
+    final authService = AuthService();
+    final result = await authService.loginWithGitHub();
+    
+    if (mounted) {
+      if (result['success'] == true) {
+        _handleSuccess(result['data'] ?? {});
+      } else {
+        ErrorSnackBar.show(context, result['message'] ?? 'GitHub Sign Up failed');
       }
     }
   }
@@ -131,6 +159,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 
+                const SizedBox(height: 16),
+                
+                // Social Login Buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Google
+                    SocialLoginButton(
+                      imagePath: 'assets/google_logo.png',
+                      onTap: _handleGoogleRegister,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(width: 20),
+                    // GitHub
+                    SocialLoginButton(
+                      imagePath: 'assets/github_logo.png',
+                      onTap: _handleGitHubRegister,
+                      color: Colors.black,
+                    ),
+                  ],
+                ),
+
                 if (!widget.isEmbedded) ...[
                   const SizedBox(height: 24),
 

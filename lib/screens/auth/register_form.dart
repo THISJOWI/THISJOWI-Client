@@ -6,7 +6,6 @@ import 'package:thisjowi/services/connectivity_service.dart';
 import 'package:thisjowi/data/local/secure_storage_service.dart';
 import 'package:thisjowi/components/error_snack_bar.dart';
 import 'package:thisjowi/i18n/translations.dart';
-import 'package:thisjowi/components/country_map_picker.dart';
 
 class RegisterForm extends StatefulWidget {
   final Function(Map<String, dynamic> result) onSuccess;
@@ -64,7 +63,6 @@ class _RegisterFormState extends State<RegisterForm> {
     _birthdateController.dispose();
     _emailFocusNode.dispose();
     _passwordFocusNode.dispose();
-    _countryFocusNode.dispose();
     super.dispose();
   }
 
@@ -213,14 +211,12 @@ class _RegisterFormState extends State<RegisterForm> {
     final fullName = _fullNameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
-    final country = _countryController.text.trim();
     final birthdate = _birthdateController.text.trim();
 
     final result = await _authRepository!.register(
       email, 
       password,
       fullName: fullName,
-      country: country.isNotEmpty ? country : null,
       birthdate: birthdate.isNotEmpty ? birthdate : null,
       accountType: widget.accountType,
       hostingMode: widget.hostingMode,
@@ -325,40 +321,6 @@ class _RegisterFormState extends State<RegisterForm> {
               },
             ),
             labelText: "Password".i18n,
-            labelStyle: TextStyle(color: AppColors.text.withOpacity(0.6)),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.text.withOpacity(0.2)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.secondary, width: 2),
-            ),
-            filled: true,
-            fillColor: AppColors.background.withOpacity(0.5),
-          ),
-        ),
-        const SizedBox(height: 20),
-
-        // Country Field (Optional)
-        TextFormField(
-          controller: _countryController,
-          focusNode: _countryFocusNode,
-          style: const TextStyle(color: AppColors.text),
-          readOnly: true,
-          onTap: () async {
-            final result = await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const CountryMapPicker()),
-            );
-            if (result != null && result is String) {
-              _countryController.text = result;
-            }
-          },
-          textInputAction: TextInputAction.next,
-          decoration: InputDecoration(
-            prefixIcon: Icon(Icons.public, color: AppColors.secondary),
-            labelText: "Country (Optional)".i18n,
             labelStyle: TextStyle(color: AppColors.text.withOpacity(0.6)),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),

@@ -85,8 +85,14 @@ extension Localization on String {
         "en": "Login",
         "es": "Iniciar sesión",
       } +
+      {        "en": "Sign in with Google",
+        "es": "Iniciar sesión con Google",
+      } +
       {
-        "en": "Register",
+        "en": "Sign up with Google",
+        "es": "Registrarse con Google",
+      } +
+      {        "en": "Register",
         "es": "Registrarse",
       } +
       {
