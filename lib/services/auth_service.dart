@@ -136,7 +136,7 @@ class AuthService {
       final res = await http.post(
         uri,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'code': code}),
+        body: jsonEncode({'code': code, 'redirect_uri': redirectUri}),
       ).timeout(const Duration(seconds: 30));
 
       final body = _tryDecode(res.body);
@@ -295,7 +295,8 @@ class AuthService {
 
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token');
+    final token = prefs.getString('token');
+    return token;
   }
 
   Future<String?> getEmail() async {

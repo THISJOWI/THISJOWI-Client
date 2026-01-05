@@ -5,6 +5,9 @@ import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/screens/auth/register_form.dart';
 
 import 'package:thisjowi/services/auth_service.dart';
+import 'package:thisjowi/data/repository/auth_repository.dart';
+import 'package:thisjowi/services/connectivity_service.dart';
+import 'package:thisjowi/data/local/secure_storage_service.dart';
 import 'package:thisjowi/components/bottomNavigation.dart';
 import 'package:thisjowi/components/social_login_button.dart';
 import 'package:thisjowi/screens/auth/email_verification_screen.dart';
@@ -69,8 +72,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _handleGoogleRegister() async {
-    final authService = AuthService();
-    final result = await authService.loginWithGoogle();
+    final authRepository = AuthRepository(
+      authService: AuthService(),
+      connectivityService: ConnectivityService(),
+      secureStorageService: SecureStorageService(),
+    );
+    final result = await authRepository.loginWithGoogle();
     
     if (mounted) {
       if (result['success'] == true) {
@@ -82,8 +89,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _handleGitHubRegister() async {
-    final authService = AuthService();
-    final result = await authService.loginWithGitHub();
+    final authRepository = AuthRepository(
+      authService: AuthService(),
+      connectivityService: ConnectivityService(),
+      secureStorageService: SecureStorageService(),
+    );
+    final result = await authRepository.loginWithGitHub();
     
     if (mounted) {
       if (result['success'] == true) {

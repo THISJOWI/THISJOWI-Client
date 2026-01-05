@@ -90,8 +90,14 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleGoogleLogin() async {
     setState(() => _isLoading = true);
     
-    final authService = AuthService();
-    final result = await authService.loginWithGoogle();
+    // Use AuthRepository to ensure local persistence
+    final authRepository = AuthRepository(
+      authService: AuthService(),
+      connectivityService: ConnectivityService(),
+      secureStorageService: SecureStorageService(),
+    );
+    
+    final result = await authRepository.loginWithGoogle();
     
     if (mounted) {
       setState(() => _isLoading = false);
@@ -109,8 +115,13 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleGitHubLogin() async {
     setState(() => _isLoading = true);
     
-    final authService = AuthService();
-    final result = await authService.loginWithGitHub();
+    final authRepository = AuthRepository(
+      authService: AuthService(),
+      connectivityService: ConnectivityService(),
+      secureStorageService: SecureStorageService(),
+    );
+    
+    final result = await authRepository.loginWithGitHub();
     
     if (mounted) {
       setState(() => _isLoading = false);

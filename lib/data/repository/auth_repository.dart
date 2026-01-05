@@ -99,6 +99,93 @@ class AuthRepository {
     }
   }
 
+  /// Login with Google (Online only, then caches session)
+  Future<Map<String, dynamic>> loginWithGoogle() async {
+    final isOnline = _connectivityService.isOnline;
+    
+    if (!isOnline) {
+      return {
+        'success': false,
+        'message': 'Google login requires internet connection.',
+      };
+    }
+
+    try {
+      final result = await _authService.loginWithGoogle();
+      
+      if (result['success'] == true) {
+        final data = result['data'];
+        final token = data?['token'];
+        // AuthService.loginWithGoogle saves email to SharedPreferences, but we need it here.
+        // The backend response might contain email, or we can get it from AuthService.
+        String? email = data?['email'];
+        
+        if (email == null) {
+           // Try to get from SharedPreferences if not in response
+           email = await _authService.getEmail();
+        }
+
+        if (email != null && token != null) {
+          // Cache credentials (use a placeholder for password since it's OAuth)
+          await _cacheUserCredentials(email, "GOOGLE_AUTH_PLACEHOLDER", token);
+          
+          // Save token/email for immediate use and persistence
+          await _secureStorageService.saveValue('cached_token', token);
+          await _secureStorageService.saveValue('cached_email', email);
+          await _authService.setSession(token, email);
+        }
+      }
+      
+      return result;
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Google login failed: $e',
+      };
+    }
+  }
+
+  /// Login with GitHub (Online only, then caches session)
+  Future<Map<String, dynamic>> loginWithGitHub() async {
+    final isOnline = _connectivityService.isOnline;
+    
+    if (!isOnline) {
+      return {
+        'success': false,
+        'message': 'GitHub login requires internet connection.',
+      };
+    }
+
+    try {
+      final result = await _authService.loginWithGitHub();
+      
+      if (result['success'] == true) {
+        final data = result['data'];
+        final token = data?['token'];
+        String? email = data?['email'];
+        
+        if (email == null) {
+           email = await _authService.getEmail();
+        }
+
+        if (email != null && token != null) {
+          await _cacheUserCredentials(email, "GITHUB_AUTH_PLACEHOLDER", token);
+          
+          await _secureStorageService.saveValue('cached_token', token);
+          await _secureStorageService.saveValue('cached_email', email);
+          await _authService.setSession(token, email);
+        }
+      }
+      
+      return result;
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'GitHub login failed: $e',
+      };
+    }
+  }
+
   /// Initiate registration by sending OTP
   Future<Map<String, dynamic>> initiateRegister(String email) async {
     if (!_connectivityService.isOnline) {
