@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:thisjowi/core/appColors.dart';
 import 'package:thisjowi/data/repository/auth_repository.dart';
@@ -152,56 +153,101 @@ class _RegisterFormState extends State<RegisterForm> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: const Color(0xFF202020),
-          title: Text("Verify Email".i18n, style: const TextStyle(color: AppColors.text)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "We sent a code to ${_emailController.text}".i18n,
-                style: TextStyle(color: AppColors.text.withOpacity(0.7)),
+        builder: (context, setDialogState) => BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: AlertDialog(
+            backgroundColor: const Color(0xFF1E1E1E).withOpacity(0.9), // More transparent/darker
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+              side: BorderSide(color: Colors.white.withOpacity(0.1)),
+            ),
+            title: Text(
+              "Verify Email".i18n, 
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+              )
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "We sent a code to ${_emailController.text}".i18n,
+                  style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 15),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  ),
+                  child: TextField(
+                    controller: otpController,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white, 
+                      fontSize: 26, 
+                      letterSpacing: 8,
+                      fontWeight: FontWeight.bold
+                    ),
+                    maxLength: 6,
+                    decoration: InputDecoration(
+                      counterText: "",
+                      hintText: "******",
+                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.2), letterSpacing: 8),
+                      filled: false,
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actionsPadding: const EdgeInsets.all(20),
+            actions: [
+              TextButton(
+                onPressed: isVerifying ? null : () => Navigator.pop(dialogContext),
+                child: Text(
+                  "Cancel".i18n, 
+                  style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w600)
+                ),
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: otpController,
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.text, fontSize: 24, letterSpacing: 8),
-                maxLength: 6,
-                decoration: InputDecoration(
-                  counterText: "",
-                  hintText: "000000",
-                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.3)),
-                  filled: true,
-                  fillColor: AppColors.background,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              Container(
+                 decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: const LinearGradient(
+                      colors: [AppColors.secondary, AppColors.accent],
+                    ),
+                  ),
+                child: ElevatedButton(
+                  onPressed: isVerifying 
+                      ? null 
+                      : () async {
+                          if (otpController.text.length < 6) return;
+                          setDialogState(() => isVerifying = true);
+                          await _completeRegistration(otpController.text, dialogContext);
+                          if (mounted) {
+                              setDialogState(() => isVerifying = false);
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                  child: isVerifying 
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : Text("Verify".i18n, style: const TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: isVerifying ? null : () => Navigator.pop(dialogContext),
-              child: Text("Cancel".i18n, style: TextStyle(color: AppColors.text.withOpacity(0.5))),
-            ),
-            ElevatedButton(
-              onPressed: isVerifying 
-                  ? null 
-                  : () async {
-                      if (otpController.text.length < 6) return;
-                      setDialogState(() => isVerifying = true);
-                      await _completeRegistration(otpController.text, dialogContext);
-                      if (mounted) {
-                          setDialogState(() => isVerifying = false);
-                      }
-                    },
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.secondary),
-              child: isVerifying 
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                  : Text("Verify".i18n),
-            ),
-          ],
         ),
       ),
     );
@@ -252,23 +298,24 @@ class _RegisterFormState extends State<RegisterForm> {
         // Full Name Field
         TextFormField(
           controller: _fullNameController,
-          style: const TextStyle(color: AppColors.text),
+          style: const TextStyle(color: Colors.white),
           textInputAction: TextInputAction.next,
           onFieldSubmitted: (_) => _emailFocusNode.requestFocus(),
           decoration: InputDecoration(
-            prefixIcon: Icon(Icons.person_outline, color: AppColors.secondary),
+            prefixIcon: Icon(Icons.person_outline, color: AppColors.text.withOpacity(0.7), size: 20),
+            contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             labelText: "Full Name".i18n,
-            labelStyle: TextStyle(color: AppColors.text.withOpacity(0.6)),
+            labelStyle: TextStyle(color: AppColors.text.withOpacity(0.5)),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.text.withOpacity(0.2)),
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.secondary, width: 2),
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(color: AppColors.secondary, width: 1),
             ),
             filled: true,
-            fillColor: AppColors.background.withOpacity(0.5),
+            fillColor: Colors.black.withOpacity(0.2),
           ),
         ),
         const SizedBox(height: 20),
@@ -277,24 +324,25 @@ class _RegisterFormState extends State<RegisterForm> {
         TextFormField(
           controller: _emailController,
           focusNode: _emailFocusNode,
-          style: const TextStyle(color: AppColors.text),
+          style: const TextStyle(color: Colors.white),
           textInputAction: TextInputAction.next,
           keyboardType: TextInputType.emailAddress,
           onFieldSubmitted: (_) => _passwordFocusNode.requestFocus(),
           decoration: InputDecoration(
-            prefixIcon: Icon(Icons.email_outlined, color: AppColors.secondary),
+            prefixIcon: Icon(Icons.email_outlined, color: AppColors.text.withOpacity(0.7), size: 20),
+            contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             labelText: "Email".i18n,
-            labelStyle: TextStyle(color: AppColors.text.withOpacity(0.6)),
+            labelStyle: TextStyle(color: AppColors.text.withOpacity(0.5)),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.text.withOpacity(0.2)),
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.secondary, width: 2),
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(color: AppColors.secondary, width: 1),
             ),
             filled: true,
-            fillColor: AppColors.background.withOpacity(0.5),
+            fillColor: Colors.black.withOpacity(0.2),
           ),
         ),
         const SizedBox(height: 20),
@@ -304,15 +352,17 @@ class _RegisterFormState extends State<RegisterForm> {
           controller: _passwordController,
           focusNode: _passwordFocusNode,
           obscureText: _obscurePassword,
-          style: const TextStyle(color: AppColors.text),
+          style: const TextStyle(color: Colors.white),
           textInputAction: TextInputAction.done,
           onFieldSubmitted: (_) => _isLoading ? null : _handleRegister(),
           decoration: InputDecoration(
-            prefixIcon: Icon(Icons.lock_outline, color: AppColors.secondary),
+            prefixIcon: Icon(Icons.lock_outline, color: AppColors.text.withOpacity(0.7), size: 20),
+            contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                color: AppColors.text.withOpacity(0.6),
+                color: AppColors.text.withOpacity(0.5),
+                size: 20,
               ),
               onPressed: () {
                 setState(() {
@@ -321,17 +371,17 @@ class _RegisterFormState extends State<RegisterForm> {
               },
             ),
             labelText: "Password".i18n,
-            labelStyle: TextStyle(color: AppColors.text.withOpacity(0.6)),
+            labelStyle: TextStyle(color: AppColors.text.withOpacity(0.5)),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.text.withOpacity(0.2)),
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.secondary, width: 2),
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(color: AppColors.secondary, width: 1),
             ),
             filled: true,
-            fillColor: AppColors.background.withOpacity(0.5),
+            fillColor: Colors.black.withOpacity(0.2),
           ),
         ),
         const SizedBox(height: 20),
@@ -343,8 +393,9 @@ class _RegisterFormState extends State<RegisterForm> {
             Checkbox(
               value: _acceptedTerms,
               activeColor: AppColors.secondary,
-              checkColor: AppColors.background,
+              checkColor: Colors.black,
               side: BorderSide(color: AppColors.text.withOpacity(0.5)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
               onChanged: (value) {
                 setState(() {
                   _acceptedTerms = value ?? false;
@@ -357,7 +408,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 child: RichText(
                   text: TextSpan(
                     text: "I accept the ".i18n,
-                    style: TextStyle(color: AppColors.text.withOpacity(0.8)),
+                    style: TextStyle(color: AppColors.text.withOpacity(0.7), fontSize: 13),
                     children: [
                       TextSpan(
                         text: "Terms and Conditions".i18n,
@@ -377,33 +428,49 @@ class _RegisterFormState extends State<RegisterForm> {
         const SizedBox(height: 32),
 
         // Register Button
-        SizedBox(
+        Container(
           width: double.infinity,
           height: 56,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: const LinearGradient(
+              colors: [AppColors.secondary, AppColors.accent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.secondary.withOpacity(0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
           child: ElevatedButton(
             onPressed: _isLoading ? null : _handleRegister,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.secondary,
-              foregroundColor: AppColors.background,
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
               ),
-              elevation: 4,
             ),
             child: _isLoading
                 ? const SizedBox(
                     height: 24,
                     width: 24,
                     child: CircularProgressIndicator(
-                      color: AppColors.background,
+                      color: Colors.white,
                       strokeWidth: 2,
                     ),
                   )
                 : Text(
                     "Create Account".i18n,
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
           ),

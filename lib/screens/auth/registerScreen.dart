@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:thisjowi/core/appColors.dart';
 import 'package:thisjowi/components/error_snack_bar.dart';
@@ -9,7 +10,6 @@ import 'package:thisjowi/data/repository/auth_repository.dart';
 import 'package:thisjowi/services/connectivity_service.dart';
 import 'package:thisjowi/data/local/secure_storage_service.dart';
 import 'package:thisjowi/components/bottomNavigation.dart';
-import 'package:thisjowi/components/social_login_button.dart';
 import 'package:thisjowi/screens/auth/email_verification_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -108,121 +108,161 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     // Define the content widget that is shared
-    Widget content = Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Center(
+    Widget content = LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 340),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Logo/Icon
-                Icon(
-                  Icons.person_add_rounded,
-                  size: 80,
-                  color: AppColors.secondary,
-                ),
-                const SizedBox(height: 24),
-                
-                // Welcome Text
-                Text(
-                  "Create Account".i18n,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 32,
-                    color: AppColors.text,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Sign up to get started".i18n,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.text.withOpacity(0.7),
-                  ),
-                ),
-                const SizedBox(height: 48),
-
-                // Register Form
-                Card(
-                  elevation: 8,
-                  color: const Color.fromRGBO(32, 32, 32, 1.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(
-                      color: AppColors.text.withOpacity(0.1),
-                      width: 1,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: RegisterForm(
-                      accountType: widget.accountType,
-                      hostingMode: widget.hostingMode,
-                      initialCountry: widget.initialCountry,
-                      onSuccess: _handleSuccess,
-                    ),
-                  ),
-                ),
-                
-                const SizedBox(height: 16),
-                
-                // Social Login Buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Google
-                    SocialLoginButton(
-                      imagePath: 'assets/google_logo.png',
-                      onTap: _handleGoogleRegister,
-                      color: Colors.red,
-                    ),
-                    const SizedBox(width: 20),
-                    // GitHub
-                    SocialLoginButton(
-                      imagePath: 'assets/github_logo.png',
-                      onTap: _handleGitHubRegister,
-                      color: Colors.black,
-                    ),
-                  ],
-                ),
-
-                if (!widget.isEmbedded) ...[
-                  const SizedBox(height: 24),
-
-                  // Login Link
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Already have an account? ".i18n,
-                        style: TextStyle(color: AppColors.text.withOpacity(0.7)),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text(
-                          "Sign In".i18n,
-                          style: const TextStyle(
-                            color: AppColors.secondary,
-                            fontWeight: FontWeight.bold,
+            constraints: BoxConstraints(
+              minHeight: constraints.maxHeight,
+            ),
+            child: IntrinsicHeight(
+              child: SafeArea(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 380),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 20),
+                        // Logo/Icon with Glow
+                        Align(
+                          alignment: Alignment.center,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.secondary.withOpacity(0.4),
+                                  blurRadius: 30,
+                                  spreadRadius: 0,
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.person_add_rounded,
+                              size: 56, // Smaller icon
+                              color: AppColors.text,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 16), // Reduced spacing
+                        
+                        // Welcome Text
+                        Text(
+                          "Create Account".i18n,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 28, // Smaller text
+                            color: AppColors.text,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Sign up to get started".i18n,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14, // Smaller text
+                            color: AppColors.text.withOpacity(0.6),
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 24), // Reduced spacing
+
+                        // Glassmorphism Register Form
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(24),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1E1E1E).withOpacity(0.6),
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.1),
+                                  width: 1,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 30,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: RegisterForm(
+                                accountType: widget.accountType,
+                                hostingMode: widget.hostingMode,
+                                initialCountry: widget.initialCountry,
+                                onSuccess: _handleSuccess,
+                              ),
+                            ),
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 24),
+                        
+                        // Social Login Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Google
+                            _buildSocialButton(
+                              asset: 'assets/google_logo.png',
+                              onTap: _handleGoogleRegister,
+                            ),
+                            const SizedBox(width: 20),
+                            // GitHub
+                            _buildSocialButton(
+                              asset: 'assets/github_logo_black.png',
+                              useWhiteLogoBackground: true,
+                              onTap: _handleGitHubRegister,
+                            ),
+                          ],
+                        ),
+
+                        if (!widget.isEmbedded) ...[
+                          const SizedBox(height: 32),
+
+                          // Login Link
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Already have an account? ".i18n,
+                                style: TextStyle(color: AppColors.text.withOpacity(0.6), fontSize: 14),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text(
+                                  "Sign In".i18n,
+                                  style: const TextStyle(
+                                    color: AppColors.secondary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ),
-                ],
-              ],
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
 
     if (widget.isEmbedded) {
@@ -230,19 +270,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Decorative background elements
+          // Ambient Background Gradients
           Positioned(
             top: -100,
             left: -100,
             child: Container(
-              width: 300,
-              height: 300,
+              width: 400,
+              height: 400,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.secondary.withOpacity(0.1),
+                gradient: RadialGradient(
+                  colors: [
+                    AppColors.secondary.withOpacity(0.3),
+                    Colors.transparent,
+                  ],
+                ),
               ),
             ),
           ),
@@ -250,17 +295,80 @@ class _RegisterScreenState extends State<RegisterScreen> {
             bottom: -50,
             right: -50,
             child: Container(
-              width: 200,
-              height: 200,
+              width: 300,
+              height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primary.withOpacity(0.05),
+                gradient: RadialGradient(
+                  colors: [
+                    AppColors.primary.withOpacity(0.3),
+                    Colors.transparent,
+                  ],
+                ),
               ),
             ),
           ),
           
+          // Blur effect
+          BackdropFilter(
+             filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+             child: Container(color: Colors.transparent),
+          ),
+
           content,
         ],
+      ),
+    );
+  }
+
+  Widget _buildSocialButton({
+    required String asset,
+    required VoidCallback onTap,
+    Color? color,
+    Color? backgroundColor,
+    bool useWhiteLogoBackground = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          color: backgroundColor ?? Colors.white.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.white.withOpacity(0.1)),
+        ),
+        padding: const EdgeInsets.all(15),
+        child: useWhiteLogoBackground
+            ? Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(2),
+                child: asset.startsWith('http')
+                    ? Image.network(
+                        asset,
+                        color: color,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Icon(Icons.code, color: AppColors.text, size: 30),
+                      )
+                    : Image.asset(
+                        asset,
+                        color: color,
+                      ),
+              )
+            : (asset.startsWith('http')
+                ? Image.network(
+                    asset,
+                    color: color,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Icon(Icons.code, color: AppColors.text, size: 30),
+                  )
+                : Image.asset(
+                    asset,
+                    color: color,
+                  )),
       ),
     );
   }

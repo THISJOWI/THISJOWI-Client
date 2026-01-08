@@ -53,6 +53,7 @@ flutter:
     - assets/removed.png
     - assets/google_logo.png
     - assets/github_logo.png
+    - assets/github_logo_black.png
     - .env
 
 flutter_launcher_icons:
