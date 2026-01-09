@@ -1,19 +1,20 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/data/models/otp_entry.dart';
+import 'package:thisjowi/data/models/otpEntry.dart';
 import 'package:thisjowi/data/repository/otp_repository.dart';
-import 'package:thisjowi/i18n/translation_service.dart';
+import 'package:thisjowi/i18n/translationService.dart';
 import 'package:thisjowi/i18n/translations.dart';
-import 'package:thisjowi/services/otp_service.dart';
-import 'package:thisjowi/components/error_snack_bar.dart';
+import 'package:thisjowi/services/otpService.dart';
+import 'package:thisjowi/components/errorBar.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io' show Platform;
 import 'package:thisjowi/components/button.dart';
 import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
-import 'package:thisjowi/data/repository/passwords_repository.dart';
+import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/data/repository/notes_repository.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -388,7 +389,7 @@ class _OtpScreenState extends State<OtpScreen> {
         statusBarBrightness: Brightness.dark,
       ),
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Colors.transparent,
         body: Stack(
           children: [
           SafeArea(
@@ -416,12 +417,17 @@ class _OtpScreenState extends State<OtpScreen> {
 
                 // Search bar
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.text.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(25),
-                    ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E1E).withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white.withOpacity(0.1)),
+                        ),
                     child: TextField(
                       onChanged: (value) {
                         _searchQuery = value;
@@ -454,6 +460,8 @@ class _OtpScreenState extends State<OtpScreen> {
                     ),
                   ),
                 ),
+              ),
+            ),
 
                 // List
                 Expanded(
@@ -481,7 +489,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
           // FAB
           Positioned(
-            bottom: 110.0,
+            bottom: 130.0,
             right: 16.0,
             child: ExpandableActionButton(
               onCreatePassword: _createPassword,
@@ -622,20 +630,25 @@ class _OtpScreenState extends State<OtpScreen> {
       progressColor = Colors.red;
     }
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: const Color.fromRGBO(30, 30, 30, 1.0),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.text.withOpacity(0.1)),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => _copyCode(entry),
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E1E).withOpacity(0.6),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _copyCode(entry),
+                borderRadius: BorderRadius.circular(16),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -779,6 +792,8 @@ class _OtpScreenState extends State<OtpScreen> {
           ),
         ),
       ),
-    );
+        ),
+      ),
+    ));
   }
 }

@@ -1,9 +1,9 @@
 import 'package:uuid/uuid.dart';
-import '../models/otp_entry.dart' as model;
-import '../local/app_database.dart';
-import '../../services/otp_api_service.dart';
-import '../../services/auth_service.dart';
-import '../../services/connectivity_service.dart';
+import '../models/otpEntry.dart' as model;
+import '../local/database.dart';
+import '../../services/otpApiService.dart';
+import '../../services/authService.dart';
+import '../../services/connectivityService.dart';
 import '../local/secure_storage_service.dart';
 
 /// Repository para gestionar las entradas OTP con enfoque offline-first

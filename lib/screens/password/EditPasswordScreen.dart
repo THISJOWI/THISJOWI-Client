@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/appColors.dart';
-import '../../data/models/password_entry.dart';
-import '../../data/repository/passwords_repository.dart';
-import '../../components/error_snack_bar.dart';
-import '../../i18n/translations.dart';
+import '../../data/models/passwordEntry.dart';
+import '../../data/repository/passwordsRepository.dart';
+import '../../components/errorBar.dart';
+import 'package:thisjowi/i18n/translations.dart';
 
 class EditPasswordScreen extends StatefulWidget {
   final PasswordsRepository passwordsRepository;
@@ -137,17 +137,17 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
           widget.passwordEntry == null ? 'Add Password'.i18n : 'Edit Password'.i18n,
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
-        backgroundColor: AppColors.background,
+        backgroundColor: Colors.transparent,
         foregroundColor: AppColors.text,
         elevation: 0,
         centerTitle: true,
       ),
-      backgroundColor: AppColors.background,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),

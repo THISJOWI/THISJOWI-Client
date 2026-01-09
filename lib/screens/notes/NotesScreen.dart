@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/data/models/note.dart';
+import 'package:thisjowi/data/models/noteEntry.dart';
 import 'package:thisjowi/data/repository/notes_repository.dart';
-import 'package:thisjowi/data/repository/passwords_repository.dart';
+import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/components/button.dart';
-import 'package:thisjowi/components/error_snack_bar.dart';
+import 'package:thisjowi/components/errorBar.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'EditNoteScreen.dart';
 

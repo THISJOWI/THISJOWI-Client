@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:thisjowi/core/appColors.dart';
-import '../../components/sync_debug_panel.dart';
-import '../../data/local/app_database.dart';
+import 'package:thisjowi/components/syncDebugPanel.dart';
+import 'package:thisjowi/data/local/database.dart';
 
 /// Pantalla de configuración y debugging
 class DebugScreen extends StatelessWidget {

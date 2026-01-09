@@ -1,19 +1,20 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/data/models/password_entry.dart';
-import 'package:thisjowi/data/models/note.dart';
-import 'package:thisjowi/data/repository/passwords_repository.dart';
+import 'package:thisjowi/data/models/passwordEntry.dart';
+import 'package:thisjowi/data/models/noteEntry.dart';
+import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/data/repository/notes_repository.dart';
 import 'package:thisjowi/data/repository/otp_repository.dart';
-import 'package:thisjowi/services/otp_service.dart';
+import 'package:thisjowi/services/otpService.dart';
 import 'package:thisjowi/components/button.dart';
-import 'package:thisjowi/components/error_snack_bar.dart';
+import 'package:thisjowi/components/errorBar.dart';
 import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
 import 'package:thisjowi/i18n/translations.dart';
-import 'package:thisjowi/i18n/translation_service.dart';
-import 'package:thisjowi/components/bottomNavigation.dart';
+import 'package:thisjowi/i18n/translationService.dart';
+import 'package:thisjowi/components/Navigation.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 
@@ -659,39 +660,46 @@ class _HomeScreenState extends State<HomeScreen> {
 
               // Search bar
               Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.text.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: TextField(
-                    style: const TextStyle(color: AppColors.text, fontSize: 16),
-                    decoration: InputDecoration(
-                      labelText: 'Search'.i18n,
-                      prefixIcon: Icon(Icons.search,
-                          color: AppColors.text.withOpacity(0.6), size: 20),
-                      suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: Icon(Icons.close,
-                                  color: AppColors.text.withOpacity(0.6),
-                                  size: 20),
-                              onPressed: () {
-                                setState(() => _searchQuery = '');
-                                _loadData();
-                              },
-                            )
-                          : null,
-                      labelStyle: TextStyle(
-                          color: AppColors.text.withOpacity(0.6), fontSize: 16),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E1E1E).withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(color: Colors.white.withOpacity(0.1)),
+                      ),
+                      child: TextField(
+                        style: const TextStyle(color: AppColors.text, fontSize: 16),
+                        decoration: InputDecoration(
+                          hintText: 'Search'.i18n,
+                          hintStyle: TextStyle(
+                              color: AppColors.text.withOpacity(0.5), fontSize: 16),
+                          prefixIcon: Icon(Icons.search,
+                              color: AppColors.text.withOpacity(0.6), size: 22),
+                          suffixIcon: _searchQuery.isNotEmpty
+                              ? IconButton(
+                                  icon: Icon(Icons.close,
+                                      color: AppColors.text.withOpacity(0.6),
+                                      size: 20),
+                                  onPressed: () {
+                                    setState(() => _searchQuery = '');
+                                    _loadData();
+                                  },
+                                )
+                              : null,
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 14),
+                        ),
+                        onChanged: (value) {
+                          setState(() => _searchQuery = value);
+                          _loadData();
+                        },
+                      ),
                     ),
-                    onChanged: (value) {
-                      setState(() => _searchQuery = value);
-                      _loadData();
-                    },
                   ),
                 ),
               ),
@@ -750,7 +758,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         // FAB
         Positioned(
-          bottom: 110.0,
+          bottom: 130.0,
           right: 16.0,
           child: ExpandableActionButton(
             onCreatePassword: _createPassword,
@@ -806,84 +814,90 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildPasswordItem(PasswordEntry entry) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.text.withOpacity(0.12), width: 1),
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => _showPasswordDetails(entry),
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.text.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(Icons.key,
-                        color: AppColors.text.withOpacity(0.6), size: 18),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          entry.title,
-                          style: const TextStyle(
-                              color: AppColors.text,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E1E).withOpacity(0.6),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _showPasswordDetails(entry),
+                borderRadius: BorderRadius.circular(20),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        if (entry.username.isNotEmpty) ...[
-                          const SizedBox(height: 2),
-                          Text(
-                            entry.username,
-                            style: TextStyle(
-                                color: AppColors.text.withOpacity(0.5),
-                                fontSize: 13),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.edit_outlined,
-                        color: AppColors.text.withOpacity(0.5), size: 18),
-                    onPressed: () async {
-                      final edited = await Navigator.push<bool>(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EditPasswordScreen(
-                            passwordsRepository: _passwordsRepository,
-                            passwordEntry: entry,
-                          ),
+                        child: Icon(Icons.key,
+                            color: AppColors.text, size: 20),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              entry.title,
+                              style: const TextStyle(
+                                  color: AppColors.text,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16),
+                            ),
+                            if (entry.username.isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                entry.username,
+                                style: TextStyle(
+                                    color: AppColors.text.withOpacity(0.6),
+                                    fontSize: 13),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ],
                         ),
-                      );
-                      if (edited == true) _loadData();
-                    },
-                    constraints: const BoxConstraints(),
-                    padding: const EdgeInsets.all(8),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.edit_outlined,
+                            color: AppColors.text.withOpacity(0.6), size: 20),
+                        onPressed: () async {
+                          final edited = await Navigator.push<bool>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditPasswordScreen(
+                                passwordsRepository: _passwordsRepository,
+                                passwordEntry: entry,
+                              ),
+                            ),
+                          );
+                          if (edited == true) _loadData();
+                        },
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.all(8),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete_outline,
+                            color: AppColors.text.withOpacity(0.6), size: 20),
+                        onPressed: () => _deletePassword(entry),
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.all(8),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    icon: Icon(Icons.delete_outline,
-                        color: AppColors.text.withOpacity(0.5), size: 18),
-                    onPressed: () => _deletePassword(entry),
-                    constraints: const BoxConstraints(),
-                    padding: const EdgeInsets.all(8),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -894,75 +908,81 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildNoteItem(Note note) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.text.withOpacity(0.12), width: 1),
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () async {
-              final edited = await Navigator.push<bool>(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditNoteScreen(
-                    notesRepository: _notesRepository,
-                    note: note,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E1E).withOpacity(0.6),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () async {
+                  final edited = await Navigator.push<bool>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditNoteScreen(
+                        notesRepository: _notesRepository,
+                        note: note,
+                      ),
+                    ),
+                  );
+                  if (edited == true) _loadData();
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(Icons.description_outlined,
+                            color: AppColors.text, size: 20),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              note.title,
+                              style: const TextStyle(
+                                  color: AppColors.text,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              note.content,
+                              style: TextStyle(
+                                  color: AppColors.text.withOpacity(0.6),
+                                  fontSize: 13),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete_outline,
+                            color: AppColors.text.withOpacity(0.6), size: 20),
+                        onPressed: () => _deleteNote(note),
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.all(8),
+                      ),
+                    ],
                   ),
                 ),
-              );
-              if (edited == true) _loadData();
-            },
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.text.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(Icons.description_outlined,
-                        color: AppColors.text.withOpacity(0.6), size: 18),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          note.title,
-                          style: const TextStyle(
-                              color: AppColors.text,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          note.content,
-                          style: TextStyle(
-                              color: AppColors.text.withOpacity(0.5),
-                              fontSize: 13),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.delete_outline,
-                        color: AppColors.text.withOpacity(0.5), size: 18),
-                    onPressed: () => _deleteNote(note),
-                    constraints: const BoxConstraints(),
-                    padding: const EdgeInsets.all(8),
-                  ),
-                ],
               ),
             ),
           ),

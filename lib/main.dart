@@ -3,13 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/core/api_config.dart';
-import 'package:thisjowi/core/env_loader.dart';
-import 'package:thisjowi/screens/auth/loginScreen.dart';
-import 'package:thisjowi/screens/auth/registerScreen.dart';
+import 'package:thisjowi/core/api.dart';
+import 'package:thisjowi/core/envLoader.dart';
+import 'package:thisjowi/screens/auth/login.dart';
+import 'package:thisjowi/screens/auth/register.dart';
 import 'package:thisjowi/screens/otp/OtpQrScannerScreen.dart';
-import 'package:thisjowi/screens/splash/splash_screen.dart';
-import 'package:thisjowi/screens/onboarding/onboarding_screen.dart';
+import 'package:thisjowi/screens/splash/splash.dart';
+import 'package:thisjowi/screens/onboarding/onBoarding.dart';
+import 'package:thisjowi/components/privacyOverlay.dart';
 
 
 
@@ -60,9 +61,11 @@ class MainApp extends StatelessWidget {
         // Por defecto, usar inglés
         return const Locale('en');
       },
-      builder: (context, child) => I18n(
-        initialLocale: const Locale('en'),
-        child: child!
+      builder: (context, child) => PrivacyOverlay(
+        child: I18n(
+          initialLocale: const Locale('en'),
+          child: child!
+        ),
       ),
       
       theme: ThemeData(

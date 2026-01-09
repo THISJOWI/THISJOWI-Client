@@ -397,7 +397,7 @@ application/
 │   ├── 🎨 components/               # Reusable UI components
 │   │   ├── bottomNavigation.dart   # Bottom navigation bar
 │   │   ├── button.dart             # Custom buttons
-│   │   └── error_snack_bar.dart    # Error notifications
+│   │   └── errorBar.dart    # Error notifications
 │   │
 │   ├── ⚙️ core/                      # Core utilities & config
 │   │   ├── api_config.dart         # API configuration

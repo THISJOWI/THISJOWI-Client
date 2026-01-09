@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../core/appColors.dart';
-import '../../data/models/note.dart';
+import '../../data/models/noteEntry.dart';
 import '../../data/repository/notes_repository.dart';
-import '../../components/error_snack_bar.dart';
-import '../../i18n/translations.dart';
+import '../../components/errorBar.dart';
+import 'package:thisjowi/i18n/translations.dart';
 
 class EditNoteScreen extends StatefulWidget {
   final NotesRepository notesRepository;
@@ -119,7 +119,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
           widget.note == null ? 'New Note'.i18n : 'Edit Note'.i18n,

@@ -171,5 +171,24 @@ import AuthenticationServices
             completion(success)
         }
     }
+
+    // MARK: - Privacy Screen
+    private var privacyView: UIVisualEffectView?
+
+    override func applicationWillResignActive(_ application: UIApplication) {
+        let blurEffect = UIBlurEffect(style: .systemUltraThinMaterialDark)
+        privacyView = UIVisualEffectView(effect: blurEffect)
+        if let window = window {
+            privacyView?.frame = window.bounds
+            window.addSubview(privacyView!)
+        }
+        super.applicationWillResignActive(application)
+    }
+
+    override func applicationDidBecomeActive(_ application: UIApplication) {
+        privacyView?.removeFromSuperview()
+        privacyView = nil
+        super.applicationDidBecomeActive(application)
+    }
 }
 

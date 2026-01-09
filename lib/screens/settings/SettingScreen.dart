@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/services/auth_service.dart';
-import 'package:thisjowi/services/biometric_service.dart';
+import 'package:thisjowi/services/authService.dart';
+import 'package:thisjowi/services/biometricService.dart';
 import 'package:thisjowi/data/repository/auth_repository.dart';
-import 'package:thisjowi/services/connectivity_service.dart';
+import 'package:thisjowi/services/connectivityService.dart';
 import 'package:thisjowi/data/local/secure_storage_service.dart';
-import 'package:thisjowi/components/error_snack_bar.dart';
+import 'package:thisjowi/components/errorBar.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -95,23 +96,28 @@ class _SettingScreenState extends State<SettingScreen> {
     Color? iconColor,
     VoidCallback? onTap,
   }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-      decoration: BoxDecoration(
-        color: AppColors.text.withOpacity(0.05),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.text.withOpacity(0.1),
-          width: 1,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E1E).withOpacity(0.6),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.1),
+                width: 1,
+              ),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onTap,
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
                 Icon(
@@ -156,7 +162,9 @@ class _SettingScreenState extends State<SettingScreen> {
           ),
         ),
       ),
-    );
+        ),
+      ),
+    ));
   }
 
   void _showConfirmationDialog({
@@ -604,43 +612,6 @@ class _SettingScreenState extends State<SettingScreen> {
     );
   }
 
-  void _showEditBirthdateDialog() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: AppColors.primary,
-              onPrimary: Colors.white,
-              surface: AppColors.background,
-              onSurface: AppColors.text,
-            ), dialogTheme: DialogThemeData(backgroundColor: AppColors.background),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null) {
-      final dateString = "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
-      try {
-        final result = await _authRepository!.updateUser(birthdate: dateString);
-        if (!mounted) return;
-        if (result['success'] == true) {
-          ErrorSnackBar.showSuccess(context, 'Birthdate updated'.i18n);
-        } else {
-          ErrorSnackBar.show(context, result['message'] ?? 'Failed'.i18n);
-        }
-      } catch (e) {
-        if (!mounted) return;
-        ErrorSnackBar.show(context, 'Error: $e');
-      }
-    }
-  }
 
   void _showEditAccountTypeDialog() {
     String? accountType;
@@ -750,7 +721,7 @@ class _SettingScreenState extends State<SettingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           SafeArea(
@@ -796,12 +767,6 @@ class _SettingScreenState extends State<SettingScreen> {
                         title: 'Country'.i18n,
                         subtitle: 'Update your country'.i18n,
                         onTap: _showEditCountryDialog,
-                      ),
-                      _buildSettingItem(
-                        icon: Icons.cake,
-                        title: 'Birthdate'.i18n,
-                        subtitle: 'Update your birthdate'.i18n,
-                        onTap: _showEditBirthdateDialog,
                       ),
                       _buildSettingItem(
                         icon: Icons.business,

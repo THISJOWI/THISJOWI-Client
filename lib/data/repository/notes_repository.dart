@@ -1,9 +1,9 @@
 import 'package:uuid/uuid.dart';
-import '../models/note.dart' as models;
-import '../local/app_database.dart';
-import '../../services/notes_service.dart';
-import '../../services/auth_service.dart';
-import '../../services/connectivity_service.dart';
+import '../models/noteEntry.dart' as models;
+import '../local/database.dart';
+import '../../services/notesService.dart';
+import '../../services/authService.dart';
+import '../../services/connectivityService.dart';
 
 /// Repository for managing notes with offline-first approach
 /// 

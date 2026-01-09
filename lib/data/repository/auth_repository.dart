@@ -1,9 +1,9 @@
 import 'package:crypto/crypto.dart';
 import 'package:i18n_extension/default.i18n.dart';
 import 'dart:convert';
-import '../../services/auth_service.dart';
-import '../local/app_database.dart';
-import '../../services/connectivity_service.dart';
+import '../../services/authService.dart';
+import '../local/database.dart';
+import '../../services/connectivityService.dart';
 import '../local/secure_storage_service.dart';
 
 /// Repository for authentication that supports offline mode.
@@ -86,8 +86,16 @@ class AuthRepository {
       final result = await _authService.login(email, password);
       
       if (result['success'] == true) {
+        final token = result['data']?['token'];
         // Cache credentials for future offline use
-        await _cacheUserCredentials(email, password, result['data']?['token']);
+        await _cacheUserCredentials(email, password, token);
+
+        // Save token/email for immediate use and persistence
+        if (token != null) {
+          await _secureStorageService.saveValue('cached_token', token);
+          await _secureStorageService.saveValue('cached_email', email);
+          await _authService.setSession(token, email);
+        }
       }
       
       return result;
@@ -120,10 +128,7 @@ class AuthRepository {
         // The backend response might contain email, or we can get it from AuthService.
         String? email = data?['email'];
         
-        if (email == null) {
-           // Try to get from SharedPreferences if not in response
-           email = await _authService.getEmail();
-        }
+        email ??= await _authService.getEmail();
 
         if (email != null && token != null) {
           // Cache credentials (use a placeholder for password since it's OAuth)
@@ -164,9 +169,7 @@ class AuthRepository {
         final token = data?['token'];
         String? email = data?['email'];
         
-        if (email == null) {
-           email = await _authService.getEmail();
-        }
+        email ??= await _authService.getEmail();
 
         if (email != null && token != null) {
           await _cacheUserCredentials(email, "GITHUB_AUTH_PLACEHOLDER", token);
