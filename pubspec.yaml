@@ -37,6 +37,7 @@ dependencies:
   mobile_scanner: ^7.1.4
   google_sign_in: ^6.2.1
   flutter_web_auth_2: ^4.1.0
+  flutter_quill: ^11.5.0
 
 dev_dependencies:
   flutter_test:

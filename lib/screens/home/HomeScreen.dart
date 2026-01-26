@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thisjowi/core/appColors.dart';
@@ -44,6 +45,44 @@ class _HomeScreenState extends State<HomeScreen> {
   void _initRepositories() {
     _passwordsRepository = PasswordsRepository();
     _notesRepository = NotesRepository();
+  }
+
+  /// Extrae el texto plano del contenido JSON Delta de una nota
+  String _extractPlainText(String content) {
+    try {
+      if (content.isEmpty) return '';
+      final json = jsonDecode(content);
+      
+      if (json is List) {
+        // Delta format: List of operations
+        final buffer = StringBuffer();
+        for (final op in json) {
+          if (op is Map && op.containsKey('insert')) {
+            final insert = op['insert'];
+            if (insert is String) {
+              buffer.write(insert);
+            }
+          }
+        }
+        return buffer.toString().replaceAll('\n', ' ').trim();
+      } else if (json is Map && json.containsKey('ops')) {
+        // Alternative Delta format
+        final buffer = StringBuffer();
+        for (final op in json['ops'] ?? []) {
+          if (op is Map && op.containsKey('insert')) {
+            final insert = op['insert'];
+            if (insert is String) {
+              buffer.write(insert);
+            }
+          }
+        }
+        return buffer.toString().replaceAll('\n', ' ').trim();
+      }
+    } catch (e) {
+      // If it's not JSON, treat as plain text
+      return content;
+    }
+    return content;
   }
 
   Future<void> _loadData() async {
@@ -160,8 +199,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 _showImportDialog();
               },
             ),
-            if (kIsWeb || 
-                defaultTargetPlatform == TargetPlatform.android || 
+            if (kIsWeb ||
+                defaultTargetPlatform == TargetPlatform.android ||
                 defaultTargetPlatform == TargetPlatform.iOS)
               IconButton(
                 icon: const Icon(Icons.camera_alt, color: AppColors.text),
@@ -359,7 +398,8 @@ class _HomeScreenState extends State<HomeScreen> {
             backgroundColor: AppColors.background,
             title: Text('Delete password?'.i18n,
                 style: TextStyle(color: AppColors.text)),
-            content: Text('${'Are you sure you want to delete'.i18n} "${entry.title}"?',
+            content: Text(
+                '${'Are you sure you want to delete'.i18n} "${entry.title}"?',
                 style: TextStyle(color: AppColors.text)),
             actions: [
               TextButton(
@@ -635,139 +675,146 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           SafeArea(
             child: Column(
-            children: [
-              // Header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                child: Row(
-                  children: [
-                    const Image(
-                      image: AssetImage("assets/removed.png"),
-                      height: 40,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'THISJOWI'.i18n,
-                      style: const TextStyle(
-                        color: AppColors.text,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+              children: [
+                // Header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                  child: Row(
+                    children: [
+                      const Image(
+                        image: AssetImage("assets/removed.png"),
+                        height: 40,
                       ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Search bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E1E).withOpacity(0.6),
-                        borderRadius: BorderRadius.circular(25),
-                        border: Border.all(color: Colors.white.withOpacity(0.1)),
-                      ),
-                      child: TextField(
-                        style: const TextStyle(color: AppColors.text, fontSize: 16),
-                        decoration: InputDecoration(
-                          hintText: 'Search'.i18n,
-                          hintStyle: TextStyle(
-                              color: AppColors.text.withOpacity(0.5), fontSize: 16),
-                          prefixIcon: Icon(Icons.search,
-                              color: AppColors.text.withOpacity(0.6), size: 22),
-                          suffixIcon: _searchQuery.isNotEmpty
-                              ? IconButton(
-                                  icon: Icon(Icons.close,
-                                      color: AppColors.text.withOpacity(0.6),
-                                      size: 20),
-                                  onPressed: () {
-                                    setState(() => _searchQuery = '');
-                                    _loadData();
-                                  },
-                                )
-                              : null,
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 14),
+                      const SizedBox(width: 12),
+                      Text(
+                        'THISJOWI'.i18n,
+                        style: const TextStyle(
+                          color: AppColors.text,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
-                        onChanged: (value) {
-                          setState(() => _searchQuery = value);
-                          _loadData();
-                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Search bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 16.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E1E).withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(25),
+                          border:
+                              Border.all(color: Colors.white.withOpacity(0.1)),
+                        ),
+                        child: TextField(
+                          style: const TextStyle(
+                              color: AppColors.text, fontSize: 16),
+                          decoration: InputDecoration(
+                            hintText: 'Search'.i18n,
+                            hintStyle: TextStyle(
+                                color: AppColors.text.withOpacity(0.5),
+                                fontSize: 16),
+                            prefixIcon: Icon(Icons.search,
+                                color: AppColors.text.withOpacity(0.6),
+                                size: 22),
+                            suffixIcon: _searchQuery.isNotEmpty
+                                ? IconButton(
+                                    icon: Icon(Icons.close,
+                                        color: AppColors.text.withOpacity(0.6),
+                                        size: 20),
+                                    onPressed: () {
+                                      setState(() => _searchQuery = '');
+                                      _loadData();
+                                    },
+                                  )
+                                : null,
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 14),
+                          ),
+                          onChanged: (value) {
+                            setState(() => _searchQuery = value);
+                            _loadData();
+                          },
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              // Content
-              Expanded(
-                child: _isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(color: AppColors.text))
-                    : RefreshIndicator(
-                        onRefresh: _loadData,
-                        color: AppColors.text,
-                        child: _passwords.isEmpty && _notes.isEmpty
-                            ? _buildEmptyState()
-                            : ListView(
-                              padding: const EdgeInsets.only(bottom: 150),
-                                children: [
-                                  // Passwords Section
-                                  if (_passwords.isNotEmpty) ...[
-                                    _buildSectionHeader(
-                                      icon: Icons.lock_outline,
-                                      title: 'Passwords'.i18n,
-                                      count: _passwords.length,
-                                    ),
-                                    ..._passwords.map(
-                                        (entry) => _buildPasswordItem(entry)),
-                                  ],
-
-                                  // Divider between sections
-                                  if (_passwords.isNotEmpty &&
-                                      _notes.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 24, vertical: 8),
-                                      child: Divider(
-                                        color: AppColors.text.withOpacity(0.1),
-                                        thickness: 1,
+                // Content
+                Expanded(
+                  child: _isLoading
+                      ? Center(
+                          child:
+                              CircularProgressIndicator(color: AppColors.text))
+                      : RefreshIndicator(
+                          onRefresh: _loadData,
+                          color: AppColors.text,
+                          child: _passwords.isEmpty && _notes.isEmpty
+                              ? _buildEmptyState()
+                              : ListView(
+                                  padding: const EdgeInsets.only(bottom: 150),
+                                  children: [
+                                    // Passwords Section
+                                    if (_passwords.isNotEmpty) ...[
+                                      _buildSectionHeader(
+                                        icon: Icons.lock_outline,
+                                        title: 'Passwords'.i18n,
+                                        count: _passwords.length,
                                       ),
-                                    ),
+                                      ..._passwords.map(
+                                          (entry) => _buildPasswordItem(entry)),
+                                    ],
 
-                                  // Notes Section
-                                  if (_notes.isNotEmpty) ...[
-                                    _buildSectionHeader(
-                                      icon: Icons.description_outlined,
-                                      title: 'Notes'.i18n,
-                                      count: _notes.length,
-                                    ),
-                                    ..._notes
-                                        .map((note) => _buildNoteItem(note)),
+                                    // Divider between sections
+                                    if (_passwords.isNotEmpty &&
+                                        _notes.isNotEmpty)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 24, vertical: 8),
+                                        child: Divider(
+                                          color:
+                                              AppColors.text.withOpacity(0.1),
+                                          thickness: 1,
+                                        ),
+                                      ),
+
+                                    // Notes Section
+                                    if (_notes.isNotEmpty) ...[
+                                      _buildSectionHeader(
+                                        icon: Icons.description_outlined,
+                                        title: 'Notes'.i18n,
+                                        count: _notes.length,
+                                      ),
+                                      ..._notes
+                                          .map((note) => _buildNoteItem(note)),
+                                    ],
                                   ],
-                                ],
-                              ),
-                      ),
-              ),
-            ],
+                                ),
+                        ),
+                ),
+              ],
+            ),
           ),
-        ),
-        // FAB
-        Positioned(
-          bottom: 130.0,
-          right: 16.0,
-          child: ExpandableActionButton(
-            onCreatePassword: _createPassword,
-            onCreateNote: _createNote,
-            onCreateOtp: _createOtp,
+          // FAB
+          Positioned(
+            bottom: 130.0,
+            right: 16.0,
+            child: ExpandableActionButton(
+              onCreatePassword: _createPassword,
+              onCreateNote: _createNote,
+              onCreateOtp: _createOtp,
+            ),
           ),
-        ),
-      ],
-    ),
+        ],
+      ),
     );
   }
 
@@ -823,7 +870,8 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration: BoxDecoration(
               color: const Color(0xFF1E1E1E).withOpacity(0.6),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+              border:
+                  Border.all(color: Colors.white.withOpacity(0.1), width: 1),
             ),
             child: Material(
               color: Colors.transparent,
@@ -831,8 +879,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () => _showPasswordDetails(entry),
                 borderRadius: BorderRadius.circular(20),
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 16.0),
                   child: Row(
                     children: [
                       Container(
@@ -841,8 +889,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: Colors.white.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Icon(Icons.key,
-                            color: AppColors.text, size: 20),
+                        child: Icon(Icons.key, color: AppColors.text, size: 20),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -917,7 +964,8 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration: BoxDecoration(
               color: const Color(0xFF1E1E1E).withOpacity(0.6),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+              border:
+                  Border.all(color: Colors.white.withOpacity(0.1), width: 1),
             ),
             child: Material(
               color: Colors.transparent,
@@ -936,8 +984,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 borderRadius: BorderRadius.circular(20),
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 16.0),
                   child: Row(
                     children: [
                       Container(
@@ -963,7 +1011,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              note.content,
+                              _extractPlainText(note.content),
                               style: TextStyle(
                                   color: AppColors.text.withOpacity(0.6),
                                   fontSize: 13),
@@ -1006,7 +1054,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No data yet'.i18n,
+            'No data yet'.tr(context),
             style: TextStyle(
               color: AppColors.text.withOpacity(0.5),
               fontSize: 18,

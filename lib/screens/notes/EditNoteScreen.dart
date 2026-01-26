@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:thisjowi/components/errorBar.dart';
+import 'package:thisjowi/data/models/noteEntry.dart';
+import 'package:thisjowi/i18n/translationService.dart';
+
 import '../../core/appColors.dart';
-import '../../data/models/noteEntry.dart';
 import '../../data/repository/notes_repository.dart';
-import '../../components/errorBar.dart';
-import 'package:thisjowi/i18n/translations.dart';
+import '../../i18n/translations.dart';
 
 class EditNoteScreen extends StatefulWidget {
   final NotesRepository notesRepository;
@@ -20,98 +22,97 @@ class EditNoteScreen extends StatefulWidget {
 }
 
 class _EditNoteScreenState extends State<EditNoteScreen> {
-  final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
-  final _contentController = TextEditingController();
-  final _contentFocusNode = FocusNode();
+  late List<TextEditingController> _lineControllers = [];
+  final _focusNode = FocusNode();
   bool _isLoading = false;
-  
-  // Error states for fields
-  String? _titleError;
-  String? _contentError;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
+    
+    _scrollController = ScrollController();
+    
     if (widget.note != null) {
       _titleController.text = widget.note!.title;
-      _contentController.text = widget.note!.content;
+      _loadContent(widget.note!.content);
+    } else {
+      _lineControllers.add(TextEditingController());
+    }
+  }
+
+  void _loadContent(String content) {
+    try {
+      _lineControllers.clear();
+      if (content.isEmpty) {
+        _lineControllers.add(TextEditingController());
+        return;
+      }
+      final lines = content.split('\n');
+      for (String line in lines) {
+        _lineControllers.add(TextEditingController(text: line));
+      }
+    } catch (e) {
+      debugPrint('Error loading content: $e');
+      _lineControllers.clear();
+      _lineControllers.add(TextEditingController());
     }
   }
 
   @override
   void dispose() {
     _titleController.dispose();
-    _contentController.dispose();
-    _contentFocusNode.dispose();
+    for (var controller in _lineControllers) {
+      controller.dispose();
+    }
+    _scrollController.dispose();
     super.dispose();
   }
 
-  Future<void> _saveNote() async {
-    // Manual validation with visual feedback
-    setState(() {
-      _titleError = null;
-      _contentError = null;
-    });
-    
-    bool hasError = false;
-    
-    if (_titleController.text.trim().isEmpty) {
-      _titleError = 'Please enter a title'.i18n;
-      hasError = true;
-    }
-    
-    if (_contentController.text.trim().isEmpty) {
-      _contentError = 'Please enter the content'.i18n;
-      hasError = true;
-    }
-    
-    if (hasError) {
-      setState(() {});
-      ErrorSnackBar.showWarning(context, 'Please fix the highlighted fields'.i18n);
+  void _saveNote() async {
+    if (_titleController.text.isEmpty) {
+      ErrorSnackBar.showWarning(context, 'Please enter a title'.i18n);
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    final contentText = _lineControllers.map((c) => c.text).join('\n').trim();
+    if (contentText.isEmpty) {
+      ErrorSnackBar.showWarning(context, 'Please enter the content'.i18n);
+      return;
+    }
+
+    setState(() => _isLoading = true);
 
     try {
       final note = Note(
         title: _titleController.text.trim(),
-        content: _contentController.text.trim(),
+        content: contentText,
       );
 
-      late Map<String, dynamic> result;
-      if (widget.note == null) {
-        // Crear nueva nota
-        result = await widget.notesRepository.createNote(note);
+      if (widget.note != null) {
+        await widget.notesRepository.updateNote(widget.note!.localId ?? '', note);
       } else {
-        // Actualizar nota existente
-        final noteId = widget.note!.localId ?? widget.note!.id?.toString() ?? '';
-        result = await widget.notesRepository.updateNote(noteId, note);
+        await widget.notesRepository.createNote(note);
       }
 
       if (!mounted) return;
-
-      if (result['success'] == true) {
-        Navigator.pop(context, true);
-      } else {
-        final message = result['message'] ?? 'Unknown error';
-        if (message.contains('title already exists')) {
-          setState(() {
-            _titleError = 'A note with this title already exists'.i18n;
-          });
-        } else {
-          ErrorSnackBar.show(context, message);
-        }
-      }
+      Navigator.pop(context);
     } catch (e) {
-      if (!mounted) return;
-      ErrorSnackBar.show(context, 'Error: $e');
+      debugPrint('Error saving note: $e');
+      if (mounted) {
+        ErrorSnackBar.show(context, 'Error saving note'.i18n);
+      }
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
+  }
+
+  // Detectar el formato de la línea
+  bool _isCheckboxLine(String line) {
+    return line.startsWith('◯ ') || line.startsWith('✓ ');
   }
 
   @override
@@ -119,161 +120,155 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.background,
         elevation: 0,
-        title: Text(
-          widget.note == null ? 'New Note'.i18n : 'Edit Note'.i18n,
-          style: const TextStyle(color: AppColors.text, fontWeight: FontWeight.w600),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.text, size: 18),
+          onPressed: () => Navigator.pop(context),
         ),
-        centerTitle: true,
-        foregroundColor: AppColors.text,
+        leadingWidth: 50,
+        title: null,
+        toolbarHeight: 70,
         actions: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ElevatedButton(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: TextButton(
               onPressed: _isLoading ? null : _saveNote,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.text,
-                foregroundColor: AppColors.background,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                elevation: 0,
-              ),
               child: Text(
-                widget.note == null ? 'Create'.i18n : 'Save'.i18n,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                'Done'.tr(context),
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              // Title field with error styling
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(color: AppColors.primary))
+          : SafeArea(
+              child: Column(
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: _titleError != null 
-                          ? Colors.red.withOpacity(0.08) 
-                          : AppColors.text.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: _titleError != null 
-                            ? Colors.red.withOpacity(0.6) 
-                            : AppColors.text.withOpacity(0.1), 
-                        width: _titleError != null ? 1.5 : 1,
-                      ),
-                    ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: TextFormField(
                       controller: _titleController,
-                      style: const TextStyle(color: AppColors.text, fontSize: 16),
+                      style: const TextStyle(
+                        color: AppColors.text,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
                       textInputAction: TextInputAction.next,
-                      onFieldSubmitted: (_) => _contentFocusNode.requestFocus(),
-                      onChanged: (_) {
-                        if (_titleError != null) {
-                          setState(() => _titleError = null);
-                        }
-                      },
+                      onFieldSubmitted: (_) => _focusNode.requestFocus(),
                       decoration: InputDecoration(
-                        labelText: 'Title'.i18n,
-                        labelStyle: TextStyle(
-                          color: _titleError != null ? Colors.red.withOpacity(0.8) : AppColors.text.withOpacity(0.6),
-                          fontSize: 14,
-                        ),
-                        prefixIcon: Icon(
-                          Icons.description_outlined, 
-                          color: _titleError != null ? Colors.red.withOpacity(0.7) : AppColors.text.withOpacity(0.6), 
-                          size: 20,
+                        hintText: 'Title'.i18n,
+                        hintStyle: TextStyle(
+                          color: AppColors.text.withOpacity(0.3),
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
                         ),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
-                  if (_titleError != null)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 12, top: 6),
-                      child: Text(
-                        _titleError!,
-                        style: TextStyle(
-                          color: Colors.red.withOpacity(0.9),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
+                  const SizedBox(height: 12),
+                  // ListView - cada línea con su TextField
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount: _lineControllers.length,
+                        itemBuilder: (context, index) {
+                          final controller = _lineControllers[index];
+                          final lineText = controller.text;
+                          bool isCheckboxLine = _isCheckboxLine(lineText);
+                          bool isChecked = lineText.startsWith('✓ ');
+                          
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Checkbox
+                              if (isCheckboxLine)
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      if (isChecked) {
+                                        controller.text = '◯ ' + lineText.substring(2);
+                                      } else {
+                                        controller.text = '✓ ' + lineText.substring(2);
+                                      }
+                                    });
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 12.0, right: 8.0),
+                                    child: Text(
+                                      isChecked ? '✓' : '◯',
+                                      style: TextStyle(
+                                        color: AppColors.text,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              else
+                                const SizedBox(width: 0),
+                              // TextField
+                              Expanded(
+                                child: TextField(
+                                  controller: controller,
+                                  maxLines: null,
+                                  keyboardType: TextInputType.multiline,
+                                  textInputAction: TextInputAction.newline,
+                                  onChanged: (value) {
+                                    setState(() {});
+                                  },
+                                  onSubmitted: (value) {
+                                    // Solo crear nueva línea vacía
+                                    if (index == _lineControllers.length - 1) {
+                                      setState(() {
+                                        _lineControllers.add(TextEditingController());
+                                      });
+                                      
+                                      Future.delayed(const Duration(milliseconds: 100), () {
+                                        _scrollController.animateTo(
+                                          _scrollController.position.maxScrollExtent,
+                                          duration: const Duration(milliseconds: 200),
+                                          curve: Curves.easeOut,
+                                        );
+                                      });
+                                    }
+                                  },
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: 'Start typing...',
+                                    hintStyle: TextStyle(
+                                      color: AppColors.text.withOpacity(0.3),
+                                      fontSize: 16,
+                                      height: 1.6,
+                                    ),
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                  style: const TextStyle(
+                                    color: AppColors.text,
+                                    fontSize: 16,
+                                    height: 1.6,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 16),
-              // Content field with error styling
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: _contentError != null 
-                              ? Colors.red.withOpacity(0.08) 
-                              : AppColors.text.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: _contentError != null 
-                                ? Colors.red.withOpacity(0.6) 
-                                : AppColors.text.withOpacity(0.1), 
-                            width: _contentError != null ? 1.5 : 1,
-                          ),
-                        ),
-                        child: TextFormField(
-                          controller: _contentController,
-                          focusNode: _contentFocusNode,
-                          style: const TextStyle(color: AppColors.text, fontSize: 16),
-                          onChanged: (_) {
-                            if (_contentError != null) {
-                              setState(() => _contentError = null);
-                            }
-                          },
-                          decoration: InputDecoration(
-                            labelText: 'Content'.i18n,
-                            alignLabelWithHint: true,
-                            labelStyle: TextStyle(
-                              color: _contentError != null ? Colors.red.withOpacity(0.8) : AppColors.text.withOpacity(0.6),
-                              fontSize: 14,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.all(16),
-                          ),
-                          maxLines: null,
-                          expands: true,
-                          textAlignVertical: TextAlignVertical.top,
-                        ),
-                      ),
-                    ),
-                    if (_contentError != null)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12, top: 6),
-                        child: Text(
-                          _contentError!,
-                          style: TextStyle(
-                            color: Colors.red.withOpacity(0.9),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }
