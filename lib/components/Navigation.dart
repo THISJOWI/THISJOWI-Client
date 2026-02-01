@@ -39,8 +39,9 @@ class Navigation extends State<MyBottomNavigation>
 
     if (mounted) {
       setState(() {
-        _isBusinessAccount = (user?.accountType?.toLowerCase() == 'business') ||
-            (cachedType?.toLowerCase() == 'business');
+        // Prioritize fresh data, fallback to cache
+        final aspect = user?.accountType ?? cachedType;
+        _isBusinessAccount = aspect?.toLowerCase() == 'business';
         _buildPages();
       });
     }
