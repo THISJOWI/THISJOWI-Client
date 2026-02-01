@@ -800,12 +800,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     ),
                   ),
                 ),
-                _buildSettingItem(
-                  icon: Icons.public,
-                  title: 'Country'.i18n,
-                  subtitle: 'Update your country'.i18n,
-                  onTap: _showEditCountryDialog,
-                ),
+
                 _buildSettingItem(
                   icon: Icons.business,
                   title: 'Account Type'.i18n,

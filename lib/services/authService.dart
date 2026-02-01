@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import '../core/api.dart';
+import '../data/models/user.dart';
 
 /// Simple service to connect with the authentication API.
 ///
@@ -21,7 +22,7 @@ import '../core/api.dart';
 class AuthService {
   // URL base del servicio de autenticación desde ApiConfig
   String get baseUrl => ApiConfig.authUrl;
-  
+
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
     clientId: Platform.isAndroid
@@ -38,7 +39,7 @@ class AuthService {
         print('DEBUG: Google Sign In aborted by user');
         return {'success': false, 'message': 'Google sign in aborted'};
       }
-      
+
       print('DEBUG: Google User signed in: ${googleUser.email}');
 
       // Get Server Auth Code (for backend processing)
@@ -46,22 +47,26 @@ class AuthService {
       print('DEBUG: Auth Code: $authCode');
 
       if (authCode == null) {
-         print('DEBUG: Auth Code is null, trying ID Token...');
-         // Fallback to ID Token if code is null (though serverClientId should ensure code)
-         final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-         final String? idToken = googleAuth.idToken;
-         print('DEBUG: ID Token found: ${idToken != null}');
-         
-         if (idToken != null) {
-            // Send ID Token (Legacy flow)
-            return _sendGoogleTokenToBackend(idToken: idToken, email: googleUser.email);
-         }
-         return {'success': false, 'message': 'Failed to retrieve Google Auth Code'};
+        print('DEBUG: Auth Code is null, trying ID Token...');
+        // Fallback to ID Token if code is null (though serverClientId should ensure code)
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
+        final String? idToken = googleAuth.idToken;
+        print('DEBUG: ID Token found: ${idToken != null}');
+
+        if (idToken != null) {
+          // Send ID Token (Legacy flow)
+          return _sendGoogleTokenToBackend(
+              idToken: idToken, email: googleUser.email);
+        }
+        return {
+          'success': false,
+          'message': 'Failed to retrieve Google Auth Code'
+        };
       }
 
       // Send Code to backend
       return _sendGoogleTokenToBackend(code: authCode, email: googleUser.email);
-
     } catch (e, stackTrace) {
       print('DEBUG: Google Sign In Error: $e');
       print(stackTrace);
@@ -69,46 +74,55 @@ class AuthService {
     }
   }
 
-  Future<Map<String, dynamic>> _sendGoogleTokenToBackend({String? code, String? idToken, required String email}) async {
-      final uri = Uri.parse('$baseUrl/google');
-      print('DEBUG: Sending to backend: $uri');
-      
-      final bodyMap = <String, String>{};
-      if (code != null) bodyMap['code'] = code;
-      if (idToken != null) bodyMap['token'] = idToken;
+  Future<Map<String, dynamic>> _sendGoogleTokenToBackend(
+      {String? code, String? idToken, required String email}) async {
+    final uri = Uri.parse('$baseUrl/google');
+    print('DEBUG: Sending to backend: $uri');
 
-      try {
-        final res = await http.post(
-          uri,
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(bodyMap),
-        ).timeout(const Duration(seconds: 30));
+    final bodyMap = <String, String>{};
+    if (code != null) bodyMap['code'] = code;
+    if (idToken != null) bodyMap['token'] = idToken;
 
-        print('DEBUG: Backend response status: ${res.statusCode}');
-        print('DEBUG: Backend response body: ${res.body}');
+    try {
+      final res = await http
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(bodyMap),
+          )
+          .timeout(const Duration(seconds: 30));
 
-        final body = _tryDecode(res.body);
+      print('DEBUG: Backend response status: ${res.statusCode}');
+      print('DEBUG: Backend response body: ${res.body}');
 
-        if (res.statusCode == 200 || res.statusCode == 201) {
-          if (body != null && body['token'] != null) {
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setString('token', body['token']);
-            await prefs.setString('email', email);
-            return {'success': true, 'data': body};
-          }
-          return {'success': false, 'message': body?['message'] ?? 'No token returned from backend'};
+      final body = _tryDecode(res.body);
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        if (body != null && body['token'] != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', body['token']);
+          await prefs.setString('email', email);
+          return {'success': true, 'data': body};
         }
-        return {'success': false, 'message': body?['message'] ?? 'Backend error: ${res.statusCode}'};
-      } catch (e) {
-        print('DEBUG: HTTP Request failed: $e');
-        return {'success': false, 'message': 'Connection error: $e'};
+        return {
+          'success': false,
+          'message': body?['message'] ?? 'No token returned from backend'
+        };
       }
+      return {
+        'success': false,
+        'message': body?['message'] ?? 'Backend error: ${res.statusCode}'
+      };
+    } catch (e) {
+      print('DEBUG: HTTP Request failed: $e');
+      return {'success': false, 'message': 'Connection error: $e'};
+    }
   }
 
   Future<Map<String, dynamic>> loginWithGitHub() async {
     try {
       // GitHub OAuth Configuration
-      const String clientId = 'Ov23lilKdhbjWe8OZhYe'; 
+      const String clientId = 'Ov23lilKdhbjWe8OZhYe';
       const String redirectUri = 'thisjowi://callback';
       const String scope = 'user:email';
 
@@ -126,18 +140,23 @@ class AuthService {
 
       // Extract code from result URL
       final code = Uri.parse(result).queryParameters['code'];
-      
+
       if (code == null) {
-         return {'success': false, 'message': 'GitHub sign in aborted or no code returned'};
+        return {
+          'success': false,
+          'message': 'GitHub sign in aborted or no code returned'
+        };
       }
 
       // Send code to backend
       final uri = Uri.parse('$baseUrl/github');
-      final res = await http.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'code': code, 'redirect_uri': redirectUri}),
-      ).timeout(const Duration(seconds: 30));
+      final res = await http
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'code': code, 'redirect_uri': redirectUri}),
+          )
+          .timeout(const Duration(seconds: 30));
 
       final body = _tryDecode(res.body);
 
@@ -148,10 +167,15 @@ class AuthService {
           await prefs.setString('email', body['email']);
           return {'success': true, 'data': body};
         }
-        return {'success': false, 'message': body?['message'] ?? 'No token returned from backend'};
+        return {
+          'success': false,
+          'message': body?['message'] ?? 'No token returned from backend'
+        };
       }
-      return {'success': false, 'message': body?['message'] ?? 'Backend error: ${res.statusCode}'};
-
+      return {
+        'success': false,
+        'message': body?['message'] ?? 'Backend error: ${res.statusCode}'
+      };
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -160,13 +184,14 @@ class AuthService {
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final uri = Uri.parse('$baseUrl/login');
-      
-      final res = await http.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
-      ).timeout(const Duration(seconds: 30));
 
+      final res = await http
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email, 'password': password}),
+          )
+          .timeout(const Duration(seconds: 30));
 
       final body = _tryDecode(res.body);
 
@@ -177,12 +202,21 @@ class AuthService {
           await prefs.setString('email', email);
           return {'success': true, 'data': body};
         }
-        return {'success': false, 'message': body?['message'] ?? 'No token returned'};
+        return {
+          'success': false,
+          'message': body?['message'] ?? 'No token returned'
+        };
       }
 
-      return {'success': false, 'message': body?['message'] ?? 'Error: ${res.statusCode}'};
+      return {
+        'success': false,
+        'message': body?['message'] ?? 'Error: ${res.statusCode}'
+      };
     } on TimeoutException {
-      return {'success': false, 'message': 'Connection timeout. Please try again.'};
+      return {
+        'success': false,
+        'message': 'Connection timeout. Please try again.'
+      };
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -191,25 +225,30 @@ class AuthService {
   Future<Map<String, dynamic>> initiateRegister(String email) async {
     try {
       final uri = Uri.parse('$baseUrl/initiate-register');
-      final res = await http.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email}),
-      ).timeout(const Duration(seconds: 30));
+      final res = await http
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email}),
+          )
+          .timeout(const Duration(seconds: 30));
 
       final body = _tryDecode(res.body);
 
       if (res.statusCode == 200) {
         return {'success': true, 'message': body?['message']};
       }
-      return {'success': false, 'message': body?['message'] ?? 'Error: ${res.statusCode}'};
+      return {
+        'success': false,
+        'message': body?['message'] ?? 'Error: ${res.statusCode}'
+      };
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
   }
 
   Future<Map<String, dynamic>> register(
-    String email, 
+    String email,
     String password, {
     String? fullName,
     String? country,
@@ -221,22 +260,24 @@ class AuthService {
     try {
       final uri = Uri.parse('$baseUrl/register');
       final bodyData = {
-        'email': email, 
+        'email': email,
         'password': password,
         'otp': otp,
       };
-      
+
       if (fullName != null) bodyData['fullName'] = fullName;
       if (country != null) bodyData['country'] = country;
       if (accountType != null) bodyData['accountType'] = accountType;
       if (hostingMode != null) bodyData['hostingMode'] = hostingMode;
       if (birthdate != null) bodyData['birthdate'] = birthdate;
 
-      final res = await http.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(bodyData),
-      ).timeout(const Duration(seconds: 30));
+      final res = await http
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(bodyData),
+          )
+          .timeout(const Duration(seconds: 30));
 
       final body = _tryDecode(res.body);
 
@@ -244,9 +285,15 @@ class AuthService {
         return {'success': true, 'data': body};
       }
 
-  return {'success': false, 'message': body?['message'] ?? 'Error: ${res.statusCode}'};
+      return {
+        'success': false,
+        'message': body?['message'] ?? 'Error: ${res.statusCode}'
+      };
     } on TimeoutException {
-      return {'success': false, 'message': 'Connection timeout. Please try again.'};
+      return {
+        'success': false,
+        'message': 'Connection timeout. Please try again.'
+      };
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -260,24 +307,27 @@ class AuthService {
   }) async {
     try {
       final token = await getToken();
-      if (token == null) return {'success': false, 'message': 'Not authenticated'};
+      if (token == null)
+        return {'success': false, 'message': 'Not authenticated'};
 
       final uri = Uri.parse('$baseUrl/user');
       final bodyData = <String, String>{};
-      
+
       if (country != null) bodyData['country'] = country;
       if (accountType != null) bodyData['accountType'] = accountType;
       if (hostingMode != null) bodyData['hostingMode'] = hostingMode;
       if (birthdate != null) bodyData['birthdate'] = birthdate;
 
-      final res = await http.put(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode(bodyData),
-      ).timeout(const Duration(seconds: 30));
+      final res = await http
+          .put(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+            body: jsonEncode(bodyData),
+          )
+          .timeout(const Duration(seconds: 30));
 
       final body = _tryDecode(res.body);
 
@@ -285,9 +335,15 @@ class AuthService {
         return {'success': true, 'data': body};
       }
 
-      return {'success': false, 'message': body?['message'] ?? 'Error: ${res.statusCode}'};
+      return {
+        'success': false,
+        'message': body?['message'] ?? 'Error: ${res.statusCode}'
+      };
     } on TimeoutException {
-      return {'success': false, 'message': 'Connection timeout. Please try again.'};
+      return {
+        'success': false,
+        'message': 'Connection timeout. Please try again.'
+      };
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -297,6 +353,76 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     return token;
+  }
+
+  Future<User?> getCurrentUser() async {
+    try {
+      final token = await getToken();
+      if (token == null) return null;
+
+      final uri = Uri.parse(
+          '$baseUrl/user'); // Changed from /me to /user based on updateUser pattern
+      final res = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      ).timeout(const Duration(seconds: 30));
+
+      if (res.statusCode == 200) {
+        final body = _tryDecode(res.body);
+        if (body != null) {
+          // Response from /user is {"userId": 123}
+          final userIdRaw = body['userId'] ?? body['data']?['userId'];
+
+          if (userIdRaw != null) {
+            final userId = userIdRaw.toString();
+            // Now fetch full details from /user-details/{userId}
+            // The backend controller is mapped to /api/v1/auth
+            // So the full path is /api/v1/auth/user-details/{userId}
+
+            final detailsUri = Uri.parse('$baseUrl/user-details/$userId');
+            try {
+              final detailsRes = await http.get(
+                detailsUri,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer $token',
+                },
+              ).timeout(const Duration(seconds: 10));
+
+              if (detailsRes.statusCode == 200) {
+                final detailsBody = _tryDecode(detailsRes.body);
+                // Backend sends the User object directly as JSON
+                if (detailsBody != null) {
+                  final user = User.fromJson(detailsBody);
+
+                  // Cache accountType
+                  final prefs = await SharedPreferences.getInstance();
+                  if (user.accountType != null) {
+                    await prefs.setString('accountType', user.accountType!);
+                  }
+                  return user;
+                }
+              }
+            } catch (e) {
+              print('Error fetching user details: $e');
+            }
+          }
+        }
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching user: $e');
+      return null;
+    }
+  }
+
+  // Get cached account type for synchronous checks
+  Future<String?> getCachedAccountType() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('accountType');
   }
 
   Future<String?> getEmail() async {
@@ -316,24 +442,27 @@ class AuthService {
     await prefs.setString('email', email);
   }
 
-  Future<Map<String, dynamic>> changePassword(String currentPassword, String newPassword, String confirmPassword) async {
+  Future<Map<String, dynamic>> changePassword(String currentPassword,
+      String newPassword, String confirmPassword) async {
     try {
       final token = await getToken();
       if (token == null) return {'success': false, 'message': 'No token found'};
 
       final uri = Uri.parse('$baseUrl/change-password');
-      final res = await http.post(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode({
-          'currentPassword': currentPassword,
-          'newPassword': newPassword,
-          'confirmPassword': confirmPassword,
-        }),
-      ).timeout(const Duration(seconds: 30));
+      final res = await http
+          .post(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+            body: jsonEncode({
+              'currentPassword': currentPassword,
+              'newPassword': newPassword,
+              'confirmPassword': confirmPassword,
+            }),
+          )
+          .timeout(const Duration(seconds: 30));
 
       final body = _tryDecode(res.body);
 
@@ -341,9 +470,16 @@ class AuthService {
         return {'success': true, 'data': body};
       }
 
-      return {'success': false, 'message': body?['message'] ?? 'Error changing password: ${res.statusCode}'};
+      return {
+        'success': false,
+        'message':
+            body?['message'] ?? 'Error changing password: ${res.statusCode}'
+      };
     } on TimeoutException {
-      return {'success': false, 'message': 'Connection timeout. Please try again.'};
+      return {
+        'success': false,
+        'message': 'Connection timeout. Please try again.'
+      };
     } catch (e) {
       return {'success': false, 'message': 'Failed to change password: $e'};
     }
@@ -352,17 +488,22 @@ class AuthService {
   Future<Map<String, dynamic>> forgotPassword(String email) async {
     final uri = Uri.parse('$baseUrl/forgot-password');
     try {
-      final res = await http.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email}),
-      ).timeout(const Duration(seconds: 30));
+      final res = await http
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email}),
+          )
+          .timeout(const Duration(seconds: 30));
 
       final body = _tryDecode(res.body);
       if (res.statusCode == 200) {
         return {'success': true, 'message': body?['message'] ?? 'OTP sent'};
       } else {
-        return {'success': false, 'message': body?['message'] ?? 'Failed to send OTP'};
+        return {
+          'success': false,
+          'message': body?['message'] ?? 'Failed to send OTP'
+        };
       }
     } catch (e) {
       return {'success': false, 'message': e.toString()};
@@ -390,9 +531,16 @@ class AuthService {
       }
 
       final body = _tryDecode(res.body);
-      return {'success': false, 'message': body?['message'] ?? 'Error deleting account: ${res.statusCode}'};
+      return {
+        'success': false,
+        'message':
+            body?['message'] ?? 'Error deleting account: ${res.statusCode}'
+      };
     } on TimeoutException {
-      return {'success': false, 'message': 'Connection timeout. Please try again.'};
+      return {
+        'success': false,
+        'message': 'Connection timeout. Please try again.'
+      };
     } catch (e) {
       return {'success': false, 'message': 'Failed to delete account: $e'};
     }

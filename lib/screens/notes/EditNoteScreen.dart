@@ -23,7 +23,7 @@ class EditNoteScreen extends StatefulWidget {
 
 class _EditNoteScreenState extends State<EditNoteScreen> {
   final _titleController = TextEditingController();
-  late List<TextEditingController> _lineControllers = [];
+  late final List<TextEditingController> _lineControllers = [];
   final _focusNode = FocusNode();
   bool _isLoading = false;
   late ScrollController _scrollController;
@@ -31,9 +31,9 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     _scrollController = ScrollController();
-    
+
     if (widget.note != null) {
       _titleController.text = widget.note!.title;
       _loadContent(widget.note!.content);
@@ -91,7 +91,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       );
 
       if (widget.note != null) {
-        await widget.notesRepository.updateNote(widget.note!.localId ?? '', note);
+        await widget.notesRepository
+            .updateNote(widget.note!.localId ?? '', note);
       } else {
         await widget.notesRepository.createNote(note);
       }
@@ -123,7 +124,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
         backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.text, size: 18),
+          icon:
+              const Icon(Icons.arrow_back_ios, color: AppColors.text, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
         leadingWidth: 50,
@@ -171,7 +173,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
@@ -188,7 +191,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                           final lineText = controller.text;
                           bool isCheckboxLine = _isCheckboxLine(lineText);
                           bool isChecked = lineText.startsWith('✓ ');
-                          
+
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -198,14 +201,17 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                                   onTap: () {
                                     setState(() {
                                       if (isChecked) {
-                                        controller.text = '◯ ' + lineText.substring(2);
+                                        controller.text =
+                                            '◯ ${lineText.substring(2)}';
                                       } else {
-                                        controller.text = '✓ ' + lineText.substring(2);
+                                        controller.text =
+                                            '✓ ${lineText.substring(2)}';
                                       }
                                     });
                                   },
                                   child: Padding(
-                                    padding: const EdgeInsets.only(top: 12.0, right: 8.0),
+                                    padding: const EdgeInsets.only(
+                                        top: 12.0, right: 8.0),
                                     child: Text(
                                       isChecked ? '✓' : '◯',
                                       style: TextStyle(
@@ -231,13 +237,18 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                                     // Solo crear nueva línea vacía
                                     if (index == _lineControllers.length - 1) {
                                       setState(() {
-                                        _lineControllers.add(TextEditingController());
+                                        _lineControllers
+                                            .add(TextEditingController());
                                       });
-                                      
-                                      Future.delayed(const Duration(milliseconds: 100), () {
+
+                                      Future.delayed(
+                                          const Duration(milliseconds: 100),
+                                          () {
                                         _scrollController.animateTo(
-                                          _scrollController.position.maxScrollExtent,
-                                          duration: const Duration(milliseconds: 200),
+                                          _scrollController
+                                              .position.maxScrollExtent,
+                                          duration:
+                                              const Duration(milliseconds: 200),
                                           curve: Curves.easeOut,
                                         );
                                       });

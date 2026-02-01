@@ -16,6 +16,7 @@ import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
 import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/data/repository/notes_repository.dart';
+import 'package:thisjowi/utils/GlobalActions.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
@@ -105,140 +106,6 @@ class _OtpScreenState extends State<OtpScreen> {
       ErrorSnackBar.showSuccess(context, 'Code copied'.tr(context));
     } catch (e) {
       ErrorSnackBar.show(context, 'Invalid secret key'.tr(context));
-    }
-  }
-
-  Future<void> _createPassword() async {
-    final repository = PasswordsRepository();
-    await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditPasswordScreen(
-          passwordsRepository: repository,
-        ),
-      ),
-    );
-  }
-
-  Future<void> _createNote() async {
-    final repository = NotesRepository();
-    await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditNoteScreen(
-          notesRepository: repository,
-        ),
-      ),
-    );
-  }
-
-  Future<void> _showAddDialog() async {
-    final nameController = TextEditingController();
-    final issuerController = TextEditingController();
-    final secretController = TextEditingController();
-
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Text('Add OTP'.tr(context),
-                style: const TextStyle(color: AppColors.text)),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.qr_code, color: AppColors.text),
-              tooltip: 'Import URI'.tr(context),
-              onPressed: () {
-                Navigator.pop(context);
-                _showImportDialog();
-              },
-            ),
-            if (!(kIsWeb ||
-                Platform.isWindows ||
-                Platform.isMacOS ||
-                Platform.isLinux))
-              IconButton(
-                icon: const Icon(Icons.camera_alt, color: AppColors.text),
-                tooltip: 'Scan QR'.tr(context),
-                onPressed: () async {
-                  Navigator.pop(context);
-                  final result =
-                      await Navigator.pushNamed(context, '/otp/qrscan');
-                  if (result == true) _loadEntries();
-                },
-              ),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildTextField(
-                controller: nameController,
-                label: 'Account name'.tr(context),
-                hint: 'user@example.com',
-              ),
-              const SizedBox(height: 16),
-              _buildTextField(
-                controller: issuerController,
-                label: 'Issuer'.tr(context),
-                hint: 'Google, GitHub...',
-              ),
-              const SizedBox(height: 16),
-              _buildTextField(
-                controller: secretController,
-                label: 'Secret key'.tr(context),
-                hint: 'JBSWY3DPEHPK3PXP',
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'.tr(context),
-                style: TextStyle(color: AppColors.text.withOpacity(0.6))),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.black,
-            ),
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('Add'.tr(context)),
-          ),
-        ],
-      ),
-    );
-
-    if (result == true) {
-      final name = nameController.text.trim();
-      final secret = secretController.text.trim().replaceAll(' ', '');
-
-      if (name.isEmpty || secret.isEmpty) {
-        ErrorSnackBar.show(context, 'Name and secret are required'.tr(context));
-        return;
-      }
-
-      if (!_otpService.isValidSecret(secret)) {
-        ErrorSnackBar.show(context, 'Invalid secret key'.tr(context));
-        return;
-      }
-
-      final addResult = await _otpRepository.addOtpEntry({
-        'name': name,
-        'issuer': issuerController.text.trim(),
-        'secret': secret,
-      });
-
-      if (addResult['success'] == true) {
-        ErrorSnackBar.showSuccess(context, 'OTP added'.tr(context));
-        _loadEntries();
-      } else {
-        ErrorSnackBar.show(context, addResult['message'] ?? 'Error');
-      }
     }
   }
 
@@ -392,114 +259,120 @@ class _OtpScreenState extends State<OtpScreen> {
         backgroundColor: Colors.transparent,
         body: Stack(
           children: [
-          SafeArea(
-            child: Column(
-              children: [
-                // Header
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.security,
-                          color: AppColors.primary, size: 28),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Authenticator'.tr(context),
-                        style: const TextStyle(
-                          color: AppColors.text,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+            SafeArea(
+              child: Column(
+                children: [
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.security,
+                            color: AppColors.primary, size: 28),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Authenticator'.tr(context),
+                          style: const TextStyle(
+                            color: AppColors.text,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
 
-                // Search bar
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E1E1E).withOpacity(0.6),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  // Search bar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1E1E1E).withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                                color: Colors.white.withOpacity(0.1)),
+                          ),
+                          child: TextField(
+                            onChanged: (value) {
+                              _searchQuery = value;
+                              _loadEntries();
+                            },
+                            style: const TextStyle(
+                                color: AppColors.text, fontSize: 16),
+                            decoration: InputDecoration(
+                              labelText: 'Search'.i18n,
+                              prefixIcon: Icon(Icons.search,
+                                  color: AppColors.text.withOpacity(0.6),
+                                  size: 20),
+                              suffixIcon: _searchQuery.isNotEmpty
+                                  ? IconButton(
+                                      icon: Icon(Icons.close,
+                                          color:
+                                              AppColors.text.withOpacity(0.6),
+                                          size: 20),
+                                      onPressed: () {
+                                        setState(() => _searchQuery = '');
+                                        _loadEntries();
+                                      },
+                                    )
+                                  : null,
+                              labelStyle: TextStyle(
+                                  color: AppColors.text.withOpacity(0.6),
+                                  fontSize: 16),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                            ),
+                          ),
                         ),
-                    child: TextField(
-                      onChanged: (value) {
-                        _searchQuery = value;
-                        _loadEntries();
-                      },
-                      style:
-                          const TextStyle(color: AppColors.text, fontSize: 16),
-                      decoration: InputDecoration(
-                        labelText: 'Search'.i18n,
-                        prefixIcon: Icon(Icons.search,
-                            color: AppColors.text.withOpacity(0.6), size: 20),
-                        suffixIcon: _searchQuery.isNotEmpty
-                            ? IconButton(
-                                icon: Icon(Icons.close,
-                                    color: AppColors.text.withOpacity(0.6),
-                                    size: 20),
-                                onPressed: () {
-                                  setState(() => _searchQuery = '');
-                                  _loadEntries();
-                                },
-                              )
-                            : null,
-                        labelStyle: TextStyle(
-                            color: AppColors.text.withOpacity(0.6),
-                            fontSize: 16),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
                       ),
                     ),
                   ),
-                ),
+
+                  // List
+                  Expanded(
+                    child: _isLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                                color: AppColors.primary))
+                        : _entries.isEmpty
+                            ? _buildEmptyState()
+                            : RefreshIndicator(
+                                onRefresh: _loadEntries,
+                                color: AppColors.primary,
+                                child: ListView.builder(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(20, 0, 20, 150),
+                                  itemCount: _entries.length,
+                                  itemBuilder: (context, index) =>
+                                      _buildOtpCard(_entries[index]),
+                                ),
+                              ),
+                  ),
+                ],
               ),
             ),
 
-                // List
-                Expanded(
-                  child: _isLoading
-                      ? const Center(
-                          child: CircularProgressIndicator(
-                              color: AppColors.primary))
-                      : _entries.isEmpty
-                          ? _buildEmptyState()
-                          : RefreshIndicator(
-                              onRefresh: _loadEntries,
-                              color: AppColors.primary,
-                              child: ListView.builder(
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 0, 20, 150),
-                                itemCount: _entries.length,
-                                itemBuilder: (context, index) =>
-                                    _buildOtpCard(_entries[index]),
-                              ),
-                            ),
-                ),
-              ],
+            // FAB
+            Positioned(
+              bottom: 130.0,
+              right: 16.0,
+              child: ExpandableActionButton(
+                onCreatePassword: () => GlobalActions.createPassword(context),
+                onCreateNote: () => GlobalActions.createNote(context),
+                onCreateOtp: () =>
+                    GlobalActions.createOtp(context, onSuccess: _loadEntries),
+                onCreateMessage: () => GlobalActions.createMessage(context),
+              ),
             ),
-          ),
-
-          // FAB
-          Positioned(
-            bottom: 130.0,
-            right: 16.0,
-            child: ExpandableActionButton(
-              onCreatePassword: _createPassword,
-              onCreateNote: _createNote,
-              onCreateOtp: _showAddDialog,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
     );
   }
 
@@ -631,169 +504,172 @@ class _OtpScreenState extends State<OtpScreen> {
     }
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E).withOpacity(0.6),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => _copyCode(entry),
+        padding: const EdgeInsets.only(bottom: 12),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E1E).withOpacity(0.6),
                 borderRadius: BorderRadius.circular(16),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    // Icon with issuer initial
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Center(
-                        child: Text(
-                          () {
-                            final text = entry.issuer.isNotEmpty
-                                ? entry.issuer
-                                : entry.name;
-                            return text.isNotEmpty
-                                ? text.substring(0, 1).toUpperCase()
-                                : '?';
-                          }(),
-                          style: const TextStyle(
-                            color: AppColors.primary,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-
-                    // Info
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            entry.issuer.isNotEmpty ? entry.issuer : entry.name,
-                            style: const TextStyle(
-                              color: AppColors.text,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          if (entry.issuer.isNotEmpty)
-                            Text(
-                              entry.name,
-                              style: TextStyle(
-                                color: AppColors.text.withOpacity(0.5),
-                                fontSize: 13,
+                border: Border.all(color: Colors.white.withOpacity(0.1)),
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => _copyCode(entry),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            // Icon with issuer initial
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  () {
+                                    final text = entry.issuer.isNotEmpty
+                                        ? entry.issuer
+                                        : entry.name;
+                                    return text.isNotEmpty
+                                        ? text.substring(0, 1).toUpperCase()
+                                        : '?';
+                                  }(),
+                                  style: const TextStyle(
+                                    color: AppColors.primary,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ),
-                        ],
-                      ),
-                    ),
+                            const SizedBox(width: 12),
 
-                    // Delete button
-                    IconButton(
-                      onPressed: () => _deleteEntry(entry),
-                      icon: Icon(
-                        Icons.delete_outline,
-                        color: AppColors.text.withOpacity(0.3),
-                        size: 20,
-                      ),
-                    ),
-                  ],
-                ),
+                            // Info
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    entry.issuer.isNotEmpty
+                                        ? entry.issuer
+                                        : entry.name,
+                                    style: const TextStyle(
+                                      color: AppColors.text,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  if (entry.issuer.isNotEmpty)
+                                    Text(
+                                      entry.name,
+                                      style: TextStyle(
+                                        color: AppColors.text.withOpacity(0.5),
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
 
-                const SizedBox(height: 16),
-
-                // Code and timer
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Code
-                    Expanded(
-                      child: Text(
-                        formattedCode,
-                        style: const TextStyle(
-                          color: AppColors.primary,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 4,
-                          fontFamily: 'monospace',
+                            // Delete button
+                            IconButton(
+                              onPressed: () => _deleteEntry(entry),
+                              icon: Icon(
+                                Icons.delete_outline,
+                                color: AppColors.text.withOpacity(0.3),
+                                size: 20,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ),
 
-                    // Timer
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        SizedBox(
-                          width: 40,
-                          height: 40,
-                          child: CircularProgressIndicator(
-                            value: progress,
-                            strokeWidth: 3,
-                            backgroundColor: AppColors.text.withOpacity(0.1),
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(progressColor),
-                          ),
+                        const SizedBox(height: 16),
+
+                        // Code and timer
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Code
+                            Expanded(
+                              child: Text(
+                                formattedCode,
+                                style: const TextStyle(
+                                  color: AppColors.primary,
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 4,
+                                  fontFamily: 'monospace',
+                                ),
+                              ),
+                            ),
+
+                            // Timer
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 40,
+                                  height: 40,
+                                  child: CircularProgressIndicator(
+                                    value: progress,
+                                    strokeWidth: 3,
+                                    backgroundColor:
+                                        AppColors.text.withOpacity(0.1),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        progressColor),
+                                  ),
+                                ),
+                                Text(
+                                  '$remainingSeconds',
+                                  style: TextStyle(
+                                    color: progressColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                        Text(
-                          '$remainingSeconds',
-                          style: TextStyle(
-                            color: progressColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
+
+                        const SizedBox(height: 8),
+
+                        // Copy hint
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.touch_app,
+                              size: 14,
+                              color: AppColors.text.withOpacity(0.3),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Tap to copy'.tr(context),
+                              style: TextStyle(
+                                color: AppColors.text.withOpacity(0.3),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-
-                const SizedBox(height: 8),
-
-                // Copy hint
-                Row(
-                  children: [
-                    Icon(
-                      Icons.touch_app,
-                      size: 14,
-                      color: AppColors.text.withOpacity(0.3),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Tap to copy'.tr(context),
-                      style: TextStyle(
-                        color: AppColors.text.withOpacity(0.3),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-        ),
-      ),
-    ));
+        ));
   }
 }

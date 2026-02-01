@@ -16,6 +16,7 @@ import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/i18n/translationService.dart';
 import 'package:thisjowi/components/Navigation.dart';
+import 'package:thisjowi/utils/GlobalActions.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 
@@ -52,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       if (content.isEmpty) return '';
       final json = jsonDecode(content);
-      
+
       if (json is List) {
         // Delta format: List of operations
         final buffer = StringBuffer();
@@ -147,147 +148,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _notes = notes;
       _isLoading = false;
     });
-  }
-
-  Future<void> _createPassword() async {
-    final created = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditPasswordScreen(
-          passwordsRepository: _passwordsRepository,
-        ),
-      ),
-    );
-    if (created == true) _loadData();
-  }
-
-  Future<void> _createNote() async {
-    final created = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditNoteScreen(
-          notesRepository: _notesRepository,
-        ),
-      ),
-    );
-    if (created == true) _loadData();
-  }
-
-  Future<void> _createOtp() async {
-    final otpRepository = OtpRepository();
-    final otpService = OtpService();
-
-    final nameController = TextEditingController();
-    final issuerController = TextEditingController();
-    final secretController = TextEditingController();
-
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Text('Add OTP'.tr(context),
-                style: const TextStyle(color: AppColors.text)),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.qr_code, color: AppColors.text),
-              tooltip: 'Import URI'.tr(context),
-              onPressed: () {
-                Navigator.pop(context);
-                _showImportDialog();
-              },
-            ),
-            if (kIsWeb ||
-                defaultTargetPlatform == TargetPlatform.android ||
-                defaultTargetPlatform == TargetPlatform.iOS)
-              IconButton(
-                icon: const Icon(Icons.camera_alt, color: AppColors.text),
-                tooltip: 'Scan QR'.tr(context),
-                onPressed: () async {
-                  Navigator.pop(context);
-                  final result =
-                      await Navigator.pushNamed(context, '/otp/qrscan');
-                  if (result == true && mounted) {
-                    bottomNavigationKey.currentState?.navigateToOtp();
-                  }
-                },
-              ),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildOtpTextField(
-                controller: nameController,
-                label: 'Account name'.tr(context),
-                hint: 'user@example.com',
-              ),
-              const SizedBox(height: 16),
-              _buildOtpTextField(
-                controller: issuerController,
-                label: 'Issuer'.tr(context),
-                hint: 'Google, GitHub...',
-              ),
-              const SizedBox(height: 16),
-              _buildOtpTextField(
-                controller: secretController,
-                label: 'Secret key'.tr(context),
-                hint: 'JBSWY3DPEHPK3PXP',
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'.tr(context),
-                style: TextStyle(color: AppColors.text.withOpacity(0.6))),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.black,
-            ),
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('Add'.tr(context)),
-          ),
-        ],
-      ),
-    );
-
-    if (result == true) {
-      final name = nameController.text.trim();
-      final secret = secretController.text.trim().replaceAll(' ', '');
-
-      if (name.isEmpty || secret.isEmpty) {
-        ErrorSnackBar.show(context, 'Name and secret are required'.tr(context));
-        return;
-      }
-
-      if (!otpService.isValidSecret(secret)) {
-        ErrorSnackBar.show(context, 'Invalid secret key'.tr(context));
-        return;
-      }
-
-      final addResult = await otpRepository.addOtpEntry({
-        'name': name,
-        'issuer': issuerController.text.trim(),
-        'secret': secret,
-      });
-
-      if (addResult['success'] == true) {
-        ErrorSnackBar.showSuccess(context, 'OTP added'.tr(context));
-        // Navegar a la pestaña de OTP usando la key global
-        if (mounted) {
-          bottomNavigationKey.currentState?.navigateToOtp();
-        }
-      } else {
-        ErrorSnackBar.show(context, addResult['message'] ?? 'Error');
-      }
-    }
   }
 
   Future<void> _showImportDialog() async {
@@ -808,9 +668,12 @@ class _HomeScreenState extends State<HomeScreen> {
             bottom: 130.0,
             right: 16.0,
             child: ExpandableActionButton(
-              onCreatePassword: _createPassword,
-              onCreateNote: _createNote,
-              onCreateOtp: _createOtp,
+              onCreatePassword: () =>
+                  GlobalActions.createPassword(context, onSuccess: _loadData),
+              onCreateNote: () =>
+                  GlobalActions.createNote(context, onSuccess: _loadData),
+              onCreateOtp: () => GlobalActions.createOtp(context),
+              onCreateMessage: () => GlobalActions.createMessage(context),
             ),
           ),
         ],

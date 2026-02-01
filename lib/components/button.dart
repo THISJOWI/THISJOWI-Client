@@ -4,12 +4,14 @@ class ExpandableActionButton extends StatefulWidget {
   final VoidCallback onCreatePassword;
   final VoidCallback onCreateNote;
   final VoidCallback? onCreateOtp;
+  final VoidCallback? onCreateMessage;
 
   const ExpandableActionButton({
     super.key,
     required this.onCreatePassword,
     required this.onCreateNote,
     this.onCreateOtp,
+    this.onCreateMessage,
   });
 
   @override
@@ -32,7 +34,8 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
       vsync: this,
     );
     _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController!, curve: Curves.easeOutCubic),
+      CurvedAnimation(
+          parent: _animationController!, curve: Curves.easeOutCubic),
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animationController!, curve: Curves.easeOut),
@@ -78,6 +81,14 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
     _animationController?.reverse();
     Future.delayed(const Duration(milliseconds: 150), () {
       if (mounted && widget.onCreateOtp != null) widget.onCreateOtp!();
+    });
+  }
+
+  void _handleCreateMessage() {
+    setState(() => _isExpanded = false);
+    _animationController?.reverse();
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted && widget.onCreateMessage != null) widget.onCreateMessage!();
     });
   }
 
@@ -152,10 +163,23 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
     if (!_isInitialized) {
       return const SizedBox.shrink();
     }
-    
+
+    // Calculate vertical positions
+    // Note: Items stack bottom-up. Lowest item (closest to main FAB) is last.
+    // 60px height difference typical
+
     return Stack(
       alignment: Alignment.bottomRight,
       children: [
+        // Top Item: Message (if available)
+        if (_isExpanded && widget.onCreateMessage != null)
+          _buildOptionButton(
+            onTap: _handleCreateMessage,
+            icon: Icons.chat_bubble_outline,
+            label: 'Mensaje',
+            bottomPadding: widget.onCreateOtp != null ? 240.0 : 185.0,
+          ),
+
         // Option: Create OTP
         if (_isExpanded && widget.onCreateOtp != null)
           _buildOptionButton(
