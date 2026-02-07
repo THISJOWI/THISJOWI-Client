@@ -10,7 +10,7 @@ import 'package:thisjowi/components/Navigation.dart';
 import 'package:thisjowi/components/errorBar.dart';
 import 'package:thisjowi/i18n/translationService.dart';
 import 'package:thisjowi/screens/auth/forgotPassword.dart';
-import 'package:thisjowi/screens/auth/ldapLogin.dart';
+import 'package:thisjowi/services/ldapAuthService.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,6 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _passwordFocusNode = FocusNode();
   final BiometricService _biometricService = BiometricService();
+  final LdapAuthService _ldapAuthService = LdapAuthService();
   AuthRepository? _authRepository;
   bool _isLoading = false;
   bool _hasSavedSession = false;
@@ -137,6 +138,37 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
   }
+
+  /// Login automático con LDAP cuando el dominio del email lo tiene habilitado
+  Future<void> _handleLdapLogin(String email, String password, String domain) async {
+    final username = email.split('@')[0];
+    
+    setState(() => _isLoading = true);
+    
+    try {
+      final result = await _ldapAuthService.loginWithLdap(
+        domain: domain,
+        username: username,
+        password: password,
+      );
+
+      if (result['success'] == true && mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
+          (route) => false,
+        );
+      } else if (mounted) {
+        setState(() => _isLoading = false);
+        ErrorSnackBar.show(context, result['message'] ?? 'LDAP authentication failed'.tr(context));
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ErrorSnackBar.show(context, 'Error: ${e.toString()}');
+      }
+    }
+  }
+
   Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
@@ -144,6 +176,17 @@ class _LoginScreenState extends State<LoginScreen> {
     if (email.isEmpty || password.isEmpty) {
       ErrorSnackBar.show(context, 'Please complete email and password'.tr(context));
       return;
+    }
+
+    // Verificar si el email tiene un dominio con LDAP habilitado
+    if (email.contains('@')) {
+      final domain = email.split('@')[1];
+      final isLdapEnabled = await _ldapAuthService.isLdapEnabledForDomain(domain);
+      
+      if (isLdapEnabled) {
+        await _handleLdapLogin(email, password, domain);
+        return;
+      }
     }
 
     if (_authRepository == null) {
@@ -485,39 +528,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
 
                   const SizedBox(height: 30),
-
-                  // Enterprise LDAP Login Button
-                  if (!_isLoading)
-                    GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const LdapLoginScreen()),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.business, color: Colors.white.withValues(alpha: 0.8), size: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              "Enterprise Login (LDAP)".tr(context),
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.8),
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                  const SizedBox(height: 20),
 
                   // Register Link
                   Row(

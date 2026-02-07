@@ -741,9 +741,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       .i18n,
               icon: Icons.check_circle,
               isSelected: _ldapChoice == 'yes',
-              onTap: () {
+              onTap: () async {
                 setState(() => _ldapChoice = 'yes');
-                _nextPage();
+                // Ir directamente al login para autenticación LDAP
+                await _completeOnboarding();
               },
             ),
             const SizedBox(height: 20),
