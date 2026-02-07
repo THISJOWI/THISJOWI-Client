@@ -319,4 +319,60 @@ class LdapAuthService {
       return {'success': false, 'message': e.toString()};
     }
   }
+
+  /// Obtener todos los usuarios LDAP de un dominio
+  /// Usado para mostrar contactos disponibles en mensajería
+  Future<Map<String, dynamic>> getLdapUsersByDomain(String domain) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/ldap/users/$domain'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+      ).timeout(
+        const Duration(seconds: 15),
+        onTimeout: () => throw Exception('Timeout al obtener usuarios'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return {
+          'success': true,
+          'users': data['users'] ?? [],
+          'count': data['count'] ?? 0,
+        };
+      } else {
+        final data = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Error al obtener usuarios',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error: ${e.toString()}',
+      };
+    }
+  }
+
+  /// Verificar si el usuario actual es LDAP y obtener su dominio
+  Future<String?> getCurrentUserDomain() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final isLdapUser = prefs.getBool('isLdapUser') ?? false;
+      final email = prefs.getString('email');
+      
+      if (isLdapUser && email != null && email.contains('@')) {
+        return email.split('@')[1];
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
 }

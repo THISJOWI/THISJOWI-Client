@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:thisjowi/core/appColors.dart';
@@ -23,7 +24,9 @@ class _ChatScreenState extends State<ChatScreen> {
   List<Message> _messages = [];
   bool _isLoading = true;
   String? _currentUserId;
+  String? _recipientId;
   String _chatTitle = 'Chat';
+  Timer? _pollingTimer;
 
   @override
   void initState() {
@@ -31,20 +34,70 @@ class _ChatScreenState extends State<ChatScreen> {
     _initUser();
   }
 
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    _textController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   Future<void> _initUser() async {
     final user = await _authService.getCurrentUser();
     if (user != null && mounted) {
+      // Get recipient from conversation participants
+      final recipient = widget.conversation.participants
+          .firstWhere((p) => p.id != user.id, orElse: () => widget.conversation.participants.first);
+      
+      // Get display name from recipient
+      final recipientName = recipient.fullName ?? recipient.email;
+      
       setState(() {
         _currentUserId = user.id;
-        _chatTitle = widget.conversation.getTitle(_currentUserId!);
+        _recipientId = recipient.id;
+        _chatTitle = recipientName.isNotEmpty ? recipientName : 'Chat';
       });
       _loadMessages();
+      // Start polling for new messages every 3 seconds
+      _startPolling();
+    }
+  }
+
+  void _startPolling() {
+    _pollingTimer?.cancel();
+    _pollingTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      _pollMessages();
+    });
+  }
+
+  Future<void> _pollMessages() async {
+    if (!mounted || _recipientId == null) return;
+    
+    final result = await _messageService.getMessages(
+      widget.conversation.id,
+      recipientId: _recipientId,
+    );
+    
+    if (!mounted) return;
+    
+    if (result['success'] == true) {
+      final newMessages = result['data'] as List<Message>;
+      // Only update if there are new messages
+      if (newMessages.length > _messages.length) {
+        setState(() {
+          _messages = newMessages;
+        });
+        _scrollToBottom();
+      }
     }
   }
 
   Future<void> _loadMessages() async {
     setState(() => _isLoading = true);
-    final result = await _messageService.getMessages(widget.conversation.id);
+    final result = await _messageService.getMessages(
+      widget.conversation.id,
+      recipientId: _recipientId,
+    );
 
     if (!mounted) return;
 
@@ -78,6 +131,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _textController.clear();
 
+    // Get recipient ID from conversation participants
+    final recipientId = widget.conversation.participants
+        .firstWhere((p) => p.id != _currentUserId, orElse: () => widget.conversation.participants.first)
+        .id;
+
     // Optimistic UI update
     final tempId = DateTime.now().millisecondsSinceEpoch.toString();
     final optimisticMessage = Message(
@@ -94,8 +152,11 @@ class _ChatScreenState extends State<ChatScreen> {
     });
     _scrollToBottom();
 
-    final result =
-        await _messageService.sendMessage(widget.conversation.id, text);
+    final result = await _messageService.sendMessage(
+      widget.conversation.id, 
+      text,
+      recipientId: recipientId,
+    );
 
     if (result['success'] == true) {
       final actualMessage = result['data'] as Message;
@@ -122,28 +183,40 @@ class _ChatScreenState extends State<ChatScreen> {
         backgroundColor:
             const Color(0xFF1E1E1E).withOpacity(0.9), // Glassmorphism-ish
         elevation: 0,
-        centerTitle: true,
+        centerTitle: false,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Column(
-          children: [
-            Text(_chatTitle,
-                style: const TextStyle(color: AppColors.text, fontSize: 16)),
-            // Optional: Online status text
-          ],
-        ),
+        title: const SizedBox.shrink(), // Empty title
         actions: [
-          // Avatar in app bar
+          // User name on the right
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
+            padding: const EdgeInsets.only(right: 8),
+            child: Center(
+              child: Text(
+                _chatTitle,
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          // Avatar with user initial
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
             child: CircleAvatar(
-              radius: 16,
-              backgroundColor: AppColors.primary,
+              radius: 18,
+              backgroundColor: AppColors.primary.withOpacity(0.2),
               child: Text(
                 _chatTitle.isNotEmpty ? _chatTitle[0].toUpperCase() : '?',
-                style: const TextStyle(fontSize: 14, color: Colors.white),
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
