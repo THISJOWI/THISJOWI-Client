@@ -27,9 +27,16 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   String? _accountType; // 'business', 'community'
   String? _hostingMode; // 'cloud', 'self-hosted'
   String? _authChoice; // 'login', 'register'
+  String? _ldapChoice; // 'yes', 'no' (only for business accounts)
   
   // Registration Data
   final TextEditingController _urlController = TextEditingController();
+  
+  // LDAP Configuration
+  final TextEditingController _ldapServerController = TextEditingController();
+  final TextEditingController _ldapBaseDnController = TextEditingController();
+  final TextEditingController _ldapBindDnController = TextEditingController();
+  final TextEditingController _ldapPasswordController = TextEditingController();
   
   @override
   void initState() {
@@ -63,6 +70,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     _fadeController.dispose();
     _scaleController.dispose();
     _urlController.dispose();
+    _ldapServerController.dispose();
+    _ldapBaseDnController.dispose();
+    _ldapBindDnController.dispose();
+    _ldapPasswordController.dispose();
     super.dispose();
   }
 
@@ -135,6 +146,16 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     if (_authChoice == 'register') {
       // 6. Account Type
       pages.add(_buildAccountTypePage());
+
+      // 6.5. LDAP Setup (Only if Business account selected)
+      if (_accountType == 'business') {
+        pages.add(_buildLdapSetupPage());
+        
+        // LDAP Configuration (Only if user wants to enable LDAP)
+        if (_ldapChoice == 'yes') {
+          pages.add(_buildLdapConfigPage());
+        }
+      }
 
       // 7. Hosting Mode (Only if account type selected)
       if (_accountType != null) {
@@ -641,6 +662,279 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               child: Text("Continue".i18n, style: const TextStyle(fontSize: 18)),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLdapSetupPage() {
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ScaleTransition(
+              scale: _scaleAnimation,
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue.withOpacity(0.2),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Icon(Icons.business, size: 60, color: Colors.blue.shade700),
+              ),
+            ),
+            const SizedBox(height: 30),
+            Text(
+              "Enterprise Authentication".i18n,
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: AppColors.text,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "Do you want to integrate LDAP with your app for corporate domain authentication?".i18n,
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.text.withOpacity(0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 40),
+            _buildSelectionCard(
+              title: "Yes, Enable LDAP".i18n,
+              description: "Allow users to authenticate using corporate LDAP credentials.".i18n,
+              icon: Icons.check_circle,
+              isSelected: _ldapChoice == 'yes',
+              onTap: () {
+                setState(() => _ldapChoice = 'yes');
+                _nextPage();
+              },
+            ),
+            const SizedBox(height: 20),
+            _buildSelectionCard(
+              title: "No, Standard Auth".i18n,
+              description: "Use regular email/password authentication.".i18n,
+              icon: Icons.close,
+              isSelected: _ldapChoice == 'no',
+              onTap: () {
+                setState(() => _ldapChoice = 'no');
+                _nextPage();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLdapConfigPage() {
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ScaleTransition(
+                scale: _scaleAnimation,
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blue.withOpacity(0.2),
+                        blurRadius: 20,
+                        spreadRadius: 5,
+                      ),
+                    ],
+                  ),
+                  child: Icon(Icons.settings, size: 60, color: Colors.blue.shade700),
+                ),
+              ),
+              const SizedBox(height: 30),
+              Text(
+                "LDAP Configuration".i18n,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.text,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "Configure your LDAP server details. These settings will be used for enterprise authentication.".i18n,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.text.withOpacity(0.7),
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 30),
+
+              // LDAP Server URL
+              Text(
+                "LDAP Server URL".i18n,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.text,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _ldapServerController,
+                decoration: InputDecoration(
+                  hintText: 'ldap://ldap.example.com:389',
+                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                style: TextStyle(color: AppColors.text),
+              ),
+              const SizedBox(height: 20),
+
+              // Base DN
+              Text(
+                "Base DN (Distinguished Name)".i18n,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.text,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _ldapBaseDnController,
+                decoration: InputDecoration(
+                  hintText: 'dc=example,dc=com',
+                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                style: TextStyle(color: AppColors.text),
+              ),
+              const SizedBox(height: 20),
+
+              // Bind DN (Optional)
+              Text(
+                "Bind DN (Optional)".i18n,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.text,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _ldapBindDnController,
+                decoration: InputDecoration(
+                  hintText: 'cn=admin,dc=example,dc=com',
+                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                style: TextStyle(color: AppColors.text),
+              ),
+              const SizedBox(height: 20),
+
+              // Bind Password (Optional)
+              Text(
+                "Bind Password (Optional)".i18n,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.text,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _ldapPasswordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: '••••••••',
+                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                style: TextStyle(color: AppColors.text),
+              ),
+              const SizedBox(height: 30),
+
+              // Info box
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.blue.withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.info_outline, size: 18, color: Colors.blue.shade700),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        "You can configure these settings later in your account dashboard.".i18n,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.blue.shade700,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 30),
+            ],
+          ),
         ),
       ),
     );

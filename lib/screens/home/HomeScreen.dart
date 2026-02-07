@@ -8,7 +8,6 @@ import 'package:thisjowi/data/models/noteEntry.dart';
 import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/data/repository/notes_repository.dart';
 import 'package:thisjowi/data/repository/otp_repository.dart';
-import 'package:thisjowi/services/otpService.dart';
 import 'package:thisjowi/components/button.dart';
 import 'package:thisjowi/components/errorBar.dart';
 import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
@@ -18,7 +17,6 @@ import 'package:thisjowi/i18n/translationService.dart';
 import 'package:thisjowi/components/Navigation.dart';
 import 'package:thisjowi/utils/GlobalActions.dart';
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

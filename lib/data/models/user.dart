@@ -6,6 +6,10 @@ class User {
   final String? accountType; // "Business" or "Community"
   final String? hostingMode;
   final String? avatarUrl;
+  final String? orgId;
+  final String? ldapUsername;
+  final String? ldapDomain;
+  final bool isLdapUser;
 
   User({
     this.id,
@@ -15,6 +19,10 @@ class User {
     this.accountType,
     this.hostingMode,
     this.avatarUrl,
+    this.orgId,
+    this.ldapUsername,
+    this.ldapDomain,
+    this.isLdapUser = false,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -27,6 +35,10 @@ class User {
       hostingMode: json['hostingMode'] ?? json['hosting_mode'],
       avatarUrl: json['avatarUrl'] ??
           json['avatar_url'], // Assuming the API might return this
+      orgId: json['orgId'],
+      ldapUsername: json['ldapUsername'],
+      ldapDomain: json['ldapDomain'],
+      isLdapUser: json['isLdapUser'] ?? false,
     );
   }
 
@@ -39,6 +51,10 @@ class User {
       'accountType': accountType,
       'hostingMode': hostingMode,
       'avatarUrl': avatarUrl,
+      'orgId': orgId,
+      'ldapUsername': ldapUsername,
+      'ldapDomain': ldapDomain,
+      'isLdapUser': isLdapUser,
     };
   }
 

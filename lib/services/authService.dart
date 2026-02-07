@@ -307,8 +307,9 @@ class AuthService {
   }) async {
     try {
       final token = await getToken();
-      if (token == null)
+      if (token == null) {
         return {'success': false, 'message': 'Not authenticated'};
+      }
 
       final uri = Uri.parse('$baseUrl/user');
       final bodyData = <String, String>{};

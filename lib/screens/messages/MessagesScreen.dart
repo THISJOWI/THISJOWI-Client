@@ -8,7 +8,6 @@ import 'package:thisjowi/services/messageService.dart';
 import 'package:thisjowi/data/models/message.dart';
 import 'package:thisjowi/screens/messages/ChatScreen.dart';
 import 'package:thisjowi/components/errorBar.dart';
-import 'package:thisjowi/data/models/user.dart';
 import 'package:thisjowi/components/button.dart';
 import 'package:thisjowi/utils/GlobalActions.dart';
 

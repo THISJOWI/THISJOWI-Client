@@ -153,8 +153,9 @@ class GlobalActions {
       final secret = secretController.text.trim().replaceAll(' ', '');
 
       if (name.isEmpty || secret.isEmpty) {
-        if (context.mounted)
+        if (context.mounted) {
           ErrorSnackBar.show(context, 'Name and secret are required');
+        }
         return;
       }
 

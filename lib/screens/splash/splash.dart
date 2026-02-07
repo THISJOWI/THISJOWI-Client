@@ -114,10 +114,10 @@ class _SplashScreenState extends State<SplashScreen>
   
   /// Navigate to the appropriate screen based on authentication status
   void _navigateToMainScreen() {
-    // Always navigate to login screen to prevent auto-login
-    // User must authenticate every time they open the app
+    // Navigate to auth selection screen to choose between LDAP or regular login
+    // User can select their preferred authentication method
     if (!mounted) return;
-    Navigator.of(context).pushReplacementNamed('/login');
+    Navigator.of(context).pushReplacementNamed('/authSelection');
   }
   
   void _showBiometricAuth() {

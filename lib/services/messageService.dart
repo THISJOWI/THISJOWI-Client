@@ -12,8 +12,9 @@ class MessageService {
   Future<Map<String, dynamic>> getConversations() async {
     try {
       final token = await _authService.getToken();
-      if (token == null)
+      if (token == null) {
         return {'success': false, 'message': 'Not authenticated'};
+      }
 
       final uri = Uri.parse('$baseUrl/conversations');
       final res = await http
@@ -40,8 +41,9 @@ class MessageService {
   Future<Map<String, dynamic>> getMessages(String conversationId) async {
     try {
       final token = await _authService.getToken();
-      if (token == null)
+      if (token == null) {
         return {'success': false, 'message': 'Not authenticated'};
+      }
 
       // Backend route: GET /api/v1/messages/:conversationId
       final uri = Uri.parse('$baseUrl/$conversationId');
@@ -69,8 +71,9 @@ class MessageService {
       String conversationId, String content) async {
     try {
       final token = await _authService.getToken();
-      if (token == null)
+      if (token == null) {
         return {'success': false, 'message': 'Not authenticated'};
+      }
 
       final user = await _authService.getCurrentUser();
       if (user?.id == null) {
@@ -78,7 +81,7 @@ class MessageService {
       }
 
       // Backend route: POST /api/v1/messages
-      final uri = Uri.parse('$baseUrl');
+      final uri = Uri.parse(baseUrl);
 
       final payload = {
         'senderId': user!.id,

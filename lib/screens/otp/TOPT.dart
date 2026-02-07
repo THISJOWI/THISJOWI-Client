@@ -9,13 +9,7 @@ import 'package:thisjowi/i18n/translationService.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/services/otpService.dart';
 import 'package:thisjowi/components/errorBar.dart';
-import 'package:flutter/foundation.dart';
-import 'dart:io' show Platform;
 import 'package:thisjowi/components/button.dart';
-import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
-import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
-import 'package:thisjowi/data/repository/passwordsRepository.dart';
-import 'package:thisjowi/data/repository/notes_repository.dart';
 import 'package:thisjowi/utils/GlobalActions.dart';
 
 class OtpScreen extends StatefulWidget {
