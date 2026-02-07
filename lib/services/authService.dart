@@ -256,6 +256,7 @@ class AuthService {
     String? hostingMode,
     String? birthdate,
     required String otp,
+    Map<String, dynamic>? ldapConfig,
   }) async {
     try {
       final uri = Uri.parse('$baseUrl/register');

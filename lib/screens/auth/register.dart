@@ -17,6 +17,7 @@ class RegisterScreen extends StatefulWidget {
   final String? hostingMode;
   final bool isEmbedded;
   final String? initialCountry;
+  final Map<String, dynamic>? ldapConfig;
   final Function(Map<String, dynamic>)? onSuccess;
 
   const RegisterScreen({
@@ -25,6 +26,7 @@ class RegisterScreen extends StatefulWidget {
     this.hostingMode,
     this.isEmbedded = false,
     this.initialCountry,
+    this.ldapConfig,
     this.onSuccess,
   });
 
@@ -33,8 +35,6 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  
-
 // ...
 
   void _handleSuccess(Map<String, dynamic> result) {
@@ -46,11 +46,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // Show success and navigate immediately
     // Background sync will happen automatically
     if (mounted) {
-      ErrorSnackBar.showSuccess(
-        context, 
-        'Account created!'.i18n
-      );
-      
+      ErrorSnackBar.showSuccess(context, 'Account created!'.i18n);
+
       // Check if we have a token (auto-login successful)
       if (result.containsKey('token')) {
         Navigator.pushReplacement(
@@ -78,12 +75,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       secureStorageService: SecureStorageService(),
     );
     final result = await authRepository.loginWithGoogle();
-    
+
     if (mounted) {
       if (result['success'] == true) {
         _handleSuccess(result['data'] ?? {});
       } else {
-        ErrorSnackBar.show(context, result['message'] ?? 'Google Sign Up failed');
+        ErrorSnackBar.show(
+            context, result['message'] ?? 'Google Sign Up failed');
       }
     }
   }
@@ -95,12 +93,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       secureStorageService: SecureStorageService(),
     );
     final result = await authRepository.loginWithGitHub();
-    
+
     if (mounted) {
       if (result['success'] == true) {
         _handleSuccess(result['data'] ?? {});
       } else {
-        ErrorSnackBar.show(context, result['message'] ?? 'GitHub Sign Up failed');
+        ErrorSnackBar.show(
+            context, result['message'] ?? 'GitHub Sign Up failed');
       }
     }
   }
@@ -149,7 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                         const SizedBox(height: 16), // Reduced spacing
-                        
+
                         // Welcome Text
                         Text(
                           "Create Account".i18n,
@@ -179,7 +178,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: BackdropFilter(
                             filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 24.0, vertical: 24.0),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF1E1E1E).withOpacity(0.6),
                                 borderRadius: BorderRadius.circular(24),
@@ -199,14 +199,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 accountType: widget.accountType,
                                 hostingMode: widget.hostingMode,
                                 initialCountry: widget.initialCountry,
+                                ldapConfig: widget.ldapConfig,
                                 onSuccess: _handleSuccess,
                               ),
                             ),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 24),
-                        
+
                         // Social Login Buttons
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -235,7 +236,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             children: [
                               Text(
                                 "Already have an account? ".i18n,
-                                style: TextStyle(color: AppColors.text.withOpacity(0.6), fontSize: 14),
+                                style: TextStyle(
+                                    color: AppColors.text.withOpacity(0.6),
+                                    fontSize: 14),
                               ),
                               GestureDetector(
                                 onTap: () {
@@ -311,11 +314,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
           ),
-          
+
           // Blur effect
           BackdropFilter(
-             filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-             child: Container(color: Colors.transparent),
+            filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+            child: Container(color: Colors.transparent),
           ),
 
           content,

@@ -32,15 +32,15 @@ class AuthRepository {
 
     // Step 1: ALWAYS check local cache first
     final cachedUser = await _db.authDao.getUserByEmail(email);
-    
+
     if (cachedUser != null) {
       // User exists in local cache
       final passwordHash = _hashPassword(password);
-      
+
       if (cachedUser.passwordHash == passwordHash) {
         // Valid credentials in cache
         final token = cachedUser.token;
-        
+
         // Restore token to SharedPreferences
         if (token != null) {
           await _secureStorageService.saveValue('cached_token', token);
@@ -48,19 +48,21 @@ class AuthRepository {
           // Also restore session for AuthService to use in API calls
           await _authService.setSession(token, email);
         }
-        
+
         // Update last login timestamp in local DB
-        await _db.authDao.updateLastLogin(email, DateTime.now().toIso8601String());
-        
+        await _db.authDao
+            .updateLastLogin(email, DateTime.now().toIso8601String());
+
         // If online, sync with backend in background (don't block UI)
         if (isOnline) {
           _syncLoginWithBackend(email, password, token);
         }
-        
+
         return {
           'success': true,
           'data': {'token': token, 'offline': !isOnline},
-          'message': isOnline ? 'Logged in successfully' : 'Logged in offline mode',
+          'message':
+              isOnline ? 'Logged in successfully' : 'Logged in offline mode',
         };
       } else if (!isOnline) {
         // Invalid password and offline
@@ -71,20 +73,21 @@ class AuthRepository {
       }
       // If online and password mismatch, fall through to backend login
     }
-    
+
     // No cached credentials OR local password mismatch + online
     // Need backend
     if (!isOnline) {
       return {
         'success': false,
-        'message': 'No internet connection. You need to login online at least once.',
+        'message':
+            'No internet connection. You need to login online at least once.',
       };
     }
-    
+
     // Try backend login
     try {
       final result = await _authService.login(email, password);
-      
+
       if (result['success'] == true) {
         final token = result['data']?['token'];
         // Cache credentials for future offline use
@@ -97,7 +100,7 @@ class AuthRepository {
           await _authService.setSession(token, email);
         }
       }
-      
+
       return result;
     } catch (e) {
       return {
@@ -110,7 +113,7 @@ class AuthRepository {
   /// Login with Google (Online only, then caches session)
   Future<Map<String, dynamic>> loginWithGoogle() async {
     final isOnline = _connectivityService.isOnline;
-    
+
     if (!isOnline) {
       return {
         'success': false,
@@ -120,27 +123,27 @@ class AuthRepository {
 
     try {
       final result = await _authService.loginWithGoogle();
-      
+
       if (result['success'] == true) {
         final data = result['data'];
         final token = data?['token'];
         // AuthService.loginWithGoogle saves email to SharedPreferences, but we need it here.
         // The backend response might contain email, or we can get it from AuthService.
         String? email = data?['email'];
-        
+
         email ??= await _authService.getEmail();
 
         if (email != null && token != null) {
           // Cache credentials (use a placeholder for password since it's OAuth)
           await _cacheUserCredentials(email, "GOOGLE_AUTH_PLACEHOLDER", token);
-          
+
           // Save token/email for immediate use and persistence
           await _secureStorageService.saveValue('cached_token', token);
           await _secureStorageService.saveValue('cached_email', email);
           await _authService.setSession(token, email);
         }
       }
-      
+
       return result;
     } catch (e) {
       return {
@@ -153,7 +156,7 @@ class AuthRepository {
   /// Login with GitHub (Online only, then caches session)
   Future<Map<String, dynamic>> loginWithGitHub() async {
     final isOnline = _connectivityService.isOnline;
-    
+
     if (!isOnline) {
       return {
         'success': false,
@@ -163,23 +166,23 @@ class AuthRepository {
 
     try {
       final result = await _authService.loginWithGitHub();
-      
+
       if (result['success'] == true) {
         final data = result['data'];
         final token = data?['token'];
         String? email = data?['email'];
-        
+
         email ??= await _authService.getEmail();
 
         if (email != null && token != null) {
           await _cacheUserCredentials(email, "GITHUB_AUTH_PLACEHOLDER", token);
-          
+
           await _secureStorageService.saveValue('cached_token', token);
           await _secureStorageService.saveValue('cached_email', email);
           await _authService.setSession(token, email);
         }
       }
-      
+
       return result;
     } catch (e) {
       return {
@@ -199,7 +202,7 @@ class AuthRepository {
 
   /// Register with offline-first support.
   Future<Map<String, dynamic>> register(
-    String email, 
+    String email,
     String password, {
     String? fullName,
     String? country,
@@ -207,6 +210,7 @@ class AuthRepository {
     String? hostingMode,
     String? birthdate,
     required String otp,
+    Map<String, dynamic>? ldapConfig,
   }) async {
     // Ensure no stale session exists from previous user
     await _authService.logout();
@@ -224,14 +228,15 @@ class AuthRepository {
     if (!_connectivityService.isOnline) {
       return {
         'success': false,
-        'message': 'Registration requires internet connection to verify email.'.i18n,
+        'message':
+            'Registration requires internet connection to verify email.'.i18n,
       };
     }
 
     try {
       // Step 2: Call backend directly to verify OTP and create user
       final result = await _authService.register(
-        email, 
+        email,
         password,
         fullName: fullName,
         country: country,
@@ -239,18 +244,19 @@ class AuthRepository {
         hostingMode: hostingMode,
         birthdate: birthdate,
         otp: otp,
+        ldapConfig: ldapConfig,
       );
 
       if (result['success'] == true) {
         // Step 3: Save to local database
         final token = result['data']?['token'] ?? 'temp_token';
         await _cacheUserCredentials(email, password, token);
-        
+
         // Save token for immediate use
         await _secureStorageService.saveValue('cached_token', token);
         await _secureStorageService.saveValue('cached_email', email);
         await _authService.setSession(token, email);
-        
+
         return result;
       } else {
         return result;
@@ -271,7 +277,7 @@ class AuthRepository {
     String? birthdate,
   }) async {
     final isOnline = _connectivityService.isOnline;
-    
+
     if (!isOnline) {
       // TODO: Implement offline queue for updates
       return {
@@ -297,21 +303,20 @@ class AuthRepository {
     }
   }
 
-
-
   /// Logout and optionally clear cached credentials.
   Future<void> logout({bool clearCache = false}) async {
     await _authService.logout();
     await _secureStorageService.deleteValue('cached_token');
     await _secureStorageService.deleteValue('cached_email');
-    
+
     if (clearCache) {
       await _clearCachedCredentials();
     }
   }
 
   /// Change password with offline-first support.
-  Future<Map<String, dynamic>> changePassword(String currentPassword, String newPassword) async {
+  Future<Map<String, dynamic>> changePassword(
+      String currentPassword, String newPassword) async {
     // Get the current user email
     final email = await _secureStorageService.getValue('cached_email');
     if (email == null) {
@@ -385,7 +390,8 @@ class AuthRepository {
   }
 
   /// Sync password change with backend in background
-  void _syncPasswordChangeInBackground(String email, String currentPassword, String newPassword) {
+  void _syncPasswordChangeInBackground(
+      String email, String currentPassword, String newPassword) {
     Future(() async {
       if (!_connectivityService.isOnline) {
         // Queue for later sync
@@ -395,8 +401,9 @@ class AuthRepository {
       }
 
       try {
-        final result = await _authService.changePassword(currentPassword, newPassword, newPassword);
-        
+        final result = await _authService.changePassword(
+            currentPassword, newPassword, newPassword);
+
         if (result['success'] == true) {
           // Remove from queue if it was queued
           await _db.syncQueueDao.removeItem('password_change', email);
@@ -426,8 +433,9 @@ class AuthRepository {
 
       try {
         // Send empty current password - backend should handle this for authenticated users
-        final result = await _authService.changePassword('', newPassword, newPassword);
-        
+        final result =
+            await _authService.changePassword('', newPassword, newPassword);
+
         if (result['success'] == true) {
           // Remove from queue if it was queued
           await _db.syncQueueDao.removeItem('password_change', email);
@@ -449,46 +457,47 @@ class AuthRepository {
   Future<Map<String, dynamic>> deleteAccount() async {
     final isOnline = _connectivityService.isOnline;
     final email = await getCachedEmail();
-    
+
     if (email == null) {
       return {'success': false, 'message': 'No user logged in'};
     }
 
     if (!isOnline) {
       return {
-        'success': false, 
+        'success': false,
         'message': 'You must be online to delete your account.'
       };
     }
 
     try {
       final result = await _authService.deleteAccount();
-      
+
       if (result['success'] == true) {
-        print('✅ Account deleted on server. Cleaning up local data for: $email');
-        
+        print(
+            '✅ Account deleted on server. Cleaning up local data for: $email');
+
         // Delete user data first
         await _db.notesDao.deleteNotesByUser(email);
         await _db.passwordsDao.deletePasswordsByUser(email);
         await _db.otpDao.deleteOtpEntriesByUser(email);
-        
+
         // Clear sync queue for this user
         await _db.syncQueueDao.removeItem('registration', email);
         await _db.syncQueueDao.removeItem('password_change', email);
-        
+
         // Delete user record
         final deletedCount = await _db.authDao.deleteUser(email);
         print('✅ Local user data deleted. Users removed: $deletedCount');
-        
+
         // Clear cached credentials
         await _secureStorageService.clearCachedCredentials();
-        
+
         // Clear shared prefs (via AuthService logout)
         await _authService.logout();
       } else {
         print('❌ Server failed to delete account: ${result['message']}');
       }
-      
+
       return result;
     } catch (e) {
       print('❌ Exception during account deletion: $e');
@@ -500,7 +509,7 @@ class AuthRepository {
   Future<void> _queuePasswordChange(String email, String newPassword) async {
     // Remove any existing password change in queue
     await _db.syncQueueDao.removeItem('password_change', email);
-    
+
     // Add new entry
     await _db.syncQueueDao.queueItem(
       'password_change',
@@ -532,9 +541,10 @@ class AuthRepository {
   // ==================== PRIVATE METHODS ====================
 
   /// Cache user credentials for offline login.
-  Future<void> _cacheUserCredentials(String email, String password, String? token) async {
+  Future<void> _cacheUserCredentials(
+      String email, String password, String? token) async {
     final passwordHash = _hashPassword(password);
-    
+
     await _db.authDao.insertOrUpdateUser(User(
       email: email,
       passwordHash: passwordHash,
@@ -554,16 +564,15 @@ class AuthRepository {
     await _db.delete(_db.users).go();
   }
 
-
-
   /// Sync login with backend (background, non-blocking)
-  Future<void> _syncLoginWithBackend(String email, String password, String? cachedToken) async {
+  Future<void> _syncLoginWithBackend(
+      String email, String password, String? cachedToken) async {
     try {
       final result = await _authService.login(email, password);
-      
+
       if (result['success'] == true) {
         final newToken = result['data']?['token'];
-        
+
         // Update cached token if it changed
         if (newToken != null && newToken != cachedToken) {
           await _cacheUserCredentials(email, password, newToken);

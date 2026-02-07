@@ -10,6 +10,7 @@ import 'package:thisjowi/components/errorBar.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:thisjowi/screens/organization/LdapConfigScreen.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -812,6 +813,32 @@ class _SettingScreenState extends State<SettingScreen> {
                   title: 'Hosting Mode'.i18n,
                   subtitle: 'Update hosting mode'.i18n,
                   onTap: _showEditHostingModeDialog,
+                ),
+
+                // Organization Section
+                Padding(
+                  padding: const EdgeInsets.only(
+                      left: 20.0, top: 24.0, bottom: 12.0),
+                  child: Text(
+                    'Organization'.i18n,
+                    style: TextStyle(
+                      color: AppColors.text.withOpacity(0.6),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                _buildSettingItem(
+                  icon: Icons.admin_panel_settings,
+                  title: 'LDAP Configuration'.i18n,
+                  subtitle: 'Manage LDAP settings'.i18n,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LdapConfigScreen()),
+                    );
+                  },
                 ),
 
                 // Security Section

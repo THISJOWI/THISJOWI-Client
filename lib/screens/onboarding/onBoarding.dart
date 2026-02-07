@@ -28,16 +28,22 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   String? _hostingMode; // 'cloud', 'self-hosted'
   String? _authChoice; // 'login', 'register'
   String? _ldapChoice; // 'yes', 'no' (only for business accounts)
-  
+
   // Registration Data
   final TextEditingController _urlController = TextEditingController();
-  
+
   // LDAP Configuration
   final TextEditingController _ldapServerController = TextEditingController();
   final TextEditingController _ldapBaseDnController = TextEditingController();
   final TextEditingController _ldapBindDnController = TextEditingController();
   final TextEditingController _ldapPasswordController = TextEditingController();
-  
+  final TextEditingController _userSearchFilterController =
+      TextEditingController();
+  final TextEditingController _emailAttributeController =
+      TextEditingController();
+  final TextEditingController _fullNameAttributeController =
+      TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -74,6 +80,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     _ldapBaseDnController.dispose();
     _ldapBindDnController.dispose();
     _ldapPasswordController.dispose();
+    _userSearchFilterController.dispose();
+    _emailAttributeController.dispose();
+    _fullNameAttributeController.dispose();
     super.dispose();
   }
 
@@ -150,7 +159,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       // 6.5. LDAP Setup (Only if Business account selected)
       if (_accountType == 'business') {
         pages.add(_buildLdapSetupPage());
-        
+
         // LDAP Configuration (Only if user wants to enable LDAP)
         if (_ldapChoice == 'yes') {
           pages.add(_buildLdapConfigPage());
@@ -168,17 +177,17 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         if (_hostingMode == 'self-hosted') {
           pages.add(_buildServerConfigPage());
         }
-        
+
         // Map Prompt -> Register
         pages.add(_buildMapPromptPage());
       }
     }
-    
+
     // Path B: Login
     if (_authChoice == 'login') {
       // 6. Hosting Mode (Need to know if self-hosted)
       pages.add(_buildHostingModePage());
-      
+
       // 7. Server Config (If self-hosted)
       if (_hostingMode == 'self-hosted') {
         pages.add(_buildServerConfigPage());
@@ -191,9 +200,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   @override
   Widget build(BuildContext context) {
     final pages = _buildPages(context);
-    
+
     // Safety check: Ensure controller is in sync with current page
-    if (_currentPage >= 5 && _pageController.hasClients && _pageController.page != null) {
+    if (_currentPage >= 5 &&
+        _pageController.hasClients &&
+        _pageController.page != null) {
       final page = _pageController.page!.round();
       if (page < 5) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -203,7 +214,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         });
       }
     }
-    
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -400,7 +411,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     ),
                   ],
                 ),
-                child: Icon(Icons.manage_accounts_outlined, size: 60, color: AppColors.primary),
+                child: Icon(Icons.manage_accounts_outlined,
+                    size: 60, color: AppColors.primary),
               ),
             ),
             const SizedBox(height: 30),
@@ -463,10 +475,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     ),
                   ],
                 ),
-                child: Icon(Icons.storage_rounded, size: 60, color: AppColors.secondary),
+                child: Icon(Icons.storage_rounded,
+                    size: 60, color: AppColors.secondary),
               ),
             ),
-             const SizedBox(height: 30),
+            const SizedBox(height: 30),
             Text(
               "Select Hosting Mode".i18n,
               style: const TextStyle(
@@ -515,7 +528,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-             ScaleTransition(
+            ScaleTransition(
               scale: _scaleAnimation,
               child: Container(
                 padding: const EdgeInsets.all(20),
@@ -530,7 +543,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     ),
                   ],
                 ),
-                child: Icon(Icons.rocket_launch_rounded, size: 60, color: AppColors.accent),
+                child: Icon(Icons.rocket_launch_rounded,
+                    size: 60, color: AppColors.accent),
               ),
             ),
             const SizedBox(height: 30),
@@ -578,7 +592,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-             ScaleTransition(
+            ScaleTransition(
               scale: _scaleAnimation,
               child: Container(
                 padding: const EdgeInsets.all(20),
@@ -593,7 +607,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     ),
                   ],
                 ),
-                child: Icon(Icons.settings_ethernet, size: 60, color: AppColors.text),
+                child: Icon(Icons.settings_ethernet,
+                    size: 60, color: AppColors.text),
               ),
             ),
             const SizedBox(height: 30),
@@ -634,7 +649,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
-                  borderSide: const BorderSide(color: AppColors.secondary, width: 1),
+                  borderSide:
+                      const BorderSide(color: AppColors.secondary, width: 1),
                 ),
               ),
             ),
@@ -656,10 +672,13 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30)),
               ),
-              child: Text("Continue".i18n, style: const TextStyle(fontSize: 18)),
+              child:
+                  Text("Continue".i18n, style: const TextStyle(fontSize: 18)),
             ),
           ],
         ),
@@ -690,7 +709,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     ),
                   ],
                 ),
-                child: Icon(Icons.business, size: 60, color: Colors.blue.shade700),
+                child:
+                    Icon(Icons.business, size: 60, color: Colors.blue.shade700),
               ),
             ),
             const SizedBox(height: 30),
@@ -705,7 +725,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             ),
             const SizedBox(height: 16),
             Text(
-              "Do you want to integrate LDAP with your app for corporate domain authentication?".i18n,
+              "Do you want to integrate LDAP with your app for corporate domain authentication?"
+                  .i18n,
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.text.withOpacity(0.7),
@@ -715,7 +736,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             const SizedBox(height: 40),
             _buildSelectionCard(
               title: "Yes, Enable LDAP".i18n,
-              description: "Allow users to authenticate using corporate LDAP credentials.".i18n,
+              description:
+                  "Allow users to authenticate using corporate LDAP credentials."
+                      .i18n,
               icon: Icons.check_circle,
               isSelected: _ldapChoice == 'yes',
               onTap: () {
@@ -764,7 +787,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       ),
                     ],
                   ),
-                  child: Icon(Icons.settings, size: 60, color: Colors.blue.shade700),
+                  child: Icon(Icons.settings,
+                      size: 60, color: Colors.blue.shade700),
                 ),
               ),
               const SizedBox(height: 30),
@@ -778,7 +802,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               ),
               const SizedBox(height: 16),
               Text(
-                "Configure your LDAP server details. These settings will be used for enterprise authentication.".i18n,
+                "Configure your LDAP server details. These settings will be used for enterprise authentication."
+                    .i18n,
                 style: TextStyle(
                   fontSize: 13,
                   color: AppColors.text.withOpacity(0.7),
@@ -804,13 +829,16 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                    borderSide:
+                        BorderSide(color: AppColors.text.withOpacity(0.3)),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                    borderSide:
+                        BorderSide(color: AppColors.text.withOpacity(0.3)),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
                 style: TextStyle(color: AppColors.text),
               ),
@@ -833,13 +861,16 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                    borderSide:
+                        BorderSide(color: AppColors.text.withOpacity(0.3)),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                    borderSide:
+                        BorderSide(color: AppColors.text.withOpacity(0.3)),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
                 style: TextStyle(color: AppColors.text),
               ),
@@ -862,13 +893,16 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                    borderSide:
+                        BorderSide(color: AppColors.text.withOpacity(0.3)),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                    borderSide:
+                        BorderSide(color: AppColors.text.withOpacity(0.3)),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
                 style: TextStyle(color: AppColors.text),
               ),
@@ -892,13 +926,16 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                    borderSide:
+                        BorderSide(color: AppColors.text.withOpacity(0.3)),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+                    borderSide:
+                        BorderSide(color: AppColors.text.withOpacity(0.3)),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
                 style: TextStyle(color: AppColors.text),
               ),
@@ -917,11 +954,13 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.info_outline, size: 18, color: Colors.blue.shade700),
+                    Icon(Icons.info_outline,
+                        size: 18, color: Colors.blue.shade700),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        "You can configure these settings later in your account dashboard.".i18n,
+                        "You can configure these settings later in your account dashboard."
+                            .i18n,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.blue.shade700,
@@ -931,6 +970,102 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     ),
                   ],
                 ),
+              ),
+              const SizedBox(height: 30),
+
+              // User Search Filter
+              Text(
+                "User Search Filter".i18n,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.text,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _userSearchFilterController,
+                decoration: InputDecoration(
+                  hintText: '(&(objectClass=person)(uid={0}))',
+                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide:
+                        BorderSide(color: AppColors.text.withOpacity(0.3)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide:
+                        BorderSide(color: AppColors.text.withOpacity(0.3)),
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                style: TextStyle(color: AppColors.text),
+              ),
+              const SizedBox(height: 20),
+
+              // Email Attribute
+              Text(
+                "Email Attribute".i18n,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.text,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _emailAttributeController,
+                decoration: InputDecoration(
+                  hintText: 'mail',
+                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide:
+                        BorderSide(color: AppColors.text.withOpacity(0.3)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide:
+                        BorderSide(color: AppColors.text.withOpacity(0.3)),
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                style: TextStyle(color: AppColors.text),
+              ),
+              const SizedBox(height: 20),
+
+              // Full Name Attribute
+              Text(
+                "Full Name Attribute".i18n,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.text,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _fullNameAttributeController,
+                decoration: InputDecoration(
+                  hintText: 'cn',
+                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide:
+                        BorderSide(color: AppColors.text.withOpacity(0.3)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide:
+                        BorderSide(color: AppColors.text.withOpacity(0.3)),
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                style: TextStyle(color: AppColors.text),
               ),
               const SizedBox(height: 30),
             ],
@@ -997,6 +1132,21 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       builder: (context) => CountryMapScreen(
                         accountType: _accountType,
                         hostingMode: _hostingMode,
+                        ldapConfig: _ldapChoice == 'yes'
+                            ? {
+                                'ldapUrl': _ldapServerController.text.trim(),
+                                'ldapBaseDn': _ldapBaseDnController.text.trim(),
+                                'ldapBindDn': _ldapBindDnController.text.trim(),
+                                'ldapBindPassword':
+                                    _ldapPasswordController.text,
+                                'userSearchFilter':
+                                    _userSearchFilterController.text.trim(),
+                                'emailAttribute':
+                                    _emailAttributeController.text.trim(),
+                                'fullNameAttribute':
+                                    _fullNameAttributeController.text.trim(),
+                              }
+                            : null,
                       ),
                     ),
                   );
@@ -1008,7 +1158,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: Text("Select Country".i18n, style: const TextStyle(fontSize: 18)),
+                child: Text("Select Country".i18n,
+                    style: const TextStyle(fontSize: 18)),
               ),
             ),
           ],
@@ -1030,11 +1181,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isSelected 
-              ? AppColors.primary.withOpacity(0.1) 
+          color: isSelected
+              ? AppColors.primary.withOpacity(0.1)
               : Colors.white.withOpacity(0.05),
           borderRadius: BorderRadius.circular(15),
-          border: isSelected 
+          border: isSelected
               ? Border.all(color: AppColors.primary, width: 1.5)
               : Border.all(color: Colors.transparent),
         ),
@@ -1043,7 +1194,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.1),
+                color: isSelected
+                    ? AppColors.primary
+                    : Colors.white.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(

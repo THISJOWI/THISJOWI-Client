@@ -13,13 +13,15 @@ class RegisterForm extends StatefulWidget {
   final String? accountType;
   final String? hostingMode;
   final String? initialCountry;
+  final Map<String, dynamic>? ldapConfig;
 
   const RegisterForm({
-    super.key, 
+    super.key,
     required this.onSuccess,
     this.accountType,
     this.hostingMode,
     this.initialCountry,
+    this.ldapConfig,
   });
 
   @override
@@ -88,17 +90,20 @@ class _RegisterFormState extends State<RegisterForm> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF202020),
-        title: Text("Terms and Conditions".i18n, style: const TextStyle(color: AppColors.text)),
+        title: Text("Terms and Conditions".i18n,
+            style: const TextStyle(color: AppColors.text)),
         content: SingleChildScrollView(
           child: Text(
-            "Here are the terms and conditions of use for the app... \n\n1. Use of the app...\n2. Privacy Policy...\n3. User Responsibilities...".i18n,
+            "Here are the terms and conditions of use for the app... \n\n1. Use of the app...\n2. Privacy Policy...\n3. User Responsibilities..."
+                .i18n,
             style: TextStyle(color: AppColors.text.withOpacity(0.8)),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("Close".i18n, style: const TextStyle(color: AppColors.secondary)),
+            child: Text("Close".i18n,
+                style: const TextStyle(color: AppColors.secondary)),
           ),
         ],
       ),
@@ -116,7 +121,8 @@ class _RegisterFormState extends State<RegisterForm> {
     }
 
     if (!_acceptedTerms) {
-      ErrorSnackBar.show(context, 'You must accept the terms and conditions'.i18n);
+      ErrorSnackBar.show(
+          context, 'You must accept the terms and conditions'.i18n);
       return;
     }
 
@@ -131,17 +137,18 @@ class _RegisterFormState extends State<RegisterForm> {
     }
 
     setState(() => _isLoading = true);
-    
+
     // Step 1: Initiate registration (Send OTP)
     final result = await _authRepository!.initiateRegister(email);
-    
+
     if (!mounted) return;
     setState(() => _isLoading = false);
 
     if (result['success'] == true) {
       _showOtpDialog();
     } else {
-      ErrorSnackBar.show(context, result['message'] ?? 'Failed to send verification code'.i18n);
+      ErrorSnackBar.show(context,
+          result['message'] ?? 'Failed to send verification code'.i18n);
     }
   }
 
@@ -156,25 +163,25 @@ class _RegisterFormState extends State<RegisterForm> {
         builder: (context, setDialogState) => BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
           child: AlertDialog(
-            backgroundColor: const Color(0xFF1E1E1E).withOpacity(0.9), // More transparent/darker
+            backgroundColor: const Color(0xFF1E1E1E)
+                .withOpacity(0.9), // More transparent/darker
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24),
               side: BorderSide(color: Colors.white.withOpacity(0.1)),
             ),
-            title: Text(
-              "Verify Email".i18n, 
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-              )
-            ),
+            title: Text("Verify Email".i18n,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                )),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   "We sent a code to ${_emailController.text}".i18n,
-                  style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 15),
+                  style: TextStyle(
+                      color: Colors.white.withOpacity(0.7), fontSize: 15),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
@@ -189,16 +196,17 @@ class _RegisterFormState extends State<RegisterForm> {
                     keyboardType: TextInputType.number,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: Colors.white, 
-                      fontSize: 26, 
-                      letterSpacing: 8,
-                      fontWeight: FontWeight.bold
-                    ),
+                        color: Colors.white,
+                        fontSize: 26,
+                        letterSpacing: 8,
+                        fontWeight: FontWeight.bold),
                     maxLength: 6,
                     decoration: InputDecoration(
                       counterText: "",
                       hintText: "******",
-                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.2), letterSpacing: 8),
+                      hintStyle: TextStyle(
+                          color: Colors.white.withOpacity(0.2),
+                          letterSpacing: 8),
                       filled: false,
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(vertical: 16),
@@ -210,40 +218,49 @@ class _RegisterFormState extends State<RegisterForm> {
             actionsPadding: const EdgeInsets.all(20),
             actions: [
               TextButton(
-                onPressed: isVerifying ? null : () => Navigator.pop(dialogContext),
-                child: Text(
-                  "Cancel".i18n, 
-                  style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w600)
-                ),
+                onPressed:
+                    isVerifying ? null : () => Navigator.pop(dialogContext),
+                child: Text("Cancel".i18n,
+                    style: TextStyle(
+                        color: Colors.white.withOpacity(0.5),
+                        fontWeight: FontWeight.w600)),
               ),
               Container(
-                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    gradient: const LinearGradient(
-                      colors: [AppColors.secondary, AppColors.accent],
-                    ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: const LinearGradient(
+                    colors: [AppColors.secondary, AppColors.accent],
                   ),
+                ),
                 child: ElevatedButton(
-                  onPressed: isVerifying 
-                      ? null 
+                  onPressed: isVerifying
+                      ? null
                       : () async {
                           if (otpController.text.length < 6) return;
                           setDialogState(() => isVerifying = true);
-                          await _completeRegistration(otpController.text, dialogContext);
+                          await _completeRegistration(
+                              otpController.text, dialogContext);
                           if (mounted) {
-                              setDialogState(() => isVerifying = false);
+                            setDialogState(() => isVerifying = false);
                           }
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
                   ),
-                  child: isVerifying 
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : Text("Verify".i18n, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  child: isVerifying
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white))
+                      : Text("Verify".i18n,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -253,30 +270,32 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
-  Future<void> _completeRegistration(String otp, BuildContext dialogContext) async {
+  Future<void> _completeRegistration(
+      String otp, BuildContext dialogContext) async {
     final fullName = _fullNameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     final birthdate = _birthdateController.text.trim();
 
     final result = await _authRepository!.register(
-      email, 
+      email,
       password,
       fullName: fullName,
       birthdate: birthdate.isNotEmpty ? birthdate : null,
       accountType: widget.accountType,
       hostingMode: widget.hostingMode,
       otp: otp,
+      ldapConfig: widget.ldapConfig,
     );
-    
+
     if (!mounted) return;
 
     if (result['success'] == true) {
       Navigator.pop(dialogContext); // Close dialog
-      
+
       // Auto login after successful registration
       final loginResult = await _authRepository!.login(email, password);
-      
+
       if (!mounted) return;
 
       if (loginResult['success'] == true) {
@@ -302,8 +321,10 @@ class _RegisterFormState extends State<RegisterForm> {
           textInputAction: TextInputAction.next,
           onFieldSubmitted: (_) => _emailFocusNode.requestFocus(),
           decoration: InputDecoration(
-            prefixIcon: Icon(Icons.person_outline, color: AppColors.text.withOpacity(0.7), size: 20),
-            contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            prefixIcon: Icon(Icons.person_outline,
+                color: AppColors.text.withOpacity(0.7), size: 20),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             labelText: "Full Name".i18n,
             labelStyle: TextStyle(color: AppColors.text.withOpacity(0.5)),
             enabledBorder: OutlineInputBorder(
@@ -312,7 +333,8 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
-              borderSide: const BorderSide(color: AppColors.secondary, width: 1),
+              borderSide:
+                  const BorderSide(color: AppColors.secondary, width: 1),
             ),
             filled: true,
             fillColor: Colors.black.withOpacity(0.2),
@@ -329,8 +351,10 @@ class _RegisterFormState extends State<RegisterForm> {
           keyboardType: TextInputType.emailAddress,
           onFieldSubmitted: (_) => _passwordFocusNode.requestFocus(),
           decoration: InputDecoration(
-            prefixIcon: Icon(Icons.email_outlined, color: AppColors.text.withOpacity(0.7), size: 20),
-            contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            prefixIcon: Icon(Icons.email_outlined,
+                color: AppColors.text.withOpacity(0.7), size: 20),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             labelText: "Email".i18n,
             labelStyle: TextStyle(color: AppColors.text.withOpacity(0.5)),
             enabledBorder: OutlineInputBorder(
@@ -339,7 +363,8 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
-              borderSide: const BorderSide(color: AppColors.secondary, width: 1),
+              borderSide:
+                  const BorderSide(color: AppColors.secondary, width: 1),
             ),
             filled: true,
             fillColor: Colors.black.withOpacity(0.2),
@@ -356,11 +381,15 @@ class _RegisterFormState extends State<RegisterForm> {
           textInputAction: TextInputAction.done,
           onFieldSubmitted: (_) => _isLoading ? null : _handleRegister(),
           decoration: InputDecoration(
-            prefixIcon: Icon(Icons.lock_outline, color: AppColors.text.withOpacity(0.7), size: 20),
-            contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            prefixIcon: Icon(Icons.lock_outline,
+                color: AppColors.text.withOpacity(0.7), size: 20),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             suffixIcon: IconButton(
               icon: Icon(
-                _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                _obscurePassword
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
                 color: AppColors.text.withOpacity(0.5),
                 size: 20,
               ),
@@ -378,14 +407,14 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
-              borderSide: const BorderSide(color: AppColors.secondary, width: 1),
+              borderSide:
+                  const BorderSide(color: AppColors.secondary, width: 1),
             ),
             filled: true,
             fillColor: Colors.black.withOpacity(0.2),
           ),
         ),
         const SizedBox(height: 20),
-
 
         // Terms and Conditions Checkbox
         Row(
@@ -395,7 +424,8 @@ class _RegisterFormState extends State<RegisterForm> {
               activeColor: AppColors.secondary,
               checkColor: Colors.black,
               side: BorderSide(color: AppColors.text.withOpacity(0.5)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)),
               onChanged: (value) {
                 setState(() {
                   _acceptedTerms = value ?? false;
@@ -408,7 +438,8 @@ class _RegisterFormState extends State<RegisterForm> {
                 child: RichText(
                   text: TextSpan(
                     text: "I accept the ".i18n,
-                    style: TextStyle(color: AppColors.text.withOpacity(0.7), fontSize: 13),
+                    style: TextStyle(
+                        color: AppColors.text.withOpacity(0.7), fontSize: 13),
                     children: [
                       TextSpan(
                         text: "Terms and Conditions".i18n,

@@ -8,11 +8,13 @@ import 'package:thisjowi/screens/auth/register.dart';
 class CountryMapScreen extends StatefulWidget {
   final String? accountType;
   final String? hostingMode;
+  final Map<String, dynamic>? ldapConfig;
 
   const CountryMapScreen({
     super.key,
     this.accountType,
     this.hostingMode,
+    this.ldapConfig,
   });
 
   @override
@@ -22,7 +24,7 @@ class CountryMapScreen extends StatefulWidget {
 class _CountryMapScreenState extends State<CountryMapScreen> {
   final MapController _mapController = MapController();
   String? _selectedCountry;
-  
+
   // Simple mapping of coordinates to countries (Demo purpose)
   final Map<String, LatLng> _countries = {
     'Spain': const LatLng(40.4637, -3.7492),
@@ -79,7 +81,8 @@ class _CountryMapScreenState extends State<CountryMapScreen> {
                   ),
                   children: [
                     TileLayer(
-                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      urlTemplate:
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                       userAgentPackageName: 'com.thisjowi.app',
                     ),
                     MarkerLayer(
@@ -99,16 +102,21 @@ class _CountryMapScreenState extends State<CountryMapScreen> {
                               children: [
                                 Icon(
                                   Icons.location_on,
-                                  color: isSelected ? AppColors.secondary : AppColors.primary,
+                                  color: isSelected
+                                      ? AppColors.secondary
+                                      : AppColors.primary,
                                   size: 40,
                                 ),
                                 if (isSelected)
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: AppColors.background.withOpacity(0.9),
+                                      color:
+                                          AppColors.background.withOpacity(0.9),
                                       borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: AppColors.secondary),
+                                      border: Border.all(
+                                          color: AppColors.secondary),
                                     ),
                                     child: Text(
                                       entry.key,
@@ -171,6 +179,7 @@ class _CountryMapScreenState extends State<CountryMapScreen> {
                                   hostingMode: widget.hostingMode,
                                   initialCountry: _selectedCountry,
                                   isEmbedded: false, // Explicitly not embedded
+                                  ldapConfig: widget.ldapConfig,
                                 ),
                               ),
                             );
@@ -182,7 +191,8 @@ class _CountryMapScreenState extends State<CountryMapScreen> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: Text("Next".i18n, style: const TextStyle(fontSize: 18)),
+                    child:
+                        Text("Next".i18n, style: const TextStyle(fontSize: 18)),
                   ),
                 ),
               ],

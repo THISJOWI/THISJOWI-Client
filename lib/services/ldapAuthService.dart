@@ -170,4 +170,153 @@ class LdapAuthService {
       print('Error clearing LDAP session: $e');
     }
   }
+
+  /// Probar conexión LDAP antes de guardar configuración
+  Future<Map<String, dynamic>> testLdapConnection(Map<String, dynamic> config) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/ldap/test-connection'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(config),
+      ).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () => throw Exception('Timeout al probar conexión LDAP'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return {
+          'success': data['success'] ?? false,
+          'message': data['message'] ?? 'Conexión exitosa',
+          'configValid': data['configValid'] ?? false,
+          'credentialsValid': data['credentialsValid'] ?? false,
+        };
+      } else {
+        final data = jsonDecode(response.body);
+        return {
+          'success': false,
+          'connectionError': data['connectionError'],
+          'credentialsError': data['credentialsError'],
+          'message': data['message'] ?? 'Error de conexión',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error: ${e.toString()}',
+      };
+    }
+  }
+
+  /// Actualizar configuración LDAP de organización
+  Future<Map<String, dynamic>> updateOrganization(String orgId, Map<String, dynamic> config) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final response = await http.put(
+        Uri.parse('$baseUrl/organizations/$orgId'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(config),
+      ).timeout(
+        const Duration(seconds: 15),
+        onTimeout: () => throw Exception('Timeout'),
+      );
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': 'Configuración guardada',
+        };
+      } else {
+        final data = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Error al guardar',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error: ${e.toString()}',
+      };
+    }
+  }
+
+  /// Sincronizar usuarios LDAP manualmente
+  Future<Map<String, dynamic>> syncLdapUsers(String domain) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/ldap/sync/$domain'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+      ).timeout(
+        const Duration(seconds: 60),
+        onTimeout: () => throw Exception('Timeout al sincronizar usuarios'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return {
+          'success': true,
+          'syncedCount': data['syncedCount'] ?? 0,
+          'deactivatedCount': data['deactivatedCount'] ?? 0,
+          'foundInLdap': data['foundInLdap'] ?? 0,
+          'message': data['message'] ?? 'Sincronización completada',
+        };
+      } else {
+        final data = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Error al sincronizar',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error: ${e.toString()}',
+      };
+    }
+  }
+
+  /// Obtener estado de sincronización
+  Future<Map<String, dynamic>> getSyncStatus(String domain) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/ldap/sync-status/$domain'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => throw Exception('Timeout'),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        return {'success': false};
+      }
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:thisjowi/core/appColors.dart';
 import 'package:thisjowi/components/errorBar.dart';
 import 'package:thisjowi/data/repository/passwordsRepository.dart';

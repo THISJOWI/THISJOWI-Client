@@ -10,6 +10,7 @@ import 'package:thisjowi/components/Navigation.dart';
 import 'package:thisjowi/components/errorBar.dart';
 import 'package:thisjowi/i18n/translationService.dart';
 import 'package:thisjowi/screens/auth/forgotPassword.dart';
+import 'package:thisjowi/screens/auth/ldapLogin.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -485,13 +486,46 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 30),
 
+                  // Enterprise LDAP Login Button
+                  if (!_isLoading)
+                    GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LdapLoginScreen()),
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.business, color: Colors.white.withValues(alpha: 0.8), size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              "Enterprise Login (LDAP)".tr(context),
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.8),
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  const SizedBox(height: 20),
+
                   // Register Link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         "Don't have an account? ".tr(context),
-                        style: TextStyle(color: AppColors.text.withOpacity(0.6), fontSize: 14),
+                        style: TextStyle(color: AppColors.text.withValues(alpha: 0.6), fontSize: 14),
                       ),
                       GestureDetector(
                         onTap: () => Navigator.pushReplacementNamed(context, '/register'),
