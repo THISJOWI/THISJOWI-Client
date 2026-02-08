@@ -4,17 +4,23 @@ class Message {
   final String id;
   final String conversationId;
   final String senderId;
+  final String? recipientId;
   final String content;
   final DateTime timestamp;
   final bool isRead;
+  final bool isEncrypted;
+  final String? ephemeralPublicKey;
 
   Message({
     required this.id,
     required this.conversationId,
     required this.senderId,
+    this.recipientId,
     required this.content,
     required this.timestamp,
     this.isRead = false,
+    this.isEncrypted = false,
+    this.ephemeralPublicKey,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
@@ -22,11 +28,14 @@ class Message {
       id: json['id'] ?? json['_id'] ?? '',
       conversationId: json['conversationId'] ?? '',
       senderId: json['senderId'] ?? '',
+      recipientId: json['recipientId'],
       content: json['content'] ?? '',
       timestamp: json['timestamp'] != null
           ? DateTime.parse(json['timestamp'])
           : DateTime.now(),
       isRead: json['isRead'] ?? false,
+      isEncrypted: json['isEncrypted'] ?? false,
+      ephemeralPublicKey: json['ephemeralPublicKey'],
     );
   }
 
@@ -35,9 +44,12 @@ class Message {
       'id': id,
       'conversationId': conversationId,
       'senderId': senderId,
+      'recipientId': recipientId,
       'content': content,
       'timestamp': timestamp.toIso8601String(),
       'isRead': isRead,
+      'isEncrypted': isEncrypted,
+      'ephemeralPublicKey': ephemeralPublicKey,
     };
   }
 }

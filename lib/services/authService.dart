@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+import 'package:thisjowi/services/cryptoService.dart';
 import '../core/api.dart';
 import '../data/models/user.dart';
 
@@ -20,6 +21,12 @@ import '../data/models/user.dart';
 /// - getEmail() -> Future<String?>
 /// - logout() -> Future<void>
 class AuthService {
+  static final AuthService _instance = AuthService._internal();
+  factory AuthService() => _instance;
+  AuthService._internal();
+
+  final CryptoService _cryptoService = CryptoService();
+
   // URL base del servicio de autenticación desde ApiConfig
   String get baseUrl => ApiConfig.authUrl;
 
@@ -102,6 +109,10 @@ class AuthService {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', body['token']);
           await prefs.setString('email', email);
+
+          // Initialize E2EE Keys
+          await _cryptoService.initKeys();
+
           return {'success': true, 'data': body};
         }
         return {
@@ -165,6 +176,10 @@ class AuthService {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', body['token']);
           await prefs.setString('email', body['email']);
+
+          // Initialize E2EE Keys
+          await _cryptoService.initKeys();
+
           return {'success': true, 'data': body};
         }
         return {
@@ -200,6 +215,10 @@ class AuthService {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', body['token']);
           await prefs.setString('email', email);
+
+          // Initialize E2EE Keys
+          await _cryptoService.initKeys();
+
           return {'success': true, 'data': body};
         }
         return {
@@ -283,6 +302,16 @@ class AuthService {
       final body = _tryDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
+        if (body != null && body['token'] != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', body['token']);
+          if (body['email'] != null) {
+            await prefs.setString('email', body['email']);
+          }
+        }
+
+        // Initialize E2EE Keys
+        await _cryptoService.initKeys();
         return {'success': true, 'data': body};
       }
 

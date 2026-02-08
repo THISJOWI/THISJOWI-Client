@@ -97,7 +97,7 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
           _connectionStatus = response['connectionError'] ?? response['credentialsError'] ?? 'Error de conexión';
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('❌ Error: ${_connectionStatus}'),
+              content: Text('❌ Error: $_connectionStatus'),
               backgroundColor: Colors.red,
             ),
           );
