@@ -114,10 +114,9 @@ class _SplashScreenState extends State<SplashScreen>
   
   /// Navigate to the appropriate screen based on authentication status
   void _navigateToMainScreen() {
-    // Navigate to auth selection screen to choose between LDAP or regular login
-    // User can select their preferred authentication method
+    // Navigate directly to login screen without selection
     if (!mounted) return;
-    Navigator.of(context).pushReplacementNamed('/authSelection');
+    Navigator.of(context).pushReplacementNamed('/login');
   }
   
   void _showBiometricAuth() {
