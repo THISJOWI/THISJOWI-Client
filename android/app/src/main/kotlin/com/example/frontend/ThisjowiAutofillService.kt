@@ -113,6 +113,9 @@ class ThisjowiAutofillService : AutofillService() {
 
         val parsedFields = parseStructure(structure)
         val packageName = structure.activityComponent?.packageName ?: ""
+        
+        // Try to extract URL if this is a browser
+        val url = extractWebUrl(structure)
 
         val username = parsedFields.usernameValue
         val password = parsedFields.passwordValue
@@ -122,6 +125,7 @@ class ThisjowiAutofillService : AutofillService() {
             val saveIntent = Intent(this, MainActivity::class.java).apply {
                 putExtra("autofill_save", true)
                 putExtra("target_package", packageName)
+                putExtra("target_url", url)  // Add URL if available
                 putExtra("username", username)
                 putExtra("password", password)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -130,6 +134,67 @@ class ThisjowiAutofillService : AutofillService() {
         }
 
         callback.onSuccess()
+    }
+    
+    /**
+     * Extract web URL from browser apps
+     */
+    private fun extractWebUrl(structure: AssistStructure): String? {
+        val packageName = structure.activityComponent?.packageName ?: return null
+        
+        // List of common browser packages
+        val browserPackages = setOf(
+            "com.android.chrome",
+            "org.mozilla.firefox",
+            "com.opera.browser",
+            "com.microsoft.emmx",
+            "com.brave.browser",
+            "com.duckduckgo.mobile.android",
+            "org.chromium.chrome",
+            "com.sec.android.app.sbrowser"  // Samsung Internet
+        )
+        
+        if (!browserPackages.contains(packageName)) {
+            return null
+        }
+        
+        // Try to find URL in the structure
+        for (i in 0 until structure.windowNodeCount) {
+            val windowNode = structure.getWindowNodeAt(i)
+            val url = findUrlInNode(windowNode.rootViewNode)
+            if (url != null) {
+                return url
+            }
+        }
+        
+        return null
+    }
+    
+    /**
+     * Recursively search for URL in view nodes
+     */
+    private fun findUrlInNode(node: AssistStructure.ViewNode): String? {
+        // Check if this node contains a URL
+        val webDomain = node.webDomain
+        if (webDomain != null && webDomain.isNotEmpty()) {
+            return "https://$webDomain"
+        }
+        
+        // Check text content for URLs
+        val text = node.text?.toString()
+        if (text != null && text.startsWith("http")) {
+            return text
+        }
+        
+        // Check children
+        for (i in 0 until node.childCount) {
+            val url = findUrlInNode(node.getChildAt(i))
+            if (url != null) {
+                return url
+            }
+        }
+        
+        return null
     }
 
     private fun parseStructure(structure: AssistStructure): ParsedFields {

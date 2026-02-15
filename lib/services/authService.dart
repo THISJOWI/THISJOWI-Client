@@ -120,10 +120,7 @@ class AuthService {
           'message': body?['message'] ?? 'No token returned from backend'
         };
       }
-      return {
-        'success': false,
-        'message': body?['message'] ?? 'Backend error: ${res.statusCode}'
-      };
+      return {'success': false, 'message': _parseError(res)};
     } catch (e) {
       print('DEBUG: HTTP Request failed: $e');
       return {'success': false, 'message': 'Connection error: $e'};
@@ -187,10 +184,7 @@ class AuthService {
           'message': body?['message'] ?? 'No token returned from backend'
         };
       }
-      return {
-        'success': false,
-        'message': body?['message'] ?? 'Backend error: ${res.statusCode}'
-      };
+      return {'success': false, 'message': _parseError(res)};
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -227,10 +221,7 @@ class AuthService {
         };
       }
 
-      return {
-        'success': false,
-        'message': body?['message'] ?? 'Error: ${res.statusCode}'
-      };
+      return {'success': false, 'message': _parseError(res)};
     } on TimeoutException {
       return {
         'success': false,
@@ -257,10 +248,7 @@ class AuthService {
       if (res.statusCode == 200) {
         return {'success': true, 'message': body?['message']};
       }
-      return {
-        'success': false,
-        'message': body?['message'] ?? 'Error: ${res.statusCode}'
-      };
+      return {'success': false, 'message': _parseError(res)};
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -315,10 +303,7 @@ class AuthService {
         return {'success': true, 'data': body};
       }
 
-      return {
-        'success': false,
-        'message': body?['message'] ?? 'Error: ${res.statusCode}'
-      };
+      return {'success': false, 'message': _parseError(res)};
     } on TimeoutException {
       return {
         'success': false,
@@ -366,10 +351,7 @@ class AuthService {
         return {'success': true, 'data': body};
       }
 
-      return {
-        'success': false,
-        'message': body?['message'] ?? 'Error: ${res.statusCode}'
-      };
+      return {'success': false, 'message': _parseError(res)};
     } on TimeoutException {
       return {
         'success': false,
@@ -582,6 +564,32 @@ class AuthService {
       return jsonDecode(text);
     } catch (_) {
       return null;
+    }
+  }
+
+  String _parseError(http.Response res) {
+    try {
+      final body = _tryDecode(res.body);
+      if (body != null && body['message'] != null) {
+        return body['message'];
+      }
+    } catch (_) {}
+
+    switch (res.statusCode) {
+      case 400:
+        return 'Solicitud incorrecta. Por favor, revisa los datos.';
+      case 401:
+        return 'Credenciales inválidas. Por favor, inténtalo de nuevo.';
+      case 403:
+        return 'Acceso denegado. No tienes permisos.';
+      case 404:
+        return 'No se encontró el recurso solicitado.';
+      case 409:
+        return 'Conflicto. Es posible que el usuario ya exista.';
+      case 500:
+        return 'Error interno del servidor. Por favor, inténtalo más tarde.';
+      default:
+        return 'Error: ${res.statusCode}';
     }
   }
 }

@@ -163,20 +163,6 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
     return Stack(
       alignment: Alignment.bottomRight,
       children: [
-        // Option: Create Message
-        if (_isExpanded && widget.onCreateMessage != null)
-          _buildOptionButton(
-            onTap: () {
-              setState(() => _isExpanded = false);
-              _animationController?.reverse();
-              Future.delayed(const Duration(milliseconds: 150), () {
-                if (mounted) widget.onCreateMessage!();
-              });
-            },
-            icon: Icons.chat_bubble_outline_rounded,
-            label: 'Mensaje',
-            bottomPadding: 240.0,
-          ),
         // Option: Create OTP
         if (_isExpanded && widget.onCreateOtp != null)
           _buildOptionButton(

@@ -1,11 +1,11 @@
 name: thisjowi
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.2
 
 environment:
-  sdk: '>=3.5.0 <4.0.0'
-  flutter: '>=3.24.0'
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.0"
 
 dependencies:
   flutter:
@@ -18,7 +18,7 @@ dependencies:
   url_launcher: ^6.3.2
   provider: ^6.0.0
   local_auth: ^2.3.0
-  
+
   # Offline mode & local database (drift - compatible con todas las plataformas)
   drift: ^2.22.1
   drift_flutter: ^0.2.4
@@ -53,16 +53,19 @@ flutter:
   uses-material-design: true
   assets:
     - assets/logo.png
+    - assets/empresa.png
     - assets/removed.png
     - assets/google_logo.png
     - assets/github_logo.png
     - assets/github_logo_black.png
+    - assets/terms_and_conditions.txt
+    - assets/terms_and_conditions_es.txt
     - .env
 
 flutter_launcher_icons:
   android: true
   ios: true
-  macos: 
+  macos:
     generate: true
     remove_alpha_ios: false
   windows:

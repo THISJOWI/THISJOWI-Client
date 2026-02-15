@@ -6,7 +6,6 @@ import 'package:thisjowi/core/appColors.dart';
 import 'package:thisjowi/services/authService.dart';
 import 'package:thisjowi/services/messageService.dart';
 import 'package:thisjowi/data/models/message.dart';
-import 'package:thisjowi/data/models/user.dart';
 import 'package:thisjowi/services/cryptoService.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -129,7 +128,7 @@ class _ChatScreenState extends State<ChatScreen> {
           .firstWhere((p) => p.id != _currentUserId);
       final key = await _cryptoService.fetchRecipientPublicKey(recipient.id!);
 
-      final isAvailable = key != null && key.isNotEmpty; 
+      final isAvailable = key != null && key.isNotEmpty;
 
       // Only update state if the status has actually changed to avoid UI rebuilds
       if (mounted && _isE2EEAvailable != isAvailable) {

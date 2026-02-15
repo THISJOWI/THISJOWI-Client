@@ -1,0 +1,239 @@
+TÉRMINOS Y CONDICIONES DE USO DE THISJOWI
+
+Última actualización: 15 de febrero de 2026
+
+Bienvenido a THISJOWI. Estos Términos y Condiciones ("Términos") rigen el uso de nuestra aplicación móvil y servicios relacionados (el "Servicio"). Al registrarse y utilizar THISJOWI, usted acepta estar legalmente vinculado por estos Términos.
+
+1. ACEPTACIÓN DE LOS TÉRMINOS
+
+1.1. Al crear una cuenta, acceder o utilizar THISJOWI, usted confirma que ha leído, comprendido y acepta estar sujeto a estos Términos y a nuestra Política de Privacidad.
+
+1.2. Si no está de acuerdo con estos Términos, no debe utilizar nuestro Servicio.
+
+1.3. Nos reservamos el derecho de modificar estos Términos en cualquier momento. Las modificaciones entrarán en vigor inmediatamente después de su publicación en la aplicación.
+
+2. DESCRIPCIÓN DEL SERVICIO
+
+2.1. THISJOWI es una plataforma de comunicación segura y gestión de información que ofrece:
+   - Mensajería cifrada de extremo a extremo (E2EE)
+   - Gestión segura de notas
+   - Gestor de contraseñas
+   - Autenticación mediante LDAP y métodos tradicionales
+   - Sincronización multiplataforma
+
+2.2. El Servicio está disponible para dispositivos Android, iOS, macOS, Windows, Linux y navegadores web compatibles.
+
+3. REQUISITOS DE ELEGIBILIDAD
+
+3.1. Debe tener al menos 16 años de edad para utilizar THISJOWI.
+
+3.2. Al registrarse, declara que toda la información proporcionada es veraz, precisa y completa.
+
+3.3. Es responsable de mantener la confidencialidad de sus credenciales de acceso.
+
+4. REGISTRO Y SEGURIDAD DE LA CUENTA
+
+4.1. Para utilizar THISJOWI, debe crear una cuenta proporcionando:
+   - Nombre de usuario único
+   - Dirección de correo electrónico válida
+   - Contraseña segura
+   - Información adicional según el tipo de cuenta (Personal o Empresarial)
+
+4.2. Usted es el único responsable de:
+   - Mantener la confidencialidad de su contraseña
+   - Todas las actividades realizadas desde su cuenta
+   - Notificarnos inmediatamente sobre cualquier uso no autorizado
+
+4.3. THISJOWI no será responsable de pérdidas derivadas del uso no autorizado de su cuenta.
+
+5. CIFRADO Y PRIVACIDAD
+
+5.1. THISJOWI implementa cifrado de extremo a extremo (E2EE) para proteger sus comunicaciones.
+
+5.2. Generamos claves criptográficas únicas para cada usuario. Usted es responsable de:
+   - Mantener seguras sus claves privadas
+   - No compartir sus claves de cifrado con terceros
+   - Comprender que la pérdida de claves puede resultar en pérdida permanente de acceso a datos cifrados
+
+5.3. No podemos acceder, leer ni descifrar sus mensajes, notas o contraseñas cifradas.
+
+5.4. Para más información sobre cómo manejamos sus datos, consulte nuestra Política de Privacidad.
+
+6. USO ACEPTABLE
+
+6.1. Usted se compromete a utilizar THISJOWI únicamente para fines legales y de acuerdo con estos Términos.
+
+6.2. Está PROHIBIDO:
+   - Utilizar el Servicio para actividades ilegales, fraudulentas o maliciosas
+   - Transmitir contenido que viole derechos de terceros
+   - Distribuir malware, virus o código malicioso
+   - Intentar acceder sin autorización a sistemas, cuentas o datos de otros usuarios
+   - Realizar ingeniería inversa, descompilar o desensamblar la aplicación
+   - Utilizar bots, scripts o herramientas automatizadas no autorizadas
+   - Acosar, amenazar o intimidar a otros usuarios
+   - Distribuir spam o contenido no solicitado
+   - Suplantar la identidad de otras personas u organizaciones
+   - Interferir con el funcionamiento normal del Servicio
+
+6.3. Nos reservamos el derecho de suspender o cancelar cuentas que violen estas políticas.
+
+7. CUENTAS EMPRESARIALES Y LDAP
+
+7.1. Las cuentas empresariales pueden configurar autenticación LDAP para integración con Active Directory.
+
+7.2. Los administradores de organizaciones son responsables de:
+   - La configuración correcta de sus servidores LDAP
+   - La gestión de usuarios dentro de su organización
+   - El cumplimiento de sus propias políticas de seguridad corporativa
+
+7.3. THISJOWI no es responsable de problemas derivados de configuraciones LDAP incorrectas.
+
+8. GESTOR DE CONTRASEÑAS
+
+8.1. El gestor de contraseñas de THISJOWI almacena sus credenciales de forma cifrada.
+
+8.2. Usted reconoce que:
+   - Es responsable de recordar su contraseña maestra
+   - La pérdida de la contraseña maestra puede resultar en pérdida permanente de acceso a contraseñas almacenadas
+   - THISJOWI no puede recuperar contraseñas olvidadas debido al cifrado E2EE
+
+8.3. Recomendamos mantener copias de seguridad de información crítica.
+
+9. PROPIEDAD INTELECTUAL
+
+9.1. THISJOWI y todos sus componentes (código, diseño, logotipos, marcas) son propiedad exclusiva de THISJOWI o sus licenciantes.
+
+9.2. Se le otorga una licencia limitada, no exclusiva, intransferible y revocable para usar la aplicación.
+
+9.3. No adquiere ningún derecho de propiedad sobre el Servicio.
+
+9.4. El contenido que usted crea (notas, mensajes) sigue siendo de su propiedad, pero nos otorga una licencia para procesarlo y almacenarlo según sea necesario para proporcionar el Servicio.
+
+10. LIMITACIÓN DE RESPONSABILIDAD
+
+10.1. THISJOWI se proporciona "TAL CUAL" y "SEGÚN DISPONIBILIDAD", sin garantías de ningún tipo.
+
+10.2. No garantizamos que el Servicio:
+   - Esté libre de errores o interrupciones
+   - Sea completamente seguro o inmune a accesos no autorizados
+   - Cumpla con todos sus requisitos específicos
+
+10.3. En la máxima medida permitida por la ley, THISJOWI no será responsable de:
+   - Pérdida de datos, beneficios o información
+   - Daños indirectos, incidentales o consecuentes
+   - Interrupciones del servicio
+   - Acciones de terceros
+   - Pérdida de claves de cifrado o contraseñas
+
+10.4. Nuestra responsabilidad total no excederá el monto pagado por usted (si aplica) en los últimos 12 meses.
+
+11. DISPONIBILIDAD Y MANTENIMIENTO
+
+11.1. Nos esforzamos por mantener el Servicio disponible 24/7, pero no podemos garantizarlo.
+
+11.2. Podemos realizar mantenimiento programado o de emergencia que resulte en interrupciones temporales.
+
+11.3. No seremos responsables de interrupciones causadas por:
+   - Problemas de conectividad de terceros
+   - Fallas de hardware o infraestructura
+   - Ataques cibernéticos o eventos de fuerza mayor
+
+12. COPIAS DE SEGURIDAD
+
+12.1. Aunque realizamos copias de seguridad regulares, usted es responsable de mantener sus propias copias de información crítica.
+
+12.2. No garantizamos la recuperación de datos en caso de pérdida.
+
+13. TERMINACIÓN
+
+13.1. Puede cancelar su cuenta en cualquier momento desde la configuración de la aplicación.
+
+13.2. Nos reservamos el derecho de suspender o cancelar su cuenta si:
+   - Viola estos Términos
+   - Participa en actividades fraudulentas o ilegales
+   - Su cuenta permanece inactiva por más de 24 meses
+   - Es necesario por razones de seguridad
+
+13.3. Tras la terminación:
+   - Su acceso al Servicio cesará inmediatamente
+   - Podemos eliminar sus datos después de un período de gracia de 30 días
+   - Ciertas obligaciones de estos Términos seguirán vigentes
+
+14. EXPORTACIÓN DE DATOS
+
+14.1. Puede solicitar una exportación de sus datos en cualquier momento.
+
+14.2. Proporcionaremos sus datos en formato legible por máquina dentro de los 30 días posteriores a la solicitud.
+
+15. LEGISLACIÓN APLICABLE
+
+15.1. Estos Términos se regirán e interpretarán de acuerdo con las leyes de España y la Unión Europea.
+
+15.2. Cualquier disputa se resolverá en los tribunales competentes de [Ciudad], España.
+
+15.3. Cumplimos con el Reglamento General de Protección de Datos (RGPD) de la UE.
+
+16. MENORES DE EDAD
+
+16.1. Si tiene entre 16 y 18 años, debe tener el consentimiento de un padre o tutor legal para usar THISJOWI.
+
+16.2. Los padres/tutores son responsables de supervisar el uso del Servicio por parte de menores.
+
+17. MODIFICACIONES DEL SERVICIO
+
+17.1. Nos reservamos el derecho de:
+   - Modificar, suspender o descontinuar cualquier característica
+   - Cambiar precios o planes de suscripción (con aviso previo)
+   - Actualizar requisitos técnicos
+
+17.2. Notificaremos cambios significativos con al menos 30 días de anticipación.
+
+18. COMUNICACIONES
+
+18.1. Al usar THISJOWI, acepta recibir comunicaciones electrónicas relacionadas con:
+   - Actualizaciones del servicio
+   - Cambios en los Términos
+   - Notificaciones de seguridad
+   - Información administrativa
+
+18.2. Puede optar por no recibir comunicaciones promocionales en cualquier momento.
+
+19. INDEMNIZACIÓN
+
+19.1. Usted acepta indemnizar y eximir de responsabilidad a THISJOWI, sus directores, empleados y afiliados de cualquier reclamación derivada de:
+   - Su uso del Servicio
+   - Violación de estos Términos
+   - Violación de derechos de terceros
+   - Contenido que usted publique o transmita
+
+20. DIVISIBILIDAD
+
+20.1. Si alguna disposición de estos Términos se considera inválida o inaplicable, las disposiciones restantes permanecerán en pleno vigor y efecto.
+
+21. RENUNCIA
+
+21.1. La falta de ejercicio de cualquier derecho bajo estos Términos no constituye una renuncia a dicho derecho.
+
+22. ACUERDO COMPLETO
+
+22.1. Estos Términos, junto con nuestra Política de Privacidad, constituyen el acuerdo completo entre usted y THISJOWI.
+
+22.2. Estos Términos reemplazan cualquier acuerdo o entendimiento previo.
+
+23. CONTACTO
+
+23.1. Para preguntas sobre estos Términos, puede contactarnos en:
+   - Email: legal@thisjowi.com
+   - Sitio web: https://thisjowi.com/contact
+
+24. RECONOCIMIENTO
+
+24.1. Al hacer clic en "Acepto" o al usar THISJOWI, usted reconoce que:
+   - Ha leído y comprendido estos Términos
+   - Acepta estar legalmente vinculado por estos Términos
+   - Tiene la capacidad legal para aceptar estos Términos
+
+---
+
+THISJOWI - Comunicación Segura y Privada
+© 2026 THISJOWI. Todos los derechos reservados.

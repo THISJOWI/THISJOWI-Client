@@ -18,10 +18,10 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
-  
+
   final BiometricService _biometricService = BiometricService();
   final AuthService _authService = AuthService();
-  
+
   // Keys for SharedPreferences
   static const String _appOpenCountKey = 'app_open_count';
 
@@ -62,7 +62,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     final prefs = await SharedPreferences.getInstance();
     final hasSeenOnboarding = prefs.getBool('onboarding_completed') ?? false;
-    
+
     // Increment app open count
     final appOpenCount = (prefs.getInt(_appOpenCountKey) ?? 0) + 1;
     await prefs.setInt(_appOpenCountKey, appOpenCount);
@@ -77,8 +77,9 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Check if biometric lock should be shown
     // Show if: app has been opened more than once AND user has session AND biometrics are available
-    final shouldShowBiometric = await _shouldShowBiometricAuth(prefs, appOpenCount);
-    
+    final shouldShowBiometric =
+        await _shouldShowBiometricAuth(prefs, appOpenCount);
+
     if (shouldShowBiometric) {
       _showBiometricAuth();
     } else {
@@ -86,39 +87,41 @@ class _SplashScreenState extends State<SplashScreen>
       _navigateToMainScreen();
     }
   }
-  
-  Future<bool> _shouldShowBiometricAuth(SharedPreferences prefs, int appOpenCount) async {
+
+  Future<bool> _shouldShowBiometricAuth(
+      SharedPreferences prefs, int appOpenCount) async {
     // Only show if app has been opened more than once
     if (appOpenCount <= 1) {
       return false;
     }
-    
+
     // Check if user has a valid session (token)
     final token = await _authService.getToken();
     if (token == null || token.isEmpty) {
       return false;
     }
-    
+
     // Check if biometric lock is enabled by user in settings
-    final biometricLockEnabled = await _biometricService.isBiometricLockEnabled();
+    final biometricLockEnabled =
+        await _biometricService.isBiometricLockEnabled();
     if (!biometricLockEnabled) {
       return false;
     }
-    
+
     // Check if device supports biometrics
     final canUseBiometrics = await _biometricService.canCheckBiometrics();
     final isDeviceSupported = await _biometricService.isDeviceSupported();
-    
+
     return canUseBiometrics && isDeviceSupported;
   }
-  
+
   /// Navigate to the appropriate screen based on authentication status
   void _navigateToMainScreen() {
     // Navigate directly to login screen without selection
     if (!mounted) return;
     Navigator.of(context).pushReplacementNamed('/login');
   }
-  
+
   void _showBiometricAuth() {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
@@ -181,7 +184,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   child: ClipOval(
                     child: Image.asset(
-                      'assets/logo.png',
+                      'assets/empresa.png',
                       fit: BoxFit.cover,
                     ),
                   ),

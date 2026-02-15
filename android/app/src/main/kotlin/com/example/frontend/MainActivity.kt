@@ -14,6 +14,7 @@ class MainActivity : FlutterActivity() {
     
     // Pending autofill data
     private var pendingAutofillPackage: String? = null
+    private var pendingAutofillUrl: String? = null
     private var pendingAutofillSave: Boolean = false
     private var pendingSaveUsername: String? = null
     private var pendingSavePassword: String? = null
@@ -36,12 +37,14 @@ class MainActivity : FlutterActivity() {
                 "getPendingAutofillRequest" -> {
                     val data = mapOf(
                         "package" to pendingAutofillPackage,
+                        "url" to pendingAutofillUrl,
                         "isSaveRequest" to pendingAutofillSave,
                         "username" to pendingSaveUsername,
                         "password" to pendingSavePassword
                     )
                     // Clear pending data after sending
                     pendingAutofillPackage = null
+                    pendingAutofillUrl = null
                     pendingAutofillSave = false
                     pendingSaveUsername = null
                     pendingSavePassword = null
@@ -80,6 +83,7 @@ class MainActivity : FlutterActivity() {
             pendingAutofillSave = false
         } else if (intent.getBooleanExtra("autofill_save", false)) {
             pendingAutofillPackage = intent.getStringExtra("target_package")
+            pendingAutofillUrl = intent.getStringExtra("target_url")
             pendingAutofillSave = true
             pendingSaveUsername = intent.getStringExtra("username")
             pendingSavePassword = intent.getStringExtra("password")

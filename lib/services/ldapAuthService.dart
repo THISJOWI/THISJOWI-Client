@@ -19,22 +19,25 @@ class LdapAuthService {
     required String password,
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/ldap/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'domain': domain,
-          'username': username,
-          'password': password,
-        }),
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () => throw Exception('Timeout al conectarse con servidor LDAP'),
-      );
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/ldap/login'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'domain': domain,
+              'username': username,
+              'password': password,
+            }),
+          )
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () =>
+                throw Exception('Timeout al conectarse con servidor LDAP'),
+          );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
-        
+
         if (data['success'] == true) {
           // Guardar token y datos del usuario
           final prefs = await SharedPreferences.getInstance();
@@ -65,15 +68,10 @@ class LdapAuthService {
             'message': data['message'] ?? 'Error en autenticación LDAP',
           };
         }
-      } else if (response.statusCode == 401) {
-        return {
-          'success': false,
-          'message': 'Credenciales de LDAP inválidas',
-        };
       } else {
         return {
           'success': false,
-          'message': 'Error del servidor: ${response.statusCode}',
+          'message': _parseError(response),
         };
       }
     } on http.ClientException {
@@ -172,22 +170,25 @@ class LdapAuthService {
   }
 
   /// Probar conexión LDAP antes de guardar configuración
-  Future<Map<String, dynamic>> testLdapConnection(Map<String, dynamic> config) async {
+  Future<Map<String, dynamic>> testLdapConnection(
+      Map<String, dynamic> config) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-      final response = await http.post(
-        Uri.parse('$baseUrl/ldap/test-connection'),
-        headers: {
-          'Content-Type': 'application/json',
-          if (token != null) 'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode(config),
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () => throw Exception('Timeout al probar conexión LDAP'),
-      );
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/ldap/test-connection'),
+            headers: {
+              'Content-Type': 'application/json',
+              if (token != null) 'Authorization': 'Bearer $token',
+            },
+            body: jsonEncode(config),
+          )
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () => throw Exception('Timeout al probar conexión LDAP'),
+          );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -215,22 +216,25 @@ class LdapAuthService {
   }
 
   /// Actualizar configuración LDAP de organización
-  Future<Map<String, dynamic>> updateOrganization(String orgId, Map<String, dynamic> config) async {
+  Future<Map<String, dynamic>> updateOrganization(
+      String orgId, Map<String, dynamic> config) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-      final response = await http.put(
-        Uri.parse('$baseUrl/organizations/$orgId'),
-        headers: {
-          'Content-Type': 'application/json',
-          if (token != null) 'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode(config),
-      ).timeout(
-        const Duration(seconds: 15),
-        onTimeout: () => throw Exception('Timeout'),
-      );
+      final response = await http
+          .put(
+            Uri.parse('$baseUrl/organizations/$orgId'),
+            headers: {
+              'Content-Type': 'application/json',
+              if (token != null) 'Authorization': 'Bearer $token',
+            },
+            body: jsonEncode(config),
+          )
+          .timeout(
+            const Duration(seconds: 15),
+            onTimeout: () => throw Exception('Timeout'),
+          );
 
       if (response.statusCode == 200) {
         return {
@@ -317,6 +321,32 @@ class LdapAuthService {
       }
     } catch (e) {
       return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  String _parseError(http.Response res) {
+    try {
+      final body = jsonDecode(res.body);
+      if (body != null && body['message'] != null) {
+        return body['message'];
+      }
+    } catch (_) {}
+
+    switch (res.statusCode) {
+      case 400:
+        return 'Solicitud incorrecta. Por favor, revisa los datos.';
+      case 401:
+        return 'Credenciales inválidas. Por favor, inténtalo de nuevo.';
+      case 403:
+        return 'Acceso denegado. No tienes permisos.';
+      case 404:
+        return 'No se encontró el recurso solicitado.';
+      case 409:
+        return 'Conflicto. Es posible que el usuario pase por un error de duplicidad.';
+      case 500:
+        return 'Error interno del servidor. Por favor, inténtalo más tarde.';
+      default:
+        return 'Error: ${res.statusCode}';
     }
   }
 }

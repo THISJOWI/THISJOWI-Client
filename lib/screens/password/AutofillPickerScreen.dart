@@ -112,7 +112,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Autofill for'.i18n + ' ${widget.request.appName}'),
+        title: Text('${'Autofill for'.i18n} ${widget.request.appName}'),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.of(context).pop(),
@@ -166,8 +166,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Do you want to save credentials for'.i18n +
-                                      ' ${widget.request.appName}?',
+                                  '${'Do you want to save credentials for'.i18n} ${widget.request.appName}?',
                                   style: const TextStyle(
                                       color: AppColors.text,
                                       fontSize: 13,
@@ -253,7 +252,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                                       children: [
                                         const SizedBox(height: 4),
                                         Text(
-                                          'User'.i18n + ': ${entry.username}',
+                                          '${'User'.i18n}: ${entry.username}',
                                           style: TextStyle(
                                               color: AppColors.text
                                                   .withOpacity(0.8),

@@ -540,7 +540,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     children: [
                       const Image(
-                        image: AssetImage("assets/removed.png"),
+                        image: AssetImage("assets/empresa.png"),
                         height: 40,
                       ),
                       const SizedBox(width: 12),

@@ -5,6 +5,7 @@ import '../../services/authService.dart';
 import '../local/database.dart';
 import '../../services/connectivityService.dart';
 import '../local/secure_storage_service.dart';
+import '../models/user.dart' as model;
 
 /// Repository for authentication that supports offline mode.
 ///
@@ -105,7 +106,7 @@ class AuthRepository {
     } catch (e) {
       return {
         'success': false,
-        'message': 'Login failed: $e',
+        'message': e.toString().replaceFirst('Exception: ', ''),
       };
     }
   }
@@ -190,6 +191,11 @@ class AuthRepository {
         'message': 'GitHub login failed: $e',
       };
     }
+  }
+
+  /// Get the current user details.
+  Future<model.User?> getCurrentUser() async {
+    return await _authService.getCurrentUser();
   }
 
   /// Initiate registration by sending OTP

@@ -85,25 +85,66 @@ class _RegisterFormState extends State<RegisterForm> {
     return null;
   }
 
-  void _showTermsDialog() {
+  Future<void> _showTermsDialog() async {
+    String termsContent = '';
+    final String languageCode = Localizations.localeOf(context).languageCode;
+    final String assetPath = languageCode == 'es'
+        ? 'assets/terms_and_conditions_es.txt'
+        : 'assets/terms_and_conditions.txt';
+
+    try {
+      termsContent = await DefaultAssetBundle.of(context).loadString(assetPath);
+    } catch (e) {
+      termsContent =
+          'Error loading terms and conditions. Please try again.'.i18n;
+    }
+
+    if (!mounted) return;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF202020),
-        title: Text("Terms and Conditions".i18n,
-            style: const TextStyle(color: AppColors.text)),
-        content: SingleChildScrollView(
-          child: Text(
-            "Here are the terms and conditions of use for the app... \n\n1. Use of the app...\n2. Privacy Policy...\n3. User Responsibilities..."
-                .i18n,
-            style: TextStyle(color: AppColors.text.withOpacity(0.8)),
+        title: Row(
+          children: [
+            const Icon(Icons.description_outlined, color: AppColors.secondary),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                "Terms and Conditions".i18n,
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: SingleChildScrollView(
+            child: SelectableText(
+              termsContent,
+              style: TextStyle(
+                color: AppColors.text.withOpacity(0.85),
+                fontSize: 14,
+                height: 1.5,
+              ),
+            ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("Close".i18n,
-                style: const TextStyle(color: AppColors.secondary)),
+            child: Text(
+              "Close".i18n,
+              style: const TextStyle(
+                color: AppColors.secondary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),

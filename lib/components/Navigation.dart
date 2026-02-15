@@ -6,6 +6,7 @@ import 'package:thisjowi/screens/home/HomeScreen.dart';
 import 'package:thisjowi/screens/settings/SettingScreen.dart';
 import 'package:thisjowi/screens/messages/MessagesScreen.dart';
 import 'package:thisjowi/services/authService.dart';
+import 'package:thisjowi/services/autofillSaveHandler.dart';
 
 // GlobalKey para acceder al estado de la navegación
 final GlobalKey<Navigation> bottomNavigationKey = GlobalKey<Navigation>();
@@ -18,16 +19,35 @@ class MyBottomNavigation extends StatefulWidget {
 }
 
 class Navigation extends State<MyBottomNavigation>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   int _currentIndex = 0;
   final AuthService _authService = AuthService();
+  final AutofillSaveHandler _autofillHandler = AutofillSaveHandler();
   bool _isBusinessAccount = false;
   List<Widget> _pages = [];
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initNavigation();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _autofillHandler.stopMonitoring();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    // Check for autofill requests when app comes to foreground
+    if (state == AppLifecycleState.resumed && mounted) {
+      _autofillHandler.checkNow(context);
+    }
   }
 
   Future<void> _initNavigation() async {
@@ -44,6 +64,9 @@ class Navigation extends State<MyBottomNavigation>
         _isBusinessAccount = aspect?.toLowerCase() == 'business';
         _buildPages();
       });
+
+      // Start monitoring for autofill save requests
+      _autofillHandler.startMonitoring(context);
     }
   }
 
