@@ -873,7 +873,9 @@ class _SettingScreenState extends State<SettingScreen> {
                     ),
                   ),
                 ),
-                if (!(_currentUser?.isLdapUser ?? false))
+                if (_currentUser != null &&
+                    !_currentUser!.isLdapUser &&
+                    _currentUser!.ldapUsername == null)
                   _buildSettingItem(
                     icon: Icons.password,
                     title: 'Change Password'.i18n,

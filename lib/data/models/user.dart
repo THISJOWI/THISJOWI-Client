@@ -28,6 +28,7 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
+    final ldapUsr = json['ldapUsername'] ?? json['ldap_username'];
     return User(
       id: (json['id'] ?? json['_id'] ?? json['userId'])?.toString(),
       email: json['email'] ?? '',
@@ -35,13 +36,15 @@ class User {
       country: json['country'],
       accountType: json['accountType'] ?? json['account_type'],
       hostingMode: json['hostingMode'] ?? json['hosting_mode'],
-      avatarUrl: json['avatarUrl'] ??
-          json['avatar_url'], // Assuming the API might return this
-      orgId: json['orgId'],
-      ldapUsername: json['ldapUsername'],
-      ldapDomain: json['ldapDomain'],
-      isLdapUser: json['isLdapUser'] ?? false,
-      publicKey: json['publicKey'],
+      avatarUrl: json['avatarUrl'] ?? json['avatar_url'],
+      orgId: json['orgId'] ?? json['org_id'],
+      ldapUsername: ldapUsr,
+      ldapDomain: json['ldapDomain'] ?? json['ldap_domain'],
+      isLdapUser: json['isLdapUser'] ??
+          json['ldapUser'] ??
+          json['is_ldap_user'] ??
+          (ldapUsr != null),
+      publicKey: json['publicKey'] ?? json['public_key'],
     );
   }
 
