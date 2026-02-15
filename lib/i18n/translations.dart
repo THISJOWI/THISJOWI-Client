@@ -246,6 +246,16 @@ extension Localization on String {
         "es": "Error al guardar contraseña",
       } +
 
+      // ==================== MESSAGES ====================
+      {
+        "en": "Messages",
+        "es": "Mensajes",
+      } +
+      {
+        "en": "No messages yet",
+        "es": "Sin mensajes aún",
+      } +
+
       // ==================== NOTES ====================
       {
         "en": "Notes",
@@ -490,6 +500,10 @@ extension Localization on String {
       {
         "en": "Login failed",
         "es": "Error al iniciar sesión",
+      } +
+      {
+        "en": "Forgot Password?",
+        "es": "¿Olvidaste tu contraseña?",
       } +
 
       // ==================== NOTES ADDITIONAL ====================

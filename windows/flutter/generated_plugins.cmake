@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
   desktop_webview_window
   file_selector_windows
+  flutter_secure_storage_windows
   local_auth_windows
   sqlite3_flutter_libs
   url_launcher_windows

@@ -11,6 +11,7 @@ import 'package:thisjowi/i18n/translations.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:thisjowi/screens/organization/LdapConfigScreen.dart';
+import 'package:thisjowi/data/models/user.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -29,6 +30,7 @@ class _SettingScreenState extends State<SettingScreen> {
   bool _biometricEnabled = false;
   bool _biometricAvailable = false;
   String _biometricType = 'Biometric';
+  User? _currentUser;
 
   AuthRepository? _authRepository;
 
@@ -36,7 +38,24 @@ class _SettingScreenState extends State<SettingScreen> {
   void initState() {
     super.initState();
     _initRepository();
-    _loadBiometricStatus();
+    _loadInitialData();
+  }
+
+  Future<void> _loadInitialData() async {
+    await Future.wait([
+      _loadBiometricStatus(),
+      _loadCurrentUser(),
+    ]);
+  }
+
+  Future<void> _loadCurrentUser() async {
+    if (_authRepository == null) _initRepository();
+    final user = await _authRepository!.getCurrentUser();
+    if (mounted) {
+      setState(() {
+        _currentUser = user;
+      });
+    }
   }
 
   void _initRepository() {
@@ -854,12 +873,13 @@ class _SettingScreenState extends State<SettingScreen> {
                     ),
                   ),
                 ),
-                _buildSettingItem(
-                  icon: Icons.password,
-                  title: 'Change Password'.i18n,
-                  subtitle: 'Update your password'.i18n,
-                  onTap: _showChangePasswordDialog,
-                ),
+                if (!(_currentUser?.isLdapUser ?? false))
+                  _buildSettingItem(
+                    icon: Icons.password,
+                    title: 'Change Password'.i18n,
+                    subtitle: 'Update your password'.i18n,
+                    onTap: _showChangePasswordDialog,
+                  ),
                 if (_biometricAvailable)
                   _buildSettingItem(
                     icon: _biometricType == 'Face ID'

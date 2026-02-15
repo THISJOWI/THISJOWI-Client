@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+import 'package:thisjowi/services/cryptoService.dart';
 import '../core/api.dart';
 import '../data/models/user.dart';
 
@@ -20,6 +21,12 @@ import '../data/models/user.dart';
 /// - getEmail() -> Future<String?>
 /// - logout() -> Future<void>
 class AuthService {
+  static final AuthService _instance = AuthService._internal();
+  factory AuthService() => _instance;
+  AuthService._internal();
+
+  final CryptoService _cryptoService = CryptoService();
+
   // URL base del servicio de autenticación desde ApiConfig
   String get baseUrl => ApiConfig.authUrl;
 
@@ -102,6 +109,10 @@ class AuthService {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', body['token']);
           await prefs.setString('email', email);
+
+          // Initialize E2EE Keys
+          await _cryptoService.initKeys();
+
           return {'success': true, 'data': body};
         }
         return {
@@ -109,10 +120,7 @@ class AuthService {
           'message': body?['message'] ?? 'No token returned from backend'
         };
       }
-      return {
-        'success': false,
-        'message': body?['message'] ?? 'Backend error: ${res.statusCode}'
-      };
+      return {'success': false, 'message': _parseError(res)};
     } catch (e) {
       print('DEBUG: HTTP Request failed: $e');
       return {'success': false, 'message': 'Connection error: $e'};
@@ -165,6 +173,10 @@ class AuthService {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', body['token']);
           await prefs.setString('email', body['email']);
+
+          // Initialize E2EE Keys
+          await _cryptoService.initKeys();
+
           return {'success': true, 'data': body};
         }
         return {
@@ -172,10 +184,7 @@ class AuthService {
           'message': body?['message'] ?? 'No token returned from backend'
         };
       }
-      return {
-        'success': false,
-        'message': body?['message'] ?? 'Backend error: ${res.statusCode}'
-      };
+      return {'success': false, 'message': _parseError(res)};
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -200,6 +209,10 @@ class AuthService {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', body['token']);
           await prefs.setString('email', email);
+
+          // Initialize E2EE Keys
+          await _cryptoService.initKeys();
+
           return {'success': true, 'data': body};
         }
         return {
@@ -208,10 +221,7 @@ class AuthService {
         };
       }
 
-      return {
-        'success': false,
-        'message': body?['message'] ?? 'Error: ${res.statusCode}'
-      };
+      return {'success': false, 'message': _parseError(res)};
     } on TimeoutException {
       return {
         'success': false,
@@ -238,10 +248,7 @@ class AuthService {
       if (res.statusCode == 200) {
         return {'success': true, 'message': body?['message']};
       }
-      return {
-        'success': false,
-        'message': body?['message'] ?? 'Error: ${res.statusCode}'
-      };
+      return {'success': false, 'message': _parseError(res)};
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -283,13 +290,20 @@ class AuthService {
       final body = _tryDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
+        if (body != null && body['token'] != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', body['token']);
+          if (body['email'] != null) {
+            await prefs.setString('email', body['email']);
+          }
+        }
+
+        // Initialize E2EE Keys
+        await _cryptoService.initKeys();
         return {'success': true, 'data': body};
       }
 
-      return {
-        'success': false,
-        'message': body?['message'] ?? 'Error: ${res.statusCode}'
-      };
+      return {'success': false, 'message': _parseError(res)};
     } on TimeoutException {
       return {
         'success': false,
@@ -337,10 +351,7 @@ class AuthService {
         return {'success': true, 'data': body};
       }
 
-      return {
-        'success': false,
-        'message': body?['message'] ?? 'Error: ${res.statusCode}'
-      };
+      return {'success': false, 'message': _parseError(res)};
     } on TimeoutException {
       return {
         'success': false,
@@ -553,6 +564,32 @@ class AuthService {
       return jsonDecode(text);
     } catch (_) {
       return null;
+    }
+  }
+
+  String _parseError(http.Response res) {
+    try {
+      final body = _tryDecode(res.body);
+      if (body != null && body['message'] != null) {
+        return body['message'];
+      }
+    } catch (_) {}
+
+    switch (res.statusCode) {
+      case 400:
+        return 'Solicitud incorrecta. Por favor, revisa los datos.';
+      case 401:
+        return 'Credenciales inválidas. Por favor, inténtalo de nuevo.';
+      case 403:
+        return 'Acceso denegado. No tienes permisos.';
+      case 404:
+        return 'No se encontró el recurso solicitado.';
+      case 409:
+        return 'Conflicto. Es posible que el usuario ya exista.';
+      case 500:
+        return 'Error interno del servidor. Por favor, inténtalo más tarde.';
+      default:
+        return 'Error: ${res.statusCode}';
     }
   }
 }

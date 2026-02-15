@@ -84,14 +84,6 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
     });
   }
 
-  void _handleCreateMessage() {
-    setState(() => _isExpanded = false);
-    _animationController?.reverse();
-    Future.delayed(const Duration(milliseconds: 150), () {
-      if (mounted && widget.onCreateMessage != null) widget.onCreateMessage!();
-    });
-  }
-
   Widget _buildOptionButton({
     required VoidCallback onTap,
     required IconData icon,
@@ -171,15 +163,6 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
     return Stack(
       alignment: Alignment.bottomRight,
       children: [
-        // Top Item: Message (if available)
-        if (_isExpanded && widget.onCreateMessage != null)
-          _buildOptionButton(
-            onTap: _handleCreateMessage,
-            icon: Icons.chat_bubble_outline,
-            label: 'Mensaje',
-            bottomPadding: widget.onCreateOtp != null ? 240.0 : 185.0,
-          ),
-
         // Option: Create OTP
         if (_isExpanded && widget.onCreateOtp != null)
           _buildOptionButton(

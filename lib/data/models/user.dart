@@ -10,6 +10,7 @@ class User {
   final String? ldapUsername;
   final String? ldapDomain;
   final bool isLdapUser;
+  final String? publicKey;
 
   User({
     this.id,
@@ -23,6 +24,7 @@ class User {
     this.ldapUsername,
     this.ldapDomain,
     this.isLdapUser = false,
+    this.publicKey,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -39,6 +41,7 @@ class User {
       ldapUsername: json['ldapUsername'],
       ldapDomain: json['ldapDomain'],
       isLdapUser: json['isLdapUser'] ?? false,
+      publicKey: json['publicKey'],
     );
   }
 
@@ -55,6 +58,7 @@ class User {
       'ldapUsername': ldapUsername,
       'ldapDomain': ldapDomain,
       'isLdapUser': isLdapUser,
+      'publicKey': publicKey,
     };
   }
 

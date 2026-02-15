@@ -1,15 +1,18 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:thisjowi/core/appColors.dart';
 import 'package:thisjowi/services/authService.dart';
 import 'package:thisjowi/services/messageService.dart';
 import 'package:thisjowi/data/models/message.dart';
+import 'package:thisjowi/services/cryptoService.dart';
 
 class ChatScreen extends StatefulWidget {
   final Conversation conversation;
+  final String? title;
 
-  const ChatScreen({super.key, required this.conversation});
+  const ChatScreen({super.key, required this.conversation, this.title});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -20,18 +23,41 @@ class _ChatScreenState extends State<ChatScreen> {
   final AuthService _authService = AuthService();
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  Timer? _pollingTimer;
 
   List<Message> _messages = [];
   bool _isLoading = true;
+  bool _isE2EEAvailable = false;
   String? _currentUserId;
   String? _recipientId;
   String _chatTitle = 'Chat';
+<<<<<<< HEAD
   Timer? _pollingTimer;
+=======
+  final CryptoService _cryptoService = CryptoService();
+>>>>>>> master
 
   @override
   void initState() {
     super.initState();
     _initUser();
+    _startPolling();
+  }
+
+  void _startPolling() {
+    _pollingTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (mounted && !_isLoading) {
+        _loadMessages(isPolling: true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    _textController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -54,6 +80,7 @@ class _ChatScreenState extends State<ChatScreen> {
       
       setState(() {
         _currentUserId = user.id;
+<<<<<<< HEAD
         _recipientId = recipient.id;
         _chatTitle = recipientName.isNotEmpty ? recipientName : 'Chat';
       });
@@ -88,41 +115,99 @@ class _ChatScreenState extends State<ChatScreen> {
           _messages = newMessages;
         });
         _scrollToBottom();
+=======
+        _chatTitle =
+            widget.title ?? widget.conversation.getTitle(_currentUserId!);
+      });
+      _loadMessages();
+      _markRead();
+    } else {
+      if (mounted) {
+        setState(() => _isLoading = false);
+>>>>>>> master
       }
     }
   }
 
+<<<<<<< HEAD
   Future<void> _loadMessages() async {
     setState(() => _isLoading = true);
     final result = await _messageService.getMessages(
       widget.conversation.id,
       recipientId: _recipientId,
+=======
+  Future<void> _loadMessages({bool isPolling = false}) async {
+    if (!isPolling) {
+      setState(() => _isLoading = true);
+    }
+
+    _checkE2EE();
+
+    // Find recipient ID for 'new' conversations
+    String? recipientId;
+    try {
+      recipientId = widget.conversation.participants
+          .firstWhere((p) => p.id != _currentUserId)
+          .id;
+    } catch (_) {}
+
+    final result = await _messageService.getMessages(
+      widget.conversation.id,
+      recipientId: recipientId,
+>>>>>>> master
     );
 
     if (!mounted) return;
 
     if (result['success'] == true) {
+      final List<Message> loadedMessages = result['data'];
+
+      // Explicitly sort by timestamp descending so index 0 is the newest message
+      // With reverse: true in ListView, index 0 will be at the bottom
+      loadedMessages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
       setState(() {
-        _messages = result['data'];
-        _isLoading = false;
+        // Merge: Keep all server messages + local optimistic ones not yet on server
+        final Set<String> serverIds = loadedMessages.map((m) => m.id).toSet();
+        final List<Message> localOnly = _messages
+            .where((m) => m.id.startsWith('temp_') && !serverIds.contains(m.id))
+            .toList();
+
+        _messages = [...loadedMessages, ...localOnly];
+        _messages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
+        if (!isPolling) _isLoading = false;
+        if (loadedMessages
+            .any((m) => m.recipientId == _currentUserId && !m.isRead)) {
+          _markRead();
+        }
       });
-      _scrollToBottom();
     } else {
-      setState(() => _isLoading = false);
-      // Ideally show error toast
+      if (!isPolling) setState(() => _isLoading = false);
     }
   }
 
-  void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
+  Future<void> _checkE2EE() async {
+    try {
+      final recipient = widget.conversation.participants
+          .firstWhere((p) => p.id != _currentUserId);
+      final key = await _cryptoService.fetchRecipientPublicKey(recipient.id!);
+
+      final isAvailable = key != null && key.isNotEmpty;
+
+      // Only update state if the status has actually changed to avoid UI rebuilds
+      if (mounted && _isE2EEAvailable != isAvailable) {
+        setState(() {
+          _isE2EEAvailable = isAvailable;
+        });
+        print(
+            '🔒 E2EE Status changed to: ${isAvailable ? "Encrypted" : "Not Encrypted"}');
       }
-    });
+    } catch (e) {
+      // On network error, we DON'T revert to "No cifrado" if we already had a key.
+      // This prevents flickering during bad connection.
+      print('⚠️ Silent error checking E2EE: $e');
+    }
   }
 
   Future<void> _sendMessage() async {
@@ -137,23 +222,40 @@ class _ChatScreenState extends State<ChatScreen> {
         .id;
 
     // Optimistic UI update
-    final tempId = DateTime.now().millisecondsSinceEpoch.toString();
+    final currentId = _currentUserId;
+    if (currentId == null) return;
+
+    final tempId = 'temp_${DateTime.now().millisecondsSinceEpoch}';
     final optimisticMessage = Message(
       id: tempId,
       conversationId: widget.conversation.id,
-      senderId: _currentUserId!,
+      senderId: currentId,
       content: text,
       timestamp: DateTime.now(),
       isRead: false,
     );
 
     setState(() {
-      _messages.add(optimisticMessage);
+      _messages.insert(0, optimisticMessage);
     });
-    _scrollToBottom();
 
+<<<<<<< HEAD
     final result = await _messageService.sendMessage(
       widget.conversation.id, 
+=======
+    // Find recipient ID (first participant that isn't me)
+    String? recipientId;
+    try {
+      recipientId = widget.conversation.participants
+          .firstWhere((p) => p.id != _currentUserId)
+          .id;
+    } catch (_) {
+      // In case of empty participants or only me
+    }
+
+    final result = await _messageService.sendMessage(
+      widget.conversation.id,
+>>>>>>> master
       text,
       recipientId: recipientId,
     );
@@ -175,6 +277,191 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  Future<void> _markRead() async {
+    if (widget.conversation.id != 'new') {
+      await _messageService.markAsRead(widget.conversation.id);
+    }
+  }
+
+  Future<void> _deleteMessage(String id) async {
+    final success = await _messageService.deleteMessage(id);
+    if (success['success'] == true) {
+      setState(() {
+        _messages.removeWhere((m) => m.id == id);
+      });
+    }
+  }
+
+  void _showMessageOptions(Message msg) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF1C1C1E).withOpacity(0.9),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(30)),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 12),
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ListTile(
+                  leading:
+                      const Icon(Icons.copy_rounded, color: AppColors.primary),
+                  title: const Text('Copiar mensaje',
+                      style: TextStyle(color: Colors.white)),
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: msg.content));
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('¡Mensaje copiado!'),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: AppColors.primary.withOpacity(0.9),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                    );
+                  },
+                ),
+                if (msg.senderId == _currentUserId)
+                  ListTile(
+                    leading: const Icon(Icons.delete_sweep_rounded,
+                        color: Colors.red),
+                    title: const Text('Eliminar mensaje',
+                        style: TextStyle(color: Colors.red)),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showDeleteConfirmation(msg);
+                    },
+                  ),
+                SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(Message msg) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF1C1C1E).withOpacity(0.9),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(30)),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 12),
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 25),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.delete_sweep_rounded,
+                      color: Colors.red, size: 32),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  '¿Eliminar mensaje?',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: Text(
+                    'Esta acción no se puede deshacer y el mensaje desaparecerá para todos.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Colors.white.withOpacity(0.5), fontSize: 14),
+                  ),
+                ),
+                const SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15)),
+                          ),
+                          child: const Text('Cancelar',
+                              style: TextStyle(color: Colors.white)),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _deleteMessage(msg.id);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15)),
+                          ),
+                          child: const Text('Eliminar',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -188,7 +475,37 @@ class _ChatScreenState extends State<ChatScreen> {
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
           onPressed: () => Navigator.pop(context),
         ),
+<<<<<<< HEAD
         title: const SizedBox.shrink(), // Empty title
+=======
+        title: Column(
+          children: [
+            Text(_chatTitle,
+                style: const TextStyle(color: AppColors.text, fontSize: 16)),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  _isE2EEAvailable
+                      ? Icons.lock_rounded
+                      : Icons.lock_open_rounded,
+                  size: 10,
+                  color: _isE2EEAvailable ? Colors.green : Colors.orange,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  _isE2EEAvailable ? 'Cifrado' : 'No cifrado',
+                  style: TextStyle(
+                    color: _isE2EEAvailable ? Colors.green : Colors.orange,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+>>>>>>> master
         actions: [
           // User name on the right
           Padding(
@@ -235,16 +552,20 @@ class _ChatScreenState extends State<ChatScreen> {
                                 color: AppColors.text.withOpacity(0.5))))
                     : ListView.builder(
                         controller: _scrollController,
+                        reverse: true, // Newest at bottom
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 10),
                         itemCount: _messages.length,
                         itemBuilder: (context, index) {
                           final msg = _messages[index];
                           final isMe = msg.senderId == _currentUserId;
-                          final showTail = index == _messages.length - 1 ||
-                              _messages[index + 1].senderId != msg.senderId;
+                          final showTail = index == 0 ||
+                              _messages[index - 1].senderId != msg.senderId;
 
-                          return _buildMessageBubble(msg, isMe, showTail);
+                          return GestureDetector(
+                            onLongPress: () => _showMessageOptions(msg),
+                            child: _buildMessageBubble(msg, isMe, showTail),
+                          );
                         },
                       ),
           ),
@@ -333,9 +654,23 @@ class _ChatScreenState extends State<ChatScreen> {
             bottomRight: Radius.circular(isMe ? 4 : 20),
           ),
         ),
-        child: Text(
-          message.content,
-          style: const TextStyle(color: Colors.white, fontSize: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              message.content,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            if (message.isEncrypted)
+              Padding(
+                padding: const EdgeInsets.only(top: 2.0),
+                child: Icon(
+                  Icons.lock_outline_rounded,
+                  size: 10,
+                  color: Colors.white.withOpacity(0.5),
+                ),
+              ),
+          ],
         ),
       ),
     );

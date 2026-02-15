@@ -1,0 +1,141 @@
+THISJOWI TERMS AND CONDITIONS OF USE
+
+Last updated: February 15, 2026
+
+Welcome to THISJOWI. These Terms and Conditions ("Terms") govern your use of our mobile application and related services (the "Service"). By registering for and using THISJOWI, you agree to be legally bound by these Terms.
+
+1. ACCEPTANCE OF TERMS
+
+1.1. By creating an account, accessing, or using THISJOWI, you confirm that you have read, understood, and agree to be bound by these Terms and our Privacy Policy.
+
+1.2. If you do not agree to these Terms, you must not use our Service.
+
+1.3. We reserve the right to modify these Terms at any time. Modifications will take effect immediately upon their posting in the application.
+
+2. DESCRIPTION OF THE SERVICE
+
+2.1. THISJOWI is a secure communication and information management platform that offers:
+
+- End-to-end encrypted messaging (E2EE)
+
+- Secure note management
+
+- Password manager
+
+- Authentication via LDAP and traditional methods
+
+- Cross-platform synchronization
+
+2.2. The Service is available for Android, iOS, macOS, Windows, Linux devices and compatible web browsers.
+
+3. ELIGIBILITY REQUIREMENTS
+
+3.1. You must be at least 16 years old to use THISJOWI.
+
+3.2. By registering, you declare that all information provided is true, accurate, and complete.
+
+3.3. You are responsible for maintaining the confidentiality of your login credentials.
+
+4. ACCOUNT REGISTRATION AND SECURITY
+
+4.1. To use THISJOWI, you must create an account by providing:
+
+- A unique username
+
+- A valid email address
+
+- A secure password
+
+- Additional information depending on your account type (Personal or Business)
+
+4.2. You are solely responsible for:
+
+- Maintaining the confidentiality of your password
+
+- All activities that occur under your account
+
+- Notifying us immediately of any unauthorized use
+
+4.3. THISJOWI will not be liable for any losses resulting from the unauthorized use of your account.
+
+5. ENCRYPTION AND PRIVACY
+
+5.1. THISJOWI implements end-to-end encryption (E2EE) to protect your communications.
+
+5.2. We generate unique cryptographic keys for each user. You are responsible for:
+
+- Keeping your private keys secure
+
+- Not sharing your encryption keys with third parties
+
+- Understanding that losing your keys may result in permanent loss of access to encrypted data
+
+5.3. We cannot access, read, or decrypt your encrypted messages, notes, or passwords.
+
+5.4. For more information on how we handle your data, please see our Privacy Policy.
+
+6. ACCEPTABLE USE
+
+6.1. You agree to use THISJOWI only for lawful purposes and in accordance with these Terms.
+
+6.2. It is PROHIBITED to:
+
+- Use the Service for illegal, fraudulent, or malicious activities
+
+- Transmit content that violates the rights of third parties
+
+- Distribute malware, viruses, or malicious code
+
+- Attempt to gain unauthorized access to other users' systems, accounts, or data
+
+- Reverse engineer, decompile, or disassemble the application
+
+- Use unauthorized bots, scripts, or automated tools
+
+- Harass, threaten, or intimidate other users
+
+- Distribute spam or unsolicited content
+
+- Impersonate other people or organizations
+
+- Interfere with the normal operation of the Service
+
+6.3. We reserve the right to suspend or terminate accounts that violate these policies.
+
+7. BUSINESS ACCOUNTS AND LDAP
+
+7.1. Business accounts can be configured with LDAP authentication for integration with Active Directory.
+
+7.2. Organization administrators are responsible for:
+
+- The correct configuration of their LDAP servers
+
+- User management within their organization
+
+- Compliance with their own corporate security policies
+
+7.3. THISJOWI is not responsible for problems arising from incorrect LDAP configurations.
+
+8. PASSWORD MANAGER
+
+8.1. The THISJOWI password manager stores your credentials in encrypted form.
+
+8.2. You acknowledge that:
+
+- You are responsible for remembering your master password
+
+- Losing your master password may result in permanent loss of access to stored passwords
+
+- THISJOWI cannot recover forgotten passwords due to end-to-end encryption
+
+8.3. We recommend maintaining backups of critical information.
+
+9. INTELLECTUAL PROPERTY
+
+9.1. THISJOWI and all its components (code, design, logos, trademarks) are the exclusive property of THISJOWI or its licensors.
+
+9.2. You are granted a limited, non-exclusive, non-transferable, and revocable license to use the application.
+
+9.3. You do not acquire any ownership rights to the Service.
+
+9.4. The content you create (notes, messages) remains your property, but you grant us a license to process and store it as necessary.

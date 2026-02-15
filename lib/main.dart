@@ -71,7 +71,11 @@ class MainApp extends StatelessWidget {
       ),
       
       theme: ThemeData(
+        brightness: Brightness.dark,
         scaffoldBackgroundColor: AppColors.background,
+        iconTheme: const IconThemeData(
+          color: AppColors.text,
+        ),
         // Configurar AppBar para que use iconos claros
         appBarTheme: const AppBarTheme(
           backgroundColor: AppColors.background,

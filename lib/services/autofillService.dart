@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 
 /// Service to manage password autofill functionality
-/// 
+///
 /// This service provides:
 /// - Check if autofill is enabled/supported
 /// - Open system autofill settings
@@ -11,17 +11,17 @@ import 'package:flutter/foundation.dart';
 /// - Provide credentials for autofill
 class AutofillService {
   static final AutofillService _instance = AutofillService._internal();
-  
+
   static const MethodChannel _channel = MethodChannel('com.thisjowi/autofill');
-  
+
   factory AutofillService() => _instance;
-  
+
   AutofillService._internal();
 
   /// Check if the device supports autofill (Android 8.0+ or iOS 12+)
   Future<bool> hasAutofillSupport() async {
     if (kIsWeb) return false;
-    
+
     if (Platform.isAndroid) {
       try {
         final result = await _channel.invokeMethod<bool>('hasAutofillSupport');
@@ -34,17 +34,18 @@ class AutofillService {
       // iOS 12+ supports AutoFill with Credential Provider Extension
       return true;
     }
-    
+
     return false;
   }
 
   /// Check if THISJOWI is set as the autofill service provider
   Future<bool> isAutofillServiceEnabled() async {
     if (kIsWeb) return false;
-    
+
     if (Platform.isAndroid) {
       try {
-        final result = await _channel.invokeMethod<bool>('isAutofillServiceEnabled');
+        final result =
+            await _channel.invokeMethod<bool>('isAutofillServiceEnabled');
         return result ?? false;
       } catch (e) {
         debugPrint('Error checking autofill status: $e');
@@ -55,14 +56,14 @@ class AutofillService {
       // User must check in Settings > Passwords > AutoFill Passwords
       return true; // Assume enabled, user will see if it works
     }
-    
+
     return false;
   }
 
   /// Open system settings to enable THISJOWI as autofill provider
   Future<void> openAutofillSettings() async {
     if (kIsWeb) return;
-    
+
     if (Platform.isAndroid) {
       try {
         await _channel.invokeMethod('openAutofillSettings');
@@ -72,20 +73,23 @@ class AutofillService {
     } else if (Platform.isIOS) {
       // On iOS, we can't directly open password settings
       // We can only guide the user
-      debugPrint('iOS: User must go to Settings > Passwords > AutoFill Passwords');
+      debugPrint(
+          'iOS: User must go to Settings > Passwords > AutoFill Passwords');
     }
   }
 
   /// Get pending autofill request data (when app is opened from autofill)
   Future<AutofillRequest?> getPendingAutofillRequest() async {
     if (kIsWeb || !Platform.isAndroid) return null;
-    
+
     try {
-      final result = await _channel.invokeMethod<Map<dynamic, dynamic>>('getPendingAutofillRequest');
-      
+      final result = await _channel
+          .invokeMethod<Map<dynamic, dynamic>>('getPendingAutofillRequest');
+
       if (result != null && result['package'] != null) {
         return AutofillRequest(
           targetPackage: result['package'] as String,
+          targetUrl: result['url'] as String?,
           isSaveRequest: result['isSaveRequest'] as bool? ?? false,
           username: result['username'] as String?,
           password: result['password'] as String?,
@@ -94,7 +98,7 @@ class AutofillService {
     } catch (e) {
       debugPrint('Error getting pending autofill request: $e');
     }
-    
+
     return null;
   }
 
@@ -104,9 +108,10 @@ class AutofillService {
     required String password,
   }) async {
     if (kIsWeb || !Platform.isAndroid) return false;
-    
+
     try {
-      final result = await _channel.invokeMethod<bool>('provideAutofillCredentials', {
+      final result =
+          await _channel.invokeMethod<bool>('provideAutofillCredentials', {
         'username': username,
         'password': password,
       });
@@ -120,7 +125,7 @@ class AutofillService {
   /// Get the autofill status message for UI display
   Future<AutofillStatus> getAutofillStatus() async {
     final hasSupport = await hasAutofillSupport();
-    
+
     if (!hasSupport) {
       return AutofillStatus(
         isSupported: false,
@@ -129,9 +134,9 @@ class AutofillService {
         actionText: null,
       );
     }
-    
+
     final isEnabled = await isAutofillServiceEnabled();
-    
+
     if (Platform.isAndroid) {
       if (isEnabled) {
         return AutofillStatus(
@@ -144,7 +149,8 @@ class AutofillService {
         return AutofillStatus(
           isSupported: true,
           isEnabled: false,
-          message: 'Activa THISJOWI como tu gestor de contraseñas para autorellenar en otras apps',
+          message:
+              'Activa THISJOWI como tu gestor de contraseñas para autorellenar en otras apps',
           actionText: 'Activar autofill',
         );
       }
@@ -152,11 +158,12 @@ class AutofillService {
       return AutofillStatus(
         isSupported: true,
         isEnabled: true, // We can't check on iOS
-        message: 'Para usar autofill, ve a Ajustes > Contraseñas > Autorrellenar contraseñas y activa THISJOWI',
+        message:
+            'Para usar autofill, ve a Ajustes > Contraseñas > Autorrellenar contraseñas y activa THISJOWI',
         actionText: 'Ver instrucciones',
       );
     }
-    
+
     return AutofillStatus(
       isSupported: false,
       isEnabled: false,
@@ -169,12 +176,14 @@ class AutofillService {
 /// Represents a pending autofill request from another app
 class AutofillRequest {
   final String targetPackage;
+  final String? targetUrl;
   final bool isSaveRequest;
   final String? username;
   final String? password;
 
   AutofillRequest({
     required this.targetPackage,
+    this.targetUrl,
     required this.isSaveRequest,
     this.username,
     this.password,
@@ -182,6 +191,27 @@ class AutofillRequest {
 
   /// Get a user-friendly name for the target app
   String get appName {
+    // If we have a URL, extract domain name
+    if (targetUrl != null && targetUrl!.isNotEmpty) {
+      try {
+        final uri = Uri.parse(targetUrl!);
+        String domain = uri.host;
+
+        // Remove www. prefix if present
+        if (domain.startsWith('www.')) {
+          domain = domain.substring(4);
+        }
+
+        // Capitalize first letter
+        if (domain.isNotEmpty) {
+          return domain[0].toUpperCase() + domain.substring(1);
+        }
+        return domain;
+      } catch (e) {
+        // Fall through to package name extraction
+      }
+    }
+
     // Extract app name from package (e.g., "com.twitter.android" -> "Twitter")
     final parts = targetPackage.split('.');
     if (parts.length >= 2) {
