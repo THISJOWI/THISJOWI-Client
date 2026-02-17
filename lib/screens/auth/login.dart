@@ -67,9 +67,11 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
         (route) => false,
       );
-    } else if (mounted) {
-      setState(() => _isLoading = false);
-      ErrorSnackBar.show(context, 'Authentication failed'.tr(context));
+    } else {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ErrorSnackBar.show(context, 'Authentication failed'.tr(context));
+      }
     }
   }
 
@@ -203,6 +205,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final isLdapEnabled =
           await _ldapAuthService.isLdapEnabledForDomain(domain);
 
+      if (!mounted) return;
+
       if (isLdapEnabled) {
         await _handleLdapLogin(email, password, domain);
         return;
@@ -215,17 +219,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
     final result = await _authRepository!.login(email, password);
+
+    if (!mounted) return;
     setState(() => _isLoading = false);
 
     if (result['success'] == true) {
       // Show message if offline login
-      if (result['offline'] == true && mounted) {
+      if (result['offline'] == true) {
         ErrorSnackBar.showSuccess(
             context, 'Logged in offline mode'.tr(context));
       }
 
       // Navigate to main screen replacing the stack
-      if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
         (route) => false,

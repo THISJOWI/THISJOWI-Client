@@ -85,14 +85,16 @@ extension Localization on String {
         "en": "Login",
         "es": "Iniciar sesión",
       } +
-      {        "en": "Sign in with Google",
+      {
+        "en": "Sign in with Google",
         "es": "Iniciar sesión con Google",
       } +
       {
         "en": "Sign up with Google",
         "es": "Registrarse con Google",
       } +
-      {        "en": "Register",
+      {
+        "en": "Register",
         "es": "Registrarse",
       } +
       {
@@ -133,15 +135,18 @@ extension Localization on String {
       } +
       {
         "en": "No internet connection. You need to login online at least once.",
-        "es": "Sin conexión a internet. Necesitas iniciar sesión en línea al menos una vez.",
+        "es":
+            "Sin conexión a internet. Necesitas iniciar sesión en línea al menos una vez.",
       } +
       {
         "en": "This user already exists locally. Please sign in.",
         "es": "Este usuario ya existe localmente. Por favor, inicia sesión.",
       } +
       {
-        "en": "This user is already in the sync queue. Please wait for it to complete.",
-        "es": "Este usuario ya está en la cola de sincronización. Por favor, espera a que se complete.",
+        "en":
+            "This user is already in the sync queue. Please wait for it to complete.",
+        "es":
+            "Este usuario ya está en la cola de sincronización. Por favor, espera a que se complete.",
       } +
 
       // ==================== PASSWORDS ====================
@@ -336,8 +341,10 @@ extension Localization on String {
         "es": "Esta acción no se puede deshacer",
       } +
       {
-        "en": "Are you sure you want to delete your account? This action cannot be undone.",
-        "es": "¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.",
+        "en":
+            "Are you sure you want to delete your account? This action cannot be undone.",
+        "es":
+            "¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.",
       } +
       {
         "en": "Are you sure you want to logout?",
@@ -678,10 +685,145 @@ extension Localization on String {
       {
         "en": "Back",
         "es": "Atrás",
+      } +
+      {
+        "en": "Password Manager",
+        "es": "Gestor de contraseñas",
+      } +
+      {
+        "en":
+            "Make THISJOWI your primary password manager to automatically fill in data in all your applications.",
+        "es":
+            "Hacer de THISJOWI tu gestor de contraseñas principal para completar datos automáticamente en todas tus aplicaciones.",
+      } +
+      {
+        "en": "Later",
+        "es": "Más tarde",
+      } +
+      {
+        "en": "Configure",
+        "es": "Configurar",
+      } +
+      {
+        "en": "LDAP Login",
+        "es": "Inicio de Sesión LDAP",
+      } +
+      {
+        "en": "Empresarial",
+        "es": "Empresarial",
+      } +
+      {
+        "en": "Enterprise email",
+        "es": "Correo empresarial",
+      } +
+      {
+        "en": "Please enter your enterprise email",
+        "es": "Por favor ingrese su correo empresarial",
+      } +
+      {
+        "en": "Use corporate domain credentials",
+        "es": "Usa tus credenciales de dominio corporativo",
+      } +
+      {
+        "en": "Use standard login",
+        "es": "Usa el inicio de sesión estándar",
+      } +
+      {
+        "en": "LDAP Configuration",
+        "es": "Configuración LDAP",
+      } +
+      {
+        "en": "Connection Settings",
+        "es": "Ajustes de Conexión",
+      } +
+      {
+        "en": "User Search & Attributes",
+        "es": "Búsqueda de Usuarios y Atributos",
+      } +
+      {
+        "en": "Enable LDAP Login",
+        "es": "Habilitar Inicio de Sesión LDAP",
+      } +
+      {
+        "en": "Test Connection",
+        "es": "Probar Conexión",
+      } +
+      {
+        "en": "Save Configuration",
+        "es": "Guardar Configuración",
+      } +
+      {
+        "en": "LDAP URL",
+        "es": "URL LDAP",
+      } +
+      {
+        "en": "Base DN",
+        "es": "DN Base",
+      } +
+      {
+        "en": "Bind DN (Optional)",
+        "es": "Bind DN (Opcional)",
+      } +
+      {
+        "en": "Bind Password (Optional)",
+        "es": "Contraseña Bind (Opcional)",
+      } +
+      {
+        "en": "User Search Filter",
+        "es": "Filtro de Búsqueda de Usuarios",
+      } +
+      {
+        "en": "Email Attribute",
+        "es": "Atributo de Email",
+      } +
+      {
+        "en": "Full Name Attribute",
+        "es": "Atributo de Nombre Completo",
+      } +
+      {
+        "en": "No Organization ID found in session",
+        "es": "No se encontró el ID de Organización en la sesión",
+      } +
+      {
+        "en": "LDAP Configuration saved",
+        "es": "Configuración LDAP guardada",
+      } +
+      {
+        "en": "Enterprise Authentication",
+        "es": "Autenticación Empresarial",
+      } +
+      {
+        "en":
+            "Do you want to integrate LDAP with your app for corporate domain authentication?",
+        "es":
+            "¿Quieres integrar LDAP para la autenticación de dominio corporativo?",
+      } +
+      {
+        "en": "Yes, Enable LDAP",
+        "es": "Sí, habilitar LDAP",
+      } +
+      {
+        "en": "Allow users to authenticate using corporate LDAP credentials.",
+        "es":
+            "Permitir que los usuarios se autentiquen usando credenciales corporativas LDAP.",
+      } +
+      {
+        "en": "No, Standard Auth",
+        "es": "No, autenticación estándar",
+      } +
+      {
+        "en": "Use regular email/password authentication.",
+        "es": "Usar autenticación regular con correo y contraseña.",
+      } +
+      {
+        "en":
+            "Configure your LDAP server details for enterprise authentication.",
+        "es":
+            "Configura los detalles de tu servidor LDAP para la autenticación empresarial.",
       };
 
   String get i18n => localize(this, _t);
-  
+
   String i18nFor(String locale) => i18n;
 
   String fill(List<Object> params) => localizeFill(this, params);

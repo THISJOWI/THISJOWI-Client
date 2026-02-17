@@ -21,10 +21,10 @@ class ApiConfig {
     var cleanIp = ip.replaceAll('http://', '').replaceAll('https://', '');
 
     if (port != null && port.isNotEmpty) {
-      return 'http://$cleanIp:$port';
+      return 'https://$cleanIp:$port';
     }
 
-    return 'http://$cleanIp';
+    return 'https://$cleanIp';
   }
 
   /// URL completa para el servicio de autenticación

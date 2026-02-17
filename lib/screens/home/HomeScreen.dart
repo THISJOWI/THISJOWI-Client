@@ -17,6 +17,8 @@ import 'package:thisjowi/i18n/translationService.dart';
 import 'package:thisjowi/components/Navigation.dart';
 import 'package:thisjowi/utils/GlobalActions.dart';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:thisjowi/services/autofillService.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -39,6 +41,143 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _initRepositories();
     _loadData();
+    _checkAutofill();
+  }
+
+  Future<void> _checkAutofill() async {
+    // Delay slightly to allow the screen to render
+    await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+
+    final autofillService = AutofillService();
+    final status = await autofillService.getAutofillStatus();
+
+    if (status.isSupported && !status.isEnabled) {
+      final prefs = await SharedPreferences.getInstance();
+      final hasPrompted = prefs.getBool('autofill_prompt_shown') ?? false;
+
+      if (!hasPrompted) {
+        _showAutofillPopup();
+      }
+    }
+  }
+
+  void _showAutofillPopup() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E1E).withOpacity(0.9),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  blurRadius: 20,
+                  spreadRadius: 5,
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.security_rounded,
+                    color: AppColors.primary,
+                    size: 48,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Password Manager'.i18n,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: AppColors.text,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Make THISJOWI your primary password manager to automatically fill in data in all your applications.'
+                      .i18n,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.text.withOpacity(0.7),
+                    fontSize: 15,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () async {
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.setBool('autofill_prompt_shown', true);
+                          if (context.mounted) Navigator.pop(context);
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        child: Text(
+                          'Later'.i18n,
+                          style: TextStyle(
+                            color: AppColors.text.withOpacity(0.5),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.setBool('autofill_prompt_shown', true);
+                          if (context.mounted) Navigator.pop(context);
+                          AutofillService().openAutofillSettings();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Configure'.i18n,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void _initRepositories() {

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Service to manage password autofill functionality
 ///
@@ -71,10 +72,19 @@ class AutofillService {
         debugPrint('Error opening autofill settings: $e');
       }
     } else if (Platform.isIOS) {
-      // On iOS, we can't directly open password settings
-      // We can only guide the user
-      debugPrint(
-          'iOS: User must go to Settings > Passwords > AutoFill Passwords');
+      // On iOS, we can't directly open the exact AutoFill settings page deep link
+      // in a documented way that works across all versions, but we can open the settings.
+      final url = Uri.parse('App-Prefs:root=PASSWORDS');
+      try {
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url);
+        } else {
+          // Fallback to general settings if deep link fails
+          await launchUrl(Uri.parse('app-settings:'));
+        }
+      } catch (e) {
+        debugPrint('Error opening iOS settings: $e');
+      }
     }
   }
 
@@ -157,10 +167,11 @@ class AutofillService {
     } else if (Platform.isIOS) {
       return AutofillStatus(
         isSupported: true,
-        isEnabled: true, // We can't check on iOS
+        isEnabled:
+            false, // We can't check on iOS, so we prompt user to check/enable
         message:
             'Para usar autofill, ve a Ajustes > Contraseñas > Autorrellenar contraseñas y activa THISJOWI',
-        actionText: 'Ver instrucciones',
+        actionText: 'Configurar',
       );
     }
 

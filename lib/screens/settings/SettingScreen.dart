@@ -822,12 +822,6 @@ class _SettingScreenState extends State<SettingScreen> {
                 ),
 
                 _buildSettingItem(
-                  icon: Icons.business,
-                  title: 'Account Type'.i18n,
-                  subtitle: 'Update account type'.i18n,
-                  onTap: _showEditAccountTypeDialog,
-                ),
-                _buildSettingItem(
                   icon: Icons.cloud_queue,
                   title: 'Hosting Mode'.i18n,
                   subtitle: 'Update hosting mode'.i18n,

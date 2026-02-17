@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:thisjowi/core/appColors.dart';
 import 'package:thisjowi/services/organizationService.dart';
@@ -43,15 +44,7 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
       final prefs = await SharedPreferences.getInstance();
       final orgId = prefs.getString('orgId');
 
-      // For now we might not have orgId in prefs if login was not LDAP or if regular user.
-      // But let's assume valid user with org.
-      // Actually we need to fetch org by domain or ID.
-      // Let's try to get current user details to get orgId if missing.
-
-      // If we don't have orgId, we can't load config.
       if (orgId == null) {
-        // Try to get from user service or just show error
-        // For development, let's assume we can get it or fail.
         if (mounted) {
           ErrorSnackBar.show(
               context, 'No Organization ID found in session'.i18n);
@@ -60,16 +53,6 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
         return;
       }
 
-      // We need getOrganizationById in Service, but we only have getOrganizationByDomain.
-      // Let's assume we can get it by domain if we have user domain...
-      // Or just implement getOrganizationById in backend/frontend.
-      // Backend has getOrganizationById?
-      // AuthRestController has getOrganization(id).
-
-      // I implemented updateOrganization(id, data) in service.
-      // I should add getOrganizationById(id) to service.
-      // BUT for now, let's assume I can use domain if I have it.
-      // User email has domain.
       final email = prefs.getString('email');
       if (email != null) {
         final domain = email.split('@').last;
@@ -96,8 +79,6 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
     if (_organization == null) return;
     _ldapUrlController.text = _organization!.ldapUrl;
     _ldapBaseDnController.text = _organization!.ldapBaseDn;
-    // Bind DN and Password might be hidden or empty if not returned by API for security?
-    // Usually password is not returned.
     _userSearchFilterController.text = _organization!.userSearchFilter;
     _emailAttributeController.text = _organization!.emailAttribute;
     _fullNameAttributeController.text = _organization!.fullNameAttribute;
@@ -170,12 +151,41 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
     if (mounted) {
       if (result['success'] == true) {
         ErrorSnackBar.showSuccess(context, 'LDAP Configuration saved'.i18n);
-        _organization = result['data']; // Update local model
+        _organization = result['data'];
       } else {
         ErrorSnackBar.show(context, result['message']);
       }
       setState(() => _isSaving = false);
     }
+  }
+
+  Widget _buildGlassCard({required List<Widget> children, String? title}) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E1E).withOpacity(0.4),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (title != null) ...[
+            Text(
+              title,
+              style: const TextStyle(
+                color: AppColors.primary,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+          ...children,
+        ],
+      ),
+    );
   }
 
   Widget _buildTextField({
@@ -184,6 +194,7 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
     String? hint,
     bool isPassword = false,
     bool required = true,
+    IconData? icon,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -202,18 +213,23 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
-          labelStyle: TextStyle(color: AppColors.text.withOpacity(0.7)),
-          hintStyle: TextStyle(color: AppColors.text.withOpacity(0.3)),
+          prefixIcon: icon != null
+              ? Icon(icon, color: AppColors.text.withOpacity(0.5), size: 20)
+              : null,
+          labelStyle: TextStyle(color: AppColors.text.withOpacity(0.5)),
+          hintStyle: TextStyle(color: AppColors.text.withOpacity(0.2)),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(16),
             borderSide: const BorderSide(color: AppColors.primary),
           ),
           filled: true,
-          fillColor: AppColors.text.withOpacity(0.05),
+          fillColor: Colors.black.withOpacity(0.2),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         ),
       ),
     );
@@ -223,147 +239,216 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    if (_organization == null) {
-      return Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: AppBar(
-            title: const Text("LDAP Configuration"),
-            backgroundColor: Colors.transparent),
-        body: Center(
-            child: Text("Organization not found",
-                style: TextStyle(color: AppColors.text))),
+        backgroundColor: Colors.black,
+        body:
+            Center(child: CircularProgressIndicator(color: AppColors.primary)),
       );
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text('LDAP Configuration'.i18n),
+        title: Text('LDAP Configuration'.i18n,
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.text),
-          onPressed: () => Navigator.pop(context),
-        ),
+        centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Connection Settings'.i18n,
-                style: const TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+      body: Stack(
+        children: [
+          // Ambient Background Gradients
+          Positioned(
+            top: -100,
+            right: -100,
+            child: Container(
+              width: 400,
+              height: 400,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    AppColors.primary.withOpacity(0.15),
+                    Colors.transparent,
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              _buildTextField(
-                  controller: _ldapUrlController,
-                  label: 'LDAP URL',
-                  hint: 'ldap://example.com:389'),
-              _buildTextField(
-                  controller: _ldapBaseDnController,
-                  label: 'Base DN',
-                  hint: 'dc=example,dc=com'),
-              _buildTextField(
-                  controller: _ldapBindDnController,
-                  label: 'Bind DN (Optional)',
-                  hint: 'cn=admin,dc=example,dc=com',
-                  required: false),
-              _buildTextField(
-                  controller: _ldapBindPasswordController,
-                  label: 'Bind Password (Optional)',
-                  isPassword: true,
-                  required: false),
-              const SizedBox(height: 24),
-              Text(
-                'User Search & Attributes'.i18n,
-                style: const TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildTextField(
-                  controller: _userSearchFilterController,
-                  label: 'User Search Filter',
-                  hint: '(&(objectClass=person)(uid={0}))'),
-              _buildTextField(
-                  controller: _emailAttributeController,
-                  label: 'Email Attribute',
-                  hint: 'mail'),
-              _buildTextField(
-                  controller: _fullNameAttributeController,
-                  label: 'Full Name Attribute',
-                  hint: 'cn'),
-              const SizedBox(height: 16),
-              SwitchListTile(
-                title: Text('Enable LDAP Login'.i18n,
-                    style: const TextStyle(color: AppColors.text)),
-                value: _ldapEnabled,
-                onChanged: (val) => setState(() => _ldapEnabled = val),
-                activeThumbColor: AppColors.primary,
-                contentPadding: EdgeInsets.zero,
-              ),
-              const SizedBox(height: 32),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: _isTesting ? null : _testConnection,
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        side:
-                            BorderSide(color: AppColors.text.withOpacity(0.5)),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                      ),
-                      child: _isTesting
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2))
-                          : Text('Test Connection'.i18n,
-                              style: const TextStyle(color: AppColors.text)),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _isSaving ? null : _saveConfig,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                      ),
-                      child: _isSaving
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                  color: Colors.white, strokeWidth: 2))
-                          : Text('Save Configuration'.i18n,
-                              style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            bottom: 200,
+            left: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    AppColors.accent.withOpacity(0.1),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Blur effect
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
+            child: Container(color: Colors.transparent),
+          ),
+
+          SafeArea(
+            child: SingleChildScrollView(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    _buildGlassCard(
+                      title: 'Connection Settings'.i18n,
+                      children: [
+                        _buildTextField(
+                            controller: _ldapUrlController,
+                            label: 'LDAP URL',
+                            icon: Icons.link_rounded,
+                            hint: 'ldap://example.com:389'),
+                        _buildTextField(
+                            controller: _ldapBaseDnController,
+                            label: 'Base DN',
+                            icon: Icons.account_tree_rounded,
+                            hint: 'dc=example,dc=com'),
+                        _buildTextField(
+                            controller: _ldapBindDnController,
+                            label: 'Bind DN (Optional)',
+                            icon: Icons.person_pin_rounded,
+                            hint: 'cn=admin,dc=example,dc=com',
+                            required: false),
+                        _buildTextField(
+                            controller: _ldapBindPasswordController,
+                            label: 'Bind Password (Optional)',
+                            icon: Icons.vpn_key_rounded,
+                            isPassword: true,
+                            required: false),
+                      ],
+                    ),
+                    _buildGlassCard(
+                      title: 'User Search & Attributes'.i18n,
+                      children: [
+                        _buildTextField(
+                            controller: _userSearchFilterController,
+                            label: 'User Search Filter',
+                            icon: Icons.search_rounded,
+                            hint: '(&(objectClass=person)(uid={0}))'),
+                        _buildTextField(
+                            controller: _emailAttributeController,
+                            label: 'Email Attribute',
+                            icon: Icons.email_rounded,
+                            hint: 'mail'),
+                        _buildTextField(
+                            controller: _fullNameAttributeController,
+                            label: 'Full Name Attribute',
+                            icon: Icons.badge_rounded,
+                            hint: 'cn'),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                                color: Colors.white.withOpacity(0.05)),
+                          ),
+                          child: SwitchListTile(
+                            title: Text('Enable LDAP Login'.i18n,
+                                style: const TextStyle(
+                                    color: AppColors.text, fontSize: 15)),
+                            value: _ldapEnabled,
+                            onChanged: (val) =>
+                                setState(() => _ldapEnabled = val),
+                            activeColor: AppColors.primary,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: _isTesting ? null : _testConnection,
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              side: BorderSide(
+                                  color: Colors.white.withOpacity(0.1)),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                            ),
+                            child: _isTesting
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2, color: AppColors.text))
+                                : Text('Test Connection'.i18n,
+                                    style: const TextStyle(
+                                        color: AppColors.text,
+                                        fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              gradient: const LinearGradient(
+                                colors: [AppColors.primary, AppColors.accent],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.3),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: ElevatedButton(
+                              onPressed: _isSaving ? null : _saveConfig,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 18),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20)),
+                              ),
+                              child: _isSaving
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                          color: Colors.white, strokeWidth: 2))
+                                  : Text('Save Configuration'.i18n,
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

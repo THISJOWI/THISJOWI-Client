@@ -769,26 +769,30 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ScaleTransition(
-                scale: _scaleAnimation,
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.blue.withOpacity(0.2),
-                        blurRadius: 20,
-                        spreadRadius: 5,
-                      ),
-                    ],
+              const SizedBox(height: 30),
+              Center(
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.2),
+                          blurRadius: 20,
+                          spreadRadius: 5,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(Icons.settings_suggest_rounded,
+                        size: 60, color: AppColors.primary),
                   ),
-                  child: Icon(Icons.settings,
-                      size: 60, color: Colors.blue.shade700),
                 ),
               ),
               const SizedBox(height: 30),
@@ -800,170 +804,74 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   color: AppColors.text,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Text(
-                "Configure your LDAP server details. These settings will be used for enterprise authentication."
+                "Configure your LDAP server details for enterprise authentication."
                     .i18n,
                 style: TextStyle(
-                  fontSize: 13,
-                  color: AppColors.text.withOpacity(0.7),
+                  fontSize: 14,
+                  color: AppColors.text.withOpacity(0.6),
                   height: 1.5,
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 32),
 
-              // LDAP Server URL
-              Text(
-                "LDAP Server URL".i18n,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.text,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
+              _buildOnboardingTextField(
                 controller: _ldapServerController,
-                decoration: InputDecoration(
-                  hintText: 'ldap://ldap.example.com:389',
-                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide:
-                        BorderSide(color: AppColors.text.withOpacity(0.3)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide:
-                        BorderSide(color: AppColors.text.withOpacity(0.3)),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-                style: TextStyle(color: AppColors.text),
+                label: "LDAP Server URL".i18n,
+                hint: 'ldap://ldap.example.com:389',
+                icon: Icons.link_rounded,
               ),
               const SizedBox(height: 20),
 
-              // Base DN
-              Text(
-                "Base DN (Distinguished Name)".i18n,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.text,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
+              _buildOnboardingTextField(
                 controller: _ldapBaseDnController,
-                decoration: InputDecoration(
-                  hintText: 'dc=example,dc=com',
-                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide:
-                        BorderSide(color: AppColors.text.withOpacity(0.3)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide:
-                        BorderSide(color: AppColors.text.withOpacity(0.3)),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-                style: TextStyle(color: AppColors.text),
+                label: "Base DN".i18n,
+                hint: 'dc=example,dc=com',
+                icon: Icons.account_tree_rounded,
               ),
               const SizedBox(height: 20),
 
-              // Bind DN (Optional)
-              Text(
-                "Bind DN (Optional)".i18n,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.text,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
+              _buildOnboardingTextField(
                 controller: _ldapBindDnController,
-                decoration: InputDecoration(
-                  hintText: 'cn=admin,dc=example,dc=com',
-                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide:
-                        BorderSide(color: AppColors.text.withOpacity(0.3)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide:
-                        BorderSide(color: AppColors.text.withOpacity(0.3)),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-                style: TextStyle(color: AppColors.text),
+                label: "Bind DN (Optional)".i18n,
+                hint: 'cn=admin,dc=example,dc=com',
+                icon: Icons.person_pin_rounded,
               ),
               const SizedBox(height: 20),
 
-              // Bind Password (Optional)
-              Text(
-                "Bind Password (Optional)".i18n,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.text,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
+              _buildOnboardingTextField(
                 controller: _ldapPasswordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: '••••••••',
-                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide:
-                        BorderSide(color: AppColors.text.withOpacity(0.3)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide:
-                        BorderSide(color: AppColors.text.withOpacity(0.3)),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-                style: TextStyle(color: AppColors.text),
+                label: "Bind Password (Optional)".i18n,
+                hint: '••••••••',
+                icon: Icons.vpn_key_rounded,
+                isPassword: true,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 32),
 
               // Info box
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  color: AppColors.primary.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: Colors.blue.withOpacity(0.3),
+                    color: AppColors.primary.withOpacity(0.1),
                   ),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.info_outline,
-                        size: 18, color: Colors.blue.shade700),
-                    const SizedBox(width: 10),
+                    const Icon(Icons.info_outline_rounded,
+                        size: 20, color: AppColors.primary),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         "You can configure these settings later in your account dashboard."
                             .i18n,
                         style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.blue.shade700,
+                          fontSize: 13,
+                          color: AppColors.text.withOpacity(0.8),
                           height: 1.4,
                         ),
                       ),
@@ -971,107 +879,121 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   ],
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 32),
 
-              // User Search Filter
-              Text(
-                "User Search Filter".i18n,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.text,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
+              _buildOnboardingTextField(
                 controller: _userSearchFilterController,
-                decoration: InputDecoration(
-                  hintText: '(&(objectClass=person)(uid={0}))',
-                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide:
-                        BorderSide(color: AppColors.text.withOpacity(0.3)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide:
-                        BorderSide(color: AppColors.text.withOpacity(0.3)),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-                style: TextStyle(color: AppColors.text),
+                label: "User Search Filter".i18n,
+                hint: '(&(objectClass=person)(uid={0}))',
+                icon: Icons.search_rounded,
               ),
               const SizedBox(height: 20),
 
-              // Email Attribute
-              Text(
-                "Email Attribute".i18n,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.text,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
+              _buildOnboardingTextField(
                 controller: _emailAttributeController,
-                decoration: InputDecoration(
-                  hintText: 'mail',
-                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide:
-                        BorderSide(color: AppColors.text.withOpacity(0.3)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide:
-                        BorderSide(color: AppColors.text.withOpacity(0.3)),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-                style: TextStyle(color: AppColors.text),
+                label: "Email Attribute".i18n,
+                hint: 'mail',
+                icon: Icons.email_rounded,
               ),
               const SizedBox(height: 20),
 
-              // Full Name Attribute
-              Text(
-                "Full Name Attribute".i18n,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.text,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
+              _buildOnboardingTextField(
                 controller: _fullNameAttributeController,
-                decoration: InputDecoration(
-                  hintText: 'cn',
-                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide:
-                        BorderSide(color: AppColors.text.withOpacity(0.3)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide:
-                        BorderSide(color: AppColors.text.withOpacity(0.3)),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-                style: TextStyle(color: AppColors.text),
+                label: "Full Name Attribute".i18n,
+                hint: 'cn',
+                icon: Icons.badge_rounded,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 40),
+
+              SizedBox(
+                width: double.infinity,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, AppColors.accent],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: ElevatedButton(
+                    onPressed: _nextPage,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                    ),
+                    child: Text(
+                      'Continue'.i18n,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildOnboardingTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    bool isPassword = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: AppColors.text.withOpacity(0.8),
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: controller,
+          obscureText: isPassword,
+          style: const TextStyle(color: AppColors.text),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(color: AppColors.text.withOpacity(0.2)),
+            prefixIcon:
+                Icon(icon, color: AppColors.primary.withOpacity(0.5), size: 20),
+            filled: true,
+            fillColor: Colors.white.withOpacity(0.03),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: Colors.white.withOpacity(0.05)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide:
+                  const BorderSide(color: AppColors.primary, width: 1.5),
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          ),
+        ),
+      ],
     );
   }
 
