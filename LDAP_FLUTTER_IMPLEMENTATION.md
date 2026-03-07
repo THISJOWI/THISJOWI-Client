@@ -85,7 +85,7 @@ Solicitar usuario LDAP
     ↓
 Solicitar contraseña LDAP
     ↓
-Enviar a backend: POST /api/v1/auth/ldap/login
+Enviar a backend: POST /v1/auth/ldap/login
     ↓
 Recibir token JWT + datos de usuario
     ↓
@@ -213,7 +213,7 @@ LdapLoginScreen
     ↓
 LdapAuthService.loginWithLdap()
     ↓
-POST /api/v1/auth/ldap/login
+POST /v1/auth/ldap/login
     ↓
 Backend LDAP Authentication
     ↓

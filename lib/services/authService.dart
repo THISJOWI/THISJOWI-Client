@@ -392,8 +392,8 @@ class AuthService {
           if (userIdRaw != null) {
             final userId = userIdRaw.toString();
             // Now fetch full details from /user-details/{userId}
-            // The backend controller is mapped to /api/v1/auth
-            // So the full path is /api/v1/auth/user-details/{userId}
+            // The backend controller is mapped to /v1/auth
+            // So the full path is /v1/auth/user-details/{userId}
 
             final detailsUri = Uri.parse('$baseUrl/user-details/$userId');
             try {

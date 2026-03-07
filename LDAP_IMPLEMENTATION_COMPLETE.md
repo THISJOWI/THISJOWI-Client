@@ -115,7 +115,7 @@ Se ha implementado exitosamente un sistema completo de autenticación LDAP en el
 └────────┬─────────┘
          │
          ▼
-POST /api/v1/auth/ldap/login
+POST /v1/auth/ldap/login
          │
          ▼
 ┌──────────────────────────────┐
@@ -171,11 +171,11 @@ if (user?.isLdapUser == true) {
 
 ## 🔐 Endpoints Utilizados
 
-- **POST** `/api/v1/auth/ldap/login` - Autenticación LDAP
+- **POST** `/v1/auth/ldap/login` - Autenticación LDAP
   - Request: { domain, username, password }
   - Response: { token, userId, email, orgId, ldapUsername }
 
-- **GET** `/api/v1/auth/organizations/{domain}` - Obtener organización
+- **GET** `/v1/auth/organizations/{domain}` - Obtener organización
   - Response: Organization object
 
 ---
@@ -246,7 +246,7 @@ dependencies:
 Asegúrate de que `core/api.dart` tiene la URL correcta:
 ```dart
 class ApiConfig {
-  static const String authUrl = 'http://your-api.com/api/v1/auth';
+  static const String authUrl = 'http://your-api.com/v1/auth';
   // ...
 }
 ```

@@ -369,7 +369,7 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
                             value: _ldapEnabled,
                             onChanged: (val) =>
                                 setState(() => _ldapEnabled = val),
-                            activeColor: AppColors.primary,
+                            activeThumbColor: AppColors.primary,
                             contentPadding: EdgeInsets.zero,
                           ),
                         ),
