@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/providers/otpProvider.dart';
 import 'package:thisjowi/data/models/otpEntry.dart';
-import 'package:thisjowi/data/repository/otp_repository.dart';
 import 'package:thisjowi/i18n/translationService.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/services/otpService.dart';
@@ -19,21 +20,29 @@ class OtpScreen extends StatefulWidget {
   State<OtpScreen> createState() => _OtpScreenState();
 }
 
-class _OtpScreenState extends State<OtpScreen> {
-  late final OtpRepository _otpRepository;
+class _OtpScreenState extends State<OtpScreen> with WidgetsBindingObserver {
   final OtpService _otpService = OtpService();
-
-  List<OtpEntry> _entries = [];
-  bool _isLoading = true;
-  String _searchQuery = '';
   Timer? _refreshTimer;
+  late OtpProvider _otpProvider;
 
   @override
   void initState() {
     super.initState();
-    // Initialize repository (local-first with background sync)
-    _otpRepository = OtpRepository();
-    _loadEntries();
+    // Add lifecycle observer
+    WidgetsBinding.instance.addObserver(this);
+    
+    // Save reference to OtpProvider for use in dispose()
+    _otpProvider = context.read<OtpProvider>();
+
+    // Load entries when screen is first opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadOtpData();
+      // Start auto-refresh to detect changes from other screens
+      _otpProvider.startAutoRefresh(
+        refreshInterval: const Duration(seconds: 2),
+      );
+    });
+
     // Update codes every second
     _refreshTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() {});
@@ -41,53 +50,51 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   @override
-  void dispose() {
-    _refreshTimer?.cancel();
-    super.dispose();
-  }
-
-  Future<void> _loadEntries() async {
-    setState(() => _isLoading = true);
-
-    final result = await _otpRepository.getAllOtpEntries();
-
-    if (!mounted) return;
-
-    if (result['success'] == true) {
-      var entries = result['data'] as List<OtpEntry>? ?? [];
-
-      // Deduplicate entries based on secret to prevent UI duplicates
-      final seenSecrets = <String>{};
-      final uniqueEntries = <OtpEntry>[];
-      for (final entry in entries) {
-        if (!seenSecrets.contains(entry.secret)) {
-          seenSecrets.add(entry.secret);
-          uniqueEntries.add(entry);
-        }
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // Reload entries when app comes to foreground
+    if (state == AppLifecycleState.resumed && mounted) {
+      _loadOtpData();
+      // Resume auto-refresh
+      try {
+        _otpProvider.startAutoRefresh(
+          refreshInterval: const Duration(seconds: 2),
+        );
+      } catch (e) {
+        // Widget may have been deactivated
       }
-      entries = uniqueEntries;
-
-      setState(() {
-        _entries = _searchQuery.isEmpty
-            ? entries
-            : entries
-                .where((e) =>
-                    e.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-                    e.issuer.toLowerCase().contains(_searchQuery.toLowerCase()))
-                .toList();
-        _isLoading = false;
-      });
-    } else {
-      setState(() {
-        _entries = [];
-        _isLoading = false;
-      });
-      ErrorSnackBar.show(
-          context, result['message'] ?? 'Error loading OTP entries');
+    } else if (state == AppLifecycleState.paused && mounted) {
+      // Stop auto-refresh when app is paused
+      try {
+        _otpProvider.stopAutoRefresh();
+      } catch (e) {
+        // Widget may have been deactivated
+      }
     }
   }
 
+  void _loadOtpData() {
+    if (mounted) {
+      try {
+        _otpProvider.loadEntries();
+      } catch (e) {
+        // Widget may have been deactivated
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _refreshTimer?.cancel();
+    // Stop auto-refresh when leaving the screen (using saved provider reference)
+    _otpProvider.stopAutoRefresh();
+    super.dispose();
+  }
+
   void _copyCode(OtpEntry entry) {
+    if (!mounted) return;
+    
     try {
       final code = _otpService.generateTotp(
         secret: entry.secret,
@@ -97,79 +104,33 @@ class _OtpScreenState extends State<OtpScreen> {
       );
 
       Clipboard.setData(ClipboardData(text: code));
-      ErrorSnackBar.showSuccess(context, 'Code copied'.tr(context));
+      
+      if (!mounted) return;
+      try {
+        ErrorSnackBar.showSuccess(context, 'Code copied'.tr(context));
+      } catch (e) {
+        // Widget may have been deactivated
+      }
     } catch (e) {
-      ErrorSnackBar.show(context, 'Invalid secret key'.tr(context));
-    }
-  }
-
-  Future<void> _showImportDialog() async {
-    final uriController = TextEditingController();
-
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Import OTP URI'.tr(context),
-            style: const TextStyle(color: AppColors.text)),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Paste the otpauth:// URI from your authenticator app'
-                    .tr(context),
-                style: TextStyle(
-                    color: AppColors.text.withOpacity(0.7), fontSize: 13),
-              ),
-              const SizedBox(height: 16),
-              _buildTextField(
-                controller: uriController,
-                label: 'OTP URI'.tr(context),
-                hint: 'otpauth://totp/...',
-                maxLines: 3,
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'.tr(context),
-                style: TextStyle(color: AppColors.text.withOpacity(0.6))),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.black,
-            ),
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('Import'.tr(context)),
-          ),
-        ],
-      ),
-    );
-
-    if (result == true) {
-      final uri = uriController.text.trim();
-
-      if (!uri.startsWith('otpauth://')) {
-        ErrorSnackBar.show(context, 'Invalid OTP URI'.tr(context));
-        return;
-      }
-
-      final addResult = await _otpRepository.addOtpFromUri(uri, '');
-
-      if (addResult['success'] == true) {
-        ErrorSnackBar.showSuccess(context, 'OTP imported'.tr(context));
-        _loadEntries();
-      } else {
-        ErrorSnackBar.show(context, addResult['message'] ?? 'Error');
+      if (!mounted) return;
+      try {
+        ErrorSnackBar.show(context, 'Invalid secret key'.tr(context));
+      } catch (e) {
+        // Widget may have been deactivated
       }
     }
   }
+
+  Future<void> _refreshFromServer() async {
+    if (!mounted) return;
+    try {
+      await _otpProvider.loadEntries();
+    } catch (e) {
+      // Widget may have been deactivated
+    }
+  }
+
+
 
   Future<void> _deleteEntry(OtpEntry entry) async {
     final confirm = await showDialog<bool>(
@@ -198,16 +159,22 @@ class _OtpScreenState extends State<OtpScreen> {
     );
 
     if (confirm == true) {
-      final result = await _otpRepository.deleteOtpEntry(
+      final success = await _otpProvider.deleteOtpEntry(
         entry.id,
         serverId: entry.serverId,
       );
 
-      if (result['success'] == true) {
-        ErrorSnackBar.showSuccess(context, 'OTP deleted'.tr(context));
-        _loadEntries();
-      } else {
-        ErrorSnackBar.show(context, result['message'] ?? 'Error');
+      if (!mounted) return;
+
+      try {
+        if (success) {
+          ErrorSnackBar.showSuccess(context, 'OTP deleted'.tr(context));
+        } else {
+          ErrorSnackBar.show(
+              context, _otpProvider.errorMessage);
+        }
+      } catch (e) {
+        // Widget may have been deactivated
       }
     }
   }
@@ -251,120 +218,126 @@ class _OtpScreenState extends State<OtpScreen> {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: Stack(
-          children: [
-            SafeArea(
-              child: Column(
-                children: [
-                  // Header
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.security,
-                            color: AppColors.primary, size: 28),
-                        const SizedBox(width: 12),
-                        Text(
-                          'Authenticator'.tr(context),
-                          style: const TextStyle(
-                            color: AppColors.text,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+        body: Consumer<OtpProvider>(
+          builder: (context, otpProvider, _) {
+            return Stack(
+              children: [
+                SafeArea(
+                  child: Column(
+                    children: [
+                      // Header
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.security,
+                                color: AppColors.primary, size: 28),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Authenticator'.tr(context),
+                              style: const TextStyle(
+                                color: AppColors.text,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
 
-                  // Search bar
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 8.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF1E1E1E).withOpacity(0.6),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                                color: Colors.white.withOpacity(0.1)),
-                          ),
-                          child: TextField(
-                            onChanged: (value) {
-                              _searchQuery = value;
-                              _loadEntries();
-                            },
-                            style: const TextStyle(
-                                color: AppColors.text, fontSize: 16),
-                            decoration: InputDecoration(
-                              labelText: 'Search'.i18n,
-                              prefixIcon: Icon(Icons.search,
-                                  color: AppColors.text.withOpacity(0.6),
-                                  size: 20),
-                              suffixIcon: _searchQuery.isNotEmpty
-                                  ? IconButton(
-                                      icon: Icon(Icons.close,
-                                          color:
-                                              AppColors.text.withOpacity(0.6),
-                                          size: 20),
-                                      onPressed: () {
-                                        setState(() => _searchQuery = '');
-                                        _loadEntries();
-                                      },
-                                    )
-                                  : null,
-                              labelStyle: TextStyle(
-                                  color: AppColors.text.withOpacity(0.6),
-                                  fontSize: 16),
-                              border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 12),
+                      // Search bar
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 16.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1E1E1E).withOpacity(0.6),
+                                borderRadius: BorderRadius.circular(25),
+                                border: Border.all(
+                                    color: Colors.white.withOpacity(0.1)),
+                              ),
+                              child: TextField(
+                                onChanged: (value) {
+                                  otpProvider.setSearchQuery(value);
+                                },
+                                style: const TextStyle(
+                                    color: AppColors.text, fontSize: 16),
+                                decoration: InputDecoration(
+                                  hintText: 'Search'.i18n,
+                                  hintStyle: TextStyle(
+                                      color: AppColors.text.withOpacity(0.5),
+                                      fontSize: 16),
+                                  prefixIcon: Icon(Icons.search,
+                                      color: AppColors.text.withOpacity(0.6),
+                                      size: 22),
+                                  suffixIcon: otpProvider.searchQuery.isNotEmpty
+                                      ? IconButton(
+                                          icon: Icon(Icons.close,
+                                              color:
+                                                  AppColors.text.withOpacity(0.6),
+                                              size: 20),
+                                          onPressed: () {
+                                            otpProvider.clearSearch();
+                                          },
+                                        )
+                                      : null,
+                                  border: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 14),
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
 
-                  // List
-                  Expanded(
-                    child: _isLoading
-                        ? const Center(
-                            child: CircularProgressIndicator(
-                                color: AppColors.primary))
-                        : _entries.isEmpty
-                            ? _buildEmptyState()
-                            : RefreshIndicator(
-                                onRefresh: _loadEntries,
-                                color: AppColors.primary,
-                                child: ListView.builder(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(20, 0, 20, 150),
-                                  itemCount: _entries.length,
-                                  itemBuilder: (context, index) =>
-                                      _buildOtpCard(_entries[index]),
-                                ),
-                              ),
+                      // List
+                      Expanded(
+                        child: otpProvider.isLoading
+                            ? const Center(
+                                child: CircularProgressIndicator(
+                                    color: AppColors.primary))
+                            : otpProvider.filteredEntries.isEmpty
+                                ? _buildEmptyState()
+                                : RefreshIndicator(
+                                    onRefresh: _refreshFromServer,
+                                    color: AppColors.primary,
+                                    child: ListView.builder(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(20, 0, 20, 150),
+                                      itemCount:
+                                          otpProvider.filteredEntries.length,
+                                      itemBuilder: (context, index) =>
+                                          _buildOtpCard(
+                                              otpProvider.filteredEntries[index]),
+                                    ),
+                                  ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
 
-            // FAB
-            Positioned(
-              bottom: 130.0,
-              right: 16.0,
-              child: ExpandableActionButton(
-                onCreatePassword: () => GlobalActions.createPassword(context),
-                onCreateNote: () => GlobalActions.createNote(context),
-                onCreateOtp: () =>
-                    GlobalActions.createOtp(context, onSuccess: _loadEntries),
-                onCreateMessage: () => GlobalActions.createMessage(context),
-              ),
-            ),
-          ],
+                // FAB
+                Positioned(
+                  bottom: 130.0,
+                  right: 16.0,
+                  child: ExpandableActionButton(
+                    onCreatePassword: () =>
+                        GlobalActions.createPassword(context),
+                    onCreateNote: () => GlobalActions.createNote(context),
+                    onCreateOtp: () =>
+                        GlobalActions.createOtp(context, onSuccess: _refreshFromServer),
+                    onCreateMessage: () =>
+                        GlobalActions.createMessage(context),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

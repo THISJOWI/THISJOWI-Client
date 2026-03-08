@@ -72,16 +72,28 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
 
   void _saveNote() async {
     if (_titleController.text.isEmpty) {
-      ErrorSnackBar.showWarning(context, 'Please enter a title'.i18n);
+      if (mounted) {
+        try {
+          ErrorSnackBar.showWarning(context, 'Please enter a title'.i18n);
+        } catch (e) {
+          debugPrint('Error showing snackbar: $e');
+        }
+      }
       return;
     }
 
     final contentText = _lineControllers.map((c) => c.text).join('\n').trim();
     if (contentText.isEmpty) {
-      ErrorSnackBar.showWarning(context, 'Please enter the content'.i18n);
+      if (!mounted) return;
+      try {
+        ErrorSnackBar.showWarning(context, 'Please enter the content'.i18n);
+      } catch (e) {
+        debugPrint('Error showing snackbar: $e');
+      }
       return;
     }
 
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
@@ -98,11 +110,20 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       }
 
       if (!mounted) return;
-      Navigator.pop(context);
+      
+      try {
+        Navigator.pop(context, true);
+      } catch (e) {
+        debugPrint('Error closing dialog: $e');
+      }
     } catch (e) {
       debugPrint('Error saving note: $e');
       if (mounted) {
-        ErrorSnackBar.show(context, 'Error saving note'.i18n);
+        try {
+          ErrorSnackBar.show(context, 'Error saving note'.i18n);
+        } catch (snackBarError) {
+          debugPrint('Error showing snackbar: $snackBarError');
+        }
       }
     } finally {
       if (mounted) {

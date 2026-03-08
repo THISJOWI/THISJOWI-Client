@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:thisjowi/components/errorBar.dart';
 import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/serviceLocator.dart';
 import 'package:thisjowi/data/models/noteEntry.dart';
 import 'package:thisjowi/data/repository/notes_repository.dart';
 import 'package:thisjowi/i18n/translationService.dart';
@@ -25,13 +26,15 @@ class _NotesScreenState extends State<NotesScreen> {
   @override
   void initState() {
     super.initState();
-    // Inicializar repositorio con servicios
-    _notesRepository = NotesRepository();
+    // Initialize repository from singleton
+    final sl = ServiceLocator();
+    _notesRepository = sl.notesRepository;
     _loadNotes();
   }
 
   Future<void> _loadNotes() async {
     try {
+      if (!mounted) return;
       setState(() => _isLoading = true);
 
       final result = _searchQuery.isEmpty
@@ -42,19 +45,34 @@ class _NotesScreenState extends State<NotesScreen> {
 
       if (result['success'] == true) {
         final notes = result['data'] as List<Note>? ?? [];
-        setState(() {
-          _notes = notes;
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _notes = notes;
+            _isLoading = false;
+          });
+        }
       } else {
-        ErrorSnackBar.show(
-            context, result['message'] ?? 'Error loading notes'.tr(context));
-        setState(() => _isLoading = false);
+        if (mounted) {
+          try {
+            ErrorSnackBar.show(
+                context, result['message'] ?? 'Error loading notes'.tr(context));
+          } catch (snackBarError) {
+            debugPrint('Error showing snackbar: $snackBarError');
+          }
+          setState(() => _isLoading = false);
+        }
       }
     } catch (e) {
       if (!mounted) return;
-      ErrorSnackBar.show(context, 'Error: $e');
-      setState(() => _isLoading = false);
+      debugPrint('Error loading notes: $e');
+      try {
+        ErrorSnackBar.show(context, 'Error: $e');
+      } catch (snackBarError) {
+        debugPrint('Error showing snackbar: $snackBarError');
+      }
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -125,14 +143,25 @@ class _NotesScreenState extends State<NotesScreen> {
         // Si falla, tendríamos que deshacer el dismiss o mostrar error.
         // Recuperar el item es complejo con Dismissible estándar si ya se fue la animación.
         // Por ahora mostramos error.
-        ErrorSnackBar.show(
-            context, result['message'] ?? 'Error deleting note'.tr(context));
+        if (mounted) {
+          try {
+            ErrorSnackBar.show(
+                context, result['message'] ?? 'Error deleting note'.tr(context));
+          } catch (snackBarError) {
+            debugPrint('Error showing snackbar: $snackBarError');
+          }
+        }
         // Recargar notas para restaurar si falló
         _loadNotes();
       }
     } catch (e) {
       if (!mounted) return;
-      ErrorSnackBar.show(context, '${'Error deleting note'.tr(context)}: $e');
+      debugPrint('Error deleting note: $e');
+      try {
+        ErrorSnackBar.show(context, '${'Error deleting note'.tr(context)}: $e');
+      } catch (snackBarError) {
+        debugPrint('Error showing snackbar: $snackBarError');
+      }
       _loadNotes();
     }
   }
