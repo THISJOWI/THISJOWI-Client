@@ -239,7 +239,7 @@ Esta guía explica cómo activar el gestor de contraseñas de THISJOWI en cada p
    - **Safari**: [Safari Extensions]
 
 2. **Iniciar Sesión en THISJOWI Web**
-   - Ve a `app.thisjowi.com`
+   - Ve a `app.thisjowi.uk`
    - Inicia sesión con tu cuenta
 
 3. **Conectar Extensión**
@@ -325,7 +325,7 @@ Cada plataforma usa su método de encriptación nativo:
 
 ### Contacto
 
-- **Email**: support@thisjowi.com
+- **Email**: support@thisjowi.uk
 - **Discord**: [discord.gg/thisjowi]
 - **GitHub**: [github.com/thisjowi/issues]
 - **Twitter**: [@thisjowi]

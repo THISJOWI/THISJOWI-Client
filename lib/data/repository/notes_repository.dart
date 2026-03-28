@@ -20,12 +20,18 @@ class NotesRepository {
   NotesRepository();
 
   /// Get all notes from local database
-  Future<Map<String, dynamic>> getAllNotes() async {
+  Future<Map<String, dynamic>> getAllNotes({bool waitForSync = true}) async {
     try {
-      // Trigger background sync if online
+      // Trigger sync if online - WAIT for completion to avoid duplicate creates
       if (_connectivityService.isOnline) {
-        _syncFromServer();
-        _syncPendingToServer();
+        if (waitForSync) {
+          await _syncFromServer();
+          await _syncPendingToServer();
+        } else {
+          // Fire-and-forget for background refresh
+          _syncFromServer();
+          _syncPendingToServer();
+        }
       }
 
       final localNotes = await _db.notesDao.getAllNotes();

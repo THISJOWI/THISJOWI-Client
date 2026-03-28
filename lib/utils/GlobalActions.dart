@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/providers/otpProvider.dart';
+import 'package:thisjowi/core/serviceLocator.dart';
 import 'package:thisjowi/components/errorBar.dart';
-import 'package:thisjowi/data/repository/passwordsRepository.dart';
-import 'package:thisjowi/data/repository/notes_repository.dart';
-import 'package:thisjowi/data/repository/otp_repository.dart';
 import 'package:thisjowi/services/otpService.dart';
 import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
@@ -15,7 +15,8 @@ import 'package:thisjowi/utils/DialogUtils.dart';
 class GlobalActions {
   static Future<void> createPassword(BuildContext context,
       {VoidCallback? onSuccess}) async {
-    final repository = PasswordsRepository();
+    final sl = ServiceLocator();
+    final repository = sl.passwordsRepository;
     final created = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
@@ -31,7 +32,8 @@ class GlobalActions {
 
   static Future<void> createNote(BuildContext context,
       {VoidCallback? onSuccess}) async {
-    final repository = NotesRepository();
+    final sl = ServiceLocator();
+    final repository = sl.notesRepository;
     final created = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
@@ -52,16 +54,11 @@ class GlobalActions {
 
   static Future<void> createOtp(BuildContext context,
       {VoidCallback? onSuccess}) async {
-    final otpRepository = OtpRepository();
     final otpService = OtpService();
 
     final nameController = TextEditingController();
     final issuerController = TextEditingController();
     final secretController = TextEditingController();
-
-    // Helper for simple translation/text
-    // In real app, reuse the existing translation mechanism
-    String tr(String text) => text;
 
     Widget buildTextField({
       required TextEditingController controller,
@@ -90,15 +87,7 @@ class GlobalActions {
       );
     }
 
-    // Capture context before async gap
-    final navigator = Navigator.of(context);
-
     // Show Dialog
-    // Note: We need to import dart:io or similar if we want platform checks for QR scanning icons
-    // For simplicity, we'll keep the manual add dialog here which works everywhere.
-    // If QR scan is needed, we'd need to extract that logic or pass a callback.
-    // Assuming manual entry for global action for now.
-
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -163,18 +152,20 @@ class GlobalActions {
         return;
       }
 
-      final addResult = await otpRepository.addOtpEntry({
-        'name': name,
-        'issuer': issuerController.text.trim(),
-        'secret': secret,
-      });
-
+      // Use Provider to add OTP - this will notify all listeners
       if (context.mounted) {
-        if (addResult['success'] == true) {
+        final otpProvider = context.read<OtpProvider>();
+        final success = await otpProvider.addOtpEntry({
+          'name': name,
+          'issuer': issuerController.text.trim(),
+          'secret': secret,
+        });
+
+        if (success) {
           ErrorSnackBar.showSuccess(context, 'OTP added');
           if (onSuccess != null) onSuccess();
         } else {
-          ErrorSnackBar.show(context, addResult['message'] ?? 'Error');
+          ErrorSnackBar.show(context, otpProvider.errorMessage);
         }
       }
     }

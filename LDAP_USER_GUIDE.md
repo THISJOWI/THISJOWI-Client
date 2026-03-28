@@ -534,8 +534,8 @@ openssl s_client -connect servidor.com:636 -showcerts
 ¿Necesitas ayuda?
 
 - **Usuarios**: Contacta a tu departamento de IT
-- **Administradores**: support@thisjowi.com
-- **Documentación**: [docs.thisjowi.com/ldap](https://docs.thisjowi.com/ldap)
+- **Administradores**: support@thisjowi.uk
+- **Documentación**: [docs.thisjowi.uk/ldap](https://docs.thisjowi.uk/ldap)
 
 ---
 

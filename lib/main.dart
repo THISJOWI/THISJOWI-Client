@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:i18n_extension/i18n_extension.dart';
+import 'package:provider/provider.dart';
 import 'package:thisjowi/core/appColors.dart';
 import 'package:thisjowi/core/api.dart';
 import 'package:thisjowi/core/envLoader.dart';
+import 'package:thisjowi/core/providers/otpProvider.dart';
 import 'package:thisjowi/screens/auth/login.dart';
 import 'package:thisjowi/screens/auth/register.dart';
 import 'package:thisjowi/screens/auth/authSelection.dart';
@@ -41,43 +43,47 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "ThisJowi",
-      
-      // Localization support
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => OtpProvider()),
       ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('es'),
-      ],
-      localeResolutionCallback: (locale, supportedLocales) {
-        // Si el idioma del dispositivo es español (cualquier variante), usar 'es'
-        if (locale != null && locale.languageCode == 'es') {
-          return const Locale('es');
-        }
-        // Por defecto, usar inglés
-        return const Locale('en');
-      },
-      builder: (context, child) => PrivacyOverlay(
-        child: I18n(
-          initialLocale: const Locale('en'),
-          child: child!
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: "ThisJowi",
+        
+        // Localization support
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'),
+          Locale('es'),
+        ],
+        localeResolutionCallback: (locale, supportedLocales) {
+          // Si el idioma del dispositivo es español (cualquier variante), usar 'es'
+          if (locale != null && locale.languageCode == 'es') {
+            return const Locale('es');
+          }
+          // Por defecto, usar inglés
+          return const Locale('en');
+        },
+        builder: (context, child) => PrivacyOverlay(
+          child: I18n(
+            initialLocale: const Locale('en'),
+            child: child!
+          ),
         ),
-      ),
-      
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: AppColors.background,
-        iconTheme: const IconThemeData(
-          color: AppColors.text,
-        ),
-        // Configurar AppBar para que use iconos claros
-        appBarTheme: const AppBarTheme(
+        
+        theme: ThemeData(
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: AppColors.background,
+          iconTheme: const IconThemeData(
+            color: AppColors.text,
+          ),
+          // Configurar AppBar para que use iconos claros
+          appBarTheme: const AppBarTheme(
           backgroundColor: AppColors.background,
           foregroundColor: AppColors.text,
           elevation: 0,
@@ -102,6 +108,7 @@ class MainApp extends StatelessWidget {
         '/otp/qrscan': (context) => const OtpQrScannerScreen(),
       },
       home: const SplashScreen(),
+      ),
     );
   }
 }

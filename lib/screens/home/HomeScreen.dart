@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/serviceLocator.dart';
 import 'package:thisjowi/data/models/passwordEntry.dart';
 import 'package:thisjowi/data/models/noteEntry.dart';
 import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/data/repository/notes_repository.dart';
-import 'package:thisjowi/data/repository/otp_repository.dart';
 import 'package:thisjowi/components/button.dart';
 import 'package:thisjowi/components/errorBar.dart';
 import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
@@ -181,8 +181,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _initRepositories() {
-    _passwordsRepository = PasswordsRepository();
-    _notesRepository = NotesRepository();
+    final sl = ServiceLocator();
+    _passwordsRepository = sl.passwordsRepository;
+    _notesRepository = sl.notesRepository;
   }
 
   /// Extrae el texto plano del contenido JSON Delta de una nota
@@ -226,10 +227,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
 
-    // Load both in parallel
+    // Load both in parallel - WAIT for sync to complete
     final results = await Future.wait([
-      _passwordsRepository.getAllPasswords(),
-      _notesRepository.getAllNotes(),
+      _passwordsRepository.getAllPasswords(waitForSync: true),
+      _notesRepository.getAllNotes(waitForSync: true),
     ]);
 
     if (!mounted) return;
@@ -288,7 +289,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _showImportDialog() async {
-    final otpRepository = OtpRepository();
+    final sl = ServiceLocator();
+    final otpRepository = sl.otpRepository;
     final uriController = TextEditingController();
 
     final result = await showDialog<bool>(

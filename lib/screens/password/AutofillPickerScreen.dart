@@ -1,5 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/serviceLocator.dart';
 import 'package:thisjowi/data/models/passwordEntry.dart';
 import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/services/autofillService.dart';
@@ -29,7 +31,8 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
   @override
   void initState() {
     super.initState();
-    _passwordsRepository = PasswordsRepository();
+    final sl = ServiceLocator();
+    _passwordsRepository = sl.passwordsRepository;
     // Try to pre-fill search with the app name
     _searchQuery = widget.request.appName;
     _authenticate();
@@ -123,25 +126,41 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
           : Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextField(
-                    autofocus: _searchQuery.isEmpty,
-                    controller: TextEditingController(text: _searchQuery)
-                      ..selection = TextSelection.fromPosition(
-                          TextPosition(offset: _searchQuery.length)),
-                    onChanged: (value) => setState(() => _searchQuery = value),
-                    style: const TextStyle(color: AppColors.text),
-                    decoration: InputDecoration(
-                      hintText: 'Search passwords'.i18n,
-                      hintStyle:
-                          TextStyle(color: AppColors.text.withOpacity(0.5)),
-                      prefixIcon:
-                          const Icon(Icons.search, color: AppColors.text),
-                      filled: true,
-                      fillColor: AppColors.text.withOpacity(0.05),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 16.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E1E).withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(25),
+                          border:
+                              Border.all(color: Colors.white.withOpacity(0.1)),
+                        ),
+                        child: TextField(
+                          autofocus: _searchQuery.isEmpty,
+                          controller: TextEditingController(text: _searchQuery)
+                            ..selection = TextSelection.fromPosition(
+                                TextPosition(offset: _searchQuery.length)),
+                          onChanged: (value) =>
+                              setState(() => _searchQuery = value),
+                          style: const TextStyle(
+                              color: AppColors.text, fontSize: 16),
+                          decoration: InputDecoration(
+                            hintText: 'Search passwords'.i18n,
+                            hintStyle: TextStyle(
+                                color: AppColors.text.withOpacity(0.5),
+                                fontSize: 16),
+                            prefixIcon: Icon(Icons.search,
+                                color: AppColors.text.withOpacity(0.6),
+                                size: 22),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 14),
+                          ),
+                        ),
                       ),
                     ),
                   ),

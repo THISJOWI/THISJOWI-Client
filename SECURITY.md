@@ -194,7 +194,7 @@ class ApiConfig {
 ```bash
 # ✅ DO: Use environment variables
 LOCAL_NETWORK_IP=192.168.1.100
-API_KEY=get_from_secure_vault
+API_KEY=get_from_secure_storage
 
 # ❌ DON'T: Hardcode sensitive data
 final apiKey = "sk_live_12345abcdef"; // NEVER DO THIS!

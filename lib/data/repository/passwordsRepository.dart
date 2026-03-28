@@ -19,11 +19,19 @@ class PasswordsRepository {
   PasswordsRepository();
 
   /// Get all passwords from local database
-  Future<Map<String, dynamic>> getAllPasswords() async {
+  Future<Map<String, dynamic>> getAllPasswords({bool waitForSync = true}) async {
     try {
-      // Trigger background sync if online
+      // Trigger sync if online - WAIT for completion to avoid duplicate creates
       if (_connectivityService.isOnline) {
-        _syncFromServer();        _syncPendingToServer();      }
+        if (waitForSync) {
+          await _syncFromServer();
+          await _syncPendingToServer();
+        } else {
+          // Fire-and-forget for background refresh
+          _syncFromServer();
+          _syncPendingToServer();
+        }
+      }
 
       final localPasswords = await _db.passwordsDao.getAllPasswords();
       final passwords = localPasswords

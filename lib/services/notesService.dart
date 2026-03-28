@@ -50,6 +50,8 @@ class NotesService {
           return {'success': true, 'data': notes};
         }
         return {'success': true, 'data': []};
+      } else if (res.statusCode == 302 || res.statusCode == 301 || res.statusCode == 307 || res.statusCode == 308) {
+        return {'success': false, 'message': 'Server redirect error. Please contact support.'};
       } else if (res.statusCode == 401) {
         return {'success': false, 'message': 'Invalid or expired token. Please log in again.'};
       } else if (res.statusCode == 403) {
@@ -84,6 +86,8 @@ class NotesService {
           return {'success': true, 'data': Note.fromJson(body)};
         }
         return {'success': true, 'data': note};
+      } else if (res.statusCode == 302 || res.statusCode == 301 || res.statusCode == 307 || res.statusCode == 308) {
+        return {'success': false, 'message': 'Server redirect error. Please contact support.'};
       } else if (res.statusCode == 401) {
         return {'success': false, 'message': 'Invalid or expired token. Please log in again.'};
       } else if (res.statusCode == 400) {

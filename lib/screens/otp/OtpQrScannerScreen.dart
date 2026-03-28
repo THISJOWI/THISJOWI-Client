@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:thisjowi/data/repository/otp_repository.dart';
+import 'package:provider/provider.dart';
+import 'package:thisjowi/core/providers/otpProvider.dart';
 import 'package:thisjowi/components/errorBar.dart';
 
 class OtpQrScannerScreen extends StatefulWidget {
@@ -11,17 +12,10 @@ class OtpQrScannerScreen extends StatefulWidget {
 }
 
 class _OtpQrScannerScreenState extends State<OtpQrScannerScreen> {
-  late final OtpRepository _otpRepository;
   final MobileScannerController _controller = MobileScannerController(
     detectionSpeed: DetectionSpeed.noDuplicates,
   );
   bool scanned = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _otpRepository = OtpRepository();
-  }
 
   @override
   void dispose() {
@@ -36,13 +30,13 @@ class _OtpQrScannerScreenState extends State<OtpQrScannerScreen> {
     });
     
     if (code.startsWith('otpauth://')) {
-      final result = await _otpRepository.addOtpFromUri(code, '');
+      final success = await context.read<OtpProvider>().addOtpFromUri(code);
       if (mounted) {
-        if (result['success'] == true) {
+        if (success) {
           ErrorSnackBar.showSuccess(context, 'OTP added');
           Navigator.pop(context, true);
         } else {
-          ErrorSnackBar.show(context, result['message'] ?? 'Error');
+          ErrorSnackBar.show(	context, context.read<OtpProvider>().errorMessage);
           Navigator.pop(context, false);
         }
       }
