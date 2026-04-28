@@ -40,6 +40,9 @@ dependencies:
   flutter_quill: ^11.5.0
   cryptography: ^2.5.0
   flutter_secure_storage: ^9.2.2
+  argon2: ^1.0.1
+  liquid_glass_widgets: ^0.8.3
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
