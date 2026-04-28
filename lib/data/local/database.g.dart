@@ -1471,11 +1471,17 @@ class SyncQueueCompanion extends UpdateCompanion<SyncQueueData> {
   }
 }
 
-class $UsersTable extends Users with TableInfo<$UsersTable, User> {
+class $OfflineUsersTable extends OfflineUsers
+    with TableInfo<$OfflineUsersTable, OfflineUser> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $UsersTable(this.attachedDatabase, [this._alias]);
+  $OfflineUsersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _emailMeta = const VerificationMeta('email');
   @override
   late final GeneratedColumn<String> email = GeneratedColumn<String>(
@@ -1487,10 +1493,29 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   late final GeneratedColumn<String> passwordHash = GeneratedColumn<String>(
       'password_hash', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _tokenMeta = const VerificationMeta('token');
+  static const VerificationMeta _fullNameMeta =
+      const VerificationMeta('fullName');
   @override
-  late final GeneratedColumn<String> token = GeneratedColumn<String>(
-      'token', aliasedName, true,
+  late final GeneratedColumn<String> fullName = GeneratedColumn<String>(
+      'full_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _countryMeta =
+      const VerificationMeta('country');
+  @override
+  late final GeneratedColumn<String> country = GeneratedColumn<String>(
+      'country', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _accountTypeMeta =
+      const VerificationMeta('accountType');
+  @override
+  late final GeneratedColumn<String> accountType = GeneratedColumn<String>(
+      'account_type', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _hostingModeMeta =
+      const VerificationMeta('hostingMode');
+  @override
+  late final GeneratedColumn<String> hostingMode = GeneratedColumn<String>(
+      'hosting_mode', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _lastLoginMeta =
       const VerificationMeta('lastLogin');
@@ -1498,18 +1523,71 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   late final GeneratedColumn<String> lastLogin = GeneratedColumn<String>(
       'last_login', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _avatarUrlMeta =
+      const VerificationMeta('avatarUrl');
   @override
-  List<GeneratedColumn> get $columns => [email, passwordHash, token, lastLogin];
+  late final GeneratedColumn<String> avatarUrl = GeneratedColumn<String>(
+      'avatar_url', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _publicKeyMeta =
+      const VerificationMeta('publicKey');
+  @override
+  late final GeneratedColumn<String> publicKey = GeneratedColumn<String>(
+      'public_key', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isActiveMeta =
+      const VerificationMeta('isActive');
+  @override
+  late final GeneratedColumn<int> isActive = GeneratedColumn<int>(
+      'is_active', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _needsSyncMeta =
+      const VerificationMeta('needsSync');
+  @override
+  late final GeneratedColumn<int> needsSync = GeneratedColumn<int>(
+      'needs_sync', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+      'created_at', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        email,
+        passwordHash,
+        fullName,
+        country,
+        accountType,
+        hostingMode,
+        lastLogin,
+        avatarUrl,
+        publicKey,
+        isActive,
+        needsSync,
+        createdAt
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'users';
+  static const String $name = 'offline_users';
   @override
-  VerificationContext validateIntegrity(Insertable<User> instance,
+  VerificationContext validateIntegrity(Insertable<OfflineUser> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
     if (data.containsKey('email')) {
       context.handle(
           _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
@@ -1524,13 +1602,49 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     } else if (isInserting) {
       context.missing(_passwordHashMeta);
     }
-    if (data.containsKey('token')) {
+    if (data.containsKey('full_name')) {
+      context.handle(_fullNameMeta,
+          fullName.isAcceptableOrUnknown(data['full_name']!, _fullNameMeta));
+    }
+    if (data.containsKey('country')) {
+      context.handle(_countryMeta,
+          country.isAcceptableOrUnknown(data['country']!, _countryMeta));
+    }
+    if (data.containsKey('account_type')) {
       context.handle(
-          _tokenMeta, token.isAcceptableOrUnknown(data['token']!, _tokenMeta));
+          _accountTypeMeta,
+          accountType.isAcceptableOrUnknown(
+              data['account_type']!, _accountTypeMeta));
+    }
+    if (data.containsKey('hosting_mode')) {
+      context.handle(
+          _hostingModeMeta,
+          hostingMode.isAcceptableOrUnknown(
+              data['hosting_mode']!, _hostingModeMeta));
     }
     if (data.containsKey('last_login')) {
       context.handle(_lastLoginMeta,
           lastLogin.isAcceptableOrUnknown(data['last_login']!, _lastLoginMeta));
+    }
+    if (data.containsKey('avatar_url')) {
+      context.handle(_avatarUrlMeta,
+          avatarUrl.isAcceptableOrUnknown(data['avatar_url']!, _avatarUrlMeta));
+    }
+    if (data.containsKey('public_key')) {
+      context.handle(_publicKeyMeta,
+          publicKey.isAcceptableOrUnknown(data['public_key']!, _publicKeyMeta));
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(_isActiveMeta,
+          isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta));
+    }
+    if (data.containsKey('needs_sync')) {
+      context.handle(_needsSyncMeta,
+          needsSync.isAcceptableOrUnknown(data['needs_sync']!, _needsSyncMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
     }
     return context;
   }
@@ -1538,176 +1652,397 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   @override
   Set<GeneratedColumn> get $primaryKey => {email};
   @override
-  User map(Map<String, dynamic> data, {String? tablePrefix}) {
+  OfflineUser map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return User(
+    return OfflineUser(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       email: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}email'])!,
       passwordHash: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}password_hash'])!,
-      token: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}token']),
+      fullName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}full_name']),
+      country: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}country']),
+      accountType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}account_type']),
+      hostingMode: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}hosting_mode']),
       lastLogin: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}last_login']),
+      avatarUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}avatar_url']),
+      publicKey: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}public_key']),
+      isActive: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}is_active'])!,
+      needsSync: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}needs_sync'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}created_at']),
     );
   }
 
   @override
-  $UsersTable createAlias(String alias) {
-    return $UsersTable(attachedDatabase, alias);
+  $OfflineUsersTable createAlias(String alias) {
+    return $OfflineUsersTable(attachedDatabase, alias);
   }
 }
 
-class User extends DataClass implements Insertable<User> {
+class OfflineUser extends DataClass implements Insertable<OfflineUser> {
+  final String id;
   final String email;
   final String passwordHash;
-  final String? token;
+  final String? fullName;
+  final String? country;
+  final String? accountType;
+  final String? hostingMode;
   final String? lastLogin;
-  const User(
-      {required this.email,
+  final String? avatarUrl;
+  final String? publicKey;
+  final int isActive;
+  final int needsSync;
+  final String? createdAt;
+  const OfflineUser(
+      {required this.id,
+      required this.email,
       required this.passwordHash,
-      this.token,
-      this.lastLogin});
+      this.fullName,
+      this.country,
+      this.accountType,
+      this.hostingMode,
+      this.lastLogin,
+      this.avatarUrl,
+      this.publicKey,
+      required this.isActive,
+      required this.needsSync,
+      this.createdAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
     map['email'] = Variable<String>(email);
     map['password_hash'] = Variable<String>(passwordHash);
-    if (!nullToAbsent || token != null) {
-      map['token'] = Variable<String>(token);
+    if (!nullToAbsent || fullName != null) {
+      map['full_name'] = Variable<String>(fullName);
+    }
+    if (!nullToAbsent || country != null) {
+      map['country'] = Variable<String>(country);
+    }
+    if (!nullToAbsent || accountType != null) {
+      map['account_type'] = Variable<String>(accountType);
+    }
+    if (!nullToAbsent || hostingMode != null) {
+      map['hosting_mode'] = Variable<String>(hostingMode);
     }
     if (!nullToAbsent || lastLogin != null) {
       map['last_login'] = Variable<String>(lastLogin);
     }
+    if (!nullToAbsent || avatarUrl != null) {
+      map['avatar_url'] = Variable<String>(avatarUrl);
+    }
+    if (!nullToAbsent || publicKey != null) {
+      map['public_key'] = Variable<String>(publicKey);
+    }
+    map['is_active'] = Variable<int>(isActive);
+    map['needs_sync'] = Variable<int>(needsSync);
+    if (!nullToAbsent || createdAt != null) {
+      map['created_at'] = Variable<String>(createdAt);
+    }
     return map;
   }
 
-  UsersCompanion toCompanion(bool nullToAbsent) {
-    return UsersCompanion(
+  OfflineUsersCompanion toCompanion(bool nullToAbsent) {
+    return OfflineUsersCompanion(
+      id: Value(id),
       email: Value(email),
       passwordHash: Value(passwordHash),
-      token:
-          token == null && nullToAbsent ? const Value.absent() : Value(token),
+      fullName: fullName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fullName),
+      country: country == null && nullToAbsent
+          ? const Value.absent()
+          : Value(country),
+      accountType: accountType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accountType),
+      hostingMode: hostingMode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(hostingMode),
       lastLogin: lastLogin == null && nullToAbsent
           ? const Value.absent()
           : Value(lastLogin),
+      avatarUrl: avatarUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(avatarUrl),
+      publicKey: publicKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(publicKey),
+      isActive: Value(isActive),
+      needsSync: Value(needsSync),
+      createdAt: createdAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdAt),
     );
   }
 
-  factory User.fromJson(Map<String, dynamic> json,
+  factory OfflineUser.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return User(
+    return OfflineUser(
+      id: serializer.fromJson<String>(json['id']),
       email: serializer.fromJson<String>(json['email']),
       passwordHash: serializer.fromJson<String>(json['passwordHash']),
-      token: serializer.fromJson<String?>(json['token']),
+      fullName: serializer.fromJson<String?>(json['fullName']),
+      country: serializer.fromJson<String?>(json['country']),
+      accountType: serializer.fromJson<String?>(json['accountType']),
+      hostingMode: serializer.fromJson<String?>(json['hostingMode']),
       lastLogin: serializer.fromJson<String?>(json['lastLogin']),
+      avatarUrl: serializer.fromJson<String?>(json['avatarUrl']),
+      publicKey: serializer.fromJson<String?>(json['publicKey']),
+      isActive: serializer.fromJson<int>(json['isActive']),
+      needsSync: serializer.fromJson<int>(json['needsSync']),
+      createdAt: serializer.fromJson<String?>(json['createdAt']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
       'email': serializer.toJson<String>(email),
       'passwordHash': serializer.toJson<String>(passwordHash),
-      'token': serializer.toJson<String?>(token),
+      'fullName': serializer.toJson<String?>(fullName),
+      'country': serializer.toJson<String?>(country),
+      'accountType': serializer.toJson<String?>(accountType),
+      'hostingMode': serializer.toJson<String?>(hostingMode),
       'lastLogin': serializer.toJson<String?>(lastLogin),
+      'avatarUrl': serializer.toJson<String?>(avatarUrl),
+      'publicKey': serializer.toJson<String?>(publicKey),
+      'isActive': serializer.toJson<int>(isActive),
+      'needsSync': serializer.toJson<int>(needsSync),
+      'createdAt': serializer.toJson<String?>(createdAt),
     };
   }
 
-  User copyWith(
-          {String? email,
+  OfflineUser copyWith(
+          {String? id,
+          String? email,
           String? passwordHash,
-          Value<String?> token = const Value.absent(),
-          Value<String?> lastLogin = const Value.absent()}) =>
-      User(
+          Value<String?> fullName = const Value.absent(),
+          Value<String?> country = const Value.absent(),
+          Value<String?> accountType = const Value.absent(),
+          Value<String?> hostingMode = const Value.absent(),
+          Value<String?> lastLogin = const Value.absent(),
+          Value<String?> avatarUrl = const Value.absent(),
+          Value<String?> publicKey = const Value.absent(),
+          int? isActive,
+          int? needsSync,
+          Value<String?> createdAt = const Value.absent()}) =>
+      OfflineUser(
+        id: id ?? this.id,
         email: email ?? this.email,
         passwordHash: passwordHash ?? this.passwordHash,
-        token: token.present ? token.value : this.token,
+        fullName: fullName.present ? fullName.value : this.fullName,
+        country: country.present ? country.value : this.country,
+        accountType: accountType.present ? accountType.value : this.accountType,
+        hostingMode: hostingMode.present ? hostingMode.value : this.hostingMode,
         lastLogin: lastLogin.present ? lastLogin.value : this.lastLogin,
+        avatarUrl: avatarUrl.present ? avatarUrl.value : this.avatarUrl,
+        publicKey: publicKey.present ? publicKey.value : this.publicKey,
+        isActive: isActive ?? this.isActive,
+        needsSync: needsSync ?? this.needsSync,
+        createdAt: createdAt.present ? createdAt.value : this.createdAt,
       );
-  User copyWithCompanion(UsersCompanion data) {
-    return User(
+  OfflineUser copyWithCompanion(OfflineUsersCompanion data) {
+    return OfflineUser(
+      id: data.id.present ? data.id.value : this.id,
       email: data.email.present ? data.email.value : this.email,
       passwordHash: data.passwordHash.present
           ? data.passwordHash.value
           : this.passwordHash,
-      token: data.token.present ? data.token.value : this.token,
+      fullName: data.fullName.present ? data.fullName.value : this.fullName,
+      country: data.country.present ? data.country.value : this.country,
+      accountType:
+          data.accountType.present ? data.accountType.value : this.accountType,
+      hostingMode:
+          data.hostingMode.present ? data.hostingMode.value : this.hostingMode,
       lastLogin: data.lastLogin.present ? data.lastLogin.value : this.lastLogin,
+      avatarUrl: data.avatarUrl.present ? data.avatarUrl.value : this.avatarUrl,
+      publicKey: data.publicKey.present ? data.publicKey.value : this.publicKey,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      needsSync: data.needsSync.present ? data.needsSync.value : this.needsSync,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('User(')
+    return (StringBuffer('OfflineUser(')
+          ..write('id: $id, ')
           ..write('email: $email, ')
           ..write('passwordHash: $passwordHash, ')
-          ..write('token: $token, ')
-          ..write('lastLogin: $lastLogin')
+          ..write('fullName: $fullName, ')
+          ..write('country: $country, ')
+          ..write('accountType: $accountType, ')
+          ..write('hostingMode: $hostingMode, ')
+          ..write('lastLogin: $lastLogin, ')
+          ..write('avatarUrl: $avatarUrl, ')
+          ..write('publicKey: $publicKey, ')
+          ..write('isActive: $isActive, ')
+          ..write('needsSync: $needsSync, ')
+          ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(email, passwordHash, token, lastLogin);
+  int get hashCode => Object.hash(
+      id,
+      email,
+      passwordHash,
+      fullName,
+      country,
+      accountType,
+      hostingMode,
+      lastLogin,
+      avatarUrl,
+      publicKey,
+      isActive,
+      needsSync,
+      createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is User &&
+      (other is OfflineUser &&
+          other.id == this.id &&
           other.email == this.email &&
           other.passwordHash == this.passwordHash &&
-          other.token == this.token &&
-          other.lastLogin == this.lastLogin);
+          other.fullName == this.fullName &&
+          other.country == this.country &&
+          other.accountType == this.accountType &&
+          other.hostingMode == this.hostingMode &&
+          other.lastLogin == this.lastLogin &&
+          other.avatarUrl == this.avatarUrl &&
+          other.publicKey == this.publicKey &&
+          other.isActive == this.isActive &&
+          other.needsSync == this.needsSync &&
+          other.createdAt == this.createdAt);
 }
 
-class UsersCompanion extends UpdateCompanion<User> {
+class OfflineUsersCompanion extends UpdateCompanion<OfflineUser> {
+  final Value<String> id;
   final Value<String> email;
   final Value<String> passwordHash;
-  final Value<String?> token;
+  final Value<String?> fullName;
+  final Value<String?> country;
+  final Value<String?> accountType;
+  final Value<String?> hostingMode;
   final Value<String?> lastLogin;
+  final Value<String?> avatarUrl;
+  final Value<String?> publicKey;
+  final Value<int> isActive;
+  final Value<int> needsSync;
+  final Value<String?> createdAt;
   final Value<int> rowid;
-  const UsersCompanion({
+  const OfflineUsersCompanion({
+    this.id = const Value.absent(),
     this.email = const Value.absent(),
     this.passwordHash = const Value.absent(),
-    this.token = const Value.absent(),
+    this.fullName = const Value.absent(),
+    this.country = const Value.absent(),
+    this.accountType = const Value.absent(),
+    this.hostingMode = const Value.absent(),
     this.lastLogin = const Value.absent(),
+    this.avatarUrl = const Value.absent(),
+    this.publicKey = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.needsSync = const Value.absent(),
+    this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  UsersCompanion.insert({
+  OfflineUsersCompanion.insert({
+    required String id,
     required String email,
     required String passwordHash,
-    this.token = const Value.absent(),
+    this.fullName = const Value.absent(),
+    this.country = const Value.absent(),
+    this.accountType = const Value.absent(),
+    this.hostingMode = const Value.absent(),
     this.lastLogin = const Value.absent(),
+    this.avatarUrl = const Value.absent(),
+    this.publicKey = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.needsSync = const Value.absent(),
+    this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
-  })  : email = Value(email),
+  })  : id = Value(id),
+        email = Value(email),
         passwordHash = Value(passwordHash);
-  static Insertable<User> custom({
+  static Insertable<OfflineUser> custom({
+    Expression<String>? id,
     Expression<String>? email,
     Expression<String>? passwordHash,
-    Expression<String>? token,
+    Expression<String>? fullName,
+    Expression<String>? country,
+    Expression<String>? accountType,
+    Expression<String>? hostingMode,
     Expression<String>? lastLogin,
+    Expression<String>? avatarUrl,
+    Expression<String>? publicKey,
+    Expression<int>? isActive,
+    Expression<int>? needsSync,
+    Expression<String>? createdAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
+      if (id != null) 'id': id,
       if (email != null) 'email': email,
       if (passwordHash != null) 'password_hash': passwordHash,
-      if (token != null) 'token': token,
+      if (fullName != null) 'full_name': fullName,
+      if (country != null) 'country': country,
+      if (accountType != null) 'account_type': accountType,
+      if (hostingMode != null) 'hosting_mode': hostingMode,
       if (lastLogin != null) 'last_login': lastLogin,
+      if (avatarUrl != null) 'avatar_url': avatarUrl,
+      if (publicKey != null) 'public_key': publicKey,
+      if (isActive != null) 'is_active': isActive,
+      if (needsSync != null) 'needs_sync': needsSync,
+      if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
-  UsersCompanion copyWith(
-      {Value<String>? email,
+  OfflineUsersCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? email,
       Value<String>? passwordHash,
-      Value<String?>? token,
+      Value<String?>? fullName,
+      Value<String?>? country,
+      Value<String?>? accountType,
+      Value<String?>? hostingMode,
       Value<String?>? lastLogin,
+      Value<String?>? avatarUrl,
+      Value<String?>? publicKey,
+      Value<int>? isActive,
+      Value<int>? needsSync,
+      Value<String?>? createdAt,
       Value<int>? rowid}) {
-    return UsersCompanion(
+    return OfflineUsersCompanion(
+      id: id ?? this.id,
       email: email ?? this.email,
       passwordHash: passwordHash ?? this.passwordHash,
-      token: token ?? this.token,
+      fullName: fullName ?? this.fullName,
+      country: country ?? this.country,
+      accountType: accountType ?? this.accountType,
+      hostingMode: hostingMode ?? this.hostingMode,
       lastLogin: lastLogin ?? this.lastLogin,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      publicKey: publicKey ?? this.publicKey,
+      isActive: isActive ?? this.isActive,
+      needsSync: needsSync ?? this.needsSync,
+      createdAt: createdAt ?? this.createdAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1715,17 +2050,44 @@ class UsersCompanion extends UpdateCompanion<User> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
     if (email.present) {
       map['email'] = Variable<String>(email.value);
     }
     if (passwordHash.present) {
       map['password_hash'] = Variable<String>(passwordHash.value);
     }
-    if (token.present) {
-      map['token'] = Variable<String>(token.value);
+    if (fullName.present) {
+      map['full_name'] = Variable<String>(fullName.value);
+    }
+    if (country.present) {
+      map['country'] = Variable<String>(country.value);
+    }
+    if (accountType.present) {
+      map['account_type'] = Variable<String>(accountType.value);
+    }
+    if (hostingMode.present) {
+      map['hosting_mode'] = Variable<String>(hostingMode.value);
     }
     if (lastLogin.present) {
       map['last_login'] = Variable<String>(lastLogin.value);
+    }
+    if (avatarUrl.present) {
+      map['avatar_url'] = Variable<String>(avatarUrl.value);
+    }
+    if (publicKey.present) {
+      map['public_key'] = Variable<String>(publicKey.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<int>(isActive.value);
+    }
+    if (needsSync.present) {
+      map['needs_sync'] = Variable<int>(needsSync.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -1735,11 +2097,20 @@ class UsersCompanion extends UpdateCompanion<User> {
 
   @override
   String toString() {
-    return (StringBuffer('UsersCompanion(')
+    return (StringBuffer('OfflineUsersCompanion(')
+          ..write('id: $id, ')
           ..write('email: $email, ')
           ..write('passwordHash: $passwordHash, ')
-          ..write('token: $token, ')
+          ..write('fullName: $fullName, ')
+          ..write('country: $country, ')
+          ..write('accountType: $accountType, ')
+          ..write('hostingMode: $hostingMode, ')
           ..write('lastLogin: $lastLogin, ')
+          ..write('avatarUrl: $avatarUrl, ')
+          ..write('publicKey: $publicKey, ')
+          ..write('isActive: $isActive, ')
+          ..write('needsSync: $needsSync, ')
+          ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2420,19 +2791,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $NotesTable notes = $NotesTable(this);
   late final $PasswordsTable passwords = $PasswordsTable(this);
   late final $SyncQueueTable syncQueue = $SyncQueueTable(this);
-  late final $UsersTable users = $UsersTable(this);
+  late final $OfflineUsersTable offlineUsers = $OfflineUsersTable(this);
   late final $OtpEntriesTable otpEntries = $OtpEntriesTable(this);
   late final NotesDao notesDao = NotesDao(this as AppDatabase);
   late final PasswordsDao passwordsDao = PasswordsDao(this as AppDatabase);
   late final OtpDao otpDao = OtpDao(this as AppDatabase);
-  late final AuthDao authDao = AuthDao(this as AppDatabase);
+  late final OfflineAuthDao offlineAuthDao =
+      OfflineAuthDao(this as AppDatabase);
   late final SyncQueueDao syncQueueDao = SyncQueueDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [notes, passwords, syncQueue, users, otpEntries];
+      [notes, passwords, syncQueue, offlineUsers, otpEntries];
 }
 
 typedef $$NotesTableCreateCompanionBuilder = NotesCompanion Function({
@@ -3135,51 +3507,102 @@ typedef $$SyncQueueTableProcessedTableManager = ProcessedTableManager<
     ),
     SyncQueueData,
     PrefetchHooks Function()>;
-typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
+typedef $$OfflineUsersTableCreateCompanionBuilder = OfflineUsersCompanion
+    Function({
+  required String id,
   required String email,
   required String passwordHash,
-  Value<String?> token,
+  Value<String?> fullName,
+  Value<String?> country,
+  Value<String?> accountType,
+  Value<String?> hostingMode,
   Value<String?> lastLogin,
+  Value<String?> avatarUrl,
+  Value<String?> publicKey,
+  Value<int> isActive,
+  Value<int> needsSync,
+  Value<String?> createdAt,
   Value<int> rowid,
 });
-typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
+typedef $$OfflineUsersTableUpdateCompanionBuilder = OfflineUsersCompanion
+    Function({
+  Value<String> id,
   Value<String> email,
   Value<String> passwordHash,
-  Value<String?> token,
+  Value<String?> fullName,
+  Value<String?> country,
+  Value<String?> accountType,
+  Value<String?> hostingMode,
   Value<String?> lastLogin,
+  Value<String?> avatarUrl,
+  Value<String?> publicKey,
+  Value<int> isActive,
+  Value<int> needsSync,
+  Value<String?> createdAt,
   Value<int> rowid,
 });
 
-class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
-  $$UsersTableFilterComposer({
+class $$OfflineUsersTableFilterComposer
+    extends Composer<_$AppDatabase, $OfflineUsersTable> {
+  $$OfflineUsersTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<String> get email => $composableBuilder(
       column: $table.email, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get passwordHash => $composableBuilder(
       column: $table.passwordHash, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get token => $composableBuilder(
-      column: $table.token, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get fullName => $composableBuilder(
+      column: $table.fullName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get country => $composableBuilder(
+      column: $table.country, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get accountType => $composableBuilder(
+      column: $table.accountType, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get hostingMode => $composableBuilder(
+      column: $table.hostingMode, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get lastLogin => $composableBuilder(
       column: $table.lastLogin, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get avatarUrl => $composableBuilder(
+      column: $table.avatarUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get publicKey => $composableBuilder(
+      column: $table.publicKey, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get isActive => $composableBuilder(
+      column: $table.isActive, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get needsSync => $composableBuilder(
+      column: $table.needsSync, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
 }
 
-class $$UsersTableOrderingComposer
-    extends Composer<_$AppDatabase, $UsersTable> {
-  $$UsersTableOrderingComposer({
+class $$OfflineUsersTableOrderingComposer
+    extends Composer<_$AppDatabase, $OfflineUsersTable> {
+  $$OfflineUsersTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get email => $composableBuilder(
       column: $table.email, builder: (column) => ColumnOrderings(column));
 
@@ -3187,83 +3610,173 @@ class $$UsersTableOrderingComposer
       column: $table.passwordHash,
       builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get token => $composableBuilder(
-      column: $table.token, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get fullName => $composableBuilder(
+      column: $table.fullName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get country => $composableBuilder(
+      column: $table.country, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get accountType => $composableBuilder(
+      column: $table.accountType, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get hostingMode => $composableBuilder(
+      column: $table.hostingMode, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get lastLogin => $composableBuilder(
       column: $table.lastLogin, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get avatarUrl => $composableBuilder(
+      column: $table.avatarUrl, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get publicKey => $composableBuilder(
+      column: $table.publicKey, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get isActive => $composableBuilder(
+      column: $table.isActive, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get needsSync => $composableBuilder(
+      column: $table.needsSync, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 }
 
-class $$UsersTableAnnotationComposer
-    extends Composer<_$AppDatabase, $UsersTable> {
-  $$UsersTableAnnotationComposer({
+class $$OfflineUsersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OfflineUsersTable> {
+  $$OfflineUsersTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
   GeneratedColumn<String> get email =>
       $composableBuilder(column: $table.email, builder: (column) => column);
 
   GeneratedColumn<String> get passwordHash => $composableBuilder(
       column: $table.passwordHash, builder: (column) => column);
 
-  GeneratedColumn<String> get token =>
-      $composableBuilder(column: $table.token, builder: (column) => column);
+  GeneratedColumn<String> get fullName =>
+      $composableBuilder(column: $table.fullName, builder: (column) => column);
+
+  GeneratedColumn<String> get country =>
+      $composableBuilder(column: $table.country, builder: (column) => column);
+
+  GeneratedColumn<String> get accountType => $composableBuilder(
+      column: $table.accountType, builder: (column) => column);
+
+  GeneratedColumn<String> get hostingMode => $composableBuilder(
+      column: $table.hostingMode, builder: (column) => column);
 
   GeneratedColumn<String> get lastLogin =>
       $composableBuilder(column: $table.lastLogin, builder: (column) => column);
+
+  GeneratedColumn<String> get avatarUrl =>
+      $composableBuilder(column: $table.avatarUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get publicKey =>
+      $composableBuilder(column: $table.publicKey, builder: (column) => column);
+
+  GeneratedColumn<int> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  GeneratedColumn<int> get needsSync =>
+      $composableBuilder(column: $table.needsSync, builder: (column) => column);
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
 }
 
-class $$UsersTableTableManager extends RootTableManager<
+class $$OfflineUsersTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $UsersTable,
-    User,
-    $$UsersTableFilterComposer,
-    $$UsersTableOrderingComposer,
-    $$UsersTableAnnotationComposer,
-    $$UsersTableCreateCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder,
-    (User, BaseReferences<_$AppDatabase, $UsersTable, User>),
-    User,
+    $OfflineUsersTable,
+    OfflineUser,
+    $$OfflineUsersTableFilterComposer,
+    $$OfflineUsersTableOrderingComposer,
+    $$OfflineUsersTableAnnotationComposer,
+    $$OfflineUsersTableCreateCompanionBuilder,
+    $$OfflineUsersTableUpdateCompanionBuilder,
+    (
+      OfflineUser,
+      BaseReferences<_$AppDatabase, $OfflineUsersTable, OfflineUser>
+    ),
+    OfflineUser,
     PrefetchHooks Function()> {
-  $$UsersTableTableManager(_$AppDatabase db, $UsersTable table)
+  $$OfflineUsersTableTableManager(_$AppDatabase db, $OfflineUsersTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$UsersTableFilterComposer($db: db, $table: table),
+              $$OfflineUsersTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$UsersTableOrderingComposer($db: db, $table: table),
+              $$OfflineUsersTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$UsersTableAnnotationComposer($db: db, $table: table),
+              $$OfflineUsersTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
             Value<String> email = const Value.absent(),
             Value<String> passwordHash = const Value.absent(),
-            Value<String?> token = const Value.absent(),
+            Value<String?> fullName = const Value.absent(),
+            Value<String?> country = const Value.absent(),
+            Value<String?> accountType = const Value.absent(),
+            Value<String?> hostingMode = const Value.absent(),
             Value<String?> lastLogin = const Value.absent(),
+            Value<String?> avatarUrl = const Value.absent(),
+            Value<String?> publicKey = const Value.absent(),
+            Value<int> isActive = const Value.absent(),
+            Value<int> needsSync = const Value.absent(),
+            Value<String?> createdAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
-              UsersCompanion(
+              OfflineUsersCompanion(
+            id: id,
             email: email,
             passwordHash: passwordHash,
-            token: token,
+            fullName: fullName,
+            country: country,
+            accountType: accountType,
+            hostingMode: hostingMode,
             lastLogin: lastLogin,
+            avatarUrl: avatarUrl,
+            publicKey: publicKey,
+            isActive: isActive,
+            needsSync: needsSync,
+            createdAt: createdAt,
             rowid: rowid,
           ),
           createCompanionCallback: ({
+            required String id,
             required String email,
             required String passwordHash,
-            Value<String?> token = const Value.absent(),
+            Value<String?> fullName = const Value.absent(),
+            Value<String?> country = const Value.absent(),
+            Value<String?> accountType = const Value.absent(),
+            Value<String?> hostingMode = const Value.absent(),
             Value<String?> lastLogin = const Value.absent(),
+            Value<String?> avatarUrl = const Value.absent(),
+            Value<String?> publicKey = const Value.absent(),
+            Value<int> isActive = const Value.absent(),
+            Value<int> needsSync = const Value.absent(),
+            Value<String?> createdAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
-              UsersCompanion.insert(
+              OfflineUsersCompanion.insert(
+            id: id,
             email: email,
             passwordHash: passwordHash,
-            token: token,
+            fullName: fullName,
+            country: country,
+            accountType: accountType,
+            hostingMode: hostingMode,
             lastLogin: lastLogin,
+            avatarUrl: avatarUrl,
+            publicKey: publicKey,
+            isActive: isActive,
+            needsSync: needsSync,
+            createdAt: createdAt,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
@@ -3273,17 +3786,20 @@ class $$UsersTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$UsersTableProcessedTableManager = ProcessedTableManager<
+typedef $$OfflineUsersTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
-    $UsersTable,
-    User,
-    $$UsersTableFilterComposer,
-    $$UsersTableOrderingComposer,
-    $$UsersTableAnnotationComposer,
-    $$UsersTableCreateCompanionBuilder,
-    $$UsersTableUpdateCompanionBuilder,
-    (User, BaseReferences<_$AppDatabase, $UsersTable, User>),
-    User,
+    $OfflineUsersTable,
+    OfflineUser,
+    $$OfflineUsersTableFilterComposer,
+    $$OfflineUsersTableOrderingComposer,
+    $$OfflineUsersTableAnnotationComposer,
+    $$OfflineUsersTableCreateCompanionBuilder,
+    $$OfflineUsersTableUpdateCompanionBuilder,
+    (
+      OfflineUser,
+      BaseReferences<_$AppDatabase, $OfflineUsersTable, OfflineUser>
+    ),
+    OfflineUser,
     PrefetchHooks Function()>;
 typedef $$OtpEntriesTableCreateCompanionBuilder = OtpEntriesCompanion Function({
   required String id,
@@ -3596,8 +4112,8 @@ class $AppDatabaseManager {
       $$PasswordsTableTableManager(_db, _db.passwords);
   $$SyncQueueTableTableManager get syncQueue =>
       $$SyncQueueTableTableManager(_db, _db.syncQueue);
-  $$UsersTableTableManager get users =>
-      $$UsersTableTableManager(_db, _db.users);
+  $$OfflineUsersTableTableManager get offlineUsers =>
+      $$OfflineUsersTableTableManager(_db, _db.offlineUsers);
   $$OtpEntriesTableTableManager get otpEntries =>
       $$OtpEntriesTableTableManager(_db, _db.otpEntries);
 }
