@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:http/http.dart' as http;
 import '../core/api.dart';
-import 'authService.dart';
+import 'token_manager.dart';
 import 'credentialSharingService.dart';
 
 /// Service to connect with the passwords API.
@@ -15,11 +15,11 @@ import 'credentialSharingService.dart';
 /// - deletePassword(id) -> Future<Map> { success: bool, message?: String }
 class PasswordService {
   String get baseUrl => ApiConfig.passwordsUrl;
-  final AuthService authService = AuthService();
+  final TokenManager _tokenManager = TokenManager();
   final CredentialSharingService _credentialService = CredentialSharingService();
 
   Future<Map<String, String>?> _getAuthHeaders() async {
-    final token = await authService.getToken();
+    final token = await _tokenManager.getToken();
     return {
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',

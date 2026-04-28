@@ -174,13 +174,7 @@ class _CountryMapScreenState extends State<CountryMapScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => RegisterScreen(
-                                  accountType: widget.accountType,
-                                  hostingMode: widget.hostingMode,
-                                  initialCountry: _selectedCountry,
-                                  isEmbedded: false, // Explicitly not embedded
-                                  ldapConfig: widget.ldapConfig,
-                                ),
+                                builder: (context) => const RegisterScreen(),
                               ),
                             );
                           },

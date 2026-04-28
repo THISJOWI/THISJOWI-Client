@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:thisjowi/services/authService.dart';
+import 'package:thisjowi/services/token_manager.dart';
 import 'package:http/http.dart' as http;
 import 'package:thisjowi/core/api.dart';
 
@@ -81,8 +81,8 @@ class CryptoService {
 
   Future<void> uploadPublicKey(String publicKey) async {
     try {
-      final authService = AuthService();
-      final token = await authService.getToken();
+      final tokenManager = TokenManager();
+      final token = await tokenManager.getToken();
       if (token == null) return;
 
       final res = await http.put(
@@ -108,8 +108,8 @@ class CryptoService {
     }
 
     try {
-      final authService = AuthService();
-      final token = await authService.getToken();
+      final tokenManager = TokenManager();
+      final token = await tokenManager.getToken();
       if (token == null) return null;
 
       final res = await http.get(

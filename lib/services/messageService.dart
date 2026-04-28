@@ -1,19 +1,21 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:thisjowi/core/api.dart';
-import 'package:thisjowi/services/authService.dart';
+import 'package:thisjowi/services/token_manager.dart';
 import 'package:thisjowi/services/cryptoService.dart';
+import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/data/models/message.dart';
 
 class MessageService {
-  final AuthService _authService = AuthService();
+  final TokenManager _tokenManager = TokenManager();
   final CryptoService _cryptoService = CryptoService();
+  final AuthService _authService = AuthService();
 
   String get baseUrl => ApiConfig.messagesUrl;
 
   Future<Map<String, dynamic>> getConversations() async {
     try {
-      final token = await _authService.getToken();
+      final token = await _tokenManager.getToken();
       if (token == null) {
         return {'success': false, 'message': 'Not authenticated'};
       }

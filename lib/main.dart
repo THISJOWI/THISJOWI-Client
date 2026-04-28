@@ -16,6 +16,61 @@ import 'package:thisjowi/screens/splash/splash.dart';
 import 'package:thisjowi/screens/onboarding/onBoarding.dart';
 import 'package:thisjowi/components/privacyOverlay.dart';
 
+// Workaround for macOS keyboard event bug
+// See: https://github.com/flutter/flutter/issues/148604
+class KeyboardEventFix extends StatefulWidget {
+  final Widget child;
+  const KeyboardEventFix({super.key, required this.child});
+
+  @override
+  State<KeyboardEventFix> createState() => _KeyboardEventFixState();
+}
+
+class _KeyboardEventFixState extends State<KeyboardEventFix> {
+  final Set<LogicalKeyboardKey> _pressedKeys = {};
+
+  @override
+  void initState() {
+    super.initState();
+    // Note: HardwareKeyboard.clearState() is not public API
+    // The fix works by intercepting duplicate key events in _handleKeyEvent
+  }
+
+  @override
+  void dispose() {
+    _pressedKeys.clear();
+    super.dispose();
+  }
+
+  KeyEventResult _handleKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (_pressedKeys.contains(event.logicalKey)) {
+        // Key was already pressed, ignore duplicate
+        return KeyEventResult.handled;
+      }
+      _pressedKeys.add(event.logicalKey);
+    } else if (event is KeyUpEvent) {
+      _pressedKeys.remove(event.logicalKey);
+    } else if (event is KeyRepeatEvent) {
+      if (!_pressedKeys.contains(event.logicalKey)) {
+        // Repeat event without prior down event
+        return KeyEventResult.handled;
+      }
+    }
+    return KeyEventResult.ignored;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      autofocus: true,
+      canRequestFocus: true,
+      onKeyEvent: (node, event) => _handleKeyEvent(event),
+      child: widget.child,
+    );
+  }
+}
+
 
 
 void main() async {
@@ -47,9 +102,10 @@ class MainApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => OtpProvider()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: "ThisJowi",
+      child: KeyboardEventFix(
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: "ThisJowi",
         
         // Localization support
         localizationsDelegates: const [
@@ -108,6 +164,7 @@ class MainApp extends StatelessWidget {
         '/otp/qrscan': (context) => const OtpQrScannerScreen(),
       },
       home: const SplashScreen(),
+      ),
       ),
     );
   }

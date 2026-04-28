@@ -1,7 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/services/authService.dart';
+import 'package:thisjowi/core/exceptions/account_exceptions.dart';
+import 'package:thisjowi/services/account_service.dart';
 import 'package:thisjowi/components/errorBar.dart';
 import 'package:thisjowi/i18n/translationService.dart';
 import 'package:thisjowi/screens/auth/passwordResetVerification.dart';
@@ -15,7 +16,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
-  final AuthService _authService = AuthService();
+  final AccountService _accountService = AccountService();
   bool _isLoading = false;
 
   @override
@@ -33,24 +34,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final result = await _authService.forgotPassword(_emailController.text);
+      await _accountService.forgotPassword(_emailController.text.trim());
+      
       if (mounted) {
         setState(() => _isLoading = false);
-        if (result['success'] == true) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('OTP sent to your email'.tr(context))),
-          );
-          // Navigate to OTP verification screen or similar
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => PasswordResetVerificationScreen(
-                    email: _emailController.text.trim(),
-                )),
-          );
-        } else {
-          ErrorSnackBar.show(context, result['message'] ?? 'Failed to send OTP'.tr(context));
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('OTP sent to your email'.tr(context))),
+        );
+        // Navigate to OTP verification screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PasswordResetVerificationScreen(
+              email: _emailController.text.trim(),
+            )),
+        );
+      }
+    } on AccountException catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ErrorSnackBar.show(context, e.message);
       }
     } catch (e) {
       if (mounted) {

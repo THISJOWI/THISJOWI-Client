@@ -1,11 +1,13 @@
-import 'dart:ui';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:thisjowi/core/appColors.dart';
 import 'package:thisjowi/screens/otp/TOPT.dart';
 import 'package:thisjowi/screens/home/HomeScreen.dart';
 import 'package:thisjowi/screens/settings/SettingScreen.dart';
 import 'package:thisjowi/screens/messages/MessagesScreen.dart';
-import 'package:thisjowi/services/authService.dart';
+import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/services/autofillSaveHandler.dart';
 
 // GlobalKey para acceder al estado de la navegación
@@ -25,6 +27,7 @@ class Navigation extends State<MyBottomNavigation>
   final AutofillSaveHandler _autofillHandler = AutofillSaveHandler();
   bool _isBusinessAccount = false;
   List<Widget> _pages = [];
+  List<_NavItem> _navItems = [];
 
   @override
   void initState() {
@@ -43,29 +46,22 @@ class Navigation extends State<MyBottomNavigation>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-
-    // Check for autofill requests when app comes to foreground
     if (state == AppLifecycleState.resumed && mounted) {
       _autofillHandler.checkNow(context);
     }
   }
 
   Future<void> _initNavigation() async {
-    // Check cached account type first for speed
     final cachedType = await _authService.getCachedAccountType();
-
-    // Also fetch fresh user data to ensure accuracy
     final user = await _authService.getCurrentUser();
 
     if (mounted) {
       setState(() {
-        // Prioritize fresh data, fallback to cache
         final aspect = user?.accountType ?? cachedType;
         _isBusinessAccount = aspect?.toLowerCase() == 'business';
         _buildPages();
+        _buildNavItems();
       });
-
-      // Start monitoring for autofill save requests
       _autofillHandler.startMonitoring(context);
     }
   }
@@ -79,15 +75,38 @@ class Navigation extends State<MyBottomNavigation>
     ];
   }
 
-  /// Método público para cambiar de pestaña
+  void _buildNavItems() {
+    _navItems = [
+      _NavItem(
+        icon: Icons.house_rounded,
+        label: 'Home',
+        index: 0,
+      ),
+      if (_isBusinessAccount)
+        _NavItem(
+          icon: Icons.chat_bubble_rounded,
+          label: 'Messages',
+          index: 1,
+        ),
+      _NavItem(
+        icon: Icons.shield_rounded,
+        label: 'OTP',
+        index: _isBusinessAccount ? 2 : 1,
+      ),
+      _NavItem(
+        icon: Icons.settings_rounded,
+        label: 'Settings',
+        index: _isBusinessAccount ? 3 : 2,
+      ),
+    ];
+  }
+
   void navigateToTab(int index) {
     if (index >= 0 && index < _pages.length) {
       setState(() => _currentIndex = index);
     }
   }
 
-  /// Navegar a la pestaña de OTP
-  /// Finds the index of OtpScreen dynamically
   void navigateToOtp() {
     final index = _pages.indexWhere((widget) => widget is OtpScreen);
     if (index != -1) {
@@ -95,164 +114,217 @@ class Navigation extends State<MyBottomNavigation>
     }
   }
 
+  bool get isDesktop {
+    try {
+      return Platform.isMacOS || Platform.isWindows || Platform.isLinux;
+    } catch (e) {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Ensure pages are built
     if (_pages.isEmpty) _buildPages();
+    if (_navItems.isEmpty) _buildNavItems();
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      extendBody: true,
-      body: Scaffold(
+    // En desktop: usar sidebar lateral estilo Apple Music
+    // En móvil: usar bottom navigation con Liquid Glass
+    if (isDesktop) {
+      return _DesktopLayout(
+        currentIndex: _currentIndex,
+        navItems: _navItems,
+        pages: _pages,
+        onItemSelected: (index) {
+          HapticFeedback.lightImpact();
+          setState(() => _currentIndex = index);
+        },
+      );
+    }
+
+    // Layout móvil con Liquid Glass bottom bar
+    return GlassBackdropScope(
+      child: Scaffold(
         backgroundColor: AppColors.background,
+        extendBody: true,
+        extendBodyBehindAppBar: true,
         body: IndexedStack(
-          // Use IndexedStack to preserve state
           index: _currentIndex,
           children: _pages,
         ),
+        bottomNavigationBar: GlassBottomBar(
+          tabs: _navItems.map((item) => GlassBottomBarTab(
+            icon: Icon(item.icon, size: 22),
+            label: item.label,
+          )).toList(),
+          selectedIndex: _currentIndex,
+          onTabSelected: (index) {
+            HapticFeedback.lightImpact();
+            setState(() => _currentIndex = index);
+          },
+          barHeight: 56,
+          barBorderRadius: 28,
+          horizontalPadding: 16,
+          verticalPadding: 12,
+          iconSize: 24,
+          maskingQuality: MaskingQuality.high,
+          selectedIconColor: AppColors.primary,
+          unselectedIconColor: AppColors.text.withValues(alpha: 0.5),
+          quality: GlassQuality.standard,
+          showIndicator: true,
+          indicatorColor: AppColors.primary.withValues(alpha: 0.2),
+        ),
       ),
-      bottomNavigationBar: Container(
-        color: Colors.transparent,
-        child: SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(30),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: Container(
-                      height: 70,
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E1E).withOpacity(0.4),
-                        borderRadius: BorderRadius.circular(35),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.05),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        alignment: Alignment.centerLeft,
-                        children: [
-                          // Liquid Glass Indicator
-                          AnimatedPositioned(
-                            duration: const Duration(
-                                milliseconds:
-                                    600), // Slightly slower for "fluid" feel
-                            curve: Curves
-                                .fastLinearToSlowEaseIn, // Apple-style organic ease
-                            left: _currentIndex * 70.0,
-                            top: 5,
-                            child: Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: AppColors.primary
-                                    .withOpacity(0.2), // Subtle tint
-                                borderRadius: BorderRadius.circular(30),
-                                border: Border.all(
-                                  color: Colors.white
-                                      .withOpacity(0.2), // Frosted edge
-                                  width: 1.5,
-                                ),
-                                boxShadow: [
-                                  // Inner glow simulation
-                                  BoxShadow(
-                                    color: AppColors.primary.withOpacity(0.3),
-                                    blurRadius: 20,
-                                    spreadRadius: -5,
-                                  ),
-                                  // Glass refraction shadow
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 5),
-                                  ),
-                                ],
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    Colors.white.withOpacity(0.3),
-                                    Colors.white.withOpacity(0.1),
-                                    Colors.white.withOpacity(0.05),
-                                  ],
-                                  stops: const [0.0, 0.4, 1.0],
-                                ),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(30),
-                                child: BackdropFilter(
-                                  filter: ImageFilter.blur(
-                                      sigmaX: 15,
-                                      sigmaY: 15), // Higher internal blur
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.1),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Icons Row
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _buildNavItem(
-                                  0, Icons.house_rounded, Icons.house_outlined),
-                              if (_isBusinessAccount) ...[
-                                const SizedBox(width: 10),
-                                _buildNavItem(1, Icons.chat_bubble_rounded,
-                                    Icons.chat_bubble_outline),
-                              ],
-                              const SizedBox(width: 10),
-                              _buildNavItem(_isBusinessAccount ? 2 : 1,
-                                  Icons.shield_rounded, Icons.shield_outlined),
-                              const SizedBox(width: 10),
-                              _buildNavItem(
-                                  _isBusinessAccount ? 3 : 2,
-                                  Icons.settings_rounded,
-                                  Icons.settings_outlined),
-                            ],
-                          ),
-                        ],
-                      ),
+    );
+  }
+}
+
+/// Item de navegación para desktop
+class _NavItem {
+  final IconData icon;
+  final String label;
+  final int index;
+
+  _NavItem({
+    required this.icon,
+    required this.label,
+    required this.index,
+  });
+}
+
+/// Layout para desktop con sidebar lateral estilo Apple Music
+class _DesktopLayout extends StatelessWidget {
+  final int currentIndex;
+  final List<_NavItem> navItems;
+  final List<Widget> pages;
+  final ValueChanged<int> onItemSelected;
+
+  const _DesktopLayout({
+    required this.currentIndex,
+    required this.navItems,
+    required this.pages,
+    required this.onItemSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: Row(
+        children: [
+// Sidebar lateral izquierda estilo Apple Music
+ Container(
+ width: 220,
+ color: AppColors.surface,
+ child: Column(
+ crossAxisAlignment: CrossAxisAlignment.start,
+ children: [
+ // Logo/Header con imagen empresa.png
+ Padding(
+ padding: const EdgeInsets.all(20),
+ child: Row(
+ children: [
+ Image.asset(
+ 'assets/empresa.png',
+ height: 40,
+ width: 40,
+ ),
+ const SizedBox(width: 12),
+ const Text(
+ 'THISJOWI',
+ style: TextStyle(
+ color: AppColors.text,
+ fontSize: 20,
+ fontWeight: FontWeight.bold,
+ ),
+ ),
+ ],
+ ),
+ ),
+ const Divider(color: Colors.white10, height: 1),
+ const SizedBox(height: 16),
+                // Items de navegación
+                ...navItems.map((item) => _SidebarItem(
+                  icon: item.icon,
+                  label: item.label,
+                  isSelected: currentIndex == item.index,
+                  onTap: () => onItemSelected(item.index),
+                )),
+                const Spacer(),
+                // Footer
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    'v1.0.2',
+                    style: TextStyle(
+                      color: Colors.white38,
+                      fontSize: 12,
                     ),
                   ),
                 ),
               ],
             ),
           ),
-        ),
+          // Contenido principal
+          Expanded(
+            child: Container(
+              color: AppColors.background,
+              child: IndexedStack(
+                index: currentIndex,
+                children: pages,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildNavItem(int index, IconData activeIcon, IconData inactiveIcon) {
-    final isSelected = _currentIndex == index;
+/// Item individual del sidebar
+class _SidebarItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
 
-    return GestureDetector(
-      onTap: () => setState(() => _currentIndex = index),
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 60,
-        height: 60,
-        child: Icon(
-          isSelected ? activeIcon : inactiveIcon,
-          color: isSelected ? Colors.white : AppColors.text.withOpacity(0.5),
-          size: 26,
+  const _SidebarItem({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: Material(
+        color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  color: isSelected ? AppColors.primary : AppColors.text.withValues(alpha: 0.7),
+                  size: 22,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: isSelected ? AppColors.primary : AppColors.text.withValues(alpha: 0.9),
+                    fontSize: 14,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

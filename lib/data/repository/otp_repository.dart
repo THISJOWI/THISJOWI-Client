@@ -2,17 +2,16 @@ import 'package:uuid/uuid.dart';
 import '../models/otpEntry.dart' as model;
 import '../local/database.dart';
 import '../../services/otpApiService.dart';
-import '../../services/authService.dart';
 import '../../services/connectivityService.dart';
 import '../local/secure_storage_service.dart';
 
 /// Repository para gestionar las entradas OTP con enfoque offline-first
-/// 
+///
 /// All operations go through local database first
 class OtpRepository {
   final AppDatabase _db = AppDatabase.instance();
   final Uuid _uuid = const Uuid();
-  final OtpApiService _otpApiService = OtpApiService(AuthService());
+  final OtpApiService _otpApiService = OtpApiService();
   final ConnectivityService _connectivityService = ConnectivityService();
   final SecureStorageService _secureStorageService = SecureStorageService();
   final Set<String> _syncingIds = {};

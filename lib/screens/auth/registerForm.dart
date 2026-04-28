@@ -1,71 +1,92 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:thisjowi/components/country_selector.dart';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/data/repository/auth_repository.dart';
-import 'package:thisjowi/services/authService.dart';
-import 'package:thisjowi/services/connectivityService.dart';
-import 'package:thisjowi/data/local/secure_storage_service.dart';
+import 'package:thisjowi/core/exceptions/auth_exceptions.dart';
+import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/components/errorBar.dart';
 import 'package:thisjowi/i18n/translations.dart';
 
 class RegisterForm extends StatefulWidget {
   final Function(Map<String, dynamic> result) onSuccess;
-  final String? accountType;
-  final String? hostingMode;
-  final String? initialCountry;
-  final Map<String, dynamic>? ldapConfig;
+  final VoidCallback onBack;
+  final String accountType;
+  final String hostingMode;
 
   const RegisterForm({
     super.key,
     required this.onSuccess,
-    this.accountType,
-    this.hostingMode,
-    this.initialCountry,
-    this.ldapConfig,
+    required this.onBack,
+    required this.accountType,
+    required this.hostingMode,
   });
 
   @override
   State<RegisterForm> createState() => _RegisterFormState();
 }
 
-class _RegisterFormState extends State<RegisterForm> {
+class _RegisterFormState extends State<RegisterForm>
+    with TickerProviderStateMixin {
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  late final TextEditingController _countryController;
-  final TextEditingController _birthdateController = TextEditingController();
+  final TextEditingController _serverUrlController = TextEditingController();
+  final TextEditingController _ldapUrlController = TextEditingController();
+  final FocusNode _fullNameFocusNode = FocusNode();
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
-  final FocusNode _countryFocusNode = FocusNode();
-  AuthRepository? _authRepository;
+  final FocusNode _serverUrlFocusNode = FocusNode();
+  final FocusNode _ldapUrlFocusNode = FocusNode();
+  final AuthService _authService = AuthService();
   bool _isLoading = false;
+  bool _isTestingConnection = false;
   bool _obscurePassword = true;
   bool _acceptedTerms = false;
+  String? _selectedCountry;
+  bool _connectionTested = false;
+
+  late AnimationController _controller;
+  int _focusedField = -1;
 
   @override
   void initState() {
     super.initState();
-    _countryController = TextEditingController(text: widget.initialCountry);
-    _initAuthRepository();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    _controller.forward();
+
+    _fullNameFocusNode
+        .addListener(() => _onFocusChange(0, _fullNameFocusNode.hasFocus));
+    _emailFocusNode
+        .addListener(() => _onFocusChange(1, _emailFocusNode.hasFocus));
+    _passwordFocusNode
+        .addListener(() => _onFocusChange(2, _passwordFocusNode.hasFocus));
+    _serverUrlFocusNode
+        .addListener(() => _onFocusChange(3, _serverUrlFocusNode.hasFocus));
+    _ldapUrlFocusNode
+        .addListener(() => _onFocusChange(4, _ldapUrlFocusNode.hasFocus));
   }
 
-  void _initAuthRepository() {
-    _authRepository = AuthRepository(
-      authService: AuthService(),
-      connectivityService: ConnectivityService(),
-      secureStorageService: SecureStorageService(),
-    );
+  void _onFocusChange(int index, bool hasFocus) {
+    setState(() => _focusedField = hasFocus ? index : -1);
   }
 
   @override
   void dispose() {
+    _controller.dispose();
     _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _countryController.dispose();
-    _birthdateController.dispose();
+    _serverUrlController.dispose();
+    _ldapUrlController.dispose();
+    _fullNameFocusNode.dispose();
     _emailFocusNode.dispose();
     _passwordFocusNode.dispose();
+    _serverUrlFocusNode.dispose();
+    _ldapUrlFocusNode.dispose();
     super.dispose();
   }
 
@@ -83,6 +104,71 @@ class _RegisterFormState extends State<RegisterForm> {
       return 'Password must contain at least one special character'.i18n;
     }
     return null;
+  }
+
+  String? _validateServerUrl(String? value) {
+    if (widget.hostingMode == 'SelfHosted') {
+      if (value == null || value.isEmpty) {
+        return 'URL del servidor es requerida'.i18n;
+      }
+      if (!value.startsWith('http://') && !value.startsWith('https://')) {
+        return 'URL debe comenzar con http:// o https://'.i18n;
+      }
+      final uri = Uri.tryParse(value);
+      if (uri == null || !uri.hasAuthority) {
+        return 'URL inválida'.i18n;
+      }
+    }
+    return null;
+  }
+
+  String? _validateLdapUrl(String? value) {
+    if (widget.accountType == 'Business') {
+      if (value == null || value.isEmpty) {
+        return 'URL LDAP es requerida para cuentas Business'.i18n;
+      }
+      if (!value.startsWith('ldap://') && !value.startsWith('ldaps://')) {
+        return 'URL LDAP debe comenzar con ldap:// o ldaps://'.i18n;
+      }
+      final uri = Uri.tryParse(value);
+      if (uri == null || !uri.hasAuthority) {
+        return 'URL LDAP inválida'.i18n;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _testServerConnection() async {
+    final url = _serverUrlController.text.trim();
+    final error = _validateServerUrl(url);
+    if (error != null) {
+      ErrorSnackBar.show(context, error);
+      return;
+    }
+
+    setState(() => _isTestingConnection = true);
+
+    try {
+      final response = await http.get(
+        Uri.parse('$url/health'),
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(const Duration(seconds: 10));
+
+      if (mounted) {
+        setState(() => _isTestingConnection = false);
+        if (response.statusCode == 200) {
+          setState(() => _connectionTested = true);
+          ErrorSnackBar.showSuccess(context, 'connection_success'.i18n);
+        } else {
+          ErrorSnackBar.show(context, 'connection_failed'.i18n);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isTestingConnection = false);
+        ErrorSnackBar.show(context, 'connection_failed'.i18n);
+      }
+    }
   }
 
   Future<void> _showTermsDialog() async {
@@ -104,16 +190,28 @@ class _RegisterFormState extends State<RegisterForm> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF202020),
+        backgroundColor: const Color(0xFF1E1E1E),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: Colors.white.withOpacity(0.1)),
+        ),
         title: Row(
           children: [
-            const Icon(Icons.description_outlined, color: AppColors.secondary),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.secondary.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.description_outlined,
+                  color: AppColors.secondary, size: 24),
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 "Terms and Conditions".i18n,
                 style: const TextStyle(
-                  color: AppColors.text,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                 ),
@@ -124,13 +222,25 @@ class _RegisterFormState extends State<RegisterForm> {
         content: SizedBox(
           width: double.maxFinite,
           height: MediaQuery.of(context).size.height * 0.6,
-          child: SingleChildScrollView(
-            child: SelectableText(
-              termsContent,
-              style: TextStyle(
-                color: AppColors.text.withOpacity(0.85),
-                fontSize: 14,
-                height: 1.5,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                child: SelectableText(
+                  termsContent,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.85),
+                    fontSize: 14,
+                    height: 1.6,
+                  ),
+                ),
               ),
             ),
           ),
@@ -138,11 +248,18 @@ class _RegisterFormState extends State<RegisterForm> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
             child: Text(
               "Close".i18n,
               style: const TextStyle(
                 color: AppColors.secondary,
                 fontWeight: FontWeight.bold,
+                fontSize: 15,
               ),
             ),
           ),
@@ -155,6 +272,8 @@ class _RegisterFormState extends State<RegisterForm> {
     final fullName = _fullNameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
+    final serverUrl = _serverUrlController.text.trim();
+    final ldapUrl = _ldapUrlController.text.trim();
 
     if (fullName.isEmpty || email.isEmpty || password.isEmpty) {
       ErrorSnackBar.show(context, 'Please complete all fields'.i18n);
@@ -173,23 +292,38 @@ class _RegisterFormState extends State<RegisterForm> {
       return;
     }
 
-    if (_authRepository == null) {
-      _initAuthRepository();
+    if (widget.hostingMode == 'SelfHosted') {
+      final serverUrlError = _validateServerUrl(serverUrl);
+      if (serverUrlError != null) {
+        ErrorSnackBar.show(context, serverUrlError);
+        return;
+      }
+    }
+
+    if (widget.accountType == 'Business') {
+      final ldapUrlError = _validateLdapUrl(ldapUrl);
+      if (ldapUrlError != null) {
+        ErrorSnackBar.show(context, ldapUrlError);
+        return;
+      }
     }
 
     setState(() => _isLoading = true);
 
-    // Step 1: Initiate registration (Send OTP)
-    final result = await _authRepository!.initiateRegister(email);
+    try {
+      await _authService.initiateRegister(email);
 
-    if (!mounted) return;
-    setState(() => _isLoading = false);
-
-    if (result['success'] == true) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
       _showOtpDialog();
-    } else {
-      ErrorSnackBar.show(context,
-          result['message'] ?? 'Failed to send verification code'.i18n);
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ErrorSnackBar.show(context, e.message);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ErrorSnackBar.show(context, 'Failed to send verification code'.i18n);
     }
   }
 
@@ -202,34 +336,68 @@ class _RegisterFormState extends State<RegisterForm> {
       barrierDismissible: false,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: AlertDialog(
-            backgroundColor: const Color(0xFF1E1E1E)
-                .withOpacity(0.9), // More transparent/darker
+            backgroundColor: const Color(0xFF1E1E1E).withOpacity(0.95),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(28),
               side: BorderSide(color: Colors.white.withOpacity(0.1)),
             ),
-            title: Text("Verify Email".i18n,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22,
-                )),
+            title: Column(
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: AppColors.secondary.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: AppColors.secondary.withOpacity(0.3),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.mark_email_read_outlined,
+                    color: AppColors.secondary,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  "Verify Email".i18n,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                  ),
+                ),
+              ],
+            ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "We sent a code to ${_emailController.text}".i18n,
+                  "We sent a code to".i18n,
                   style: TextStyle(
-                      color: Colors.white.withOpacity(0.7), fontSize: 15),
+                    color: Colors.white.withOpacity(0.6),
+                    fontSize: 15,
+                  ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 4),
+                Text(
+                  _emailController.text,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 28),
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.white.withOpacity(0.1)),
                   ),
                   child: TextField(
@@ -237,72 +405,115 @@ class _RegisterFormState extends State<RegisterForm> {
                     keyboardType: TextInputType.number,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        letterSpacing: 8,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.white,
+                      fontSize: 28,
+                      letterSpacing: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                     maxLength: 6,
                     decoration: InputDecoration(
                       counterText: "",
-                      hintText: "******",
+                      hintText: "• • • • • •",
                       hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.2),
-                          letterSpacing: 8),
+                        color: Colors.white.withOpacity(0.2),
+                        letterSpacing: 8,
+                        fontSize: 24,
+                      ),
                       filled: false,
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 20),
                     ),
                   ),
                 ),
               ],
             ),
-            actionsPadding: const EdgeInsets.all(20),
+            actionsPadding: const EdgeInsets.all(24),
             actions: [
-              TextButton(
-                onPressed:
-                    isVerifying ? null : () => Navigator.pop(dialogContext),
-                child: Text("Cancel".i18n,
-                    style: TextStyle(
-                        color: Colors.white.withOpacity(0.5),
-                        fontWeight: FontWeight.w600)),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  gradient: const LinearGradient(
-                    colors: [AppColors.secondary, AppColors.accent],
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: isVerifying
+                          ? null
+                          : () => Navigator.pop(dialogContext),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Text(
+                        "Cancel".i18n,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                child: ElevatedButton(
-                  onPressed: isVerifying
-                      ? null
-                      : () async {
-                          if (otpController.text.length < 6) return;
-                          setDialogState(() => isVerifying = true);
-                          await _completeRegistration(
-                              otpController.text, dialogContext);
-                          if (mounted) {
-                            setDialogState(() => isVerifying = false);
-                          }
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: Container(
+                      height: 52,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        gradient: const LinearGradient(
+                          colors: [AppColors.secondary, AppColors.accent],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.secondary.withOpacity(0.4),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: isVerifying
+                            ? null
+                            : () async {
+                                if (otpController.text.length < 6) return;
+                                setDialogState(() => isVerifying = true);
+                                await _completeRegistration(
+                                    otpController.text, dialogContext);
+                                if (mounted) {
+                                  setDialogState(() => isVerifying = false);
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                        child: isVerifying
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(
+                                "Verify".i18n,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                      ),
+                    ),
                   ),
-                  child: isVerifying
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white))
-                      : Text("Verify".i18n,
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                ),
+                ],
               ),
             ],
           ),
@@ -316,238 +527,613 @@ class _RegisterFormState extends State<RegisterForm> {
     final fullName = _fullNameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
-    final birthdate = _birthdateController.text.trim();
+    final serverUrl = _serverUrlController.text.trim();
+    final ldapUrl = _ldapUrlController.text.trim();
 
-    final result = await _authRepository!.register(
-      email,
-      password,
-      fullName: fullName,
-      birthdate: birthdate.isNotEmpty ? birthdate : null,
-      accountType: widget.accountType,
-      hostingMode: widget.hostingMode,
-      otp: otp,
-      ldapConfig: widget.ldapConfig,
-    );
-
-    if (!mounted) return;
-
-    if (result['success'] == true) {
-      Navigator.pop(dialogContext); // Close dialog
-
-      // Auto login after successful registration
-      final loginResult = await _authRepository!.login(email, password);
+    try {
+      final authUser = await _authService.register(
+        email: email,
+        password: password,
+        otp: otp,
+        fullName: fullName,
+        country: _selectedCountry,
+        accountType: widget.accountType,
+        hostingMode: widget.hostingMode,
+        serverUrl: widget.hostingMode == 'SelfHosted' ? serverUrl : null,
+        ldapUrl: widget.accountType == 'Business' ? ldapUrl : null,
+      );
 
       if (!mounted) return;
 
-      if (loginResult['success'] == true) {
-        widget.onSuccess(loginResult['data']);
-      } else {
-        // Fallback to register result if login fails
-        widget.onSuccess(result);
-      }
-    } else {
-      // Show error in snackbar (using main context)
-      ErrorSnackBar.show(context, result['message'] ?? 'Register failed'.i18n);
+      Navigator.pop(dialogContext);
+
+      widget.onSuccess({
+        'email': authUser.email,
+        'token': authUser.token,
+        'userId': authUser.id,
+      });
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      ErrorSnackBar.show(context, e.message);
     }
+  }
+
+  int _getTermsCheckboxIndex() {
+    int index = 4;
+    if (widget.accountType == 'Business') index++;
+    if (widget.hostingMode == 'SelfHosted') index += 2;
+    return index;
+  }
+
+  int _getCreateButtonIndex() {
+    int index = 5;
+    if (widget.accountType == 'Business') index++;
+    if (widget.hostingMode == 'SelfHosted') index += 2;
+    return index;
+  }
+
+  Widget _buildAnimatedField({required int index, required Widget child}) {
+    final delay = index * 0.08;
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: Interval(delay, delay + 0.3, curve: Curves.easeOut),
+          ),
+        );
+        final slideAnimation = Tween<Offset>(
+          begin: const Offset(0, 20),
+          end: Offset.zero,
+        ).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: Interval(delay, delay + 0.3, curve: Curves.easeOutCubic),
+          ),
+        );
+        return FadeTransition(
+          opacity: fadeAnimation,
+          child: SlideTransition(
+            position: slideAnimation,
+            child: child,
+          ),
+        );
+      },
+      child: child,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Full Name Field
-        TextFormField(
-          controller: _fullNameController,
-          style: const TextStyle(color: Colors.white),
-          textInputAction: TextInputAction.next,
-          onFieldSubmitted: (_) => _emailFocusNode.requestFocus(),
-          decoration: InputDecoration(
-            prefixIcon: Icon(Icons.person_outline,
-                color: AppColors.text.withOpacity(0.7), size: 20),
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-            labelText: "Full Name".i18n,
-            labelStyle: TextStyle(color: AppColors.text.withOpacity(0.5)),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: constraints.maxHeight,
+              maxWidth: 340,
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-              borderSide:
-                  const BorderSide(color: AppColors.secondary, width: 1),
-            ),
-            filled: true,
-            fillColor: Colors.black.withOpacity(0.2),
-          ),
-        ),
-        const SizedBox(height: 20),
-
-        // Email Field
-        TextFormField(
-          controller: _emailController,
-          focusNode: _emailFocusNode,
-          style: const TextStyle(color: Colors.white),
-          textInputAction: TextInputAction.next,
-          keyboardType: TextInputType.emailAddress,
-          onFieldSubmitted: (_) => _passwordFocusNode.requestFocus(),
-          decoration: InputDecoration(
-            prefixIcon: Icon(Icons.email_outlined,
-                color: AppColors.text.withOpacity(0.7), size: 20),
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-            labelText: "Email".i18n,
-            labelStyle: TextStyle(color: AppColors.text.withOpacity(0.5)),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-              borderSide:
-                  const BorderSide(color: AppColors.secondary, width: 1),
-            ),
-            filled: true,
-            fillColor: Colors.black.withOpacity(0.2),
-          ),
-        ),
-        const SizedBox(height: 20),
-
-        // Password Field
-        TextFormField(
-          controller: _passwordController,
-          focusNode: _passwordFocusNode,
-          obscureText: _obscurePassword,
-          style: const TextStyle(color: Colors.white),
-          textInputAction: TextInputAction.done,
-          onFieldSubmitted: (_) => _isLoading ? null : _handleRegister(),
-          decoration: InputDecoration(
-            prefixIcon: Icon(Icons.lock_outline,
-                color: AppColors.text.withOpacity(0.7), size: 20),
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                color: AppColors.text.withOpacity(0.5),
-                size: 20,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscurePassword = !_obscurePassword;
-                });
-              },
-            ),
-            labelText: "Password".i18n,
-            labelStyle: TextStyle(color: AppColors.text.withOpacity(0.5)),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-              borderSide:
-                  const BorderSide(color: AppColors.secondary, width: 1),
-            ),
-            filled: true,
-            fillColor: Colors.black.withOpacity(0.2),
-          ),
-        ),
-        const SizedBox(height: 20),
-
-        // Terms and Conditions Checkbox
-        Row(
-          children: [
-            Checkbox(
-              value: _acceptedTerms,
-              activeColor: AppColors.secondary,
-              checkColor: Colors.black,
-              side: BorderSide(color: AppColors.text.withOpacity(0.5)),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5)),
-              onChanged: (value) {
-                setState(() {
-                  _acceptedTerms = value ?? false;
-                });
-              },
-            ),
-            Expanded(
-              child: GestureDetector(
-                onTap: _showTermsDialog,
-                child: RichText(
-                  text: TextSpan(
-                    text: "I accept the ".i18n,
-                    style: TextStyle(
-                        color: AppColors.text.withOpacity(0.7), fontSize: 13),
-                    children: [
-                      TextSpan(
-                        text: "Terms and Conditions".i18n,
-                        style: const TextStyle(
-                          color: AppColors.secondary,
-                          decoration: TextDecoration.underline,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+            child: IntrinsicHeight(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildLogo(),
+                  const SizedBox(height: 32),
+                  _buildTitle(),
+                  const SizedBox(height: 32),
+                  _buildSelectionSummary(),
+                  const SizedBox(height: 32),
+                  _buildAnimatedField(
+                    index: 0,
+                    child: _buildTextField(
+                      controller: _fullNameController,
+                      focusNode: _fullNameFocusNode,
+                      icon: Icons.person_outline,
+                      label: "Full Name".i18n,
+                      isFocused: _focusedField == 0,
+                      textInputAction: TextInputAction.next,
+                      onSubmitted: () => _emailFocusNode.requestFocus(),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  _buildAnimatedField(
+                    index: 1,
+                    child: _buildTextField(
+                      controller: _emailController,
+                      focusNode: _emailFocusNode,
+                      icon: Icons.email_outlined,
+                      label: "Email".i18n,
+                      isFocused: _focusedField == 1,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      onSubmitted: () => _passwordFocusNode.requestFocus(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildAnimatedField(
+                    index: 2,
+                    child: _buildPasswordField(),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildAnimatedField(
+                    index: 3,
+                    child: CountrySelector(
+                      initialValue: _selectedCountry,
+                      onCountrySelected: (country) {
+                        setState(() => _selectedCountry = country);
+                      },
+                    ),
+                  ),
+                  if (widget.accountType == 'Business') ...[
+                    const SizedBox(height: 16),
+                    _buildAnimatedField(
+                      index: 4,
+                      child: _buildTextField(
+                        controller: _ldapUrlController,
+                        focusNode: _ldapUrlFocusNode,
+                        icon: Icons.account_tree_outlined,
+                        label: "LDAP URL".i18n,
+                        hint: "ldaps://ldap.company.com".i18n,
+                        isFocused: _focusedField == 4,
+                        textInputAction: TextInputAction.next,
+                        onSubmitted: () {
+                          if (widget.hostingMode == 'SelfHosted') {
+                            _serverUrlFocusNode.requestFocus();
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                  if (widget.hostingMode == 'SelfHosted') ...[
+                    const SizedBox(height: 16),
+                    _buildAnimatedField(
+                      index: widget.accountType == 'Business' ? 5 : 4,
+                      child: _buildTextField(
+                        controller: _serverUrlController,
+                        focusNode: _serverUrlFocusNode,
+                        icon: Icons.link,
+                        label: "Server URL".i18n,
+                        hint: "https://your-server.com".i18n,
+                        isFocused: _focusedField == 3,
+                        textInputAction: TextInputAction.done,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildAnimatedField(
+                      index: widget.accountType == 'Business' ? 6 : 5,
+                      child: _buildConnectionButton(),
+                    ),
+                  ],
+                  const SizedBox(height: 24),
+                  _buildAnimatedField(
+                    index: _getTermsCheckboxIndex(),
+                    child: _buildTermsCheckbox(),
+                  ),
+                  const SizedBox(height: 32),
+                  _buildAnimatedField(
+                    index: _getCreateButtonIndex(),
+                    child: _buildCreateButton(),
+                  ),
+                  const SizedBox(height: 24),
+                ],
               ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLogo() {
+    return Center(
+      child: Container(
+        width: 80,
+        height: 80,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            colors: [
+              AppColors.accent.withOpacity(0.3),
+              AppColors.secondary.withOpacity(0.2),
+            ],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.accent.withOpacity(0.2),
+              blurRadius: 30,
+              spreadRadius: 5,
             ),
           ],
         ),
-        const SizedBox(height: 32),
+        child: const Icon(
+          Icons.edit_note_outlined,
+          size: 36,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
 
-        // Register Button
-        Container(
-          width: double.infinity,
-          height: 56,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: const LinearGradient(
-              colors: [AppColors.secondary, AppColors.accent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.secondary.withOpacity(0.3),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
+  Widget _buildTitle() {
+    return Column(
+      children: [
+        Text(
+          'Completa tu registro'.i18n,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            letterSpacing: -0.5,
           ),
-          child: ElevatedButton(
-            onPressed: _isLoading ? null : _handleRegister,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            child: _isLoading
-                ? const SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : Text(
-                    "Create Account".i18n,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Ingresa tus datos para continuar'.i18n,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 15,
+            color: Colors.white.withOpacity(0.5),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required FocusNode focusNode,
+    required IconData icon,
+    required String label,
+    String? hint,
+    required bool isFocused,
+    TextInputType? keyboardType,
+    TextInputAction? textInputAction,
+    VoidCallback? onSubmitted,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            color: isFocused
+                ? Colors.white.withOpacity(0.1)
+                : Colors.white.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isFocused
+                  ? Colors.white.withOpacity(0.3)
+                  : Colors.white.withOpacity(0.1),
+              width: isFocused ? 1.5 : 1,
+            ),
+          ),
+          child: TextFormField(
+            controller: controller,
+            focusNode: focusNode,
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+            textInputAction: textInputAction,
+            keyboardType: keyboardType,
+            onFieldSubmitted: (_) => onSubmitted?.call(),
+            decoration: InputDecoration(
+              prefixIcon: Icon(
+                icon,
+                color: isFocused
+                    ? Colors.white.withOpacity(0.8)
+                    : Colors.white.withOpacity(0.4),
+                size: 20,
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+              labelText: label,
+              hintText: hint,
+              labelStyle: TextStyle(
+                color: isFocused
+                    ? Colors.white.withOpacity(0.8)
+                    : Colors.white.withOpacity(0.4),
+                fontSize: 14,
+              ),
+              hintStyle: TextStyle(
+                color: Colors.white.withOpacity(0.3),
+                fontSize: 14,
+              ),
+              border: InputBorder.none,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            color: _focusedField == 2
+                ? Colors.white.withOpacity(0.1)
+                : Colors.white.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: _focusedField == 2
+                  ? Colors.white.withOpacity(0.3)
+                  : Colors.white.withOpacity(0.1),
+              width: _focusedField == 2 ? 1.5 : 1,
+            ),
+          ),
+          child: TextFormField(
+            controller: _passwordController,
+            focusNode: _passwordFocusNode,
+            obscureText: _obscurePassword,
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+            textInputAction: TextInputAction.done,
+            decoration: InputDecoration(
+              prefixIcon: Icon(
+                Icons.lock_outline,
+                color: _focusedField == 2
+                    ? Colors.white.withOpacity(0.8)
+                    : Colors.white.withOpacity(0.4),
+                size: 20,
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  color: _focusedField == 2
+                      ? Colors.white.withOpacity(0.8)
+                      : Colors.white.withOpacity(0.4),
+                  size: 20,
+                ),
+                onPressed: () =>
+                    setState(() => _obscurePassword = !_obscurePassword),
+              ),
+              labelText: "Password".i18n,
+              labelStyle: TextStyle(
+                color: _focusedField == 2
+                    ? Colors.white.withOpacity(0.8)
+                    : Colors.white.withOpacity(0.4),
+                fontSize: 14,
+              ),
+              border: InputBorder.none,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildConnectionButton() {
+    return ElevatedButton.icon(
+      onPressed: _isTestingConnection ? null : _testServerConnection,
+      icon: _isTestingConnection
+          ? const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(
+                  strokeWidth: 2, color: Colors.white),
+            )
+          : Icon(
+              _connectionTested ? Icons.check_circle : Icons.wifi_tethering,
+              color: _connectionTested ? Colors.green : Colors.white,
+              size: 20,
+            ),
+      label: Text(
+        _isTestingConnection
+            ? "Testing...".i18n
+            : (_connectionTested ? "Connected".i18n : "Test Connection".i18n),
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: _connectionTested ? Colors.green : Colors.white,
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: _connectionTested
+            ? Colors.green.withOpacity(0.15)
+            : Colors.white.withOpacity(0.1),
+        foregroundColor: _connectionTested ? Colors.green : Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: _connectionTested
+                ? Colors.green.withOpacity(0.3)
+                : Colors.white.withOpacity(0.1),
+          ),
+        ),
+        elevation: 0,
+      ),
+    );
+  }
+
+  Widget _buildTermsCheckbox() {
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: () => setState(() => _acceptedTerms = !_acceptedTerms),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: _acceptedTerms
+                  ? AppColors.secondary.withOpacity(0.3)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: _acceptedTerms
+                    ? AppColors.secondary
+                    : Colors.white.withOpacity(0.3),
+                width: 2,
+              ),
+            ),
+            child: _acceptedTerms
+                ? const Icon(Icons.check, size: 16, color: Colors.white)
+                : null,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: GestureDetector(
+            onTap: _showTermsDialog,
+            child: RichText(
+              text: TextSpan(
+                text: "I accept the ".i18n,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.6),
+                  fontSize: 14,
+                ),
+                children: [
+                  TextSpan(
+                    text: "Terms and Conditions".i18n,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCreateButton() {
+    return Container(
+      height: 56,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          colors: [AppColors.secondary, AppColors.accent],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.secondary.withOpacity(0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : _handleRegister,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+        ),
+        child: _isLoading
+            ? const SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                    color: Colors.white, strokeWidth: 2),
+              )
+            : Text(
+                "Create Account".i18n,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildSelectionSummary() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.06),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white.withOpacity(0.1)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  gradient: LinearGradient(
+                    colors: widget.accountType == 'Business'
+                        ? [const Color(0xFFFFA726), const Color(0xFFFFB74D)]
+                        : [const Color(0xFF5B8DEF), const Color(0xFF7B9FE8)],
+                  ),
+                ),
+                child: Icon(
+                  widget.accountType == 'Business'
+                      ? Icons.business_center
+                      : Icons.person,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.accountType == 'Business'
+                          ? 'Business'
+                          : 'Personal',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          widget.hostingMode == 'Cloud'
+                              ? Icons.cloud
+                              : Icons.computer,
+                          size: 14,
+                          color: Colors.white.withOpacity(0.5),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          widget.hostingMode == 'Cloud'
+                              ? 'Cloud'
+                              : 'Self-Hosted',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.white.withOpacity(0.5),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

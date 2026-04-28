@@ -4,18 +4,18 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import '../core/api.dart';
 import '../core/encryptionHelper.dart';
-import 'authService.dart';
+import 'token_manager.dart';
 import '../data/models/otpEntry.dart';
 
 /// Service to connect with the OTP API.
 class OtpApiService {
   String get baseUrl => ApiConfig.otpUrl;
-  final AuthService _authService;
+  final TokenManager _tokenManager = TokenManager();
 
-  OtpApiService(this._authService);
+  OtpApiService();
 
   Future<Map<String, String>> _getHeaders() async {
-    final token = await _authService.getToken();
+    final token = await _tokenManager.getToken();
     if (token == null || token.isEmpty) {
       throw Exception('No authentication token available');
     }

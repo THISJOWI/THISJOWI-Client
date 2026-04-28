@@ -1,17 +1,23 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/services/authService.dart';
+import 'package:thisjowi/core/exceptions/account_exceptions.dart';
+import 'package:thisjowi/core/exceptions/profile_exceptions.dart';
+import 'package:thisjowi/services/auth_service.dart';
+import 'package:thisjowi/services/account_service.dart';
+import 'package:thisjowi/services/profile_service.dart';
 import 'package:thisjowi/services/biometricService.dart';
-import 'package:thisjowi/data/repository/auth_repository.dart';
-import 'package:thisjowi/services/connectivityService.dart';
-import 'package:thisjowi/data/local/secure_storage_service.dart';
 import 'package:thisjowi/components/errorBar.dart';
+import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:thisjowi/screens/organization/LdapConfigScreen.dart';
-import 'package:thisjowi/data/models/user.dart';
+import 'package:thisjowi/data/models/auth_user.dart';
+import 'package:thisjowi/data/models/profile_user.dart';
+import 'package:thisjowi/data/models/account_user.dart';
+import 'package:image_picker/image_picker.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -22,6 +28,8 @@ class SettingScreen extends StatefulWidget {
 
 class _SettingScreenState extends State<SettingScreen> {
   final AuthService _authService = AuthService();
+  final AccountService _accountService = AccountService();
+  final ProfileService _profileService = ProfileService();
   final BiometricService _biometricService = BiometricService();
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -30,14 +38,13 @@ class _SettingScreenState extends State<SettingScreen> {
   bool _biometricEnabled = false;
   bool _biometricAvailable = false;
   String _biometricType = 'Biometric';
-  User? _currentUser;
-
-  AuthRepository? _authRepository;
+  AuthUser? _currentAuthUser;
+  ProfileUser? _currentProfile;
+  AccountUser? _currentAccount;
 
   @override
   void initState() {
     super.initState();
-    _initRepository();
     _loadInitialData();
   }
 
@@ -49,21 +56,17 @@ class _SettingScreenState extends State<SettingScreen> {
   }
 
   Future<void> _loadCurrentUser() async {
-    if (_authRepository == null) _initRepository();
-    final user = await _authRepository!.getCurrentUser();
+    final authUser = await _authService.getCurrentAuthUser();
+    final profile = await _profileService.getCurrentProfile();
+    final account = await _accountService.getCurrentAccount();
+
     if (mounted) {
       setState(() {
-        _currentUser = user;
+        _currentAuthUser = authUser;
+        _currentProfile = profile;
+        _currentAccount = account;
       });
     }
-  }
-
-  void _initRepository() {
-    _authRepository = AuthRepository(
-      authService: _authService,
-      connectivityService: ConnectivityService(),
-      secureStorageService: SecureStorageService(),
-    );
   }
 
   Future<void> _loadBiometricStatus() async {
@@ -115,77 +118,17 @@ class _SettingScreenState extends State<SettingScreen> {
     Widget? trailing,
     Color? iconColor,
     VoidCallback? onTap,
+    bool isWarning = false,
   }) {
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E1E1E).withOpacity(0.6),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.1),
-                  width: 1,
-                ),
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: onTap,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
-                    child: Row(
-                      children: [
-                        Icon(
-                          icon,
-                          color: iconColor ?? AppColors.text.withOpacity(0.7),
-                          size: 20,
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                title,
-                                style: const TextStyle(
-                                  color: AppColors.text,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              if (subtitle != null)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 4),
-                                  child: Text(
-                                    subtitle,
-                                    style: TextStyle(
-                                      color: AppColors.text.withOpacity(0.6),
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                        if (trailing != null)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12),
-                            child: trailing,
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ));
+    return LiquidGlassListItem(
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      trailing: trailing,
+      iconColor: iconColor,
+      onTap: onTap,
+      isWarning: isWarning,
+    );
   }
 
   void _showConfirmationDialog({
@@ -292,18 +235,17 @@ class _SettingScreenState extends State<SettingScreen> {
               .i18n,
       onConfirm: () async {
         try {
-          final result = await _authRepository!.deleteAccount();
+          // Solicitar contraseña para confirmar eliminación
+          await _accountService
+              .deleteAccount(''); // Se mostrará dialog para password
 
           if (!mounted) return;
-
-          if (result['success'] == true) {
-            Navigator.pushReplacementNamed(context, '/login');
-            ErrorSnackBar.showSuccess(
-                context, 'Account deleted successfully'.i18n);
-          } else {
-            ErrorSnackBar.show(
-                context, result['message'] ?? 'Error deleting account'.i18n);
-          }
+          Navigator.pushReplacementNamed(context, '/login');
+          ErrorSnackBar.showSuccess(
+              context, 'Account deleted successfully'.i18n);
+        } on AccountException catch (e) {
+          if (!mounted) return;
+          ErrorSnackBar.show(context, e.message);
         } catch (e) {
           if (!mounted) return;
           ErrorSnackBar.show(context, '${'Error deleting account'.i18n}: $e');
@@ -504,21 +446,9 @@ class _SettingScreenState extends State<SettingScreen> {
     }
 
     try {
-      // Ensure repository is initialized
-      if (_authRepository == null) {
-        _initRepository();
-      }
-
-      // Use AuthRepository for offline-first password change (no current password needed)
-      final result = await _authRepository!.changePasswordDirect(newPassword);
+      // Use AccountService for password change
+      await _accountService.changePassword('', newPassword, confirmPassword);
       if (!mounted) return;
-
-      // Check if password change was successful
-      if (result['success'] != true) {
-        ErrorSnackBar.show(
-            context, result['message'] ?? 'Failed to change password'.i18n);
-        return;
-      }
 
       // Clear the text fields and close the dialog
       _newPasswordController.clear();
@@ -526,6 +456,9 @@ class _SettingScreenState extends State<SettingScreen> {
       Navigator.pop(context);
 
       ErrorSnackBar.showSuccess(context, 'Password changed successfully'.i18n);
+    } on AccountException catch (e) {
+      if (!mounted) return;
+      ErrorSnackBar.show(context, e.message);
     } catch (e) {
       if (!mounted) return;
       ErrorSnackBar.show(context, '${'Error changing password'.i18n}: $e');
@@ -618,17 +551,14 @@ class _SettingScreenState extends State<SettingScreen> {
                             "${selectedLocation!.latitude}, ${selectedLocation!.longitude}";
 
                         try {
-                          final result = await _authRepository!
-                              .updateUser(country: countryString);
+                          await _profileService.updateProfileFields(
+                            country: countryString,
+                          );
                           if (!mounted) return;
-                          if (result['success'] == true) {
-                            Navigator.pop(context);
-                            ErrorSnackBar.showSuccess(
-                                context, 'Country updated'.i18n);
-                          } else {
-                            ErrorSnackBar.show(
-                                context, result['message'] ?? 'Failed'.i18n);
-                          }
+                          Navigator.pop(context);
+                          ErrorSnackBar.showSuccess(
+                              context, 'Country updated'.i18n);
+                          await _loadCurrentUser();
                         } catch (e) {
                           if (!mounted) return;
                           ErrorSnackBar.show(context, 'Error: $e');
@@ -682,17 +612,14 @@ class _SettingScreenState extends State<SettingScreen> {
               onPressed: () async {
                 if (accountType == null) return;
                 try {
-                  final result = await _authRepository!
-                      .updateUser(accountType: accountType);
+                  await _profileService.updateProfileFields(
+                    accountType: accountType,
+                  );
                   if (!mounted) return;
-                  if (result['success'] == true) {
-                    Navigator.pop(context);
-                    ErrorSnackBar.showSuccess(
-                        context, 'Account Type updated'.i18n);
-                  } else {
-                    ErrorSnackBar.show(
-                        context, result['message'] ?? 'Failed'.i18n);
-                  }
+                  Navigator.pop(context);
+                  ErrorSnackBar.showSuccess(
+                      context, 'Account Type updated'.i18n);
+                  await _loadCurrentUser();
                 } catch (e) {
                   if (!mounted) return;
                   ErrorSnackBar.show(context, 'Error: $e');
@@ -741,17 +668,14 @@ class _SettingScreenState extends State<SettingScreen> {
               onPressed: () async {
                 if (hostingMode == null) return;
                 try {
-                  final result = await _authRepository!
-                      .updateUser(hostingMode: hostingMode);
+                  await _profileService.updateProfileFields(
+                    hostingMode: hostingMode,
+                  );
                   if (!mounted) return;
-                  if (result['success'] == true) {
-                    Navigator.pop(context);
-                    ErrorSnackBar.showSuccess(
-                        context, 'Hosting Mode updated'.i18n);
-                  } else {
-                    ErrorSnackBar.show(
-                        context, result['message'] ?? 'Failed'.i18n);
-                  }
+                  Navigator.pop(context);
+                  ErrorSnackBar.showSuccess(
+                      context, 'Hosting Mode updated'.i18n);
+                  await _loadCurrentUser();
                 } catch (e) {
                   if (!mounted) return;
                   ErrorSnackBar.show(context, 'Error: $e');
@@ -763,6 +687,234 @@ class _SettingScreenState extends State<SettingScreen> {
               child: Text('Save'.i18n),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  void _showEditFullNameDialog() {
+    final fullNameController = TextEditingController(
+      text: _currentProfile?.fullName ?? '',
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Dialog(
+          backgroundColor: AppColors.background,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            width: 400,
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Edit Full Name'.i18n,
+                  style: const TextStyle(
+                    color: AppColors.text,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.text.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.text.withOpacity(0.1),
+                      width: 1,
+                    ),
+                  ),
+                  child: TextField(
+                    controller: fullNameController,
+                    style: const TextStyle(color: AppColors.text, fontSize: 16),
+                    decoration: InputDecoration(
+                      labelText: 'Full Name'.i18n,
+                      labelStyle: TextStyle(
+                        color: AppColors.text.withOpacity(0.6),
+                        fontSize: 14,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.person,
+                        color: AppColors.text.withOpacity(0.6),
+                        size: 20,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'Cancel'.i18n,
+                        style: TextStyle(
+                          color: AppColors.text.withOpacity(0.7),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        final fullName = fullNameController.text.trim();
+                        if (fullName.isEmpty) {
+                          ErrorSnackBar.show(
+                            context,
+                            'Full name cannot be empty'.i18n,
+                          );
+                          return;
+                        }
+                        try {
+                          await _profileService.updateProfileFields(
+                            fullName: fullName,
+                          );
+                          if (!mounted) return;
+                          Navigator.pop(context);
+                          ErrorSnackBar.showSuccess(
+                            context,
+                            'Full name updated'.i18n,
+                          );
+                          await _loadCurrentUser();
+                        } catch (e) {
+                          if (!mounted) return;
+                          ErrorSnackBar.show(context, 'Error: $e');
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: Text('Save'.i18n),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickAndUploadAvatar() async {
+    final ImagePicker picker = ImagePicker();
+    try {
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 85,
+      );
+
+      if (image == null) return;
+
+      final File imageFile = File(image.path);
+      await _profileService.uploadAvatar(imageFile);
+
+      if (!mounted) return;
+      ErrorSnackBar.showSuccess(context, 'Avatar updated'.i18n);
+      await _loadCurrentUser();
+    } on InvalidAvatarException catch (e) {
+      if (!mounted) return;
+      ErrorSnackBar.show(context, e.message);
+    } catch (e) {
+      if (!mounted) return;
+      ErrorSnackBar.show(context, 'Error uploading avatar: $e');
+    }
+  }
+
+  Future<void> _deleteAvatar() async {
+    _showConfirmationDialog(
+      title: 'Delete Avatar'.i18n,
+      content: 'Are you sure you want to remove your profile picture?'.i18n,
+      confirmColor: Colors.red,
+      onConfirm: () async {
+        try {
+          await _profileService.deleteAvatar();
+          if (!mounted) return;
+          ErrorSnackBar.showSuccess(context, 'Avatar removed'.i18n);
+          await _loadCurrentUser();
+        } catch (e) {
+          if (!mounted) return;
+          ErrorSnackBar.show(context, 'Error: $e');
+        }
+      },
+    );
+  }
+
+  void _showAvatarOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.background,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.text.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Profile Picture'.i18n,
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: Icon(
+                  Icons.photo_library,
+                  color: AppColors.text.withOpacity(0.7),
+                ),
+                title: Text(
+                  'Choose from Gallery'.i18n,
+                  style: const TextStyle(color: AppColors.text),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickAndUploadAvatar();
+                },
+              ),
+              if (_currentProfile?.avatarUrl != null)
+                ListTile(
+                  leading: const Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  ),
+                  title: Text(
+                    'Remove Photo'.i18n,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _deleteAvatar();
+                  },
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -807,42 +959,115 @@ class _SettingScreenState extends State<SettingScreen> {
                 ),
                 const SizedBox(height: 12),
 
-                // Profile Section
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 20.0, top: 24.0, bottom: 12.0),
-                  child: Text(
-                    'Profile'.i18n,
-                    style: TextStyle(
-                      color: AppColors.text.withOpacity(0.6),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+// Profile Section
+              LiquidGlassSectionHeader(title: 'Profile'.i18n),
 
-                _buildSettingItem(
-                  icon: Icons.cloud_queue,
-                  title: 'Hosting Mode'.i18n,
-                  subtitle: 'Update hosting mode'.i18n,
-                  onTap: _showEditHostingModeDialog,
-                ),
-
-                if (_currentUser != null &&
-                    _currentUser!.isBusinessAccount) ...[
-                  // Organization Section
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        left: 20.0, top: 24.0, bottom: 12.0),
-                    child: Text(
-                      'Organization'.i18n,
-                      style: TextStyle(
-                        color: AppColors.text.withOpacity(0.6),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
+              // Avatar
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                child: GestureDetector(
+                  onTap: _showAvatarOptions,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 64,
+                        height: 64,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.text.withOpacity(0.1),
+                          border: Border.all(
+                            color: AppColors.text.withOpacity(0.2),
+                            width: 2,
+                          ),
+                          image: _currentProfile?.avatarUrl != null
+                              ? DecorationImage(
+                                  image: NetworkImage(_currentProfile!.avatarUrl!),
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
+                        ),
+                        child: _currentProfile?.avatarUrl == null
+                            ? Center(
+                                child: Text(
+                                  _currentProfile?.initials ?? 'U',
+                                  style: TextStyle(
+                                    color: AppColors.text.withOpacity(0.7),
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              )
+                            : null,
                       ),
-                    ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Profile Picture'.i18n,
+                              style: const TextStyle(
+                                color: AppColors.text,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Tap to change'.i18n,
+                              style: TextStyle(
+                                color: AppColors.text.withOpacity(0.6),
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        Icons.chevron_right,
+                        color: AppColors.text.withOpacity(0.4),
+                      ),
+                    ],
                   ),
+                ),
+              ),
+
+              // Full Name
+              _buildSettingItem(
+                icon: Icons.person,
+                title: 'Full Name'.i18n,
+                subtitle: _currentProfile?.fullName ?? 'Not set'.i18n,
+                onTap: _showEditFullNameDialog,
+              ),
+
+              // Country
+              _buildSettingItem(
+                icon: Icons.location_on,
+                title: 'Country'.i18n,
+                subtitle: _currentProfile?.country ?? 'Not set'.i18n,
+                onTap: _showEditCountryDialog,
+              ),
+
+              // Account Type
+              _buildSettingItem(
+                icon: Icons.business,
+                title: 'Account Type'.i18n,
+                subtitle: _currentProfile?.accountType ?? 'Not set'.i18n,
+                onTap: _showEditAccountTypeDialog,
+              ),
+
+              // Hosting Mode
+              _buildSettingItem(
+                icon: Icons.cloud_queue,
+                title: 'Hosting Mode'.i18n,
+                subtitle: _currentProfile?.hostingMode ?? 'Cloud'.i18n,
+                onTap: _showEditHostingModeDialog,
+              ),
+
+                if (_currentAuthUser != null &&
+                    _currentAuthUser!.isBusinessAccount) ...[
+                  // Organization Section
+                  LiquidGlassSectionHeader(title: 'Organization'.i18n),
                   _buildSettingItem(
                     icon: Icons.admin_panel_settings,
                     title: 'LDAP Configuration'.i18n,
@@ -858,21 +1083,10 @@ class _SettingScreenState extends State<SettingScreen> {
                 ],
 
                 // Security Section
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 20.0, top: 24.0, bottom: 12.0),
-                  child: Text(
-                    'Security'.i18n,
-                    style: TextStyle(
-                      color: AppColors.text.withOpacity(0.6),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                if (_currentUser != null &&
-                    !_currentUser!.isLdapUser &&
-                    _currentUser!.ldapUsername == null)
+                LiquidGlassSectionHeader(title: 'Security'.i18n),
+                if (_currentAuthUser != null &&
+                    !_currentAuthUser!.isLdapUser &&
+                    _currentAuthUser!.ldapUsername == null)
                   _buildSettingItem(
                     icon: Icons.password,
                     title: 'Change Password'.i18n,
@@ -898,18 +1112,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   ),
 
                 // About Section
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 20.0, top: 24.0, bottom: 12.0),
-                  child: Text(
-                    'Information'.i18n,
-                    style: TextStyle(
-                      color: AppColors.text.withOpacity(0.6),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+                LiquidGlassSectionHeader(title: 'Information'.i18n),
                 _buildSettingItem(
                   icon: Icons.info_outline,
                   title: 'Application Version'.i18n,
@@ -924,18 +1127,7 @@ class _SettingScreenState extends State<SettingScreen> {
                 ),
 
                 // Account Section
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 30.0, top: 24.0, bottom: 12.0),
-                  child: Text(
-                    'Account'.i18n,
-                    style: TextStyle(
-                      color: AppColors.text.withOpacity(0.6),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+                LiquidGlassSectionHeader(title: 'Account'.i18n),
                 _buildSettingItem(
                   icon: Icons.logout,
                   title: 'Logout'.i18n,
@@ -948,6 +1140,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   subtitle: 'This action cannot be undone'.i18n,
                   iconColor: Colors.red,
                   onTap: _handleDeleteAccount,
+                  isWarning: true,
                 ),
                 const SizedBox(
                   height: 24,

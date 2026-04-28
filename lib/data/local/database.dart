@@ -119,7 +119,7 @@ class AppDatabase extends _$AppDatabase {
       },
       onUpgrade: (Migrator m, int from, int to) async {
         if (from < 2) {
-          await m.createTable(users);
+          await m.createTable(offlineUsers);
         }
         if (from < 3) {
           await m.addColumn(notes, notes.userEmail);

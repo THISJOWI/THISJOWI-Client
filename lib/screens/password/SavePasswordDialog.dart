@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:thisjowi/core/appColors.dart';
 import 'package:thisjowi/services/passwordService.dart';
-import 'package:thisjowi/services/authService.dart';
+import 'package:thisjowi/services/token_manager.dart';
 import 'package:uuid/uuid.dart';
 
 /// Dialog to save a new password detected from autofill
@@ -32,7 +32,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
   final _notesController = TextEditingController();
 
   final PasswordService _passwordService = PasswordService();
-  final AuthService _authService = AuthService();
+  final TokenManager _tokenManager = TokenManager();
 
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -99,7 +99,11 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
     });
 
     try {
-      final email = await _authService.getEmail();
+      final email = await _tokenManager.getToken().then((token) async {
+        if (token == null) return null;
+        final payload = _tokenManager.decodeTokenPayload();
+        return payload?['email']?.toString();
+      });
 
       final passwordData = {
         'id': const Uuid().v4(),

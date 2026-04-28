@@ -299,47 +299,71 @@ extension Localization on String {
         "es": "Contenido",
       } +
 
-      // ==================== SETTINGS ====================
-      {
-        "en": "Settings",
-        "es": "Configuración",
-      } +
-      {
-        "en": "Security",
-        "es": "Seguridad",
-      } +
-      {
-        "en": "Change Password",
-        "es": "Cambiar contraseña",
-      } +
-      {
-        "en": "Update your password",
-        "es": "Actualiza tu contraseña",
-      } +
-      {
-        "en": "Information",
-        "es": "Información",
-      } +
-      {
-        "en": "Application Version",
-        "es": "Versión de la aplicación",
-      } +
-      {
-        "en": "Account & Privacy",
-        "es": "Cuenta y privacidad",
-      } +
-      {
-        "en": "Account",
-        "es": "Cuenta",
-      } +
-      {
-        "en": "Delete Account",
-        "es": "Eliminar cuenta",
-      } +
-      {
-        "en": "This action cannot be undone",
-        "es": "Esta acción no se puede deshacer",
-      } +
+ // ==================== SETTINGS ====================
+    {
+      "en": "Settings",
+      "es": "Configuración",
+    } +
+    {
+      "en": "Profile",
+      "es": "Perfil",
+    } +
+    {
+      "en": "Hosting Mode",
+      "es": "Modo de Hosting",
+    } +
+    {
+      "en": "Update hosting mode",
+      "es": "Actualizar modo de hosting",
+    } +
+    {
+      "en": "Organization",
+      "es": "Organización",
+    } +
+    {
+      "en": "LDAP Configuration",
+      "es": "Configuración LDAP",
+    } +
+    {
+      "en": "Manage LDAP settings",
+      "es": "Gestionar configuración LDAP",
+    } +
+    {
+      "en": "Security",
+      "es": "Seguridad",
+    } +
+    {
+      "en": "Change Password",
+      "es": "Cambiar contraseña",
+    } +
+    {
+      "en": "Update your password",
+      "es": "Actualiza tu contraseña",
+    } +
+    {
+      "en": "Information",
+      "es": "Información",
+    } +
+    {
+      "en": "Application Version",
+      "es": "Versión de la aplicación",
+    } +
+    {
+      "en": "Account & Privacy",
+      "es": "Cuenta y privacidad",
+    } +
+    {
+      "en": "Account",
+      "es": "Cuenta",
+    } +
+    {
+      "en": "Delete Account",
+      "es": "Eliminar cuenta",
+    } +
+    {
+      "en": "This action cannot be undone",
+      "es": "Esta acción no se puede deshacer",
+    } +
       {
         "en":
             "Are you sure you want to delete your account? This action cannot be undone.",
@@ -815,14 +839,112 @@ extension Localization on String {
         "en": "Use regular email/password authentication.",
         "es": "Usar autenticación regular con correo y contraseña.",
       } +
-      {
-        "en":
-            "Configure your LDAP server details for enterprise authentication.",
-        "es":
-            "Configura los detalles de tu servidor LDAP para la autenticación empresarial.",
-      };
+{
+"en":
+"Configure your LDAP server details for enterprise authentication.",
+"es":
+"Configura los detalles de tu servidor LDAP para la autenticación empresarial.",
+} +
 
-  String get i18n => localize(this, _t);
+// ==================== REGISTRO INTERACTIVO ====================
+{
+"en": "select_account_type",
+"es": "Elige tu tipo de cuenta",
+} +
+{
+"en": "community_account",
+"es": "Community Account",
+} +
+{
+"en": "business_account",
+"es": "Business Account",
+} +
+{
+"en": "select_deployment",
+"es": "¿Cómo deseas desplegar?",
+} +
+{
+"en": "cloud_deployment",
+"es": "Cloud",
+} +
+{
+"en": "cloud_desc",
+"es": "Nosotros gestionamos la infraestructura",
+} +
+{
+"en": "selfhosted_deployment",
+"es": "Self-Hosted",
+} +
+{
+"en": "selfhosted_desc",
+"es": "Requiere servidor propio",
+} +
+{
+"en": "back_button",
+"es": "Atrás",
+} +
+{
+"en": "continue_button",
+"es": "Continuar",
+} +
+{
+"en": "server_url_label",
+"es": "URL del servidor",
+} +
+{
+"en": "server_url_hint",
+"es": "https://mi.servidor.com",
+} +
+{
+"en": "country_optional",
+"es": "País (opcional)",
+} +
+{
+"en": "test_connection",
+"es": "Probar conexión",
+} +
+{
+"en": "testing_connection",
+"es": "Probando conexión...",
+} +
+{
+"en": "connection_success",
+"es": "Conexión exitosa",
+} +
+{
+"en": "connection_failed",
+"es": "No se pudo conectar al servidor",
+} +
+{
+    "en": "No selection",
+    "es": "No seleccionar",
+  } +
+  {
+    "en": "Completa tu registro",
+    "es": "Completa tu registro",
+  } +
+  {
+    "en": "Tu selección:",
+    "es": "Tu selección:",
+  } +
+  {
+    "en": "select_country",
+    "es": "Seleccionar país",
+  } +
+  {
+    "en": "search_country",
+    "es": "Buscar país...",
+  } +
+  {
+    "en": "clear",
+    "es": "Limpiar",
+  } +
+  {
+    "en": "no_results",
+    "es": "No se encontraron resultados",
+  };
+
+String get i18n => localize(this, _t);
 
   String i18nFor(String locale) => i18n;
 

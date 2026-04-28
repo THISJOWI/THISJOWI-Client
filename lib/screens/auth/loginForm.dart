@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/data/repository/auth_repository.dart';
-import 'package:thisjowi/services/authService.dart';
-import 'package:thisjowi/services/connectivityService.dart';
-import 'package:thisjowi/data/local/secure_storage_service.dart';
+import 'package:thisjowi/core/exceptions/auth_exceptions.dart';
+import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/components/errorBar.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/components/Navigation.dart';
@@ -22,23 +20,9 @@ class _LoginFormState extends State<LoginForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _passwordFocusNode = FocusNode();
-  AuthRepository? _authRepository;
+  final AuthService _authService = AuthService();
   bool _isLoading = false;
   bool _obscurePassword = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _initAuthRepository();
-  }
-
-  void _initAuthRepository() {
-    _authRepository = AuthRepository(
-      authService: AuthService(),
-      connectivityService: ConnectivityService(),
-      secureStorageService: SecureStorageService(),
-    );
-  }
 
   @override
   void dispose() {
@@ -57,20 +41,13 @@ class _LoginFormState extends State<LoginForm> {
       return;
     }
 
-    if (_authRepository == null) {
-      _initAuthRepository();
-    }
-
     setState(() => _isLoading = true);
-    final result = await _authRepository!.login(email, password);
-    setState(() => _isLoading = false);
-
-    if (result['success'] == true) {
-      if (result['offline'] == true && mounted) {
-        ErrorSnackBar.showSuccess(context, 'Logged in offline mode'.i18n);
-      }
+    
+    try {
+      await _authService.login(email, password);
       
       if (!mounted) return;
+      
       if (widget.onSuccess != null) {
         widget.onSuccess!();
       } else {
@@ -79,8 +56,16 @@ class _LoginFormState extends State<LoginForm> {
           MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
         );
       }
-    } else {
-      ErrorSnackBar.show(context, result['message'] ?? 'Login failed'.i18n);
+    } on AuthException catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ErrorSnackBar.show(context, e.message);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ErrorSnackBar.show(context, 'Login failed'.i18n);
+      }
     }
   }
 

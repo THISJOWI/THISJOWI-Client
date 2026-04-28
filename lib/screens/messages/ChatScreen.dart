@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/services/authService.dart';
+import 'package:thisjowi/services/token_manager.dart';
 import 'package:thisjowi/services/messageService.dart';
 import 'package:thisjowi/data/models/message.dart';
 import 'package:thisjowi/services/cryptoService.dart';
@@ -20,7 +20,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final MessageService _messageService = MessageService();
-  final AuthService _authService = AuthService();
+  final TokenManager _tokenManager = TokenManager();
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   Timer? _pollingTimer;
@@ -56,12 +56,12 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _initUser() async {
-    final user = await _authService.getCurrentUser();
-    if (user != null && mounted) {
+    final userId = await _tokenManager.getUserId();
+    if (userId != null && mounted) {
       setState(() {
-        _currentUserId = user.id;
+        _currentUserId = userId;
         _chatTitle =
-            widget.title ?? widget.conversation.getTitle(_currentUserId!);
+          widget.title ?? widget.conversation.getTitle(_currentUserId!);
       });
       _loadMessages();
       _markRead();

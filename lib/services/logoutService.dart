@@ -43,10 +43,13 @@ class LogoutService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('token');
       await prefs.remove('email');
+      await prefs.remove('cached_email');
+      await prefs.remove('cached_token');
 
       // 4. Clear secure storage (encryption keys)
       final secureStorage = SecureStorageService();
       await secureStorage.clearSecureData();
+      await secureStorage.clearCachedCredentials();
 
       print('✅ Logout completed successfully');
     } catch (e) {

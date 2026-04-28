@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:thisjowi/core/appColors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thisjowi/services/biometricService.dart';
-import 'package:thisjowi/services/authService.dart';
+import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/screens/auth/biometricAuth.dart';
 import 'package:thisjowi/components/Navigation.dart';
 

@@ -677,28 +677,6 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 // Header
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                  child: Row(
-                    children: [
-                      const Image(
-                        image: AssetImage("assets/empresa.png"),
-                        height: 40,
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'THISJOWI'.i18n,
-                        style: const TextStyle(
-                          color: AppColors.text,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Search bar
-                Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 16.0),
                   child: ClipRRect(

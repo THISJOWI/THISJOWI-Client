@@ -324,6 +324,67 @@ class LdapAuthService {
     }
   }
 
+  /// Registrar nueva organización con LDAP
+  Future<Map<String, dynamic>> registerLdapOrganization({
+    required String organizationName,
+    required String ldapUrl,
+    required String adminCn,
+    required String dc,
+    required String adminPassword,
+    String? baseDn,
+    required String hostingMode,
+  }) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/ldap/register-organization'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'organizationName': organizationName,
+              'ldapUrl': ldapUrl,
+              'adminCn': adminCn,
+              'dc': dc,
+              'adminPassword': adminPassword,
+              'baseDn': baseDn,
+              'hostingMode': hostingMode,
+            }),
+          )
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () =>
+                throw Exception('Timeout al registrar organización LDAP'),
+          );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return {
+          'success': true,
+          'message': data['message'] ?? 'Organización registrada exitosamente',
+          'data': {
+            'orgId': data['orgId'],
+            'domain': data['domain'],
+            'ldapEnabled': true,
+          },
+        };
+      } else {
+        return {
+          'success': false,
+          'message': _parseError(response),
+        };
+      }
+    } on http.ClientException {
+      return {
+        'success': false,
+        'message': 'Error de conexión con el servidor',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error: ${e.toString()}',
+      };
+    }
+  }
+
   String _parseError(http.Response res) {
     try {
       final body = jsonDecode(res.body);

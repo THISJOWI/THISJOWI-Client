@@ -2,17 +2,16 @@ import 'package:uuid/uuid.dart';
 import '../models/noteEntry.dart' as models;
 import '../local/database.dart';
 import '../../services/notesService.dart';
-import '../../services/authService.dart';
 import '../../services/connectivityService.dart';
 
 /// Repository for managing notes with offline-first approach
-/// 
+///
 /// All operations go through local database first, then sync with backend
 /// when connection is available
 class NotesRepository {
   final AppDatabase _db = AppDatabase.instance();
   final Uuid _uuid = const Uuid();
-  final NotesService _notesService = NotesService(AuthService());
+  final NotesService _notesService = NotesService();
   final ConnectivityService _connectivityService = ConnectivityService();
   final Set<String> _syncingIds = {};
   bool _isSyncing = false;

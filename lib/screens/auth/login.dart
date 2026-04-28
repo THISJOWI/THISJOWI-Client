@@ -1,11 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/data/repository/auth_repository.dart';
-import 'package:thisjowi/services/authService.dart';
+import 'package:thisjowi/core/exceptions/auth_exceptions.dart';
+import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/services/biometricService.dart';
-import 'package:thisjowi/services/connectivityService.dart';
-import 'package:thisjowi/data/local/secure_storage_service.dart';
+import 'package:thisjowi/services/token_manager.dart';
 import 'package:thisjowi/components/Navigation.dart';
 import 'package:thisjowi/components/errorBar.dart';
 import 'package:thisjowi/i18n/translationService.dart';
@@ -25,7 +24,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final FocusNode _passwordFocusNode = FocusNode();
   final BiometricService _biometricService = BiometricService();
   final LdapAuthService _ldapAuthService = LdapAuthService();
-  AuthRepository? _authRepository;
+  final AuthService _authService = AuthService();
+  final TokenManager _tokenManager = TokenManager();
   bool _isLoading = false;
   bool _hasSavedSession = false;
   bool _biometricAvailable = false;
@@ -35,13 +35,11 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _initAuthRepository();
     _checkBiometricAvailability();
   }
 
   Future<void> _checkBiometricAvailability() async {
-    final authService = AuthService();
-    final token = await authService.getToken();
+    final token = await _tokenManager.getToken();
     final canCheck = await _biometricService.canCheckBiometrics();
     final isEnabled = await _biometricService.isBiometricEnabled();
     final biometricType = await _biometricService.getBiometricTypeName();
@@ -75,14 +73,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _initAuthRepository() {
-    _authRepository = AuthRepository(
-      authService: AuthService(),
-      connectivityService: ConnectivityService(),
-      secureStorageService: SecureStorageService(),
-    );
-  }
-
   @override
   void dispose() {
     _emailController.dispose();
@@ -94,31 +84,24 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleGoogleLogin() async {
     setState(() => _isLoading = true);
     try {
-      final authRepository = AuthRepository(
-        authService: AuthService(),
-        connectivityService: ConnectivityService(),
-        secureStorageService: SecureStorageService(),
-      );
-
-      final result = await authRepository.loginWithGoogle();
+      await _authService.loginWithGoogle();
 
       if (mounted) {
         setState(() => _isLoading = false);
-        if (result['success'] == true) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
-            (route) => false,
-          );
-        } else {
-          ErrorSnackBar.show(
-              context, result['message'] ?? 'Google Sign In failed');
-        }
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
+          (route) => false,
+        );
+      }
+    } on AuthException catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ErrorSnackBar.show(context, e.message);
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        String errorMsg = e.toString().replaceFirst('Exception: ', '');
-        ErrorSnackBar.show(context, errorMsg);
+        ErrorSnackBar.show(context, 'Error en login con Google: $e');
       }
     }
   }
@@ -126,26 +109,20 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleGitHubLogin() async {
     setState(() => _isLoading = true);
 
-    final authRepository = AuthRepository(
-      authService: AuthService(),
-      connectivityService: ConnectivityService(),
-      secureStorageService: SecureStorageService(),
-    );
-
     try {
-      final result = await authRepository.loginWithGitHub();
+      await _authService.loginWithGitHub();
 
       if (mounted) {
         setState(() => _isLoading = false);
-        if (result['success'] == true) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
-            (route) => false,
-          );
-        } else {
-          ErrorSnackBar.show(
-              context, result['message'] ?? 'GitHub login failed');
-        }
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
+          (route) => false,
+        );
+      }
+    } on AuthException catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ErrorSnackBar.show(context, e.message);
       }
     } catch (e) {
       if (mounted) {
@@ -213,31 +190,27 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
 
-    if (_authRepository == null) {
-      _initAuthRepository();
-    }
-
     setState(() => _isLoading = true);
-    final result = await _authRepository!.login(email, password);
 
-    if (!mounted) return;
-    setState(() => _isLoading = false);
+    try {
+      await _authService.login(email, password);
 
-    if (result['success'] == true) {
-      // Show message if offline login
-      if (result['offline'] == true) {
-        ErrorSnackBar.showSuccess(
-            context, 'Logged in offline mode'.tr(context));
-      }
+      if (!mounted) return;
+      setState(() => _isLoading = false);
 
       // Navigate to main screen replacing the stack
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
         (route) => false,
       );
-    } else {
-      ErrorSnackBar.show(
-          context, result['message'] ?? 'Login failed'.tr(context));
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ErrorSnackBar.show(context, e.message);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ErrorSnackBar.show(context, 'Login failed'.tr(context));
     }
   }
 

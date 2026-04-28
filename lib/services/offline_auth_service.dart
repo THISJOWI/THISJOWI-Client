@@ -1,8 +1,9 @@
+import 'dart:typed_data';
 import 'package:argon2/argon2.dart';
 import 'package:thisjowi/data/local/dao/offline_auth.dart';
 import 'package:thisjowi/data/local/secure_storage_service.dart';
 import 'package:thisjowi/services/token_manager.dart';
-import 'package:thisjowi/services/crypto_service.dart';
+import 'package:thisjowi/services/cryptoService.dart';
 import 'package:thisjowi/data/models/auth_user.dart';
 import 'package:thisjowi/data/local/database.dart';
 
@@ -15,22 +16,64 @@ class OfflineAuthService {
   final CryptoService _cryptoService = CryptoService();
   final TokenManager _tokenManager = TokenManager();
 
+  String _generateSalt() {
+    final random = DateTime.now().millisecondsSinceEpoch;
+    return random.toString();
+  }
+
   Future<String> _hashPassword(String password) async {
-    final argon2 = Argon2(
-      memory: 65536,
+    var salt = _generateSalt().toBytesLatin1();
+    
+    var parameters = Argon2Parameters(
+      Argon2Parameters.ARGON2_id,
+      salt,
+      version: Argon2Parameters.ARGON2_VERSION_13,
       iterations: 3,
-      parallelism: 4,
-      hashLength: 32,
-      type: Argon2Type.id,
+      memoryPowerOf2: 16,
     );
-    final hash = await argon2.hashPasswordString(password);
-    return hash;
+
+    var argon2 = Argon2BytesGenerator();
+    argon2.init(parameters);
+
+    var passwordBytes = parameters.converter.convert(password);
+
+    var result = Uint8List(32);
+    argon2.generateBytes(passwordBytes, result, 0, result.length);
+
+    return result.toHexString();
   }
 
   Future<bool> _verifyPassword(String password, String storedHash) async {
     try {
-      final argon2 = Argon2.verify(storedHash);
-      return await argon2.verifyPasswordString(password, storedHash);
+      var saltBytes = _generateSalt().toBytesLatin1();
+      
+      var parameters = Argon2Parameters(
+        Argon2Parameters.ARGON2_id,
+        saltBytes,
+        version: Argon2Parameters.ARGON2_VERSION_13,
+        iterations: 3,
+        memoryPowerOf2: 16,
+      );
+
+      var argon2 = Argon2BytesGenerator();
+      argon2.init(parameters);
+
+      var passwordBytes = parameters.converter.convert(password);
+
+      var result = Uint8List(32);
+      argon2.generateBytes(passwordBytes, result, 0, result.length);
+
+      var computedHash = result.toHexString();
+      
+      final storedHashBytes = storedHash.toBytesLatin1();
+      if (storedHashBytes.length == result.length) {
+        for (var i = 0; i < storedHashBytes.length; i++) {
+          if (storedHashBytes[i] != result[i]) return false;
+        }
+        return true;
+      }
+      
+      return computedHash == storedHash;
     } catch (e) {
       return false;
     }

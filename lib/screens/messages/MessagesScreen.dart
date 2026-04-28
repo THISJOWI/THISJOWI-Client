@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thisjowi/core/appColors.dart';
 import 'package:thisjowi/i18n/translationService.dart';
-import 'package:thisjowi/services/authService.dart';
+import 'package:thisjowi/services/token_manager.dart';
 import 'package:thisjowi/services/messageService.dart';
 import 'package:thisjowi/data/models/message.dart';
 import 'package:thisjowi/data/models/user.dart';
@@ -19,7 +19,7 @@ class MessagesScreen extends StatefulWidget {
 
 class _MessagesScreenState extends State<MessagesScreen> {
   final MessageService _messageService = MessageService();
-  final AuthService _authService = AuthService();
+  final TokenManager _tokenManager = TokenManager();
 
   List<Map<String, dynamic>> _ldapUsers = [];
   List<Conversation> _conversations = [];
@@ -43,8 +43,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
 
-    final currentUser = await _authService.getCurrentUser();
-    _currentUserId = currentUser?.id;
+    _currentUserId = await _tokenManager.getUserId();
 
     // Fetch Conversations
     final convResult = await _messageService.getConversations();
@@ -55,7 +54,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
     }
 
     // Get user email to extract domain
-    final email = await _authService.getEmail();
+    final email = await _tokenManager.getToken().then((token) async {
+      if (token == null) return null;
+      final payload = _tokenManager.decodeTokenPayload();
+      return payload?['email']?.toString();
+    });
+    
     String? domain;
     if (email != null && email.contains('@')) {
       domain = email.split('@').last;
@@ -67,8 +71,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
         if (ldapResult['success'] == true && ldapResult['data'] is List) {
           final allUsers = List<Map<String, dynamic>>.from(ldapResult['data']);
           final filteredUsers = allUsers
-              .where((u) => u['id']?.toString() != currentUser?.id?.toString())
-              .toList();
+            .where((u) => u['id']?.toString() != _currentUserId?.toString())
+            .toList();
           setState(() {
             _ldapUsers = filteredUsers;
             _isLoading = false;

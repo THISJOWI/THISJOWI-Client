@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import '../data/models/noteEntry.dart';
 import '../core/api.dart';
-import 'authService.dart';
+import 'token_manager.dart';
 
 /// Service to connect with the notes API.
 ///
@@ -16,13 +16,13 @@ import 'authService.dart';
 /// - searchNotes(title) -> Future<Map> { success: bool, data?: List<Note>, message?: String }
 class NotesService {
   String get baseUrl => ApiConfig.notesUrl;
-  final AuthService _authService;
+  final TokenManager _tokenManager = TokenManager();
 
-  NotesService(this._authService);
+  NotesService();
 
   /// Get common headers with authentication token
   Future<Map<String, String>> _getHeaders() async {
-    final token = await _authService.getToken();
+    final token = await _tokenManager.getToken();
     if (token == null || token.isEmpty) {
       throw Exception('No authentication token available');
     }
