@@ -4,7 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dao/notes.dart';
 import 'dao/passwords.dart';
 import 'dao/otp.dart';
-import 'dao/auth.dart';
+import 'dao/offline_auth.dart';
 import 'dao/syncQueue.dart';
 
 part 'database.g.dart';
@@ -81,8 +81,27 @@ class OtpEntries extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+class OfflineUsers extends Table {
+  TextColumn get id => text()();
+  TextColumn get email => text()();
+  TextColumn get passwordHash => text().named('password_hash')();
+  TextColumn get fullName => text().nullable().named('full_name')();
+  TextColumn get country => text().nullable()();
+  TextColumn get accountType => text().nullable().named('account_type')();
+  TextColumn get hostingMode => text().nullable().named('hosting_mode')();
+  TextColumn get lastLogin => text().nullable().named('last_login')();
+  TextColumn get avatarUrl => text().nullable().named('avatar_url')();
+  TextColumn get publicKey => text().nullable().named('public_key')();
+  IntColumn get isActive => integer().withDefault(const Constant(0)).named('is_active')();
+  IntColumn get needsSync => integer().withDefault(const Constant(0)).named('needs_sync')();
+  TextColumn get createdAt => text().nullable().named('created_at')();
+
+  @override
+  Set<Column> get primaryKey => {email};
+}
+
 /// Database class using Drift - compatible with all platforms
-@DriftDatabase(tables: [Notes, Passwords, SyncQueue, Users, OtpEntries], daos: [NotesDao, PasswordsDao, OtpDao, AuthDao, SyncQueueDao])
+@DriftDatabase(tables: [Notes, Passwords, SyncQueue, OfflineUsers, OtpEntries], daos: [NotesDao, PasswordsDao, OtpDao, OfflineAuthDao, SyncQueueDao])
 class AppDatabase extends _$AppDatabase {
   static final AppDatabase _instance = AppDatabase();
   factory AppDatabase.instance() => _instance;
@@ -90,7 +109,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration {
@@ -113,6 +132,9 @@ class AppDatabase extends _$AppDatabase {
         }
         if (from == 4) {
           await m.addColumn(otpEntries, otpEntries.type);
+        }
+        if (from < 6) {
+          await m.createTable(offlineUsers);
         }
       },
     );
