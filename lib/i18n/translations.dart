@@ -383,6 +383,18 @@ extension Localization on String {
         "es": "Error al eliminar cuenta",
       } +
       {
+        "en": "Confirm Deletion",
+        "es": "Confirmar eliminación",
+      } +
+      {
+        "en": "Enter your password to confirm account deletion.",
+        "es": "Ingresa tu contraseña para confirmar la eliminación de la cuenta.",
+      } +
+      {
+        "en": "Please enter your password",
+        "es": "Por favor ingresa tu contraseña",
+      } +
+      {
         "en": "Please complete the new password",
         "es": "Por favor completa la nueva contraseña",
       } +

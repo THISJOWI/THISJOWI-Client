@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/exceptions/account_exceptions.dart';
 import 'package:thisjowi/core/exceptions/profile_exceptions.dart';
 import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/services/account_service.dart';
 import 'package:thisjowi/services/profile_service.dart';
 import 'package:thisjowi/services/biometricService.dart';
-import 'package:thisjowi/components/errorBar.dart';
+import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -16,7 +16,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:thisjowi/screens/organization/LdapConfigScreen.dart';
 import 'package:thisjowi/data/models/auth_user.dart';
 import 'package:thisjowi/data/models/profile_user.dart';
-import 'package:thisjowi/data/models/account_user.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -40,7 +39,6 @@ class _SettingScreenState extends State<SettingScreen> {
   String _biometricType = 'Biometric';
   AuthUser? _currentAuthUser;
   ProfileUser? _currentProfile;
-  AccountUser? _currentAccount;
 
   @override
   void initState() {
@@ -55,18 +53,16 @@ class _SettingScreenState extends State<SettingScreen> {
     ]);
   }
 
-  Future<void> _loadCurrentUser() async {
-    final authUser = await _authService.getCurrentAuthUser();
-    final profile = await _profileService.getCurrentProfile();
-    final account = await _accountService.getCurrentAccount();
+Future<void> _loadCurrentUser() async {
+  final authUser = await _authService.getCurrentAuthUser();
+  final profile = await _profileService.getCurrentProfile();
 
-    if (mounted) {
-      setState(() {
-        _currentAuthUser = authUser;
-        _currentProfile = profile;
-        _currentAccount = account;
-      });
-    }
+  if (mounted) {
+    setState(() {
+      _currentAuthUser = authUser;
+      _currentProfile = profile;
+    });
+  }
   }
 
   Future<void> _loadBiometricStatus() async {
@@ -164,7 +160,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     content,
                     textAlign: TextAlign.justify,
                     style: TextStyle(
-                      color: AppColors.text.withOpacity(0.7),
+                      color: AppColors.text.withValues(alpha: 0.7),
                       fontSize: 14,
                       height: 1.5,
                     ),
@@ -184,7 +180,7 @@ class _SettingScreenState extends State<SettingScreen> {
                           child: Text(
                             'Cancel'.i18n,
                             style: TextStyle(
-                              color: AppColors.text.withOpacity(0.6),
+                              color: AppColors.text.withValues(alpha: 0.6),
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
@@ -233,25 +229,189 @@ class _SettingScreenState extends State<SettingScreen> {
       content:
           'Are you sure you want to delete your account? This action cannot be undone.'
               .i18n,
-      onConfirm: () async {
-        try {
-          // Solicitar contraseña para confirmar eliminación
-          await _accountService
-              .deleteAccount(''); // Se mostrará dialog para password
-
-          if (!mounted) return;
-          Navigator.pushReplacementNamed(context, '/login');
-          ErrorSnackBar.showSuccess(
-              context, 'Account deleted successfully'.i18n);
-        } on AccountException catch (e) {
-          if (!mounted) return;
-          ErrorSnackBar.show(context, e.message);
-        } catch (e) {
-          if (!mounted) return;
-          ErrorSnackBar.show(context, '${'Error deleting account'.i18n}: $e');
-        }
+      onConfirm: () {
+        _showDeleteAccountPasswordDialog();
       },
     );
+  }
+
+  void _showDeleteAccountPasswordDialog() {
+    final passwordController = TextEditingController();
+    bool obscurePassword = true;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Center(
+          child: SizedBox(
+            width: 400,
+            child: Dialog(
+              backgroundColor: AppColors.background,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Confirm Deletion'.i18n,
+                          style: const TextStyle(
+                            color: AppColors.text,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Icon(
+                            Icons.close,
+                            color: AppColors.text.withValues(alpha: 0.6),
+                            size: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Enter your password to confirm account deletion.'.i18n,
+                      style: TextStyle(
+                        color: AppColors.text.withValues(alpha: 0.7),
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.text.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.text.withValues(alpha: 0.1),
+                          width: 1,
+                        ),
+                      ),
+                      child: TextField(
+                        controller: passwordController,
+                        obscureText: obscurePassword,
+                        style:
+                            const TextStyle(color: AppColors.text, fontSize: 16),
+                        decoration: InputDecoration(
+                          labelText: 'Password'.i18n,
+                          labelStyle: TextStyle(
+                            color: AppColors.text.withValues(alpha: 0.6),
+                            fontSize: 14,
+                          ),
+                          prefixIcon: Icon(
+                            Icons.lock,
+                            color: AppColors.text.withValues(alpha: 0.6),
+                            size: 20,
+                          ),
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: IconButton(
+                              icon: Icon(
+                                obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: AppColors.text.withValues(alpha: 0.7),
+                                size: 24,
+                              ),
+                              onPressed: () => setState(
+                                  () => obscurePassword = !obscurePassword),
+                            ),
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              passwordController.clear();
+                              Navigator.pop(context);
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              'Cancel'.i18n,
+                              style: TextStyle(
+                                color: AppColors.text.withValues(alpha: 0.6),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              final password = passwordController.text;
+                              if (password.isEmpty) {
+                                ErrorSnackBar.show(
+                                  context,
+                                  'Please enter your password'.i18n,
+                                );
+                                return;
+                              }
+                              Navigator.pop(context);
+                              await _performAccountDeletion(password);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: Text(
+                              'Delete Account'.i18n,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _performAccountDeletion(String password) async {
+    try {
+      await _accountService.deleteAccount(password);
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/login');
+      ErrorSnackBar.showSuccess(context, 'Account deleted successfully'.i18n);
+    } on AccountException catch (e) {
+      if (!mounted) return;
+      ErrorSnackBar.show(context, e.message);
+    } catch (e) {
+      if (!mounted) return;
+      ErrorSnackBar.show(context, '${'Error deleting account'.i18n}: $e');
+    }
   }
 
   void _handleLogout() {
@@ -295,7 +455,7 @@ class _SettingScreenState extends State<SettingScreen> {
                           onTap: () => Navigator.pop(context),
                           child: Icon(
                             Icons.close,
-                            color: AppColors.text.withOpacity(0.6),
+                            color: AppColors.text.withValues(alpha: 0.6),
                             size: 20,
                           ),
                         ),
@@ -336,7 +496,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             child: Text(
                               'Cancel'.i18n,
                               style: TextStyle(
-                                color: AppColors.text.withOpacity(0.6),
+                                color: AppColors.text.withValues(alpha: 0.6),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -385,9 +545,9 @@ class _SettingScreenState extends State<SettingScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.text.withOpacity(0.05),
+        color: AppColors.text.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.text.withOpacity(0.1), width: 1),
+        border: Border.all(color: AppColors.text.withValues(alpha: 0.1), width: 1),
       ),
       child: TextField(
         controller: controller,
@@ -396,12 +556,12 @@ class _SettingScreenState extends State<SettingScreen> {
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(
-            color: AppColors.text.withOpacity(0.6),
+            color: AppColors.text.withValues(alpha: 0.6),
             fontSize: 14,
           ),
           prefixIcon: Icon(
             Icons.lock,
-            color: AppColors.text.withOpacity(0.6),
+            color: AppColors.text.withValues(alpha: 0.6),
             size: 20,
           ),
           suffixIcon: Padding(
@@ -409,7 +569,7 @@ class _SettingScreenState extends State<SettingScreen> {
             child: IconButton(
               icon: Icon(
                 obscure ? Icons.visibility_off : Icons.visibility,
-                color: AppColors.text.withOpacity(0.7),
+                color: AppColors.text.withValues(alpha: 0.7),
                 size: 24,
               ),
               onPressed: onVisibilityToggle,
@@ -494,7 +654,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   height: 300,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.text.withOpacity(0.2)),
+                    border: Border.all(color: AppColors.text.withValues(alpha: 0.2)),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
@@ -541,7 +701,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       onPressed: () => Navigator.pop(context),
                       child: Text('Cancel'.i18n,
                           style: TextStyle(
-                              color: AppColors.text.withOpacity(0.7))),
+                              color: AppColors.text.withValues(alpha: 0.7))),
                     ),
                     const SizedBox(width: 16),
                     ElevatedButton(
@@ -606,7 +766,7 @@ class _SettingScreenState extends State<SettingScreen> {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text('Cancel'.i18n,
-                  style: TextStyle(color: AppColors.text.withOpacity(0.7))),
+                  style: TextStyle(color: AppColors.text.withValues(alpha: 0.7))),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -662,7 +822,7 @@ class _SettingScreenState extends State<SettingScreen> {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text('Cancel'.i18n,
-                  style: TextStyle(color: AppColors.text.withOpacity(0.7))),
+                  style: TextStyle(color: AppColors.text.withValues(alpha: 0.7))),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -722,10 +882,10 @@ class _SettingScreenState extends State<SettingScreen> {
                 const SizedBox(height: 24),
                 Container(
                   decoration: BoxDecoration(
-                    color: AppColors.text.withOpacity(0.05),
+                    color: AppColors.text.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.text.withOpacity(0.1),
+                      color: AppColors.text.withValues(alpha: 0.1),
                       width: 1,
                     ),
                   ),
@@ -735,12 +895,12 @@ class _SettingScreenState extends State<SettingScreen> {
                     decoration: InputDecoration(
                       labelText: 'Full Name'.i18n,
                       labelStyle: TextStyle(
-                        color: AppColors.text.withOpacity(0.6),
+                        color: AppColors.text.withValues(alpha: 0.6),
                         fontSize: 14,
                       ),
                       prefixIcon: Icon(
                         Icons.person,
-                        color: AppColors.text.withOpacity(0.6),
+                        color: AppColors.text.withValues(alpha: 0.6),
                         size: 20,
                       ),
                       border: InputBorder.none,
@@ -760,7 +920,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       child: Text(
                         'Cancel'.i18n,
                         style: TextStyle(
-                          color: AppColors.text.withOpacity(0.7),
+                          color: AppColors.text.withValues(alpha: 0.7),
                         ),
                       ),
                     ),
@@ -870,7 +1030,7 @@ class _SettingScreenState extends State<SettingScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.text.withOpacity(0.3),
+                  color: AppColors.text.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -887,7 +1047,7 @@ class _SettingScreenState extends State<SettingScreen> {
               ListTile(
                 leading: Icon(
                   Icons.photo_library,
-                  color: AppColors.text.withOpacity(0.7),
+                  color: AppColors.text.withValues(alpha: 0.7),
                 ),
                 title: Text(
                   'Choose from Gallery'.i18n,
@@ -974,12 +1134,13 @@ class _SettingScreenState extends State<SettingScreen> {
                         height: 64,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.text.withOpacity(0.1),
+                          color: AppColors.text.withValues(alpha: 0.1),
                           border: Border.all(
-                            color: AppColors.text.withOpacity(0.2),
+                            color: AppColors.text.withValues(alpha: 0.2),
                             width: 2,
                           ),
-                          image: _currentProfile?.avatarUrl != null
+                          image: _currentProfile?.avatarUrl != null &&
+                                  _currentProfile!.avatarUrl!.isNotEmpty
                               ? DecorationImage(
                                   image: NetworkImage(_currentProfile!.avatarUrl!),
                                   fit: BoxFit.cover,
@@ -991,7 +1152,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                 child: Text(
                                   _currentProfile?.initials ?? 'U',
                                   style: TextStyle(
-                                    color: AppColors.text.withOpacity(0.7),
+                                    color: AppColors.text.withValues(alpha: 0.7),
                                     fontSize: 24,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -1016,7 +1177,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             Text(
                               'Tap to change'.i18n,
                               style: TextStyle(
-                                color: AppColors.text.withOpacity(0.6),
+                                color: AppColors.text.withValues(alpha: 0.6),
                                 fontSize: 14,
                               ),
                             ),
@@ -1025,7 +1186,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       ),
                       Icon(
                         Icons.chevron_right,
-                        color: AppColors.text.withOpacity(0.4),
+                        color: AppColors.text.withValues(alpha: 0.4),
                       ),
                     ],
                   ),
@@ -1105,9 +1266,9 @@ class _SettingScreenState extends State<SettingScreen> {
                       value: _biometricEnabled,
                       onChanged: _toggleBiometric,
                       activeThumbColor: AppColors.text,
-                      activeTrackColor: AppColors.text.withOpacity(0.3),
-                      inactiveThumbColor: AppColors.text.withOpacity(0.5),
-                      inactiveTrackColor: AppColors.text.withOpacity(0.1),
+                      activeTrackColor: AppColors.text.withValues(alpha: 0.3),
+                      inactiveThumbColor: AppColors.text.withValues(alpha: 0.5),
+                      inactiveTrackColor: AppColors.text.withValues(alpha: 0.1),
                     ),
                   ),
 
