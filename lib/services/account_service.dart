@@ -34,6 +34,20 @@ class AccountService {
     return response;
   }
 
+  Future<http.Response> _delete(String endpoint, Map<String, dynamic> body) async {
+    final token = await _tokenManager.getToken();
+    final response = await http.delete(
+      Uri.parse('${ApiConfig.baseUrl}$endpoint'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(body),
+    );
+    return response;
+  }
+
   Future<void> forgotPassword(String email) async {
     await _post('/auth/forgot-password', {'email': email});
   }
@@ -57,6 +71,6 @@ class AccountService {
   }
 
   Future<void> deleteAccount(String password) async {
-    await _post('/auth/delete-account', {'password': password});
+    await _delete('/auth/delete-account', {'password': password});
   }
 }
