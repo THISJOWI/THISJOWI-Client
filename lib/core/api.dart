@@ -31,6 +31,12 @@ class ApiConfig {
     return '$baseUrl$path';
   }
 
+  /// URL completa para el servicio de cuenta
+  static String get accountUrl {
+    final path = EnvLoader.getRequired('ACCOUNT_SERVICE_URL');
+    return '$baseUrl$path';
+  }
+
   /// URL completa para el servicio de notas
   static String get notesUrl {
     final path = EnvLoader.getRequired('NOTES_SERVICE_URL');
