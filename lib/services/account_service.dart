@@ -92,7 +92,7 @@ class AccountService {
       debugPrint('🔴 deleteAccount() called with password length: ${password.length}');
     }
     
-    final response = await _delete('/auth/delete-account', {'password': password});
+    final response = await _delete('/account/delete-account', {'password': password});
     
     if (kDebugMode) {
       debugPrint('📊 deleteAccount response status: ${response.statusCode}');
