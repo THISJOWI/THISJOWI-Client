@@ -1,8 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:thisjowi/core/envLoader.dart';
+import 'package:thisjowi/core/env_loader.dart';
 
 /// Configuración centralizada de API para el proyecto ThisJowi
 /// Lee todas las variables desde .env
@@ -75,31 +73,11 @@ class ApiConfig {
   /// Método para debugging - muestra la configuración actual
   static void printConfig() {
     if (kDebugMode) {
-      debugPrint('═══════════════════════════════════════');
-      debugPrint('🔧 ThisJowi API Configuration');
-      debugPrint('═══════════════════════════════════════');
-      debugPrint('Platform: ${_getPlatformName()}');
-      debugPrint('Base URL: $baseUrl');
-      debugPrint('Auth URL: $authUrl');
-      debugPrint('Notes URL: $notesUrl');
-      debugPrint('Passwords URL: $passwordsUrl');
-      debugPrint('OTP URL: $otpUrl');
-      debugPrint('Timeout: ${requestTimeout}s');
-      debugPrint('═══════════════════════════════════════');
-    }
+debugPrint('🔧 API: $baseUrl');
   }
+}
 
-  static String _getPlatformName() {
-    if (kIsWeb) return 'Web';
-    if (Platform.isAndroid) return 'Android';
-    if (Platform.isIOS) return 'iOS';
-    if (Platform.isMacOS) return 'macOS';
-    if (Platform.isWindows) return 'Windows';
-    if (Platform.isLinux) return 'Linux';
-    return 'Unknown';
-  }
-
-  /// Permite sobreescribir manualmente la URL base (útil para testing)
+/// Permite sobreescribir manualmente la URL base (útil para testing)
   static String? _manualBaseUrl;
 
   static Future<void> init() async {

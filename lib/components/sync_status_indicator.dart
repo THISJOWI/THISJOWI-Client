@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import '../services/connectivityService.dart';
 
 /// Widget to display connectivity and sync status
@@ -45,13 +45,13 @@ class _SyncStatusIndicatorState extends State<SyncStatusIndicator> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: _isOnline 
-              ? Colors.green.withOpacity(0.1)
-              : Colors.orange.withOpacity(0.1),
+              ? Colors.green.withValues(alpha: 0.1)
+              : Colors.orange.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: _isOnline 
-                ? Colors.green.withOpacity(0.3)
-                : Colors.orange.withOpacity(0.3),
+                ? Colors.green.withValues(alpha: 0.3)
+                : Colors.orange.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -117,10 +117,10 @@ class _SyncStatusBannerState extends State<SyncStatusBanner> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.orange.withOpacity(0.2),
+        color: Colors.orange.withValues(alpha: 0.2),
         border: Border(
           bottom: BorderSide(
-            color: Colors.orange.withOpacity(0.5),
+            color: Colors.orange.withValues(alpha: 0.5),
             width: 1,
           ),
         ),

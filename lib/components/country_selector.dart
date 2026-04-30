@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/i18n/translations.dart';
 
 /// Selector de países nativo con diseño moderno tipo iOS/Android
@@ -83,17 +83,17 @@ class _CountrySelectorState extends State<CountrySelector>
           scale: _scaleAnimation.value,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: _selectedCountry != null
-                    ? AppColors.secondary.withOpacity(0.5)
-                    : Colors.white.withOpacity(0.1),
+                    ? AppColors.secondary.withValues(alpha: 0.5)
+                    : Colors.white.withValues(alpha: 0.1),
                 width: _selectedCountry != null ? 1.5 : 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -116,8 +116,8 @@ class _CountrySelectorState extends State<CountrySelector>
                         height: 40,
                         decoration: BoxDecoration(
                           color: _selectedCountry != null
-                              ? AppColors.secondary.withOpacity(0.15)
-                              : Colors.white.withOpacity(0.05),
+                              ? AppColors.secondary.withValues(alpha: 0.15)
+                              : Colors.white.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Center(
@@ -138,7 +138,7 @@ class _CountrySelectorState extends State<CountrySelector>
                             Text(
                               widget.labelText ?? "country_optional".i18n,
                               style: TextStyle(
-                                color: AppColors.text.withOpacity(0.5),
+                                color: AppColors.text.withValues(alpha: 0.5),
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                                 letterSpacing: 0.3,
@@ -151,7 +151,7 @@ class _CountrySelectorState extends State<CountrySelector>
                               style: TextStyle(
                                 color: _selectedCountry != null
                                     ? AppColors.text
-                                    : AppColors.text.withOpacity(0.4),
+                                    : AppColors.text.withValues(alpha: 0.4),
                                 fontSize: 16,
                                 fontWeight: _selectedCountry != null
                                     ? FontWeight.w600
@@ -164,7 +164,7 @@ class _CountrySelectorState extends State<CountrySelector>
                       // Icono de flecha
                       Icon(
                         Icons.chevron_right,
-                        color: AppColors.text.withOpacity(0.4),
+                        color: AppColors.text.withValues(alpha: 0.4),
                         size: 24,
                       ),
                     ],
@@ -267,7 +267,7 @@ class _CountryPickerSheetState extends State<CountryPickerSheet>
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         border: Border(
           top: BorderSide(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
@@ -280,7 +280,7 @@ class _CountryPickerSheetState extends State<CountryPickerSheet>
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -306,13 +306,13 @@ class _CountryPickerSheetState extends State<CountryPickerSheet>
                     onPressed: _clearSelection,
                     icon: Icon(
                       Icons.clear,
-                      color: AppColors.text.withOpacity(0.6),
+                      color: AppColors.text.withValues(alpha: 0.6),
                       size: 18,
                     ),
                     label: Text(
                       "clear".i18n,
                       style: TextStyle(
-                        color: AppColors.text.withOpacity(0.6),
+                        color: AppColors.text.withValues(alpha: 0.6),
                         fontSize: 14,
                       ),
                     ),
@@ -326,12 +326,12 @@ class _CountryPickerSheetState extends State<CountryPickerSheet>
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
+                color: Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: _searchFocusNode.hasFocus
-                      ? AppColors.secondary.withOpacity(0.5)
-                      : Colors.white.withOpacity(0.1),
+                      ? AppColors.secondary.withValues(alpha: 0.5)
+                      : Colors.white.withValues(alpha: 0.1),
                 ),
               ),
               child: TextField(
@@ -345,17 +345,17 @@ class _CountryPickerSheetState extends State<CountryPickerSheet>
                 decoration: InputDecoration(
                   hintText: "search_country".i18n,
                   hintStyle: TextStyle(
-                    color: AppColors.text.withOpacity(0.4),
+                    color: AppColors.text.withValues(alpha: 0.4),
                   ),
                   prefixIcon: Icon(
                     Icons.search,
-                    color: AppColors.text.withOpacity(0.5),
+                    color: AppColors.text.withValues(alpha: 0.5),
                   ),
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
                           icon: Icon(
                             Icons.clear,
-                            color: AppColors.text.withOpacity(0.5),
+                            color: AppColors.text.withValues(alpha: 0.5),
                             size: 20,
                           ),
                           onPressed: () {
@@ -382,13 +382,13 @@ class _CountryPickerSheetState extends State<CountryPickerSheet>
               tabAlignment: TabAlignment.start,
               padding: const EdgeInsets.symmetric(horizontal: 24),
               indicator: BoxDecoration(
-                color: AppColors.secondary.withOpacity(0.2),
+                color: AppColors.secondary.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(20),
               ),
               indicatorSize: TabBarIndicatorSize.tab,
               dividerColor: Colors.transparent,
               labelColor: AppColors.secondary,
-              unselectedLabelColor: AppColors.text.withOpacity(0.5),
+              unselectedLabelColor: AppColors.text.withValues(alpha: 0.5),
               labelStyle: const TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
@@ -437,13 +437,13 @@ class _CountryPickerSheetState extends State<CountryPickerSheet>
             Icon(
               Icons.search_off,
               size: 64,
-              color: AppColors.text.withOpacity(0.2),
+              color: AppColors.text.withValues(alpha: 0.2),
             ),
             const SizedBox(height: 16),
             Text(
               "no_results".i18n,
               style: TextStyle(
-                color: AppColors.text.withOpacity(0.5),
+                color: AppColors.text.withValues(alpha: 0.5),
                 fontSize: 16,
               ),
             ),
@@ -505,12 +505,12 @@ class _CountryListItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: isSelected
-            ? AppColors.secondary.withOpacity(0.15)
+            ? AppColors.secondary.withValues(alpha: 0.15)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(16),
         border: isSelected
             ? Border.all(
-                color: AppColors.secondary.withOpacity(0.5),
+                color: AppColors.secondary.withValues(alpha: 0.5),
                 width: 1.5,
               )
             : null,
@@ -521,8 +521,8 @@ class _CountryListItem extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
-          splashColor: AppColors.secondary.withOpacity(0.1),
-          highlightColor: AppColors.secondary.withOpacity(0.05),
+          splashColor: AppColors.secondary.withValues(alpha: 0.1),
+          highlightColor: AppColors.secondary.withValues(alpha: 0.05),
           child: Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 16,
@@ -535,7 +535,7 @@ class _CountryListItem extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Center(
@@ -563,7 +563,7 @@ class _CountryListItem extends StatelessWidget {
                       Text(
                         country.code,
                         style: TextStyle(
-                          color: AppColors.text.withOpacity(0.4),
+                          color: AppColors.text.withValues(alpha: 0.4),
                           fontSize: 12,
                         ),
                       ),

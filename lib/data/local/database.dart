@@ -5,7 +5,7 @@ import 'dao/notes.dart';
 import 'dao/passwords.dart';
 import 'dao/otp.dart';
 import 'dao/offline_auth.dart';
-import 'dao/syncQueue.dart';
+import 'package:thisjowi/data/local/dao/syncQueue.dart';
 
 part 'database.g.dart';
 
@@ -92,8 +92,10 @@ class OfflineUsers extends Table {
   TextColumn get lastLogin => text().nullable().named('last_login')();
   TextColumn get avatarUrl => text().nullable().named('avatar_url')();
   TextColumn get publicKey => text().nullable().named('public_key')();
-  IntColumn get isActive => integer().withDefault(const Constant(0)).named('is_active')();
-  IntColumn get needsSync => integer().withDefault(const Constant(0)).named('needs_sync')();
+  IntColumn get isActive =>
+      integer().withDefault(const Constant(0)).named('is_active')();
+  IntColumn get needsSync =>
+      integer().withDefault(const Constant(0)).named('needs_sync')();
   TextColumn get createdAt => text().nullable().named('created_at')();
 
   @override
@@ -101,7 +103,9 @@ class OfflineUsers extends Table {
 }
 
 /// Database class using Drift - compatible with all platforms
-@DriftDatabase(tables: [Notes, Passwords, SyncQueue, OfflineUsers, OtpEntries], daos: [NotesDao, PasswordsDao, OtpDao, OfflineAuthDao, SyncQueueDao])
+@DriftDatabase(
+    tables: [Notes, Passwords, SyncQueue, OfflineUsers, OtpEntries, Users],
+    daos: [NotesDao, PasswordsDao, OtpDao, OfflineAuthDao, SyncQueueDao])
 class AppDatabase extends _$AppDatabase {
   static final AppDatabase _instance = AppDatabase();
   factory AppDatabase.instance() => _instance;

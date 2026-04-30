@@ -111,17 +111,17 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.white.withOpacity(0.18),
-                    Colors.white.withOpacity(0.08),
+                    Colors.white.withValues(alpha: 0.18),
+                    Colors.white.withValues(alpha: 0.08),
                   ],
                 ),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.25),
+                  color: Colors.white.withValues(alpha: 0.25),
                   width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.25),
+                    color: Colors.black.withValues(alpha: 0.25),
                     blurRadius: 16,
                     offset: const Offset(0, 4),
                   ),
@@ -130,12 +130,12 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(icon, color: Colors.white.withOpacity(0.9), size: 18),
+                  Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 18),
                   const SizedBox(width: 8),
                   Text(
                     label,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       letterSpacing: 0.3,
@@ -217,7 +217,7 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
                     ],
                   ),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.15 + (value * 0.1)),
+                    color: Colors.white.withValues(alpha: 0.15 + (value * 0.1)),
                     width: 1,
                   ),
                 ),

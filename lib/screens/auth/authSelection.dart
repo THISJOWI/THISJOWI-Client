@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../components/authMethodSelector.dart';
+import 'package:thisjowi/components/auth_method_selector.dart';
 import 'login.dart';
 import 'ldapLogin.dart';
 

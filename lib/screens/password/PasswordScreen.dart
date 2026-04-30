@@ -1,15 +1,31 @@
 import 'dart:ui';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
-import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/core/serviceLocator.dart';
-import 'package:thisjowi/data/models/passwordEntry.dart';
+import 'package:thisjowi/core/app_colors.dart';
+import 'package:thisjowi/core/service_locator.dart';
+import 'package:thisjowi/data/models/password_entry.dart';
 import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/components/button.dart';
-import 'package:thisjowi/components/errorBar.dart';
+import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'EditPasswordScreen.dart';
+
+/// Debounce helper for search queries
+class _SearchDebounce {
+  Timer? _timer;
+
+  void debounce(VoidCallback action,
+      {Duration delay = const Duration(milliseconds: 300)}) {
+    _timer?.cancel();
+    _timer = Timer(delay, action);
+  }
+
+  void dispose() {
+    _timer?.cancel();
+  }
+}
 
 class PasswordScreen extends StatefulWidget {
   const PasswordScreen({super.key});
@@ -20,6 +36,7 @@ class PasswordScreen extends StatefulWidget {
 
 class _PasswordScreenState extends State<PasswordScreen> {
   late final PasswordsRepository _passwordsRepository;
+  final _searchDebounce = _SearchDebounce();
   List<PasswordEntry> _passwords = [];
   bool _isLoading = true;
   String _searchQuery = '';
@@ -31,6 +48,12 @@ class _PasswordScreenState extends State<PasswordScreen> {
     final sl = ServiceLocator();
     _passwordsRepository = sl.passwordsRepository;
     _loadPasswords();
+  }
+
+  @override
+  void dispose() {
+    _searchDebounce.dispose();
+    super.dispose();
   }
 
   Future<void> _loadPasswords() async {
@@ -109,7 +132,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
     bool showPassword = false;
     showDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.5),
+      barrierColor: Colors.black.withValues(alpha: 0.5),
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => Dialog(
           backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
@@ -139,7 +162,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
                         child: Icon(Icons.close,
-                            color: AppColors.text.withOpacity(0.6), size: 24),
+                            color: AppColors.text.withValues(alpha: 0.6), size: 24),
                       ),
                     ],
                   ),
@@ -147,14 +170,14 @@ class _PasswordScreenState extends State<PasswordScreen> {
                   if (entry.website.isNotEmpty) ...[
                     Text('Website'.i18n,
                         style: TextStyle(
-                            color: AppColors.text.withOpacity(0.6),
+                            color: AppColors.text.withValues(alpha: 0.6),
                             fontSize: 13,
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.text.withOpacity(0.05),
+                        color: AppColors.text.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(entry.website,
@@ -166,14 +189,14 @@ class _PasswordScreenState extends State<PasswordScreen> {
                   if (entry.username.isNotEmpty) ...[
                     Text('User',
                         style: TextStyle(
-                            color: AppColors.text.withOpacity(0.6),
+                            color: AppColors.text.withValues(alpha: 0.6),
                             fontSize: 13,
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.text.withOpacity(0.05),
+                        color: AppColors.text.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -185,7 +208,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                       color: AppColors.text, fontSize: 14))),
                           IconButton(
                             icon: Icon(Icons.copy,
-                                color: AppColors.text.withOpacity(0.7),
+                                color: AppColors.text.withValues(alpha: 0.7),
                                 size: 18),
                             onPressed: () {
                               Clipboard.setData(
@@ -203,14 +226,14 @@ class _PasswordScreenState extends State<PasswordScreen> {
                   ],
                   Text('Password'.i18n,
                       style: TextStyle(
-                          color: AppColors.text.withOpacity(0.6),
+                          color: AppColors.text.withValues(alpha: 0.6),
                           fontSize: 13,
                           fontWeight: FontWeight.w500)),
                   const SizedBox(height: 6),
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: AppColors.text.withOpacity(0.05),
+                      color: AppColors.text.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -234,7 +257,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                             showPassword
                                 ? Icons.visibility
                                 : Icons.visibility_off,
-                            color: AppColors.text.withOpacity(0.7),
+                            color: AppColors.text.withValues(alpha: 0.7),
                             size: 18,
                           ),
                           onPressed: () =>
@@ -245,7 +268,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                         const SizedBox(width: 8),
                         IconButton(
                           icon: Icon(Icons.copy,
-                              color: AppColors.text.withOpacity(0.7), size: 18),
+                              color: AppColors.text.withValues(alpha: 0.7), size: 18),
                           onPressed: () {
                             Clipboard.setData(
                                 ClipboardData(text: entry.password));
@@ -262,14 +285,14 @@ class _PasswordScreenState extends State<PasswordScreen> {
                     const SizedBox(height: 16),
                     Text('Notes'.i18n,
                         style: TextStyle(
-                            color: AppColors.text.withOpacity(0.6),
+                            color: AppColors.text.withValues(alpha: 0.6),
                             fontSize: 13,
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.text.withOpacity(0.05),
+                        color: AppColors.text.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(entry.notes,
@@ -282,7 +305,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.text.withOpacity(0.1),
+                        backgroundColor: AppColors.text.withValues(alpha: 0.1),
                         foregroundColor: AppColors.text,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
@@ -345,45 +368,48 @@ class _PasswordScreenState extends State<PasswordScreen> {
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(25),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E1E).withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
-                    ),
-                    child: TextField(
-                      style:
-                          const TextStyle(color: AppColors.text, fontSize: 16),
-                      decoration: InputDecoration(
-                        hintText: 'Search passwords'.i18n,
-                        hintStyle: TextStyle(
-                            color: AppColors.text.withOpacity(0.5),
-                            fontSize: 16),
-                        prefixIcon: Icon(Icons.search,
-                            color: AppColors.text.withOpacity(0.6), size: 22),
-                        suffixIcon: _searchQuery.isNotEmpty
-                            ? IconButton(
-                                icon: Icon(Icons.close,
-                                    color: AppColors.text.withOpacity(0.6),
-                                    size: 20),
-                                onPressed: () {
-                                  setState(() => _searchQuery = '');
-                                  _loadPasswords();
-                                },
-                              )
-                            : null,
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 14),
+              child: RepaintBoundary(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(25),
+                        border:
+                            Border.all(color: Colors.white.withValues(alpha: 0.1)),
                       ),
-                      onChanged: (value) {
-                        setState(() => _searchQuery = value);
-                        _loadPasswords();
-                      },
+                      child: TextField(
+                        style: const TextStyle(
+                            color: AppColors.text, fontSize: 16),
+                        decoration: InputDecoration(
+                          hintText: 'Search passwords'.i18n,
+                          hintStyle: TextStyle(
+                              color: AppColors.text.withValues(alpha: 0.5),
+                              fontSize: 16),
+                          prefixIcon: Icon(Icons.search,
+                              color: AppColors.text.withValues(alpha: 0.6), size: 22),
+                          suffixIcon: _searchQuery.isNotEmpty
+                              ? IconButton(
+                                  icon: Icon(Icons.close,
+                                      color: AppColors.text.withValues(alpha: 0.6),
+                                      size: 20),
+                                  onPressed: () {
+                                    setState(() => _searchQuery = '');
+                                    _loadPasswords();
+                                  },
+                                )
+                              : null,
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 14),
+                        ),
+                        onChanged: (value) {
+                          setState(() => _searchQuery = value);
+                          _searchDebounce.debounce(() => _loadPasswords());
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -410,7 +436,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                   color: AppColors.background,
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: AppColors.text.withOpacity(0.15),
+                                    color: AppColors.text.withValues(alpha: 0.15),
                                     width: 1,
                                   ),
                                 ),
@@ -444,7 +470,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                                       : entry.website,
                                                   style: TextStyle(
                                                     color: AppColors.text
-                                                        .withOpacity(0.6),
+                                                        .withValues(alpha: 0.6),
                                                     fontSize: 13,
                                                   ),
                                                   maxLines: 1,
@@ -458,7 +484,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                           IconButton(
                                             icon: Icon(Icons.edit,
                                                 color: AppColors.text
-                                                    .withOpacity(0.7),
+                                                    .withValues(alpha: 0.7),
                                                 size: 20),
                                             onPressed: () async {
                                               final edited =
@@ -483,7 +509,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                           IconButton(
                                             icon: Icon(Icons.delete,
                                                 color: AppColors.text
-                                                    .withOpacity(0.7),
+                                                    .withValues(alpha: 0.7),
                                                 size: 20),
                                             onPressed: () =>
                                                 _deletePassword(entry),

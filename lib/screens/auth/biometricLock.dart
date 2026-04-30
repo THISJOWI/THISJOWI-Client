@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/services/biometricService.dart';
 import 'package:thisjowi/i18n/translations.dart';
 
@@ -106,13 +106,13 @@ class _BiometricLockScreenState extends State<BiometricLockScreen>
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: AppColors.text.withOpacity(0.1),
+                  color: AppColors.text.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Icon(
                   Icons.lock_rounded,
                   size: 40,
-                  color: AppColors.text.withOpacity(0.8),
+                  color: AppColors.text.withValues(alpha: 0.8),
                 ),
               ),
               const SizedBox(height: 32),
@@ -132,7 +132,7 @@ class _BiometricLockScreenState extends State<BiometricLockScreen>
               Text(
                 'Authenticate to continue'.i18n,
                 style: TextStyle(
-                  color: AppColors.text.withOpacity(0.6),
+                  color: AppColors.text.withValues(alpha: 0.6),
                   fontSize: 16,
                 ),
               ),
@@ -144,10 +144,10 @@ class _BiometricLockScreenState extends State<BiometricLockScreen>
                 child: Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: AppColors.text.withOpacity(0.05),
+                    color: AppColors.text.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: AppColors.text.withOpacity(0.15),
+                      color: AppColors.text.withValues(alpha: 0.15),
                       width: 1,
                     ),
                   ),
@@ -157,7 +157,7 @@ class _BiometricLockScreenState extends State<BiometricLockScreen>
                           height: 48,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: AppColors.text.withOpacity(0.6),
+                            color: AppColors.text.withValues(alpha: 0.6),
                           ),
                         )
                       : Icon(
@@ -165,7 +165,7 @@ class _BiometricLockScreenState extends State<BiometricLockScreen>
                               ? Icons.face_rounded
                               : Icons.fingerprint_rounded,
                           size: 48,
-                          color: AppColors.text.withOpacity(0.8),
+                          color: AppColors.text.withValues(alpha: 0.8),
                         ),
                 ),
               ),
@@ -177,7 +177,7 @@ class _BiometricLockScreenState extends State<BiometricLockScreen>
                     ? 'Authenticating...'.i18n
                     : 'Tap to use %s'.i18n.fill([_biometricType]),
                 style: TextStyle(
-                  color: AppColors.text.withOpacity(0.5),
+                  color: AppColors.text.withValues(alpha: 0.5),
                   fontSize: 14,
                 ),
               ),

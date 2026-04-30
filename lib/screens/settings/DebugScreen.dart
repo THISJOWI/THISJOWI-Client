@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/components/syncDebugPanel.dart';
+import 'package:thisjowi/core/app_colors.dart';
+import 'package:thisjowi/components/sync_debug_panel.dart';
 import 'package:thisjowi/data/local/database.dart';
 
 /// Pantalla de configuración y debugging
@@ -35,7 +35,7 @@ class DebugScreen extends StatelessWidget {
 
   Widget _buildDangerZone(BuildContext context) {
     return Card(
-      color: Colors.red.withOpacity(0.1),
+      color: Colors.red.withValues(alpha: 0.1),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

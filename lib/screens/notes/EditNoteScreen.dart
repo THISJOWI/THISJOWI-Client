@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/components/errorBar.dart';
-import 'package:thisjowi/data/models/noteEntry.dart';
+import 'package:thisjowi/components/error_bar.dart';
+import 'package:thisjowi/data/models/note_entry.dart';
 import 'package:thisjowi/i18n/translationService.dart';
 
-import '../../core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import '../../data/repository/notes_repository.dart';
 import '../../i18n/translations.dart';
 
@@ -189,7 +189,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                       decoration: InputDecoration(
                         hintText: 'Title'.i18n,
                         hintStyle: TextStyle(
-                          color: AppColors.text.withOpacity(0.3),
+                          color: AppColors.text.withValues(alpha: 0.3),
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                         ),
@@ -279,7 +279,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                                     border: InputBorder.none,
                                     hintText: 'Start typing...',
                                     hintStyle: TextStyle(
-                                      color: AppColors.text.withOpacity(0.3),
+                                      color: AppColors.text.withValues(alpha: 0.3),
                                       fontSize: 16,
                                       height: 1.6,
                                     ),

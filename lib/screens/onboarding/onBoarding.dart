@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/core/api.dart';
-import 'package:thisjowi/components/errorBar.dart';
+import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/screens/onboarding/countryMap.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -231,7 +231,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     child: Text(
                       'Skip'.i18n,
                       style: TextStyle(
-                        color: AppColors.text.withOpacity(0.6),
+                        color: AppColors.text.withValues(alpha: 0.6),
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -344,11 +344,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 width: 160,
                 height: 160,
                 decoration: BoxDecoration(
-                  color: page.color.withOpacity(0.1),
+                  color: page.color.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: page.color.withOpacity(0.3),
+                      color: page.color.withValues(alpha: 0.3),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -377,7 +377,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               page.description,
               style: TextStyle(
                 fontSize: 16,
-                color: AppColors.text.withOpacity(0.7),
+                color: AppColors.text.withValues(alpha: 0.7),
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
@@ -401,11 +401,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.2),
+                      color: AppColors.primary.withValues(alpha: 0.2),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -465,11 +465,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.secondary.withOpacity(0.1),
+                  color: AppColors.secondary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.secondary.withOpacity(0.2),
+                      color: AppColors.secondary.withValues(alpha: 0.2),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -533,11 +533,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.accent.withOpacity(0.1),
+                  color: AppColors.accent.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.accent.withOpacity(0.2),
+                      color: AppColors.accent.withValues(alpha: 0.2),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -597,11 +597,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.text.withOpacity(0.1),
+                  color: AppColors.text.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.text.withOpacity(0.1),
+                      color: AppColors.text.withValues(alpha: 0.1),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -625,7 +625,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               "Enter your self-hosted server URL".i18n,
               style: TextStyle(
                 fontSize: 16,
-                color: AppColors.text.withOpacity(0.7),
+                color: AppColors.text.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -635,10 +635,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               style: const TextStyle(color: AppColors.text),
               decoration: InputDecoration(
                 labelText: "Server URL (e.g. https://api.myserver.com)".i18n,
-                labelStyle: TextStyle(color: AppColors.text.withOpacity(0.6)),
+                labelStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.6)),
                 prefixIcon: Icon(Icons.link, color: AppColors.secondary),
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.05),
+                fillColor: Colors.white.withValues(alpha: 0.05),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
                   borderSide: BorderSide.none,
@@ -699,11 +699,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
+                  color: Colors.blue.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.blue.withOpacity(0.2),
+                      color: Colors.blue.withValues(alpha: 0.2),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -729,7 +729,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   .i18n,
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.text.withOpacity(0.7),
+                color: AppColors.text.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -780,11 +780,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.2),
+                          color: AppColors.primary.withValues(alpha: 0.2),
                           blurRadius: 20,
                           spreadRadius: 5,
                         ),
@@ -810,7 +810,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     .i18n,
                 style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.text.withOpacity(0.6),
+                  color: AppColors.text.withValues(alpha: 0.6),
                   height: 1.5,
                 ),
               ),
@@ -853,10 +853,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.05),
+                  color: AppColors.primary.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                   ),
                 ),
                 child: Row(
@@ -871,7 +871,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                             .i18n,
                         style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.text.withOpacity(0.8),
+                          color: AppColors.text.withValues(alpha: 0.8),
                           height: 1.4,
                         ),
                       ),
@@ -915,7 +915,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.3),
+                        color: AppColors.primary.withValues(alpha: 0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 6),
                       ),
@@ -964,7 +964,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppColors.text.withOpacity(0.8),
+            color: AppColors.text.withValues(alpha: 0.8),
             letterSpacing: 0.5,
           ),
         ),
@@ -975,14 +975,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           style: const TextStyle(color: AppColors.text),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: AppColors.text.withOpacity(0.2)),
+            hintStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.2)),
             prefixIcon:
-                Icon(icon, color: AppColors.primary.withOpacity(0.5), size: 20),
+                Icon(icon, color: AppColors.primary.withValues(alpha: 0.5), size: 20),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.03),
+            fillColor: Colors.white.withValues(alpha: 0.03),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.05)),
+              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -1010,11 +1010,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.secondary.withOpacity(0.1),
+                  color: AppColors.secondary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.secondary.withOpacity(0.2),
+                      color: AppColors.secondary.withValues(alpha: 0.2),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -1038,7 +1038,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               "We need to know your location to optimize your experience.".i18n,
               style: TextStyle(
                 fontSize: 16,
-                color: AppColors.text.withOpacity(0.7),
+                color: AppColors.text.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -1104,8 +1104,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withOpacity(0.1)
-              : Colors.white.withOpacity(0.05),
+              ? AppColors.primary.withValues(alpha: 0.1)
+              : Colors.white.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(15),
           border: isSelected
               ? Border.all(color: AppColors.primary, width: 1.5)
@@ -1118,7 +1118,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               decoration: BoxDecoration(
                 color: isSelected
                     ? AppColors.primary
-                    : Colors.white.withOpacity(0.1),
+                    : Colors.white.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -1145,7 +1145,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     description,
                     style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.text.withOpacity(0.6),
+                      color: AppColors.text.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -1172,7 +1172,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           decoration: BoxDecoration(
             color: _currentPage == index
                 ? AppColors.primary
-                : AppColors.text.withOpacity(0.2),
+                : AppColors.text.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(4),
           ),
         ),

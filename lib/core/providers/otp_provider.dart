@@ -1,17 +1,18 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:thisjowi/core/serviceLocator.dart';
-import 'package:thisjowi/data/models/otpEntry.dart';
+import 'package:thisjowi/core/service_locator.dart';
+import 'package:thisjowi/data/models/otp_entry.dart';
 import 'package:thisjowi/data/repository/otp_repository.dart';
 
 class OtpProvider extends ChangeNotifier {
   late final OtpRepository _repository;
-  
+
   List<OtpEntry> _entries = [];
   bool _isLoading = false;
   String _errorMessage = '';
   String _searchQuery = '';
   Timer? _autoRefreshTimer;
+  Timer? _searchDebounceTimer;
   DateTime? _lastRefresh;
 
   OtpProvider() {
@@ -116,14 +117,18 @@ class OtpProvider extends ChangeNotifier {
     }
   }
 
-  /// Update search query and filter entries
+  /// Update search query and filter entries with debounce
   void setSearchQuery(String query) {
-    _searchQuery = query;
-    notifyListeners();
+    _searchDebounceTimer?.cancel();
+    _searchDebounceTimer = Timer(const Duration(milliseconds: 300), () {
+      _searchQuery = query;
+      notifyListeners();
+    });
   }
 
   /// Clear search query
   void clearSearch() {
+    _searchDebounceTimer?.cancel();
     _searchQuery = '';
     notifyListeners();
   }
@@ -190,6 +195,7 @@ class OtpProvider extends ChangeNotifier {
   @override
   void dispose() {
     _autoRefreshTimer?.cancel();
+    _searchDebounceTimer?.cancel();
     super.dispose();
   }
 }

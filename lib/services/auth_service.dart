@@ -5,7 +5,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:thisjowi/core/api.dart';
 import 'package:thisjowi/core/exceptions/auth_exceptions.dart';
 import 'package:thisjowi/data/models/auth_user.dart';
 import 'package:thisjowi/data/models/user.dart';
@@ -22,18 +21,23 @@ class AuthService extends BaseService {
   AuthService._internal() : super('AuthService');
 
   final CryptoService _cryptoService = CryptoService();
-  final TokenManager _tokenManager = TokenManager();
+final TokenManager _tokenManager = TokenManager();
 
-  // URL base del servicio de autenticacion
-  String get _baseUrl => ApiConfig.authUrl;
+// Configuracion de Google Sign In - singleton instance
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  bool _googleSignInInitialized = false;
 
-  // Configuracion de Google Sign In
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: ['email', 'profile'],
-    clientId: Platform.isAndroid
-        ? '874520303548-5ck3hf71d2n408d83vqi2p4c8mhqmppp.apps.googleusercontent.com'
-        : null,
-  );
+  /// Initialize Google Sign In
+  Future<void> _initGoogleSignIn() async {
+    if (_googleSignInInitialized) return;
+
+    await _googleSignIn.initialize(
+      clientId: Platform.isAndroid
+          ? '874520303548-5ck3hf71d2n408d83vqi2p4c8mhqmppp.apps.googleusercontent.com'
+          : null,
+    );
+    _googleSignInInitialized = true;
+  }
 
   // Configuracion de GitHub OAuth
   static const String _githubClientId = 'Ov23lilKdhbjWe8OZhYe';
@@ -80,6 +84,7 @@ class AuthService extends BaseService {
       case 500:
       case 502:
       case 503:
+      case 530:
         throw ServerException(
           statusCode: response.statusCode,
           message: 'Error del servidor. Intenta mas tarde.',
@@ -125,14 +130,9 @@ class AuthService extends BaseService {
 
       logInfo('Login successful for user: ${authUser.id}');
       return authUser;
-    } on AuthException {
-      rethrow;
-    } on TimeoutException {
-      logWarning('Login timeout for email: $email');
-      throw const TimeoutException(
-        message: 'Tiempo de espera agotado. Intenta de nuevo.',
-      );
-    } on SocketException catch (e) {
+} on AuthException {
+  rethrow;
+} on SocketException catch (e) {
       logWarning('Network error during login: $e');
       throw NetworkException(
         message: 'Error de conexion. Verifica tu internet.',
@@ -153,54 +153,51 @@ class AuthService extends BaseService {
     logInfo('Starting Google Sign In...');
 
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      await _initGoogleSignIn();
 
-      if (googleUser == null) {
-        logWarning('Google Sign In aborted by user');
-        throw const AuthException(
-          message: 'Inicio de sesion cancelado',
-          code: 'GOOGLE_SIGN_IN_ABORTED',
-        );
+final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate(
+    scopeHint: ['email', 'profile'],
+  );
+
+  if (googleUser == null) {
+    logWarning('Google Sign In aborted by user');
+    throw const AuthException(
+      message: 'Inicio de sesion cancelado',
+      code: 'GOOGLE_SIGN_IN_ABORTED',
+    );
       }
 
       logInfo('Google User signed in: ${googleUser.email}');
 
-      // Obtener Server Auth Code
-      final String? authCode = googleUser.serverAuthCode;
+      // Obtener tokens de autenticacion
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
-      if (authCode == null) {
-        logWarning('Auth Code is null, trying Access Token...');
-        // Fallback a Access Token (necesario para el endpoint /userinfo del backend)
-        final GoogleSignInAuthentication googleAuth =
-            await googleUser.authentication;
-        final String? accessToken = googleAuth.accessToken;
-
-        if (accessToken != null) {
-          return _sendGoogleTokenToBackend(
-            idToken: accessToken, // El backend lo recibe en el campo 'token'
-            email: googleUser.email,
-          );
-        }
-
-        // Si no hay access token, intentar con idToken por si el backend se actualiza
-        final String? idToken = googleAuth.idToken;
-        if (idToken != null) {
-          logWarning('Access Token null, trying ID Token as last resort...');
-          return _sendGoogleTokenToBackend(
-            idToken: idToken,
-            email: googleUser.email,
-          );
-        }
-
-        throw const OAuthException(
-          provider: 'Google',
-          message: 'No se pudo obtener token de Google',
+      // Intentar usar el ID Token primero (recomendado)
+      final String? idToken = googleAuth.idToken;
+      if (idToken != null) {
+        return _sendGoogleTokenToBackend(
+          idToken: idToken,
+          email: googleUser.email,
         );
       }
 
-      return _sendGoogleTokenToBackend(
-        code: authCode,
-        email: googleUser.email,
+      // Si no hay idToken, intentar obtener accessToken via authorizationClient
+      try {
+        final GoogleSignInClientAuthorization authz = await googleUser
+            .authorizationClient
+            .authorizeScopes(['email', 'profile']);
+        return _sendGoogleTokenToBackend(
+          idToken:
+              authz.accessToken, // El backend lo recibe en el campo 'token'
+          email: googleUser.email,
+        );
+      } catch (e) {
+        logWarning('Failed to get authorization tokens: $e');
+      }
+
+      throw const OAuthException(
+        provider: 'Google',
+        message: 'No se pudo obtener token de Google',
       );
     } on AuthException {
       rethrow;
@@ -374,14 +371,9 @@ class AuthService extends BaseService {
 
       logInfo('LDAP login successful for user: ${authUser.id}');
       return authUser;
-    } on AuthException {
-      rethrow;
-    } on TimeoutException {
-      logWarning('LDAP login timeout');
-      throw const TimeoutException(
-        message: 'Tiempo de espera agotado en LDAP.',
-      );
-    } on SocketException catch (e) {
+} on AuthException {
+  rethrow;
+} on SocketException catch (e) {
       logWarning('Network error during LDAP login: $e');
       throw NetworkException(
         message: 'Error de conexion LDAP.',
@@ -411,14 +403,9 @@ class AuthService extends BaseService {
       validateResponse(response);
 
       logInfo('OTP sent successfully to: $email');
-    } on AuthException {
-      rethrow;
-    } on TimeoutException {
-      logWarning('Initiate register timeout');
-      throw const TimeoutException(
-        message: 'Tiempo de espera agotado. Intenta de nuevo.',
-      );
-    } catch (e, stackTrace) {
+} on AuthException {
+  rethrow;
+} catch (e, stackTrace) {
       logError('Error initiating registration', e, stackTrace);
       throw RegistrationException(
         message: 'Error al iniciar registro: $e',
@@ -483,14 +470,9 @@ class AuthService extends BaseService {
 
       logInfo('Registration successful for user: ${authUser.id}');
       return authUser;
-    } on AuthException {
-      rethrow;
-    } on TimeoutException {
-      logWarning('Registration timeout');
-      throw const TimeoutException(
-        message: 'Tiempo de espera agotado. Intenta de nuevo.',
-      );
-    } catch (e, stackTrace) {
+} on AuthException {
+  rethrow;
+} catch (e, stackTrace) {
       logError('Registration error', e, stackTrace);
       throw RegistrationException(
         message: 'Error en el registro: $e',

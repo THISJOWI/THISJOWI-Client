@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/i18n/translations.dart';
 
 class AccountTypeSelector extends StatefulWidget {
@@ -98,13 +98,13 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector>
           shape: BoxShape.circle,
           gradient: LinearGradient(
             colors: [
-              AppColors.secondary.withOpacity(0.3),
-              AppColors.primary.withOpacity(0.2),
+              AppColors.secondary.withValues(alpha: 0.3),
+              AppColors.primary.withValues(alpha: 0.2),
             ],
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.secondary.withOpacity(0.2),
+              color: AppColors.secondary.withValues(alpha: 0.2),
               blurRadius: 30,
               spreadRadius: 5,
             ),
@@ -158,7 +158,7 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector>
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
               letterSpacing: 0.3,
             ),
           ),
@@ -221,13 +221,13 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector>
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
                       color: isHovered
-                          ? Colors.white.withOpacity(0.12)
-                          : Colors.white.withOpacity(0.06),
+                          ? Colors.white.withValues(alpha: 0.12)
+                          : Colors.white.withValues(alpha: 0.06),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
                         color: isHovered
-                            ? Colors.white.withOpacity(0.25)
-                            : Colors.white.withOpacity(0.1),
+                            ? Colors.white.withValues(alpha: 0.25)
+                            : Colors.white.withValues(alpha: 0.1),
                         width: isHovered ? 1.5 : 1,
                       ),
                     ),
@@ -247,7 +247,7 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector>
                             boxShadow: isHovered
                                 ? [
                                     BoxShadow(
-                                      color: option.gradient[0].withOpacity(0.4),
+                                      color: option.gradient[0].withValues(alpha: 0.4),
                                       blurRadius: 20,
                                       spreadRadius: 2,
                                     ),
@@ -278,7 +278,7 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector>
                                 option.subtitle,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                 ),
                               ),
                             ],
@@ -290,7 +290,7 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector>
                           height: 36,
                           decoration: BoxDecoration(
                             color: isHovered
-                                ? Colors.white.withOpacity(0.15)
+                                ? Colors.white.withValues(alpha: 0.15)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -299,7 +299,7 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector>
                             size: 16,
                             color: isHovered
                                 ? Colors.white
-                                : Colors.white.withOpacity(0.4),
+                                : Colors.white.withValues(alpha: 0.4),
                           ),
                         ),
                       ],

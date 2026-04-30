@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/exceptions/auth_exceptions.dart';
 import 'package:thisjowi/services/ldapAuthService.dart';
-import 'package:thisjowi/components/errorBar.dart';
+import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/i18n/translations.dart';
 
 class LdapRegisterForm extends StatefulWidget {
@@ -288,14 +288,14 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
         backgroundColor: const Color(0xFF1E1E1E),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: Colors.white.withOpacity(0.1)),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
         ),
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.secondary.withOpacity(0.2),
+                color: AppColors.secondary.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(Icons.description_outlined,
@@ -319,9 +319,9 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
           height: MediaQuery.of(context).size.height * 0.6,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
@@ -331,7 +331,7 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
                 child: SelectableText(
                   termsContent,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.85),
+                    color: Colors.white.withValues(alpha: 0.85),
                     fontSize: 14,
                     height: 1.6,
                   ),
@@ -498,13 +498,13 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
           shape: BoxShape.circle,
           gradient: LinearGradient(
             colors: [
-              const Color(0xFF4CAF50).withOpacity(0.3),
-              const Color(0xFF8BC34A).withOpacity(0.2),
+              const Color(0xFF4CAF50).withValues(alpha: 0.3),
+              const Color(0xFF8BC34A).withValues(alpha: 0.2),
             ],
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF4CAF50).withOpacity(0.2),
+              color: const Color(0xFF4CAF50).withValues(alpha: 0.2),
               blurRadius: 30,
               spreadRadius: 5,
             ),
@@ -538,7 +538,7 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 15,
-            color: Colors.white.withOpacity(0.5),
+            color: Colors.white.withValues(alpha: 0.5),
           ),
         ),
       ],
@@ -563,13 +563,13 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
             color: isFocused
-                ? Colors.white.withOpacity(0.1)
-                : Colors.white.withOpacity(0.05),
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isFocused
-                  ? Colors.white.withOpacity(0.3)
-                  : Colors.white.withOpacity(0.1),
+                  ? Colors.white.withValues(alpha: 0.3)
+                  : Colors.white.withValues(alpha: 0.1),
               width: isFocused ? 1.5 : 1,
             ),
           ),
@@ -583,8 +583,8 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
               prefixIcon: Icon(
                 icon,
                 color: isFocused
-                    ? Colors.white.withOpacity(0.8)
-                    : Colors.white.withOpacity(0.4),
+                    ? Colors.white.withValues(alpha: 0.8)
+                    : Colors.white.withValues(alpha: 0.4),
                 size: 20,
               ),
               contentPadding:
@@ -593,12 +593,12 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
               hintText: hint,
               labelStyle: TextStyle(
                 color: isFocused
-                    ? Colors.white.withOpacity(0.8)
-                    : Colors.white.withOpacity(0.4),
+                    ? Colors.white.withValues(alpha: 0.8)
+                    : Colors.white.withValues(alpha: 0.4),
                 fontSize: 14,
               ),
               hintStyle: TextStyle(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 fontSize: 14,
               ),
               border: InputBorder.none,
@@ -618,13 +618,13 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
             color: _focusedField == 4
-                ? Colors.white.withOpacity(0.1)
-                : Colors.white.withOpacity(0.05),
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: _focusedField == 4
-                  ? Colors.white.withOpacity(0.3)
-                  : Colors.white.withOpacity(0.1),
+                  ? Colors.white.withValues(alpha: 0.3)
+                  : Colors.white.withValues(alpha: 0.1),
               width: _focusedField == 4 ? 1.5 : 1,
             ),
           ),
@@ -639,8 +639,8 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
               prefixIcon: Icon(
                 Icons.lock_outline,
                 color: _focusedField == 4
-                    ? Colors.white.withOpacity(0.8)
-                    : Colors.white.withOpacity(0.4),
+                    ? Colors.white.withValues(alpha: 0.8)
+                    : Colors.white.withValues(alpha: 0.4),
                 size: 20,
               ),
               contentPadding:
@@ -651,8 +651,8 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
                       ? Icons.visibility_outlined
                       : Icons.visibility_off_outlined,
                   color: _focusedField == 4
-                      ? Colors.white.withOpacity(0.8)
-                      : Colors.white.withOpacity(0.4),
+                      ? Colors.white.withValues(alpha: 0.8)
+                      : Colors.white.withValues(alpha: 0.4),
                   size: 20,
                 ),
                 onPressed: () =>
@@ -661,8 +661,8 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
               labelText: "Contraseña del administrador LDAP".i18n,
               labelStyle: TextStyle(
                 color: _focusedField == 4
-                    ? Colors.white.withOpacity(0.8)
-                    : Colors.white.withOpacity(0.4),
+                    ? Colors.white.withValues(alpha: 0.8)
+                    : Colors.white.withValues(alpha: 0.4),
                 fontSize: 14,
               ),
               border: InputBorder.none,
@@ -711,9 +711,9 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
       style: ElevatedButton.styleFrom(
         backgroundColor: _connectionTested
             ? (_connectionValid
-                ? Colors.green.withOpacity(0.15)
-                : Colors.red.withOpacity(0.15))
-            : Colors.white.withOpacity(0.1),
+                ? Colors.green.withValues(alpha: 0.15)
+                : Colors.red.withValues(alpha: 0.15))
+            : Colors.white.withValues(alpha: 0.1),
         foregroundColor: _connectionTested
             ? (_connectionValid ? Colors.green : Colors.red)
             : Colors.white,
@@ -723,9 +723,9 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
           side: BorderSide(
             color: _connectionTested
                 ? (_connectionValid
-                    ? Colors.green.withOpacity(0.3)
-                    : Colors.red.withOpacity(0.3))
-                : Colors.white.withOpacity(0.1),
+                    ? Colors.green.withValues(alpha: 0.3)
+                    : Colors.red.withValues(alpha: 0.3))
+                : Colors.white.withValues(alpha: 0.1),
           ),
         ),
         elevation: 0,
@@ -744,13 +744,13 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
             height: 24,
             decoration: BoxDecoration(
               color: _acceptedTerms
-                  ? AppColors.secondary.withOpacity(0.3)
+                  ? AppColors.secondary.withValues(alpha: 0.3)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: _acceptedTerms
                     ? AppColors.secondary
-                    : Colors.white.withOpacity(0.3),
+                    : Colors.white.withValues(alpha: 0.3),
                 width: 2,
               ),
             ),
@@ -767,7 +767,7 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
               text: TextSpan(
                 text: "Acepto los ".i18n,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.6),
+                  color: Colors.white.withValues(alpha: 0.6),
                   fontSize: 14,
                 ),
                 children: [
@@ -799,7 +799,7 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.secondary.withOpacity(0.4),
+            color: AppColors.secondary.withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -842,9 +842,9 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.06),
+            color: Colors.white.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: Row(
             children: [
@@ -884,7 +884,7 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
                               ? Icons.cloud
                               : Icons.computer,
                           size: 14,
-                          color: Colors.white.withOpacity(0.5),
+                          color: Colors.white.withValues(alpha: 0.5),
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -893,7 +893,7 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
                               : 'Self-Hosted',
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.white.withOpacity(0.5),
+                            color: Colors.white.withValues(alpha: 0.5),
                           ),
                         ),
                       ],

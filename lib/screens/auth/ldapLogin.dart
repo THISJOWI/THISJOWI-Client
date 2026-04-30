@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../services/ldapAuthService.dart';
-import '../../components/Navigation.dart';
-import '../../core/appColors.dart';
-import '../../components/errorBar.dart';
+import 'package:thisjowi/components/navigation.dart';
+import 'package:thisjowi/core/app_colors.dart';
+import 'package:thisjowi/components/error_bar.dart';
 import '../../i18n/translationService.dart';
 
 class LdapLoginScreen extends StatefulWidget {
@@ -125,7 +125,7 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.primary.withOpacity(0.2),
+                    AppColors.primary.withValues(alpha: 0.2),
                     Colors.transparent,
                   ],
                 ),
@@ -142,7 +142,7 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.accent.withOpacity(0.2),
+                    AppColors.accent.withValues(alpha: 0.2),
                     Colors.transparent,
                   ],
                 ),
@@ -174,10 +174,10 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                               width: 80,
                               height: 80,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(24),
                                 border: Border.all(
-                                    color: Colors.white.withOpacity(0.1)),
+                                    color: Colors.white.withValues(alpha: 0.1)),
                               ),
                               child: const Icon(
                                 Icons.business_rounded,
@@ -200,7 +200,7 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                               'Accede con tus credenciales corporativas',
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.white.withOpacity(0.6),
+                                color: Colors.white.withValues(alpha: 0.6),
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -216,10 +216,10 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(32.0),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1E1E1E).withOpacity(0.6),
+                              color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
                               borderRadius: BorderRadius.circular(30),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.withValues(alpha: 0.1),
                                 width: 1,
                               ),
                             ),
@@ -238,15 +238,15 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                                     decoration: InputDecoration(
                                       labelText: 'Email Corporativo',
                                       labelStyle: TextStyle(
-                                          color: Colors.white.withOpacity(0.5)),
+                                          color: Colors.white.withValues(alpha: 0.5)),
                                       hintText: 'usuario@empresa.com',
                                       prefixIcon: Icon(Icons.email_outlined,
-                                          color: Colors.white.withOpacity(0.7)),
+                                          color: Colors.white.withValues(alpha: 0.7)),
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(20),
                                         borderSide: BorderSide(
                                             color:
-                                                Colors.white.withOpacity(0.1)),
+                                                Colors.white.withValues(alpha: 0.1)),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(20),
@@ -254,7 +254,7 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                                             color: AppColors.primary),
                                       ),
                                       filled: true,
-                                      fillColor: Colors.black.withOpacity(0.2),
+                                      fillColor: Colors.black.withValues(alpha: 0.2),
                                     ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -279,15 +279,15 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                                     decoration: InputDecoration(
                                       labelText: 'Contraseña LDAP',
                                       labelStyle: TextStyle(
-                                          color: Colors.white.withOpacity(0.5)),
+                                          color: Colors.white.withValues(alpha: 0.5)),
                                       prefixIcon: Icon(Icons.lock_outline,
-                                          color: Colors.white.withOpacity(0.7)),
+                                          color: Colors.white.withValues(alpha: 0.7)),
                                       suffixIcon: IconButton(
                                         icon: Icon(
                                           _obscurePassword
                                               ? Icons.visibility_off
                                               : Icons.visibility,
-                                          color: Colors.white.withOpacity(0.5),
+                                          color: Colors.white.withValues(alpha: 0.5),
                                         ),
                                         onPressed: () {
                                           setState(() {
@@ -300,7 +300,7 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                                         borderRadius: BorderRadius.circular(20),
                                         borderSide: BorderSide(
                                             color:
-                                                Colors.white.withOpacity(0.1)),
+                                                Colors.white.withValues(alpha: 0.1)),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(20),
@@ -308,7 +308,7 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                                             color: AppColors.primary),
                                       ),
                                       filled: true,
-                                      fillColor: Colors.black.withOpacity(0.2),
+                                      fillColor: Colors.black.withValues(alpha: 0.2),
                                     ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -327,12 +327,12 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                                       child: Container(
                                         padding: const EdgeInsets.all(12),
                                         decoration: BoxDecoration(
-                                          color: Colors.red.withOpacity(0.1),
+                                          color: Colors.red.withValues(alpha: 0.1),
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           border: Border.all(
                                               color:
-                                                  Colors.red.withOpacity(0.3)),
+                                                  Colors.red.withValues(alpha: 0.3)),
                                         ),
                                         child: Row(
                                           children: [
@@ -368,7 +368,7 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                                       boxShadow: [
                                         BoxShadow(
                                           color: AppColors.primary
-                                              .withOpacity(0.3),
+                                              .withValues(alpha: 0.3),
                                           blurRadius: 12,
                                           offset: const Offset(0, 6),
                                         ),
@@ -422,7 +422,7 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                           text: TextSpan(
                             text: '¿No usas LDAP? ',
                             style: TextStyle(
-                                color: Colors.white.withOpacity(0.6),
+                                color: Colors.white.withValues(alpha: 0.6),
                                 fontSize: 15),
                             children: const [
                               TextSpan(

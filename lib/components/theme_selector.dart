@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/themeProvider.dart';
+import 'package:thisjowi/core/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 /// Widget selector de tema con opciones: Sistema, Claro, Oscuro
@@ -26,8 +26,8 @@ class ThemeSelectorWidget extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             color: isDark 
-                ? Colors.white.withOpacity(0.05)
-                : Colors.black.withOpacity(0.05),
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.black.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -43,8 +43,8 @@ class ThemeSelectorWidget extends StatelessWidget {
               Divider(
                 height: 1,
                 color: isDark 
-                    ? Colors.white.withOpacity(0.1)
-                    : Colors.black.withOpacity(0.1),
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.black.withValues(alpha: 0.1),
               ),
               _buildThemeOption(
                 context,
@@ -57,8 +57,8 @@ class ThemeSelectorWidget extends StatelessWidget {
               Divider(
                 height: 1,
                 color: isDark 
-                    ? Colors.white.withOpacity(0.1)
-                    : Colors.black.withOpacity(0.1),
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.black.withValues(alpha: 0.1),
               ),
               _buildThemeOption(
                 context,
@@ -98,7 +98,7 @@ class ThemeSelectorWidget extends StatelessWidget {
               size: 24,
               color: isSelected 
                   ? Theme.of(context).primaryColor
-                  : Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
+                  : Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -118,7 +118,7 @@ class ThemeSelectorWidget extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
+                      color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -135,8 +135,8 @@ class ThemeSelectorWidget extends StatelessWidget {
                 Icons.circle_outlined,
                 size: 22,
                 color: isDark 
-                    ? Colors.white.withOpacity(0.3)
-                    : Colors.black.withOpacity(0.3),
+                    ? Colors.white.withValues(alpha: 0.3)
+                    : Colors.black.withValues(alpha: 0.3),
               ),
           ],
         ),
@@ -196,7 +196,7 @@ class ThemeSettingsTile extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),

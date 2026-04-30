@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/exceptions/auth_exceptions.dart';
 import 'package:thisjowi/services/auth_service.dart';
-import 'package:thisjowi/components/errorBar.dart';
+import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/i18n/translations.dart';
-import 'package:thisjowi/components/Navigation.dart';
+import 'package:thisjowi/components/navigation.dart';
 import 'package:thisjowi/screens/auth/forgotPassword.dart';
 
 class LoginForm extends StatefulWidget {
@@ -81,9 +81,9 @@ class _LoginFormState extends State<LoginForm> {
           keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
             labelText: 'Email'.i18n,
-            labelStyle: TextStyle(color: AppColors.text.withOpacity(0.7)),
+            labelStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.7)),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide.none,
@@ -102,9 +102,9 @@ class _LoginFormState extends State<LoginForm> {
           style: const TextStyle(color: AppColors.text),
           decoration: InputDecoration(
             labelText: 'Password'.i18n,
-            labelStyle: TextStyle(color: AppColors.text.withOpacity(0.7)),
+            labelStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.7)),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide.none,
@@ -113,7 +113,7 @@ class _LoginFormState extends State<LoginForm> {
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                color: AppColors.text.withOpacity(0.5),
+                color: AppColors.text.withValues(alpha: 0.5),
               ),
               onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
             ),

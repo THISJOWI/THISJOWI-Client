@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thisjowi/services/biometricService.dart';
 import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/screens/auth/biometricAuth.dart';
-import 'package:thisjowi/components/Navigation.dart';
+import 'package:thisjowi/components/navigation.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -176,7 +176,7 @@ class _SplashScreenState extends State<SplashScreen>
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.5),
+                        color: AppColors.primary.withValues(alpha: 0.5),
                         blurRadius: 40,
                         spreadRadius: 10,
                       ),
@@ -211,7 +211,7 @@ class _SplashScreenState extends State<SplashScreen>
                   height: 40,
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primary.withOpacity(0.7),
+                      AppColors.primary.withValues(alpha: 0.7),
                     ),
                     strokeWidth: 3,
                   ),

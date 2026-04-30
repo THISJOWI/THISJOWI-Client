@@ -66,19 +66,16 @@ class BiometricService {
     try {
       final isAvailable = await canCheckBiometrics();
       final isDeviceSupported = await this.isDeviceSupported();
-      
+
       if (!isAvailable || !isDeviceSupported) {
         return false;
       }
 
       return await _localAuth.authenticate(
         localizedReason: localizedReason,
-        options: AuthenticationOptions(
-          useErrorDialogs: useErrorDialogs,
-          stickyAuth: stickyAuth,
-          sensitiveTransaction: sensitiveTransaction,
-          biometricOnly: false, // Allow PIN/pattern as fallback
-        ),
+        biometricOnly: false, // Allow PIN/pattern as fallback
+        sensitiveTransaction: sensitiveTransaction,
+        persistAcrossBackgrounding: stickyAuth,
       );
     } on PlatformException catch (e) {
       print('Biometric authentication error: ${e.message}');

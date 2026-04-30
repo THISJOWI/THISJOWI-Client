@@ -254,30 +254,18 @@ class ApiClient {
   /// Logging de requests
   void _logRequest(String method, String url, Map<String, String> headers, [String? body]) {
     if (kDebugMode) {
-      debugPrint('═══════════════════════════════════════');
-      debugPrint('📤 REQUEST: $method $url');
-      debugPrint('Headers: ${headers.toString()}');
-      if (body != null) {
-        // Ocultar contraseñas en logs
-        final sanitizedBody = body.replaceAll(RegExp(r'"password"\s*:\s*"[^"]*"'), '"password":"***"');
-        debugPrint('Body: $sanitizedBody');
-      }
-      debugPrint('═══════════════════════════════════════');
+      debugPrint('📤 $method $url');
     }
   }
 
   /// Logging de responses
   void _logResponse(String method, String url, http.Response? response, [String? message]) {
     if (kDebugMode) {
-      debugPrint('═══════════════════════════════════════');
-      debugPrint('📥 RESPONSE: $method $url');
       if (response != null) {
-        debugPrint('Status: ${response.statusCode}');
-        debugPrint('Body: ${response.body.substring(0, response.body.length > 500 ? 500 : response.body.length)}...');
+        debugPrint('📥 ${response.statusCode} $url');
       } else if (message != null) {
-        debugPrint(message);
+        debugPrint('📥 $message');
       }
-      debugPrint('═══════════════════════════════════════');
     }
   }
 

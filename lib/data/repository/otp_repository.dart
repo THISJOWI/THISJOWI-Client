@@ -1,5 +1,5 @@
 import 'package:uuid/uuid.dart';
-import '../models/otpEntry.dart' as model;
+import 'package:thisjowi/data/models/otp_entry.dart' as model;
 import '../local/database.dart';
 import '../../services/otpApiService.dart';
 import '../../services/connectivityService.dart';

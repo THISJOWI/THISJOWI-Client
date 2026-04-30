@@ -395,7 +395,7 @@ class _ShimmerAnimationState extends State<ShimmerAnimation>
             return LinearGradient(
               colors: [
                 Colors.transparent,
-                widget.shimmerColor.withOpacity(0.3),
+                widget.shimmerColor.withValues(alpha: 0.3),
                 Colors.transparent,
               ],
               stops: const [0.0, 0.5, 1.0],

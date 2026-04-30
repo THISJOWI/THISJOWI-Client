@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:thisjowi/data/models/passwordEntry.dart';
+import 'package:thisjowi/data/models/password_entry.dart';
 
 /// Abstract interface for platform-specific autofill services
 ///

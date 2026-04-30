@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:thisjowi/components/errorBar.dart';
-import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/core/serviceLocator.dart';
-import 'package:thisjowi/data/models/noteEntry.dart';
+import 'package:thisjowi/components/error_bar.dart';
+import 'package:thisjowi/core/app_colors.dart';
+import 'package:thisjowi/core/service_locator.dart';
+import 'package:thisjowi/data/models/note_entry.dart';
 import 'package:thisjowi/data/repository/notes_repository.dart';
 import 'package:thisjowi/i18n/translationService.dart';
 
@@ -234,10 +234,10 @@ class _NotesScreenState extends State<NotesScreen> {
                         decoration: InputDecoration(
                           hintText: 'Search'.tr(context),
                           hintStyle: TextStyle(
-                              color: AppColors.text.withOpacity(0.6),
+                              color: AppColors.text.withValues(alpha: 0.6),
                               fontSize: 17),
                           prefixIcon: Icon(Icons.search,
-                              color: AppColors.text.withOpacity(0.6), size: 18),
+                              color: AppColors.text.withValues(alpha: 0.6), size: 18),
                           prefixIconConstraints:
                               const BoxConstraints(minWidth: 32, minHeight: 36),
                           border: InputBorder.none,
@@ -250,7 +250,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                     _loadNotes();
                                   },
                                   child: Icon(Icons.close,
-                                      color: AppColors.text.withOpacity(0.6),
+                                      color: AppColors.text.withValues(alpha: 0.6),
                                       size: 18),
                                 )
                               : null,
@@ -275,7 +275,7 @@ class _NotesScreenState extends State<NotesScreen> {
                       child: Text(
                         'No have notes yet'.tr(context),
                         style: TextStyle(
-                            color: AppColors.text.withOpacity(0.6),
+                            color: AppColors.text.withValues(alpha: 0.6),
                             fontSize: 16),
                       ),
                     ),
@@ -300,7 +300,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                 ? null
                                 : Border(
                                     bottom: BorderSide(
-                                        color: AppColors.text.withOpacity(0.2),
+                                        color: AppColors.text.withValues(alpha: 0.2),
                                         width: 0.5),
                                   ),
                           ),
@@ -359,14 +359,14 @@ class _NotesScreenState extends State<NotesScreen> {
                                     Row(
                                       children: [
                                         // Fecha iría aquí
-                                        // Text('10/10/24', style: TextStyle(color: AppColors.text.withOpacity(0.4), fontSize: 14)),
+                                        // Text('10/10/24', style: TextStyle(color: AppColors.text.withValues(alpha: 0.4), fontSize: 14)),
                                         // SizedBox(width: 8),
                                         Expanded(
                                           child: Text(
                                             _getPreviewText(note.content),
                                             style: TextStyle(
                                               color: AppColors.text
-                                                  .withOpacity(0.6),
+                                                  .withValues(alpha: 0.6),
                                               fontSize: 14,
                                             ),
                                             maxLines: 1,
@@ -393,10 +393,10 @@ class _NotesScreenState extends State<NotesScreen> {
             height: 80, // Altura suficiente para safe area
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColors.background.withOpacity(0.95), // Casi sólido
+              color: AppColors.background.withValues(alpha: 0.95), // Casi sólido
               border: Border(
                   top: BorderSide(
-                      color: AppColors.text.withOpacity(0.2), width: 0.5)),
+                      color: AppColors.text.withValues(alpha: 0.2), width: 0.5)),
             ),
             child: SafeArea(
               child: Row(
@@ -405,7 +405,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   IconButton(
                     icon: Icon(Icons.grid_view,
                         color: AppColors.primary
-                            .withOpacity(0.0)), // Invisible para spacing
+                            .withValues(alpha: 0.0)), // Invisible para spacing
                     onPressed: null,
                   ),
                   const Spacer(),
@@ -413,7 +413,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   Text(
                     '${_notes.length} ${'Notes'.tr(context)}',
                     style: TextStyle(
-                        color: AppColors.text.withOpacity(0.8), fontSize: 11),
+                        color: AppColors.text.withValues(alpha: 0.8), fontSize: 11),
                   ),
                   const Spacer(),
                   // Botón Nueva Nota (Icono lápiz sobre papel)

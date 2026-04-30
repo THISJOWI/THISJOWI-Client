@@ -1,5 +1,5 @@
 import 'package:uuid/uuid.dart';
-import '../models/noteEntry.dart' as models;
+import 'package:thisjowi/data/models/note_entry.dart' as models;
 import '../local/database.dart';
 import '../../services/notesService.dart';
 import '../../services/connectivityService.dart';

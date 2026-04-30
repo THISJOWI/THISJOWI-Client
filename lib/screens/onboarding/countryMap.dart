@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/screens/auth/register.dart';
 
@@ -113,7 +113,7 @@ class _CountryMapScreenState extends State<CountryMapScreen> {
                                         horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
                                       color:
-                                          AppColors.background.withOpacity(0.9),
+                                          AppColors.background.withValues(alpha: 0.9),
                                       borderRadius: BorderRadius.circular(8),
                                       border: Border.all(
                                           color: AppColors.secondary),
@@ -144,7 +144,7 @@ class _CountryMapScreenState extends State<CountryMapScreen> {
               color: AppColors.background,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 10,
                   offset: const Offset(0, -5),
                 ),

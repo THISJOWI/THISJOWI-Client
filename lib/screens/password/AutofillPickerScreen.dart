@@ -1,13 +1,13 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/core/serviceLocator.dart';
-import 'package:thisjowi/data/models/passwordEntry.dart';
+import 'package:thisjowi/core/app_colors.dart';
+import 'package:thisjowi/core/service_locator.dart';
+import 'package:thisjowi/data/models/password_entry.dart';
 import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/services/autofillService.dart';
 import 'package:thisjowi/services/biometricService.dart';
 import 'package:thisjowi/i18n/translations.dart';
-import 'package:thisjowi/components/errorBar.dart';
+import 'package:thisjowi/components/error_bar.dart';
 
 class AutofillPickerScreen extends StatefulWidget {
   final AutofillRequest request;
@@ -134,10 +134,10 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E1E1E).withOpacity(0.6),
+                          color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
                           borderRadius: BorderRadius.circular(25),
                           border:
-                              Border.all(color: Colors.white.withOpacity(0.1)),
+                              Border.all(color: Colors.white.withValues(alpha: 0.1)),
                         ),
                         child: TextField(
                           autofocus: _searchQuery.isEmpty,
@@ -151,10 +151,10 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                           decoration: InputDecoration(
                             hintText: 'Search passwords'.i18n,
                             hintStyle: TextStyle(
-                                color: AppColors.text.withOpacity(0.5),
+                                color: AppColors.text.withValues(alpha: 0.5),
                                 fontSize: 16),
                             prefixIcon: Icon(Icons.search,
-                                color: AppColors.text.withOpacity(0.6),
+                                color: AppColors.text.withValues(alpha: 0.6),
                                 size: 22),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
@@ -172,9 +172,9 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
+                        color: Colors.blue.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                        border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         children: [
@@ -195,7 +195,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                                   Text(
                                     'Usuario: ${widget.request.username}',
                                     style: TextStyle(
-                                        color: AppColors.text.withOpacity(0.7),
+                                        color: AppColors.text.withValues(alpha: 0.7),
                                         fontSize: 12),
                                   ),
                               ],
@@ -223,7 +223,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                                 children: [
                                   Icon(Icons.search_off,
                                       size: 64,
-                                      color: AppColors.text.withOpacity(0.2)),
+                                      color: AppColors.text.withValues(alpha: 0.2)),
                                   const SizedBox(height: 16),
                                   Text(
                                     'No matching passwords found'.i18n,
@@ -247,7 +247,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                                   margin: const EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: AppColors.text.withOpacity(0.05),
+                                    color: AppColors.text.withValues(alpha: 0.05),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: ListTile(
@@ -255,7 +255,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                                         horizontal: 16, vertical: 8),
                                     leading: CircleAvatar(
                                       backgroundColor:
-                                          AppColors.primary.withOpacity(0.1),
+                                          AppColors.primary.withValues(alpha: 0.1),
                                       child: const Icon(Icons.account_circle,
                                           color: AppColors.primary),
                                     ),
@@ -274,7 +274,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                                           '${'User'.i18n}: ${entry.username}',
                                           style: TextStyle(
                                               color: AppColors.text
-                                                  .withOpacity(0.8),
+                                                  .withValues(alpha: 0.8),
                                               fontSize: 13),
                                         ),
                                         if (entry.website.isNotEmpty)
@@ -282,7 +282,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                                             entry.website,
                                             style: TextStyle(
                                                 color: AppColors.text
-                                                    .withOpacity(0.4),
+                                                    .withValues(alpha: 0.4),
                                                 fontSize: 11),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -326,7 +326,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
             const SizedBox(height: 16),
             Text(
               'Se usarán estas credenciales para ${widget.request.appName}:',
-              style: TextStyle(color: AppColors.text.withOpacity(0.7)),
+              style: TextStyle(color: AppColors.text.withValues(alpha: 0.7)),
             ),
             const SizedBox(height: 24),
             Row(
@@ -365,7 +365,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
               child: TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text('Cancelar'.i18n,
-                    style: TextStyle(color: AppColors.text.withOpacity(0.6))),
+                    style: TextStyle(color: AppColors.text.withValues(alpha: 0.6))),
               ),
             ),
             const SizedBox(height: 16),

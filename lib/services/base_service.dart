@@ -1,19 +1,18 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:logging/logging.dart';
 import 'package:thisjowi/services/api_client.dart';
 import 'package:thisjowi/services/token_manager.dart';
+import 'package:thisjowi/utils/app_logger.dart';
 
 /// Clase base abstracta para todos los servicios
 /// Proporciona funcionalidad comun: HTTP, tokens, logging, manejo de errores
 abstract class BaseService {
-  final Logger _logger;
+  final AppLogger _logger;
   final ApiClient _apiClient = ApiClient();
   final TokenManager _tokenManager = TokenManager();
 
-  BaseService(String serviceName) : _logger = Logger(serviceName);
+  BaseService(String serviceName) : _logger = AppLogger(serviceName);
 
   /// Cliente HTTP
   ApiClient get apiClient => _apiClient;
@@ -22,41 +21,32 @@ abstract class BaseService {
   TokenManager get tokenManager => _tokenManager;
 
   /// Logger
-  Logger get logger => _logger;
+  AppLogger get logger => _logger;
 
   /// Log de informacion
-  void logInfo(String message) {
-    _logger.info(message);
-    if (kDebugMode) {
-      debugPrint('[INFO] ${_logger.name}: $message');
-    }
+  void logInfo(String message, {Map<String, dynamic>? context}) {
+    _logger.i(message, context: context);
   }
 
   /// Log de advertencia
-  void logWarning(String message, [dynamic error]) {
-    _logger.warning(message, error);
-    if (kDebugMode) {
-      debugPrint('[WARNING] ${_logger.name}: $message');
-      if (error != null) debugPrint('Error: $error');
-    }
+  void logWarning(String message, {dynamic error, Map<String, dynamic>? context}) {
+    _logger.w(message, error: error, context: context);
   }
 
   /// Log de error
-  void logError(String message, dynamic error, StackTrace stackTrace) {
-    _logger.severe(message, error, stackTrace);
-    if (kDebugMode) {
-      debugPrint('[ERROR] ${_logger.name}: $message');
-      debugPrint('Error: $error');
-      debugPrint('StackTrace: $stackTrace');
-    }
+  void logError(String message, dynamic error, StackTrace stackTrace,
+      {Map<String, dynamic>? context}) {
+    _logger.e(message, error: error, stackTrace: stackTrace, context: context);
   }
 
   /// Log de debug
-  void logDebug(String message) {
-    _logger.fine(message);
-    if (kDebugMode) {
-      debugPrint('[DEBUG] ${_logger.name}: $message');
-    }
+  void logDebug(String message, {Map<String, dynamic>? context}) {
+    _logger.d(message, context: context);
+  }
+
+  /// Log de verbose (muy detallado)
+  void logVerbose(String message, {Map<String, dynamic>? context}) {
+    _logger.v(message, context: context);
   }
 
   /// Valida una respuesta HTTP y lanza excepciones apropiadas
@@ -67,8 +57,13 @@ abstract class BaseService {
   Map<String, dynamic> parseJsonBody(http.Response response) {
     try {
       return jsonDecode(response.body) as Map<String, dynamic>;
-    } catch (e) {
-      logError('Failed to parse JSON response', e, StackTrace.current);
+    } catch (e, stackTrace) {
+      logError(
+        'Failed to parse JSON response',
+        e,
+        stackTrace,
+        context: {'responseBody': response.body},
+      );
       throw Exception('Invalid JSON response from server');
     }
   }
@@ -77,8 +72,13 @@ abstract class BaseService {
   List<dynamic> parseJsonListBody(http.Response response) {
     try {
       return jsonDecode(response.body) as List<dynamic>;
-    } catch (e) {
-      logError('Failed to parse JSON list response', e, StackTrace.current);
+    } catch (e, stackTrace) {
+      logError(
+        'Failed to parse JSON list response',
+        e,
+        stackTrace,
+        context: {'responseBody': response.body},
+      );
       throw Exception('Invalid JSON list response from server');
     }
   }
@@ -113,12 +113,49 @@ abstract class BaseService {
       } catch (e) {
         attempts++;
         if (attempts >= maxRetries) {
+          logError(
+            'Max retries exceeded',
+            e,
+            StackTrace.current,
+            context: {'attempts': attempts, 'maxRetries': maxRetries},
+          );
           rethrow;
         }
-        logWarning('Attempt $attempts failed, retrying in ${delay.inSeconds}s...', e);
+        logWarning(
+          'Attempt $attempts failed, retrying in ${delay.inSeconds}s...',
+          error: e,
+          context: {'attempt': attempts, 'maxRetries': maxRetries},
+        );
         await Future.delayed(delay * attempts);
       }
     }
     throw Exception('Max retries exceeded');
+  }
+
+  /// Log de una peticion HTTP
+  void logHttpRequest(String method, String url,
+      {Map<String, dynamic>? headers, Map<String, dynamic>? body}) {
+    logDebug(
+      'HTTP Request: $method $url',
+      context: {
+        if (headers != null) 'headers': headers,
+        if (body != null) 'body': body,
+      },
+    );
+  }
+
+  /// Log de una respuesta HTTP
+  void logHttpResponse(int statusCode, String url,
+      {Map<String, dynamic>? headers, dynamic body, int? durationMs}) {
+    _logger.d(
+      'HTTP Response: $statusCode for $url',
+      context: {
+        'statusCode': statusCode,
+        'url': url,
+        if (headers != null) 'headers': headers,
+        if (body != null) 'body': body,
+        if (durationMs != null) 'durationMs': durationMs,
+      },
+    );
   }
 }

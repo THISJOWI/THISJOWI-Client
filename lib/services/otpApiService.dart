@@ -3,9 +3,9 @@ import 'dart:async';
 
 import 'package:http/http.dart' as http;
 import '../core/api.dart';
-import '../core/encryptionHelper.dart';
+import 'package:thisjowi/core/encryption_helper.dart';
 import 'token_manager.dart';
-import '../data/models/otpEntry.dart';
+import 'package:thisjowi/data/models/otp_entry.dart';
 
 /// Service to connect with the OTP API.
 class OtpApiService {

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/services/token_manager.dart';
 import 'package:thisjowi/services/messageService.dart';
 import 'package:thisjowi/data/models/message.dart';
@@ -227,10 +227,10 @@ class _ChatScreenState extends State<ChatScreen> {
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF1C1C1E).withOpacity(0.9),
+              color: const Color(0xFF1C1C1E).withValues(alpha: 0.9),
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(30)),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -240,7 +240,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -257,7 +257,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       SnackBar(
                         content: const Text('¡Mensaje copiado!'),
                         behavior: SnackBarBehavior.floating,
-                        backgroundColor: AppColors.primary.withOpacity(0.9),
+                        backgroundColor: AppColors.primary.withValues(alpha: 0.9),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                       ),
@@ -294,10 +294,10 @@ class _ChatScreenState extends State<ChatScreen> {
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF1C1C1E).withOpacity(0.9),
+              color: const Color(0xFF1C1C1E).withValues(alpha: 0.9),
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(30)),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -307,7 +307,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -315,7 +315,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
+                    color: Colors.red.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.delete_sweep_rounded,
@@ -336,7 +336,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     'Esta acción no se puede deshacer y el mensaje desaparecerá para todos.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        color: Colors.white.withOpacity(0.5), fontSize: 14),
+                        color: Colors.white.withValues(alpha: 0.5), fontSize: 14),
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -393,7 +393,7 @@ class _ChatScreenState extends State<ChatScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor:
-            const Color(0xFF1E1E1E).withOpacity(0.9), // Glassmorphism-ish
+            const Color(0xFF1E1E1E).withValues(alpha: 0.9), // Glassmorphism-ish
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
@@ -452,7 +452,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     ? Center(
                         child: Text('Start the conversation!',
                             style: TextStyle(
-                                color: AppColors.text.withOpacity(0.5))))
+                                color: AppColors.text.withValues(alpha: 0.5))))
                     : ListView.builder(
                         controller: _scrollController,
                         reverse: true, // Newest at bottom
@@ -481,9 +481,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 12, 16,
                     24), // account for safe area implicitly or add SafeArea
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E1E).withOpacity(0.8),
+                  color: const Color(0xFF1E1E1E).withValues(alpha: 0.8),
                   border: Border(
-                      top: BorderSide(color: Colors.white.withOpacity(0.1))),
+                      top: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
                 ),
                 child: SafeArea(
                   top: false,
@@ -497,10 +497,10 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           decoration: BoxDecoration(
-                            color: AppColors.text.withOpacity(0.1),
+                            color: AppColors.text.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                                color: Colors.white.withOpacity(0.1)),
+                                color: Colors.white.withValues(alpha: 0.1)),
                           ),
                           child: TextField(
                             controller: _textController,
@@ -570,7 +570,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: Icon(
                   Icons.lock_outline_rounded,
                   size: 10,
-                  color: Colors.white.withOpacity(0.5),
+                  color: Colors.white.withValues(alpha: 0.5),
                 ),
               ),
           ],

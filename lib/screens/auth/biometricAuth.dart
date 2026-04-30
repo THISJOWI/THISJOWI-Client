@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/services/biometricService.dart';
 
 /// Screen that prompts user for biometric authentication
@@ -144,10 +144,10 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                     height: 120,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.3),
+                          color: AppColors.primary.withValues(alpha: 0.3),
                           blurRadius: 30,
                           spreadRadius: 5,
                         ),
@@ -179,7 +179,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                     'Usa $_biometricTypeName para desbloquear',
                     style: TextStyle(
                       fontSize: 16,
-                      color: AppColors.text.withOpacity(0.7),
+                      color: AppColors.text.withValues(alpha: 0.7),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -194,10 +194,10 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.1),
+                        color: Colors.red.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Colors.red.withOpacity(0.3),
+                          color: Colors.red.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Row(
@@ -269,7 +269,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                       'Usar contraseña',
                       style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.text.withOpacity(0.6),
+                        color: AppColors.text.withValues(alpha: 0.6),
                       ),
                     ),
                   ),

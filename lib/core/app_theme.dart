@@ -34,30 +34,30 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: darkText.withOpacity(0.05),
+        fillColor: darkText.withValues(alpha: 0.05),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: darkText.withOpacity(0.1),
+            color: darkText.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: darkText.withOpacity(0.1),
+            color: darkText.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: darkText.withOpacity(0.3),
+            color: darkText.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
         labelStyle: TextStyle(
-          color: darkText.withOpacity(0.6),
+          color: darkText.withValues(alpha: 0.6),
           fontSize: 14,
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -67,7 +67,7 @@ class AppTheme {
       ),
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: darkText,
-        selectionColor: darkText.withOpacity(0.3),
+        selectionColor: darkText.withValues(alpha: 0.3),
         selectionHandleColor: darkText,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -94,13 +94,13 @@ class AppTheme {
       textTheme: TextTheme(
         bodyLarge: TextStyle(color: darkText),
         bodyMedium: TextStyle(color: darkText),
-        bodySmall: TextStyle(color: darkText.withOpacity(0.7)),
+        bodySmall: TextStyle(color: darkText.withValues(alpha: 0.7)),
         titleLarge: TextStyle(
           color: darkText,
           fontWeight: FontWeight.bold,
         ),
         titleMedium: TextStyle(color: darkText),
-        titleSmall: TextStyle(color: darkText.withOpacity(0.6)),
+        titleSmall: TextStyle(color: darkText.withValues(alpha: 0.6)),
       ), dialogTheme: DialogThemeData(backgroundColor: darkBackground),
     );
   }
@@ -119,18 +119,18 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: lightText.withOpacity(0.05),
+        fillColor: lightText.withValues(alpha: 0.05),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: lightText.withOpacity(0.1),
+            color: lightText.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: lightText.withOpacity(0.1),
+            color: lightText.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
@@ -142,7 +142,7 @@ class AppTheme {
           ),
         ),
         labelStyle: TextStyle(
-          color: lightText.withOpacity(0.6),
+          color: lightText.withValues(alpha: 0.6),
           fontSize: 14,
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -174,13 +174,13 @@ class AppTheme {
       textTheme: TextTheme(
         bodyLarge: TextStyle(color: lightText),
         bodyMedium: TextStyle(color: lightText),
-        bodySmall: TextStyle(color: lightText.withOpacity(0.7)),
+        bodySmall: TextStyle(color: lightText.withValues(alpha: 0.7)),
         titleLarge: TextStyle(
           color: lightText,
           fontWeight: FontWeight.bold,
         ),
         titleMedium: TextStyle(color: lightText),
-        titleSmall: TextStyle(color: lightText.withOpacity(0.6)),
+        titleSmall: TextStyle(color: lightText.withValues(alpha: 0.6)),
       ), dialogTheme: DialogThemeData(backgroundColor: lightBackground),
     );
   }

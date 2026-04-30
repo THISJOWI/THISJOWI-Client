@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:thisjowi/core/api.dart';
@@ -170,7 +170,7 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.secondary.withOpacity(0.3),
+                    AppColors.secondary.withValues(alpha: 0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -187,7 +187,7 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.primary.withOpacity(0.3),
+                    AppColors.primary.withValues(alpha: 0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -215,10 +215,10 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.white.withOpacity(0.05),
+                            color: Colors.white.withValues(alpha: 0.05),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.secondary.withOpacity(0.2),
+                                color: AppColors.secondary.withValues(alpha: 0.2),
                                 blurRadius: 30,
                                 spreadRadius: 10,
                               ),
@@ -249,7 +249,7 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                              : 'We sent a verification code to your email.'.tr(context),
                           style: TextStyle(
                             fontSize: 15,
-                            color: AppColors.text.withOpacity(0.6),
+                            color: AppColors.text.withValues(alpha: 0.6),
                             height: 1.5,
                           ),
                           textAlign: TextAlign.center,
@@ -265,10 +265,10 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                                 child: Container(
                                   padding: const EdgeInsets.all(32),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF1E1E1E).withOpacity(0.6),
+                                    color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
                                     borderRadius: BorderRadius.circular(24),
                                     border: Border.all(
-                                      color: Colors.white.withOpacity(0.1),
+                                      color: Colors.white.withValues(alpha: 0.1),
                                     ),
                                   ),
                                   child: Column(
@@ -288,11 +288,11 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                                           counterText: "",
                                           hintText: "******",
                                           hintStyle: TextStyle(
-                                            color: AppColors.text.withOpacity(0.2),
+                                            color: AppColors.text.withValues(alpha: 0.2),
                                             letterSpacing: 12,
                                           ),
                                           filled: true,
-                                          fillColor: Colors.black.withOpacity(0.2),
+                                          fillColor: Colors.black.withValues(alpha: 0.2),
                                           border: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(16),
                                             borderSide: BorderSide.none,
@@ -300,14 +300,14 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                                           focusedBorder: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(16),
                                             borderSide: BorderSide(
-                                              color: AppColors.secondary.withOpacity(0.5),
+                                              color: AppColors.secondary.withValues(alpha: 0.5),
                                               width: 1,
                                             ),
                                           ),
                                           enabledBorder: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(16),
                                             borderSide: BorderSide(
-                                              color: Colors.white.withOpacity(0.1),
+                                              color: Colors.white.withValues(alpha: 0.1),
                                               width: 1,
                                             ),
                                           ),
@@ -327,7 +327,7 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                                           ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: AppColors.secondary.withOpacity(0.3),
+                                              color: AppColors.secondary.withValues(alpha: 0.3),
                                               blurRadius: 12,
                                               offset: const Offset(0, 6),
                                             ),
@@ -372,10 +372,10 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                                 child: Container(
                                   padding: const EdgeInsets.all(32),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF1E1E1E).withOpacity(0.6),
+                                    color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
                                     borderRadius: BorderRadius.circular(24),
                                     border: Border.all(
-                                      color: Colors.white.withOpacity(0.1),
+                                      color: Colors.white.withValues(alpha: 0.1),
                                     ),
                                   ),
                                   child: Column(
@@ -386,26 +386,26 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                                         obscureText: _obscurePassword,
                                         decoration: InputDecoration(
                                           labelText: 'New Password'.tr(context),
-                                          labelStyle: TextStyle(color: AppColors.text.withOpacity(0.5)),
-                                          prefixIcon: Icon(Icons.lock_outline, color: AppColors.text.withOpacity(0.7), size: 20),
+                                          labelStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.5)),
+                                          prefixIcon: Icon(Icons.lock_outline, color: AppColors.text.withValues(alpha: 0.7), size: 20),
                                           suffixIcon: IconButton(
                                               icon: Icon(
                                                 _obscurePassword ? Icons.visibility : Icons.visibility_off, 
-                                                color: AppColors.text.withOpacity(0.5),
+                                                color: AppColors.text.withValues(alpha: 0.5),
                                                 size: 20,
                                               ),
                                               onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                                           ),
                                           enabledBorder: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(16),
-                                            borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                                            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
                                           ),
                                           focusedBorder: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(16),
-                                            borderSide: BorderSide(color: AppColors.primary.withOpacity(0.5)),
+                                            borderSide: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
                                           ),
                                           filled: true,
-                                          fillColor: Colors.black.withOpacity(0.2),
+                                          fillColor: Colors.black.withValues(alpha: 0.2),
                                           contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
                                         ),
                                       ),
@@ -416,18 +416,18 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                                         obscureText: _obscurePassword,
                                         decoration: InputDecoration(
                                           labelText: 'Confirm Password'.tr(context),
-                                          labelStyle: TextStyle(color: AppColors.text.withOpacity(0.5)),
-                                          prefixIcon: Icon(Icons.lock_outline, color: AppColors.text.withOpacity(0.7), size: 20),
+                                          labelStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.5)),
+                                          prefixIcon: Icon(Icons.lock_outline, color: AppColors.text.withValues(alpha: 0.7), size: 20),
                                           enabledBorder: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(16),
-                                            borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                                            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
                                           ),
                                           focusedBorder: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(16),
-                                            borderSide: BorderSide(color: AppColors.primary.withOpacity(0.5)),
+                                            borderSide: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
                                           ),
                                           filled: true,
-                                          fillColor: Colors.black.withOpacity(0.2),
+                                          fillColor: Colors.black.withValues(alpha: 0.2),
                                           contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
                                         ),
                                       ),
@@ -444,7 +444,7 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                                           ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: AppColors.secondary.withOpacity(0.3),
+                                              color: AppColors.secondary.withValues(alpha: 0.3),
                                               blurRadius: 12,
                                               offset: const Offset(0, 6),
                                             ),

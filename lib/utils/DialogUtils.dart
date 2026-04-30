@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/data/models/user.dart';
 import 'package:thisjowi/data/models/message.dart';
 import 'package:thisjowi/screens/messages/ChatScreen.dart';
@@ -47,20 +47,20 @@ class DialogUtils {
               if (ldapUsers.isEmpty)
                 Text('Enter email of the recipient',
                     style: TextStyle(
-                        color: AppColors.text.withOpacity(0.7), fontSize: 13))
+                        color: AppColors.text.withValues(alpha: 0.7), fontSize: 13))
               else
                 Text('Select a contact or enter an email',
                     style: TextStyle(
-                        color: AppColors.text.withOpacity(0.7), fontSize: 13)),
+                        color: AppColors.text.withValues(alpha: 0.7), fontSize: 13)),
               const SizedBox(height: 16),
               // LDAP Users List
               if (ldapUsers.isNotEmpty)
                 Container(
                   constraints: const BoxConstraints(minHeight: 100, maxHeight: 250),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                     borderRadius: BorderRadius.circular(12),
-                    color: AppColors.text.withOpacity(0.05),
+                    color: AppColors.text.withValues(alpha: 0.05),
                   ),
                   child: ListView.builder(
                     shrinkWrap: true,
@@ -84,7 +84,7 @@ class DialogUtils {
                         subtitle: Text(
                           userEmail,
                           style: TextStyle(
-                            color: AppColors.text.withOpacity(0.6),
+                            color: AppColors.text.withValues(alpha: 0.6),
                             fontSize: 12,
                           ),
                         ),
@@ -92,7 +92,7 @@ class DialogUtils {
                           emailController.text = userEmail;
                         },
                         selected: emailController.text == userEmail,
-                        selectedTileColor: AppColors.primary.withOpacity(0.2),
+                        selectedTileColor: AppColors.primary.withValues(alpha: 0.2),
                       );
                     },
                   ),
@@ -107,15 +107,15 @@ class DialogUtils {
                 decoration: InputDecoration(
                   labelText: 'Email',
                   hintText: 'or type email',
-                  labelStyle: TextStyle(color: AppColors.text.withOpacity(0.6)),
-                  hintStyle: TextStyle(color: AppColors.text.withOpacity(0.4)),
+                  labelStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.6)),
+                  hintStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.4)),
                   filled: true,
-                  fillColor: AppColors.text.withOpacity(0.05),
+                  fillColor: AppColors.text.withValues(alpha: 0.05),
                   border:
                       OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                    borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
                   ),
                 ),
               ),
@@ -136,7 +136,7 @@ class DialogUtils {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel',
-                style: TextStyle(color: AppColors.text.withOpacity(0.6))),
+                style: TextStyle(color: AppColors.text.withValues(alpha: 0.6))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(

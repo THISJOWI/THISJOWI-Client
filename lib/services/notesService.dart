@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:http/http.dart' as http;
-import '../data/models/noteEntry.dart';
+import 'package:thisjowi/data/models/note_entry.dart';
 import '../core/api.dart';
 import 'token_manager.dart';
 

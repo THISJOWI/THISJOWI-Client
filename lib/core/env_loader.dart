@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 /// Cargador de variables de entorno desde .env
@@ -12,7 +11,6 @@ class EnvLoader {
     if (_initialized) return;
 
     try {
-      debugPrint('Loading .env file...');
       final envContent = await rootBundle.loadString('.env');
       
       for (var line in envContent.split('\n')) {

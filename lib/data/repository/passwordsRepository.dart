@@ -1,5 +1,5 @@
 import 'package:uuid/uuid.dart';
-import '../models/passwordEntry.dart';
+import 'package:thisjowi/data/models/password_entry.dart';
 import '../local/database.dart';
 import '../../services/passwordService.dart';
 import '../../services/connectivityService.dart';

@@ -2,23 +2,36 @@ import 'dart:ui';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/core/serviceLocator.dart';
-import 'package:thisjowi/data/models/passwordEntry.dart';
-import 'package:thisjowi/data/models/noteEntry.dart';
+import 'package:thisjowi/core/app_colors.dart';
+import 'package:thisjowi/core/service_locator.dart';
+import 'package:thisjowi/data/models/password_entry.dart';
+import 'package:thisjowi/data/models/note_entry.dart';
 import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/data/repository/notes_repository.dart';
 import 'package:thisjowi/components/button.dart';
-import 'package:thisjowi/components/errorBar.dart';
+import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/i18n/translationService.dart';
-import 'package:thisjowi/components/Navigation.dart';
 import 'package:thisjowi/utils/GlobalActions.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thisjowi/services/autofillService.dart';
+
+/// Debounce helper for search queries
+class _SearchDebounce {
+  Timer? _timer;
+
+  void debounce(VoidCallback action, {Duration delay = const Duration(milliseconds: 300)}) {
+    _timer?.cancel();
+    _timer = Timer(delay, action);
+  }
+
+  void dispose() {
+    _timer?.cancel();
+  }
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,11 +43,18 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late final PasswordsRepository _passwordsRepository;
   late final NotesRepository _notesRepository;
+  final _searchDebounce = _SearchDebounce();
 
   List<PasswordEntry> _passwords = [];
   List<Note> _notes = [];
   bool _isLoading = true;
   String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchDebounce.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -73,12 +93,12 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E).withOpacity(0.9),
+              color: const Color(0xFF1E1E1E).withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                   blurRadius: 20,
                   spreadRadius: 5,
                 ),
@@ -90,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -115,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       .i18n,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: AppColors.text.withOpacity(0.7),
+                    color: AppColors.text.withValues(alpha: 0.7),
                     fontSize: 15,
                     height: 1.5,
                   ),
@@ -136,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Text(
                           'Later'.i18n,
                           style: TextStyle(
-                            color: AppColors.text.withOpacity(0.5),
+                            color: AppColors.text.withValues(alpha: 0.5),
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -284,113 +304,11 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _passwords = passwords;
       _notes = notes;
-      _isLoading = false;
-    });
-  }
+_isLoading = false;
+});
+}
 
-  Future<void> _showImportDialog() async {
-    final sl = ServiceLocator();
-    final otpRepository = sl.otpRepository;
-    final uriController = TextEditingController();
-
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Import OTP URI'.tr(context),
-            style: const TextStyle(color: AppColors.text)),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Paste the otpauth:// URI from your authenticator app'
-                    .tr(context),
-                style: TextStyle(
-                    color: AppColors.text.withOpacity(0.7), fontSize: 13),
-              ),
-              const SizedBox(height: 16),
-              _buildOtpTextField(
-                controller: uriController,
-                label: 'OTP URI'.tr(context),
-                hint: 'otpauth://totp/...',
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'.tr(context),
-                style: TextStyle(color: AppColors.text.withOpacity(0.6))),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.black,
-            ),
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('Import'.tr(context)),
-          ),
-        ],
-      ),
-    );
-
-    if (result == true) {
-      final uri = uriController.text.trim();
-
-      if (!uri.startsWith('otpauth://')) {
-        ErrorSnackBar.show(context, 'Invalid OTP URI'.tr(context));
-        return;
-      }
-
-      final addResult = await otpRepository.addOtpFromUri(uri, '');
-
-      if (addResult['success'] == true) {
-        ErrorSnackBar.showSuccess(context, 'OTP imported'.tr(context));
-        if (mounted) {
-          bottomNavigationKey.currentState?.navigateToOtp();
-        }
-      } else {
-        ErrorSnackBar.show(context, addResult['message'] ?? 'Error');
-      }
-    }
-  }
-
-  Widget _buildOtpTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-  }) {
-    return TextField(
-      controller: controller,
-      style: const TextStyle(color: AppColors.text),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: AppColors.text.withOpacity(0.6)),
-        hintText: hint,
-        hintStyle: TextStyle(color: AppColors.text.withOpacity(0.3)),
-        filled: true,
-        fillColor: AppColors.text.withOpacity(0.05),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.text.withOpacity(0.1)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.text.withOpacity(0.1)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.text.withOpacity(0.3)),
-        ),
-      ),
-    );
-  }
-
-  Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
+Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
     return await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
@@ -486,7 +404,7 @@ class _HomeScreenState extends State<HomeScreen> {
     bool showPassword = false;
     showDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.5),
+      barrierColor: Colors.black.withValues(alpha: 0.5),
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => Dialog(
           backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
@@ -518,7 +436,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         GestureDetector(
                           onTap: () => Navigator.pop(context),
                           child: Icon(Icons.close,
-                              color: AppColors.text.withOpacity(0.6), size: 24),
+                              color: AppColors.text.withValues(alpha: 0.6), size: 24),
                         ),
                       ],
                     ),
@@ -526,14 +444,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (entry.website.isNotEmpty) ...[
                       Text('Website'.i18n,
                           style: TextStyle(
-                              color: AppColors.text.withOpacity(0.6),
+                              color: AppColors.text.withValues(alpha: 0.6),
                               fontSize: 13,
                               fontWeight: FontWeight.w500)),
                       const SizedBox(height: 6),
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                            color: AppColors.text.withOpacity(0.05),
+                            color: AppColors.text.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(8)),
                         child: Text(entry.website,
                             style: const TextStyle(
@@ -544,14 +462,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (entry.username.isNotEmpty) ...[
                       Text('User'.i18n,
                           style: TextStyle(
-                              color: AppColors.text.withOpacity(0.6),
+                              color: AppColors.text.withValues(alpha: 0.6),
                               fontSize: 13,
                               fontWeight: FontWeight.w500)),
                       const SizedBox(height: 6),
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                            color: AppColors.text.withOpacity(0.05),
+                            color: AppColors.text.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(8)),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -562,7 +480,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         color: AppColors.text, fontSize: 14))),
                             IconButton(
                               icon: Icon(Icons.copy,
-                                  color: AppColors.text.withOpacity(0.7),
+                                  color: AppColors.text.withValues(alpha: 0.7),
                                   size: 18),
                               onPressed: () {
                                 Clipboard.setData(
@@ -580,14 +498,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                     Text('Password'.i18n,
                         style: TextStyle(
-                            color: AppColors.text.withOpacity(0.6),
+                            color: AppColors.text.withValues(alpha: 0.6),
                             fontSize: 13,
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                          color: AppColors.text.withOpacity(0.05),
+                          color: AppColors.text.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(8)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -610,7 +528,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 showPassword
                                     ? Icons.visibility
                                     : Icons.visibility_off,
-                                color: AppColors.text.withOpacity(0.7),
+                                color: AppColors.text.withValues(alpha: 0.7),
                                 size: 18),
                             onPressed: () =>
                                 setState(() => showPassword = !showPassword),
@@ -620,7 +538,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(width: 8),
                           IconButton(
                             icon: Icon(Icons.copy,
-                                color: AppColors.text.withOpacity(0.7),
+                                color: AppColors.text.withValues(alpha: 0.7),
                                 size: 18),
                             onPressed: () {
                               Clipboard.setData(
@@ -639,7 +557,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.text.withOpacity(0.1),
+                          backgroundColor: AppColors.text.withValues(alpha: 0.1),
                           foregroundColor: AppColors.text,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -675,20 +593,21 @@ class _HomeScreenState extends State<HomeScreen> {
           SafeArea(
             child: Column(
               children: [
-                // Header
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0, vertical: 16.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(25),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(
+// Header
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 16.0),
+                        child: RepaintBoundary(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(25),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                              child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E1E1E).withOpacity(0.6),
+                          color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
                           borderRadius: BorderRadius.circular(25),
                           border:
-                              Border.all(color: Colors.white.withOpacity(0.1)),
+                              Border.all(color: Colors.white.withValues(alpha: 0.1)),
                         ),
                         child: TextField(
                           style: const TextStyle(
@@ -696,15 +615,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           decoration: InputDecoration(
                             hintText: 'Search'.i18n,
                             hintStyle: TextStyle(
-                                color: AppColors.text.withOpacity(0.5),
+                                color: AppColors.text.withValues(alpha: 0.5),
                                 fontSize: 16),
                             prefixIcon: Icon(Icons.search,
-                                color: AppColors.text.withOpacity(0.6),
+                                color: AppColors.text.withValues(alpha: 0.6),
                                 size: 22),
                             suffixIcon: _searchQuery.isNotEmpty
                                 ? IconButton(
                                     icon: Icon(Icons.close,
-                                        color: AppColors.text.withOpacity(0.6),
+                                        color: AppColors.text.withValues(alpha: 0.6),
                                         size: 20),
                                     onPressed: () {
                                       setState(() => _searchQuery = '');
@@ -716,16 +635,17 @@ class _HomeScreenState extends State<HomeScreen> {
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 14),
                           ),
-                          onChanged: (value) {
-                            setState(() => _searchQuery = value);
-                            _loadData();
-                          },
+onChanged: (value) {
+                              setState(() => _searchQuery = value);
+                              _searchDebounce.debounce(() => _loadData());
+                            },
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                // Content
+                  // Content
                 Expanded(
                   child: _isLoading
                       ? Center(
@@ -758,7 +678,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             horizontal: 24, vertical: 8),
                                         child: Divider(
                                           color:
-                                              AppColors.text.withOpacity(0.1),
+                                              AppColors.text.withValues(alpha: 0.1),
                                           thickness: 1,
                                         ),
                                       ),
@@ -807,12 +727,12 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Row(
         children: [
-          Icon(icon, color: AppColors.text.withOpacity(0.7), size: 20),
+          Icon(icon, color: AppColors.text.withValues(alpha: 0.7), size: 20),
           const SizedBox(width: 8),
           Text(
             title,
             style: TextStyle(
-              color: AppColors.text.withOpacity(0.7),
+              color: AppColors.text.withValues(alpha: 0.7),
               fontSize: 14,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
@@ -822,13 +742,13 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: AppColors.text.withOpacity(0.1),
+              color: AppColors.text.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               count.toString(),
               style: TextStyle(
-                color: AppColors.text.withOpacity(0.6),
+                color: AppColors.text.withValues(alpha: 0.6),
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
@@ -848,10 +768,10 @@ class _HomeScreenState extends State<HomeScreen> {
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E).withOpacity(0.6),
+              color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(20),
               border:
-                  Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+                  Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
             ),
             child: Material(
               color: Colors.transparent,
@@ -866,7 +786,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.white.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(Icons.key, color: AppColors.text, size: 20),
@@ -888,7 +808,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Text(
                                 entry.username,
                                 style: TextStyle(
-                                    color: AppColors.text.withOpacity(0.6),
+                                    color: AppColors.text.withValues(alpha: 0.6),
                                     fontSize: 13),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -899,7 +819,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       IconButton(
                         icon: Icon(Icons.edit_outlined,
-                            color: AppColors.text.withOpacity(0.6), size: 20),
+                            color: AppColors.text.withValues(alpha: 0.6), size: 20),
                         onPressed: () async {
                           final edited = await Navigator.push<bool>(
                             context,
@@ -917,7 +837,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       IconButton(
                         icon: Icon(Icons.delete_outline,
-                            color: AppColors.text.withOpacity(0.6), size: 20),
+                            color: AppColors.text.withValues(alpha: 0.6), size: 20),
                         onPressed: () => _deletePassword(entry),
                         constraints: const BoxConstraints(),
                         padding: const EdgeInsets.all(8),
@@ -942,10 +862,10 @@ class _HomeScreenState extends State<HomeScreen> {
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E).withOpacity(0.6),
+              color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(20),
               border:
-                  Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+                  Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
             ),
             child: Material(
               color: Colors.transparent,
@@ -971,7 +891,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.white.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(Icons.description_outlined,
@@ -993,7 +913,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Text(
                               _extractPlainText(note.content),
                               style: TextStyle(
-                                  color: AppColors.text.withOpacity(0.6),
+                                  color: AppColors.text.withValues(alpha: 0.6),
                                   fontSize: 13),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -1003,7 +923,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       IconButton(
                         icon: Icon(Icons.delete_outline,
-                            color: AppColors.text.withOpacity(0.6), size: 20),
+                            color: AppColors.text.withValues(alpha: 0.6), size: 20),
                         onPressed: () => _deleteNote(note),
                         constraints: const BoxConstraints(),
                         padding: const EdgeInsets.all(8),
@@ -1036,7 +956,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(
             'No data yet'.tr(context),
             style: TextStyle(
-              color: AppColors.text.withOpacity(0.5),
+              color: AppColors.text.withValues(alpha: 0.5),
               fontSize: 18,
             ),
           ),
@@ -1044,7 +964,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(
             'Add your first password or note'.tr(context),
             style: TextStyle(
-              color: AppColors.text.withOpacity(0.3),
+              color: AppColors.text.withValues(alpha: 0.3),
               fontSize: 14,
             ),
           ),

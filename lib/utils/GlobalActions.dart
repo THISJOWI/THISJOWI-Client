@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:thisjowi/core/appColors.dart';
-import 'package:thisjowi/core/providers/otpProvider.dart';
-import 'package:thisjowi/core/serviceLocator.dart';
-import 'package:thisjowi/components/errorBar.dart';
+import 'package:thisjowi/core/app_colors.dart';
+import 'package:thisjowi/core/providers/otp_provider.dart';
+import 'package:thisjowi/core/service_locator.dart';
+import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/services/otpService.dart';
 import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
@@ -71,18 +71,18 @@ class GlobalActions {
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
-          labelStyle: TextStyle(color: AppColors.text.withOpacity(0.7)),
-          hintStyle: TextStyle(color: AppColors.text.withOpacity(0.3)),
+          labelStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.7)),
+          hintStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.3)),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: AppColors.text.withOpacity(0.2)),
+            borderSide: BorderSide(color: AppColors.text.withValues(alpha: 0.2)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: AppColors.primary),
           ),
           filled: true,
-          fillColor: AppColors.text.withOpacity(0.05),
+          fillColor: AppColors.text.withValues(alpha: 0.05),
         ),
       );
     }
@@ -122,7 +122,7 @@ class GlobalActions {
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text('Cancel',
-                style: TextStyle(color: AppColors.text.withOpacity(0.6))),
+                style: TextStyle(color: AppColors.text.withValues(alpha: 0.6))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(

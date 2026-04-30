@@ -3,7 +3,7 @@ import '../data/local/database.dart';
 import '../data/local/secure_storage_service.dart';
 
 /// Helper service to manage user logout
-/// 
+///
 /// Handles:
 /// - Clearing local database
 /// - Clearing secure storage
@@ -11,13 +11,13 @@ import '../data/local/secure_storage_service.dart';
 /// - Stopping sync service
 class LogoutService {
   static final LogoutService _instance = LogoutService._internal();
-  
+
   factory LogoutService() => _instance;
-  
+
   LogoutService._internal();
 
   /// Perform complete logout
-  /// 
+  ///
   /// This will:
   /// 1. Stop sync service
   /// 2. Clear all local data
@@ -35,7 +35,7 @@ class LogoutService {
       await db.delete(db.otpEntries).go();
       await db.delete(db.users).go();
       await db.delete(db.syncQueue).go();
-      
+
       // Don't close the database instance as it's a singleton and might be used again if user logs back in
       // await db.close();
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:thisjowi/services/biometricService.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 
 /// Widget to configure biometric app lock settings
 class BiometricLockSettings extends StatefulWidget {
@@ -106,18 +106,18 @@ class _BiometricLockSettingsState extends State<BiometricLockSettings> {
       return ListTile(
         leading: Icon(
           Icons.lock_outline,
-          color: AppColors.text.withOpacity(0.4),
+          color: AppColors.text.withValues(alpha: 0.4),
         ),
         title: Text(
           'Bloqueo biométrico',
           style: TextStyle(
-            color: AppColors.text.withOpacity(0.4),
+            color: AppColors.text.withValues(alpha: 0.4),
           ),
         ),
         subtitle: Text(
           'No disponible en este dispositivo',
           style: TextStyle(
-            color: AppColors.text.withOpacity(0.3),
+            color: AppColors.text.withValues(alpha: 0.3),
             fontSize: 12,
           ),
         ),
@@ -127,7 +127,7 @@ class _BiometricLockSettingsState extends State<BiometricLockSettings> {
     return ListTile(
       leading: Icon(
         _getBiometricIcon(),
-        color: _isLockEnabled ? AppColors.primary : AppColors.text.withOpacity(0.6),
+        color: _isLockEnabled ? AppColors.primary : AppColors.text.withValues(alpha: 0.6),
       ),
       title: Text(
         'Bloquear con $_biometricTypeName',
@@ -140,7 +140,7 @@ class _BiometricLockSettingsState extends State<BiometricLockSettings> {
             ? 'Se pedirá $_biometricTypeName al abrir la app'
             : 'La app se abrirá sin verificación',
         style: TextStyle(
-          color: AppColors.text.withOpacity(0.6),
+          color: AppColors.text.withValues(alpha: 0.6),
           fontSize: 12,
         ),
       ),
@@ -244,13 +244,13 @@ class _BiometricLockSettingsCardState extends State<BiometricLockSettingsCard> {
               height: 48,
               decoration: BoxDecoration(
                 color: _isLockEnabled 
-                    ? AppColors.primary.withOpacity(0.1)
-                    : AppColors.text.withOpacity(0.05),
+                    ? AppColors.primary.withValues(alpha: 0.1)
+                    : AppColors.text.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 _getBiometricIcon(),
-                color: _isLockEnabled ? AppColors.primary : AppColors.text.withOpacity(0.4),
+                color: _isLockEnabled ? AppColors.primary : AppColors.text.withValues(alpha: 0.4),
                 size: 28,
               ),
             ),
@@ -274,7 +274,7 @@ class _BiometricLockSettingsCardState extends State<BiometricLockSettingsCard> {
                         : 'Desactivado',
                     style: TextStyle(
                       fontSize: 12,
-                      color: _isLockEnabled ? Colors.green : AppColors.text.withOpacity(0.5),
+                      color: _isLockEnabled ? Colors.green : AppColors.text.withValues(alpha: 0.5),
                     ),
                   ),
                 ],

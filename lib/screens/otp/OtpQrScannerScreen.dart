@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
-import 'package:thisjowi/core/providers/otpProvider.dart';
-import 'package:thisjowi/components/errorBar.dart';
+import 'package:thisjowi/core/providers/otp_provider.dart';
+import 'package:thisjowi/components/error_bar.dart';
 
 class OtpQrScannerScreen extends StatefulWidget {
   const OtpQrScannerScreen({super.key});

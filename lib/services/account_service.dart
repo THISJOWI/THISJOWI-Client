@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:thisjowi/core/api.dart';
+import 'package:thisjowi/core/exceptions/account_exceptions.dart';
 import 'package:thisjowi/data/models/account_user.dart';
 import 'package:thisjowi/services/token_manager.dart';
 
@@ -36,15 +38,30 @@ class AccountService {
 
   Future<http.Response> _delete(String endpoint, Map<String, dynamic> body) async {
     final token = await _tokenManager.getToken();
+    final url = '${ApiConfig.baseUrl}$endpoint';
+    final bodyJson = jsonEncode(body);
+    
+    if (kDebugMode) {
+      debugPrint('🗑️ DELETE $url');
+      debugPrint('📦 Body: $bodyJson');
+      debugPrint('🔐 Token: ${token != null ? 'SET' : 'NOT SET'}');
+    }
+    
     final response = await http.delete(
-      Uri.parse('${ApiConfig.baseUrl}$endpoint'),
+      Uri.parse(url),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         if (token != null) 'Authorization': 'Bearer $token',
       },
-      body: jsonEncode(body),
+      body: bodyJson,
     );
+    
+    if (kDebugMode) {
+      debugPrint('📥 Response: ${response.statusCode}');
+      debugPrint('📄 Body: ${response.body}');
+    }
+    
     return response;
   }
 
@@ -71,6 +88,61 @@ class AccountService {
   }
 
   Future<void> deleteAccount(String password) async {
-    await _delete('/auth/delete-account', {'password': password});
+    if (kDebugMode) {
+      debugPrint('🔴 deleteAccount() called with password length: ${password.length}');
+    }
+    
+    final response = await _delete('/auth/delete-account', {'password': password});
+    
+    if (kDebugMode) {
+      debugPrint('📊 deleteAccount response status: ${response.statusCode}');
+    }
+    
+    // Handle different status codes
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      if (kDebugMode) {
+        debugPrint('✅ Account deleted successfully');
+      }
+      return;
+    }
+    
+    // Parse error response
+    try {
+      final json = jsonDecode(response.body);
+      final message = json['message'] ?? 'Error al eliminar la cuenta';
+      
+      if (response.statusCode == 401) {
+        throw AccountException(
+          message: 'Contraseña incorrecta',
+          code: 'INVALID_PASSWORD',
+          details: message,
+        );
+      } else if (response.statusCode == 400) {
+        throw AccountException(
+          message: message,
+          code: 'INVALID_REQUEST',
+          details: json,
+        );
+      } else if (response.statusCode >= 500) {
+        throw AccountServerException(
+          statusCode: response.statusCode,
+          message: message,
+          details: json,
+        );
+      } else {
+        throw AccountDeletionException(
+          message: message,
+          details: json,
+        );
+      }
+    } catch (e) {
+      if (e is AccountException) {
+        rethrow;
+      }
+      throw AccountDeletionException(
+        message: 'Error al eliminar la cuenta: ${response.statusCode}',
+        details: response.body,
+      );
+    }
   }
 }

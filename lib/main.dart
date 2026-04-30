@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:i18n_extension/i18n_extension.dart';
+import 'package:i18n_extension/i18n_extension.dart' show Translations, I18n;
 import 'package:provider/provider.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/api.dart';
-import 'package:thisjowi/core/envLoader.dart';
-import 'package:thisjowi/core/providers/otpProvider.dart';
+import 'package:thisjowi/core/env_loader.dart';
+import 'package:thisjowi/core/providers/otp_provider.dart';
 import 'package:thisjowi/screens/auth/login.dart';
 import 'package:thisjowi/screens/auth/register.dart';
 import 'package:thisjowi/screens/auth/authSelection.dart';
@@ -14,7 +14,8 @@ import 'package:thisjowi/screens/auth/ldapLogin.dart';
 import 'package:thisjowi/screens/otp/OtpQrScannerScreen.dart';
 import 'package:thisjowi/screens/splash/splash.dart';
 import 'package:thisjowi/screens/onboarding/onBoarding.dart';
-import 'package:thisjowi/components/privacyOverlay.dart';
+import 'package:thisjowi/components/privacy_overlay.dart';
+import 'package:thisjowi/utils/app_logger.dart';
 
 // Workaround for macOS keyboard event bug
 // See: https://github.com/flutter/flutter/issues/148604
@@ -75,7 +76,16 @@ class _KeyboardEventFixState extends State<KeyboardEventFix> {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
+  // Inicializar sistema de logging
+  await AppLogger.initialize();
+  appLog.i('🚀 App starting...');
+
+  // Silenciar callbacks de traducciones faltantes
+  // Estas configs deben estar ANTES de que se carguen las traducciones
+  Translations.missingKeyCallback = (key, locale) {};
+  Translations.missingTranslationCallback = ({required key, required locale, required translations, required supportedLocales}) => false;
+
   // Configurar el estilo de la barra de estado (iconos claros para fondo oscuro)
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
@@ -84,12 +94,13 @@ void main() async {
     systemNavigationBarColor: AppColors.bottomNavBar,
     systemNavigationBarIconBrightness: Brightness.light,
   ));
-  
+
   await EnvLoader.load();
   await ApiConfig.init();
-  
+
   ApiConfig.printConfig();
-  
+
+  appLog.i('✅ App initialized successfully');
   runApp(const MainApp());
 }
 
@@ -151,7 +162,7 @@ class MainApp extends StatelessWidget {
         ),
         textSelectionTheme: TextSelectionThemeData(
           cursorColor: AppColors.text,
-          selectionColor: AppColors.text.withOpacity(0.3),
+          selectionColor: AppColors.text.withValues(alpha: 0.3),
           selectionHandleColor: AppColors.text,
         ),
       ),

@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 
 class BackgroundOrbs extends StatelessWidget {
   final Widget child;
@@ -22,7 +22,7 @@ class BackgroundOrbs extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  AppColors.primary.withOpacity(0.2), // Blueish
+                  AppColors.primary.withValues(alpha: 0.2), // Blueish
                   Colors.transparent,
                 ],
               ),
@@ -39,7 +39,7 @@ class BackgroundOrbs extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  AppColors.secondary.withOpacity(0.15), // Yellowish/Gold
+                  AppColors.secondary.withValues(alpha: 0.15), // Yellowish/Gold
                   Colors.transparent,
                 ],
               ),
@@ -56,7 +56,7 @@ class BackgroundOrbs extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  AppColors.accent.withOpacity(0.15), // Purple
+                  AppColors.accent.withValues(alpha: 0.15), // Purple
                   Colors.transparent,
                 ],
               ),

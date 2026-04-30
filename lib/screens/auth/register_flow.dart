@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:thisjowi/components/account_type_selector.dart';
 import 'package:thisjowi/components/deployment_mode_selector.dart';
 import 'package:thisjowi/components/ldap_selector.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/screens/auth/registerForm.dart';
 import 'package:thisjowi/screens/auth/ldap_register_form.dart';
 
@@ -228,7 +228,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
                 gradient: RadialGradient(
                   colors: [
                     AppColors.secondary
-                        .withOpacity(currentStep == 0 ? 0.3 : 0.2),
+                        .withValues(alpha: currentStep == 0 ? 0.3 : 0.2),
                     Colors.transparent,
                   ],
                 ),
@@ -249,7 +249,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
                 gradient: RadialGradient(
                   colors: [
                     AppColors.primary
-                        .withOpacity(currentStep == 1 ? 0.35 : 0.2),
+                        .withValues(alpha: currentStep == 1 ? 0.35 : 0.2),
                     Colors.transparent,
                   ],
                 ),
@@ -270,7 +270,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      AppColors.accent.withOpacity(0.3),
+                      AppColors.accent.withValues(alpha: 0.3),
                       Colors.transparent,
                     ],
                   ),
@@ -301,7 +301,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
                       duration: const Duration(milliseconds: 500),
                       color: currentStep >= 0
                           ? AppColors.secondary
-                          : Colors.white.withOpacity(0.1),
+                          : Colors.white.withValues(alpha: 0.1),
                     ),
                   ),
                   // Paso 1: Modo de despliegue
@@ -311,7 +311,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
                       duration: const Duration(milliseconds: 500),
                       color: currentStep >= 1
                           ? AppColors.primary
-                          : Colors.white.withOpacity(0.1),
+                          : Colors.white.withValues(alpha: 0.1),
                     ),
                   ),
                   // Paso 2: LDAP (solo Business) o Formulario
@@ -323,7 +323,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
                           ? (accountType == 'Business'
                               ? AppColors.accent
                               : AppColors.accent)
-                          : Colors.white.withOpacity(0.1),
+                          : Colors.white.withValues(alpha: 0.1),
                     ),
                   ),
                   // Paso 3: Formulario (solo si hay LDAP)
@@ -334,7 +334,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
                         duration: const Duration(milliseconds: 500),
                         color: currentStep >= 3
                             ? AppColors.accent
-                            : Colors.white.withOpacity(0.1),
+                            : Colors.white.withValues(alpha: 0.1),
                       ),
                     ),
                 ],
@@ -352,14 +352,14 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),

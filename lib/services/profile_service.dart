@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
-import 'package:thisjowi/core/api.dart';
 import 'package:thisjowi/core/exceptions/profile_exceptions.dart';
 import 'package:thisjowi/data/models/profile_user.dart';
 import 'package:thisjowi/services/base_service.dart';
@@ -15,12 +14,9 @@ class ProfileService extends BaseService {
   factory ProfileService() => _instance;
   ProfileService._internal() : super('ProfileService');
 
-  final TokenManager _tokenManager = TokenManager();
+final TokenManager _tokenManager = TokenManager();
 
-  // URL base del servicio de perfil
-  String get _baseUrl => ApiConfig.baseUrl;
-
-  @override
+@override
   void validateResponse(http.Response response) {
     switch (response.statusCode) {
       case 200:

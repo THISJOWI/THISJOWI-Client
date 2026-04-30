@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/appColors.dart';
+import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/services/organizationService.dart';
 import 'package:thisjowi/data/models/organization.dart';
-import 'package:thisjowi/components/errorBar.dart';
+import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -164,9 +164,9 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
       margin: const EdgeInsets.only(bottom: 24),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E).withOpacity(0.4),
+        color: const Color(0xFF1E1E1E).withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,20 +214,20 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
           labelText: label,
           hintText: hint,
           prefixIcon: icon != null
-              ? Icon(icon, color: AppColors.text.withOpacity(0.5), size: 20)
+              ? Icon(icon, color: AppColors.text.withValues(alpha: 0.5), size: 20)
               : null,
-          labelStyle: TextStyle(color: AppColors.text.withOpacity(0.5)),
-          hintStyle: TextStyle(color: AppColors.text.withOpacity(0.2)),
+          labelStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.5)),
+          hintStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.2)),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: const BorderSide(color: AppColors.primary),
           ),
           filled: true,
-          fillColor: Colors.black.withOpacity(0.2),
+          fillColor: Colors.black.withValues(alpha: 0.2),
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         ),
@@ -268,7 +268,7 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.primary.withOpacity(0.15),
+                    AppColors.primary.withValues(alpha: 0.15),
                     Colors.transparent,
                   ],
                 ),
@@ -285,7 +285,7 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.accent.withOpacity(0.1),
+                    AppColors.accent.withValues(alpha: 0.1),
                     Colors.transparent,
                   ],
                 ),
@@ -357,10 +357,10 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                                color: Colors.white.withOpacity(0.05)),
+                                color: Colors.white.withValues(alpha: 0.05)),
                           ),
                           child: SwitchListTile(
                             title: Text('Enable LDAP Login'.i18n,
@@ -384,7 +384,7 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 18),
                               side: BorderSide(
-                                  color: Colors.white.withOpacity(0.1)),
+                                  color: Colors.white.withValues(alpha: 0.1)),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20)),
                             ),
@@ -410,7 +410,7 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.3),
+                                  color: AppColors.primary.withValues(alpha: 0.3),
                                   blurRadius: 12,
                                   offset: const Offset(0, 6),
                                 ),
