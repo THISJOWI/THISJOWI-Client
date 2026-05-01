@@ -9,12 +9,10 @@ import 'package:thisjowi/services/token_manager.dart';
 class AccountService {
   final TokenManager _tokenManager = TokenManager();
 
-  String get _baseUrl => ApiConfig.accountUrl;
-
   Future<http.Response> _get(String endpoint) async {
     final token = await _tokenManager.getToken();
     final response = await http.get(
-      Uri.parse('$_baseUrl$endpoint'),
+      Uri.parse('${ApiConfig.baseUrl}$endpoint'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -27,7 +25,7 @@ class AccountService {
   Future<http.Response> _post(String endpoint, Map<String, dynamic> body) async {
     final token = await _tokenManager.getToken();
     final response = await http.post(
-      Uri.parse('$_baseUrl$endpoint'),
+      Uri.parse('${ApiConfig.baseUrl}$endpoint'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -40,7 +38,7 @@ class AccountService {
 
   Future<http.Response> _delete(String endpoint, Map<String, dynamic> body) async {
     final token = await _tokenManager.getToken();
-    final url = '$_baseUrl$endpoint';
+    final url = '${ApiConfig.baseUrl}$endpoint';
     final bodyJson = jsonEncode(body);
     
     if (kDebugMode) {
@@ -91,10 +89,10 @@ class AccountService {
 
   Future<void> deleteAccount(String password) async {
     if (kDebugMode) {
-      debugPrint('🔴 deleteAccount() called with password length: ${password.length}');
+      debugPrint('🔴 deleteAccount() called');
     }
-    
-    final response = await _delete('/delete-account', {'password': password});
+
+    final response = await _delete('/v1/auth/delete-account', {'password': password});
     
     if (kDebugMode) {
       debugPrint('📊 deleteAccount response status: ${response.statusCode}');

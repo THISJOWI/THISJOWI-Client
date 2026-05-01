@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/exceptions/account_exceptions.dart';
@@ -402,10 +401,6 @@ Future<void> _loadCurrentUser() async {
 
   Future<void> _performAccountDeletion(String password) async {
     try {
-      if (kDebugMode) {
-        debugPrint('🔴 _performAccountDeletion() called');
-        debugPrint('🔐 Password length: ${password.length}');
-      }
       await _accountService.deleteAccount(password);
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/login');

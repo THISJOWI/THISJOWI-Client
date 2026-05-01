@@ -375,12 +375,34 @@ class AppLogger {
     final color = _config.useColors ? entry.level.color : '';
     final reset = _config.useColors ? LogLevel.resetColor : '';
     
+    String formattedLevel;
+    switch (entry.level) {
+      case LogLevel.verbose:
+        formattedLevel = 'Verbose';
+        break;
+      case LogLevel.debug:
+        formattedLevel = 'Debug';
+        break;
+      case LogLevel.info:
+        formattedLevel = 'Info';
+        break;
+      case LogLevel.warning:
+        formattedLevel = 'Warning';
+        break;
+      case LogLevel.error:
+        formattedLevel = 'Error';
+        break;
+      case LogLevel.fatal:
+        formattedLevel = 'Fatal';
+        break;
+    }
+    
     String consoleMsg;
     if (entry.error != null && entry.level.value >= LogLevel.warning.value) {
       // Para errores y warnings, mostrar el error brevemente
-      consoleMsg = '${entry.level.name}: ${entry.message} -> ${_truncateError(entry.error.toString())}';
+      consoleMsg = '$formattedLevel: ${entry.message} -> ${_truncateError(entry.error.toString())}';
     } else {
-      consoleMsg = '${entry.level.name}: ${entry.message}';
+      consoleMsg = '$formattedLevel: ${entry.message}';
     }
 
     debugPrint('$color$consoleMsg$reset');
