@@ -1,5 +1,6 @@
+import 'dart:convert';
 import 'dart:typed_data';
-import 'package:argon2/argon2.dart';
+import 'package:cryptography/cryptography.dart';
 import 'package:thisjowi/data/local/dao/offline_auth.dart';
 import 'package:thisjowi/data/local/secure_storage_service.dart';
 import 'package:thisjowi/services/token_manager.dart';
@@ -16,64 +17,41 @@ class OfflineAuthService {
   final CryptoService _cryptoService = CryptoService();
   final TokenManager _tokenManager = TokenManager();
 
+  final _algorithm = Argon2id(
+    memory: 10240,
+    parallelism: 2,
+    iterations: 3,
+    hashLength: 32,
+  );
+
   String _generateSalt() {
     final random = DateTime.now().millisecondsSinceEpoch;
     return random.toString();
   }
 
   Future<String> _hashPassword(String password) async {
-    var salt = _generateSalt().toBytesLatin1();
-    
-    var parameters = Argon2Parameters(
-      Argon2Parameters.ARGON2_id,
-      salt,
-      version: Argon2Parameters.ARGON2_VERSION_13,
-      iterations: 3,
-      memoryPowerOf2: 16,
+    final salt = _generateSalt();
+    final key = await _algorithm.deriveKeyFromPassword(
+      password: password,
+      nonce: utf8.encode(salt),
     );
-
-    var argon2 = Argon2BytesGenerator();
-    argon2.init(parameters);
-
-    var passwordBytes = parameters.converter.convert(password);
-
-    var result = Uint8List(32);
-    argon2.generateBytes(passwordBytes, result, 0, result.length);
-
-    return result.toHexString();
+    return '$salt:${base64.encode(await key.extractBytes())}';
   }
 
   Future<bool> _verifyPassword(String password, String storedHash) async {
     try {
-      var saltBytes = _generateSalt().toBytesLatin1();
+      final parts = storedHash.split(':');
+      if (parts.length != 2) return false;
       
-      var parameters = Argon2Parameters(
-        Argon2Parameters.ARGON2_id,
-        saltBytes,
-        version: Argon2Parameters.ARGON2_VERSION_13,
-        iterations: 3,
-        memoryPowerOf2: 16,
+      final salt = parts[0];
+      final storedHashBytes = parts[1];
+      
+      final key = await _algorithm.deriveKeyFromPassword(
+        password: password,
+        nonce: utf8.encode(salt),
       );
-
-      var argon2 = Argon2BytesGenerator();
-      argon2.init(parameters);
-
-      var passwordBytes = parameters.converter.convert(password);
-
-      var result = Uint8List(32);
-      argon2.generateBytes(passwordBytes, result, 0, result.length);
-
-      var computedHash = result.toHexString();
       
-      final storedHashBytes = storedHash.toBytesLatin1();
-      if (storedHashBytes.length == result.length) {
-        for (var i = 0; i < storedHashBytes.length; i++) {
-          if (storedHashBytes[i] != result[i]) return false;
-        }
-        return true;
-      }
-      
-      return computedHash == storedHash;
+      return base64.encode(await key.extractBytes()) == storedHashBytes;
     } catch (e) {
       return false;
     }

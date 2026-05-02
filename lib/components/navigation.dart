@@ -10,7 +10,6 @@ import 'package:thisjowi/screens/messages/MessagesScreen.dart';
 import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/services/autofillSaveHandler.dart';
 
-// GlobalKey para acceder al estado de la navegación
 final GlobalKey<Navigation> bottomNavigationKey = GlobalKey<Navigation>();
 
 class MyBottomNavigation extends StatefulWidget {
@@ -114,7 +113,7 @@ class Navigation extends State<MyBottomNavigation>
     }
   }
 
-  bool get isDesktop {
+  bool get _isDesktopPlatform {
     try {
       return Platform.isMacOS || Platform.isWindows || Platform.isLinux;
     } catch (e) {
@@ -127,58 +126,63 @@ class Navigation extends State<MyBottomNavigation>
     if (_pages.isEmpty) _buildPages();
     if (_navItems.isEmpty) _buildNavItems();
 
-    // En desktop: usar sidebar lateral estilo Apple Music
-    // En móvil: usar bottom navigation con Liquid Glass
-    if (isDesktop) {
-      return _DesktopLayout(
-        currentIndex: _currentIndex,
-        navItems: _navItems,
-        pages: _pages,
-        onItemSelected: (index) {
-          HapticFeedback.lightImpact();
-          setState(() => _currentIndex = index);
-        },
-      );
-    }
+    return LayoutBuilder(
+      builder: (context, _) {
+        final useSidebar =
+            MediaQuery.of(context).size.width >= 600 || _isDesktopPlatform;
 
-    // Layout móvil con Liquid Glass bottom bar
-    return GlassBackdropScope(
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        extendBody: true,
-        extendBodyBehindAppBar: true,
-        body: IndexedStack(
-          index: _currentIndex,
-          children: _pages,
-        ),
-        bottomNavigationBar: GlassBottomBar(
-          tabs: _navItems.map((item) => GlassBottomBarTab(
-            icon: Icon(item.icon, size: 22),
-            label: item.label,
-          )).toList(),
-          selectedIndex: _currentIndex,
-          onTabSelected: (index) {
-            HapticFeedback.lightImpact();
-            setState(() => _currentIndex = index);
-          },
-          barHeight: 56,
-          barBorderRadius: 28,
-          horizontalPadding: 16,
-          verticalPadding: 12,
-          iconSize: 24,
-          maskingQuality: MaskingQuality.high,
-          selectedIconColor: AppColors.primary,
-          unselectedIconColor: AppColors.text.withValues(alpha: 0.5),
-          quality: GlassQuality.standard,
-          showIndicator: true,
-          indicatorColor: AppColors.primary.withValues(alpha: 0.2),
-        ),
-      ),
+        if (useSidebar) {
+          return _DesktopLayout(
+            currentIndex: _currentIndex,
+            navItems: _navItems,
+            pages: _pages,
+            onItemSelected: (index) {
+              HapticFeedback.lightImpact();
+              setState(() => _currentIndex = index);
+            },
+          );
+        }
+
+        return GlassBackdropScope(
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            extendBody: true,
+            extendBodyBehindAppBar: true,
+            body: IndexedStack(
+              index: _currentIndex,
+              children: _pages,
+            ),
+            bottomNavigationBar: GlassBottomBar(
+              tabs: _navItems
+                  .map((item) => GlassBottomBarTab(
+                        icon: Icon(item.icon, size: 22),
+                        label: item.label,
+                      ))
+                  .toList(),
+              selectedIndex: _currentIndex,
+              onTabSelected: (index) {
+                HapticFeedback.lightImpact();
+                setState(() => _currentIndex = index);
+              },
+              barHeight: 56,
+              barBorderRadius: 28,
+              horizontalPadding: 16,
+              verticalPadding: 12,
+              iconSize: 24,
+              maskingQuality: MaskingQuality.high,
+              selectedIconColor: AppColors.primary,
+              unselectedIconColor: AppColors.text.withValues(alpha: 0.5),
+              quality: GlassQuality.standard,
+              showIndicator: true,
+              indicatorColor: AppColors.primary.withValues(alpha: 0.2),
+            ),
+          ),
+        );
+      },
     );
   }
 }
 
-/// Item de navegación para desktop
 class _NavItem {
   final IconData icon;
   final String label;
@@ -191,7 +195,6 @@ class _NavItem {
   });
 }
 
-/// Layout para desktop con sidebar lateral estilo Apple Music
 class _DesktopLayout extends StatelessWidget {
   final int currentIndex;
   final List<_NavItem> navItems;
@@ -211,46 +214,42 @@ class _DesktopLayout extends StatelessWidget {
       backgroundColor: AppColors.background,
       body: Row(
         children: [
-// Sidebar lateral izquierda estilo Apple Music
- Container(
- width: 220,
- color: AppColors.surface,
- child: Column(
- crossAxisAlignment: CrossAxisAlignment.start,
- children: [
- // Logo/Header con imagen empresa.png
- Padding(
- padding: const EdgeInsets.all(20),
- child: Row(
- children: [
- Image.asset(
- 'assets/empresa.png',
- height: 40,
- width: 40,
- ),
- const SizedBox(width: 12),
- const Text(
- 'THISJOWI',
- style: TextStyle(
- color: AppColors.text,
- fontSize: 20,
- fontWeight: FontWeight.bold,
- ),
- ),
- ],
- ),
- ),
- const Divider(color: Colors.white10, height: 1),
- const SizedBox(height: 16),
-                // Items de navegación
+          Container(
+            width: 220,
+            color: AppColors.surface,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        'assets/empresa.png',
+                        height: 40,
+                        width: 40,
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        'THISJOWI',
+                        style: TextStyle(
+                          color: AppColors.text,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(color: Colors.white10, height: 1),
+                const SizedBox(height: 16),
                 ...navItems.map((item) => _SidebarItem(
-                  icon: item.icon,
-                  label: item.label,
-                  isSelected: currentIndex == item.index,
-                  onTap: () => onItemSelected(item.index),
-                )),
+                      icon: item.icon,
+                      label: item.label,
+                      isSelected: currentIndex == item.index,
+                      onTap: () => onItemSelected(item.index),
+                    )),
                 const Spacer(),
-                // Footer
                 const Padding(
                   padding: EdgeInsets.all(16),
                   child: Text(
@@ -264,7 +263,6 @@ class _DesktopLayout extends StatelessWidget {
               ],
             ),
           ),
-          // Contenido principal
           Expanded(
             child: Container(
               color: AppColors.background,
@@ -280,7 +278,6 @@ class _DesktopLayout extends StatelessWidget {
   }
 }
 
-/// Item individual del sidebar
 class _SidebarItem extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -299,7 +296,8 @@ class _SidebarItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Material(
-        color: isSelected ? AppColors.primary.withValues(alpha: 0.15) : Colors.transparent,
+        color:
+            isSelected ? AppColors.primary.withValues(alpha: 0.15) : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
           onTap: onTap,
@@ -310,14 +308,18 @@ class _SidebarItem extends StatelessWidget {
               children: [
                 Icon(
                   icon,
-                  color: isSelected ? AppColors.primary : AppColors.text.withValues(alpha: 0.7),
+                  color: isSelected
+                      ? AppColors.primary
+                      : AppColors.text.withValues(alpha: 0.7),
                   size: 22,
                 ),
                 const SizedBox(width: 12),
                 Text(
                   label,
                   style: TextStyle(
-                    color: isSelected ? AppColors.primary : AppColors.text.withValues(alpha: 0.9),
+                    color: isSelected
+                        ? AppColors.primary
+                        : AppColors.text.withValues(alpha: 0.9),
                     fontSize: 14,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                   ),
