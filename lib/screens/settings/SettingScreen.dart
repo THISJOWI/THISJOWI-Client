@@ -10,9 +10,8 @@ import 'package:thisjowi/services/profile_service.dart';
 import 'package:thisjowi/services/biometricService.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/components/liquid_glass.dart';
+import 'package:thisjowi/components/country_selector.dart';
 import 'package:thisjowi/i18n/translations.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:thisjowi/screens/organization/LdapConfigScreen.dart';
 import 'package:thisjowi/data/models/auth_user.dart';
 import 'package:thisjowi/data/models/profile_user.dart';
@@ -626,114 +625,58 @@ Future<void> _loadCurrentUser() async {
   }
 
   void _showEditCountryDialog() {
-    LatLng? selectedLocation;
-
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => Dialog(
-          backgroundColor: AppColors.background,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          child: Container(
-            width: 400,
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Select Country'.i18n,
-                  style: const TextStyle(
-                    color: AppColors.text,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+      builder: (context) => Dialog(
+        backgroundColor: AppColors.background,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Container(
+          width: 400,
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Select Country'.i18n,
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(height: 24),
-                Container(
-                  height: 300,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.text.withValues(alpha: 0.2)),
+              ),
+              const SizedBox(height: 24),
+              CountrySelector(
+                initialValue: _currentProfile?.country,
+                onCountrySelected: (country) async {
+                  if (country == null) return;
+                  try {
+                    await _profileService.updateProfileFields(
+                      country: country,
+                    );
+                    if (!mounted) return;
+                    Navigator.pop(context);
+                    ErrorSnackBar.showSuccess(
+                        context, 'Country updated'.i18n);
+                    await _loadCurrentUser();
+                  } catch (e) {
+                    if (!mounted) return;
+                    ErrorSnackBar.show(context, 'Error: $e');
+                  }
+                },
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text('Cancel'.i18n,
+                        style: TextStyle(
+                            color: AppColors.text.withValues(alpha: 0.7))),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: FlutterMap(
-                      options: MapOptions(
-                        initialCenter: const LatLng(20.0, 0.0),
-                        initialZoom: 2.0,
-                        onTap: (tapPosition, point) {
-                          setState(() {
-                            selectedLocation = point;
-                          });
-                        },
-                      ),
-                      children: [
-                        TileLayer(
-                          urlTemplate:
-                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName: 'uk.thisjowi.client',
-                        ),
-                        if (selectedLocation != null)
-                          MarkerLayer(
-                            markers: [
-                              Marker(
-                                point: selectedLocation!,
-                                width: 40,
-                                height: 40,
-                                child: const Icon(
-                                  Icons.location_on,
-                                  color: Colors.red,
-                                  size: 40,
-                                ),
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('Cancel'.i18n,
-                          style: TextStyle(
-                              color: AppColors.text.withValues(alpha: 0.7))),
-                    ),
-                    const SizedBox(width: 16),
-                    ElevatedButton(
-                      onPressed: () async {
-                        if (selectedLocation == null) return;
-                        final countryString =
-                            "${selectedLocation!.latitude}, ${selectedLocation!.longitude}";
-
-                        try {
-                          await _profileService.updateProfileFields(
-                            country: countryString,
-                          );
-                          if (!mounted) return;
-                          Navigator.pop(context);
-                          ErrorSnackBar.showSuccess(
-                              context, 'Country updated'.i18n);
-                          await _loadCurrentUser();
-                        } catch (e) {
-                          if (!mounted) return;
-                          ErrorSnackBar.show(context, 'Error: $e');
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                      ),
-                      child: Text('Save'.i18n),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

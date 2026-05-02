@@ -5,6 +5,7 @@ import 'package:thisjowi/components/country_selector.dart';
 import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/exceptions/auth_exceptions.dart';
 import 'package:thisjowi/services/auth_service.dart';
+import 'package:thisjowi/services/profile_service.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/i18n/translations.dart';
 
@@ -529,6 +530,7 @@ class _RegisterFormState extends State<RegisterForm>
     final password = _passwordController.text;
     final serverUrl = _serverUrlController.text.trim();
     final ldapUrl = _ldapUrlController.text.trim();
+    final country = _selectedCountry;
 
     try {
       final authUser = await _authService.register(
@@ -536,11 +538,19 @@ class _RegisterFormState extends State<RegisterForm>
         password: password,
         otp: otp,
         fullName: fullName,
-        country: _selectedCountry,
+        country: country,
         accountType: widget.accountType,
         hostingMode: widget.hostingMode,
         serverUrl: widget.hostingMode == 'SelfHosted' ? serverUrl : null,
         ldapUrl: widget.accountType == 'Business' ? ldapUrl : null,
+      );
+
+      if (!mounted) return;
+
+      final profileService = ProfileService();
+      await profileService.updateProfileFields(
+        fullName: fullName,
+        country: country,
       );
 
       if (!mounted) return;

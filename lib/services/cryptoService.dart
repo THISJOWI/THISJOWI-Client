@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cryptography/cryptography.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thisjowi/services/token_manager.dart';
@@ -26,7 +27,9 @@ class CryptoService {
       final val = await _storage.read(key: key);
       if (val != null) return val;
     } catch (e) {
-      print('⚠️ SecureStorage Read Failed: $e');
+      if (kDebugMode) {
+        debugPrint('flutter: Info: SecureStorage read failed, using SharedPreferences fallback: $e');
+      }
     }
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(key);
@@ -39,25 +42,33 @@ class CryptoService {
       await _storage.write(key: key, value: value);
       secureSuccess = true;
     } catch (e) {
-      print('⚠️ SecureStorage Write Failed: $e');
+      if (kDebugMode) {
+        debugPrint('flutter: Info: SecureStorage write failed, using SharedPreferences fallback: $e');
+      }
     }
     // Always store in SharedPreferences as well for redundancy
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(key, value);
     if (!secureSuccess) {
-      print('ℹ️ Key stored in SharedPreferences only (Fallback Active)');
+      if (kDebugMode) {
+        debugPrint('flutter: Info: Key stored in SharedPreferences only (Fallback Active)');
+      }
     }
   }
 
   /// Generates and stores a new keypair if one doesn't exist
   Future<void> initKeys() async {
-    print('🔐 [PRO] Initializing Advanced E2EE...');
+    if (kDebugMode) {
+      debugPrint('flutter: Info: Initializing Advanced E2EE...');
+    }
     try {
       String? priv = await _safeRead(_privateKeyKey);
       String? pub = await _safeRead(_publicKeyKey);
 
       if (priv == null || pub == null) {
-        print('🔑 Generating fresh secure keypair...');
+        if (kDebugMode) {
+          debugPrint('flutter: Info: Generating fresh secure keypair...');
+        }
         final keyPair = await _algorithm.newKeyPair();
         final publicKey = await keyPair.extractPublicKey();
         final privateKey = await keyPair.extractPrivateKeyBytes();
@@ -68,14 +79,20 @@ class CryptoService {
         await _safeWrite(_privateKeyKey, privBase64);
         await _safeWrite(_publicKeyKey, pubBase64);
 
-        print('✨ Advanced E2EE keys generated');
+        if (kDebugMode) {
+          debugPrint('flutter: Info: Advanced E2EE keys generated');
+        }
         await uploadPublicKey(pubBase64);
       } else {
-        print('📂 Advanced E2EE keys loaded. Syncing...');
+        if (kDebugMode) {
+          debugPrint('flutter: Info: Advanced E2EE keys loaded. Syncing...');
+        }
         await uploadPublicKey(pub);
       }
     } catch (e) {
-      print('❌ CRITICAL: Error during E2EE setup: $e');
+      if (kDebugMode) {
+        debugPrint('flutter: Error: CRITICAL: Error during E2EE setup: $e');
+      }
     }
   }
 
@@ -92,12 +109,18 @@ class CryptoService {
       );
 
       if (res.statusCode == 200) {
-        print('✅ Public key synced with server');
+        if (kDebugMode) {
+          debugPrint('flutter: Info: Public key synced with server');
+        }
       } else {
-        print('❌ Server sync failed: ${res.statusCode}');
+        if (kDebugMode) {
+          debugPrint('flutter: Error: Server sync failed: ${res.statusCode}');
+        }
       }
     } catch (e) {
-      print('❌ Network error syncing public key: $e');
+      if (kDebugMode) {
+        debugPrint('flutter: Error: Network error syncing public key: $e');
+      }
     }
   }
 
@@ -126,7 +149,9 @@ class CryptoService {
         }
       }
     } catch (e) {
-      print('❌ Error fetching recipient key: $e');
+      if (kDebugMode) {
+        debugPrint('flutter: Error: Error fetching recipient key: $e');
+      }
     }
     return null;
   }
@@ -178,7 +203,9 @@ class CryptoService {
         'ephemeralPublicKey': myPubBase64,
       };
     } catch (e) {
-      print('❌ Encryption Error: $e');
+      if (kDebugMode) {
+        debugPrint('flutter: Error: Encryption Error: $e');
+      }
       return null;
     }
   }
@@ -220,7 +247,9 @@ class CryptoService {
       final clearText = await _cipher.decrypt(secretBox, secretKey: sessionKey);
       return utf8.decode(clearText);
     } catch (e) {
-      print('❌ Decryption Error: $e');
+      if (kDebugMode) {
+        debugPrint('flutter: Error: Decryption Error: $e');
+      }
       return null;
     }
   }

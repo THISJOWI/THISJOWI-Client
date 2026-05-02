@@ -254,7 +254,7 @@ class ApiClient {
   /// Logging de requests
   void _logRequest(String method, String url, Map<String, String> headers, [String? body]) {
     if (kDebugMode) {
-      debugPrint('flutter: 📤 $method $url');
+      debugPrint('📤 $method $url');
     }
   }
 
@@ -262,9 +262,9 @@ class ApiClient {
   void _logResponse(String method, String url, http.Response? response, [String? message]) {
     if (kDebugMode) {
       if (response != null) {
-        debugPrint('flutter: 📥 ${response.statusCode} $url');
+        debugPrint('📥 ${response.statusCode} $url');
       } else if (message != null) {
-        debugPrint('flutter: 📥 $message');
+        debugPrint('📥 $message');
       }
     }
   }

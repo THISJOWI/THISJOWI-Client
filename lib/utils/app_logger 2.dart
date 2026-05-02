@@ -405,7 +405,7 @@ class AppLogger {
       consoleMsg = '$formattedLevel: ${entry.message}';
     }
 
-    debugPrint('flutter: $color$consoleMsg$reset');
+    debugPrint('$color$consoleMsg$reset');
   }
 
   String _truncateError(String error) {

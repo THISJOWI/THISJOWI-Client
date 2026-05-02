@@ -42,9 +42,9 @@ class AccountService {
     final bodyJson = jsonEncode(body);
     
     if (kDebugMode) {
-      debugPrint('flutter: 🗑️ DELETE $url');
-      debugPrint('flutter: 📦 Body: $bodyJson');
-      debugPrint('flutter: 🔐 Token: ${token != null ? 'SET' : 'NOT SET'}');
+      debugPrint('🗑️ DELETE $url');
+      debugPrint('📦 Body: $bodyJson');
+      debugPrint('🔐 Token: ${token != null ? 'SET' : 'NOT SET'}');
     }
     
     final response = await http.delete(
@@ -58,15 +58,15 @@ class AccountService {
     );
     
     if (kDebugMode) {
-      debugPrint('flutter: 📥 Response: ${response.statusCode}');
-      debugPrint('flutter: 📄 Body: ${response.body}');
+      debugPrint('📥 Response: ${response.statusCode}');
+      debugPrint('📄 Body: ${response.body}');
     }
     
     return response;
   }
 
   Future<void> forgotPassword(String email) async {
-    await _post('/v1/auth/forgot-password', {'email': email});
+    await _post('/auth/forgot-password', {'email': email});
   }
 
   Future<AccountUser?> getCurrentAccount() async {
@@ -89,19 +89,19 @@ class AccountService {
 
   Future<void> deleteAccount(String password) async {
     if (kDebugMode) {
-      debugPrint('flutter: Info: deleteAccount() called');
+      debugPrint('🔴 deleteAccount() called');
     }
 
     final response = await _delete('/v1/auth/delete-account', {'password': password});
     
     if (kDebugMode) {
-      debugPrint('flutter: Info: deleteAccount response status: ${response.statusCode}');
+      debugPrint('📊 deleteAccount response status: ${response.statusCode}');
     }
     
     // Handle different status codes
     if (response.statusCode == 200 || response.statusCode == 204) {
       if (kDebugMode) {
-        debugPrint('flutter: Info: Account deleted successfully');
+        debugPrint('✅ Account deleted successfully');
       }
       return;
     }
