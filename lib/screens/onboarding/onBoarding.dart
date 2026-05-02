@@ -558,60 +558,65 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   Widget _buildAuthChoicePage() {
     return FadeTransition(
       opacity: _fadeAnimation,
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ScaleTransition(
-              scale: _scaleAnimation,
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.accent.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.accent.withValues(alpha: 0.2),
-                      blurRadius: 20,
-                      spreadRadius: 5,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 340),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.accent.withValues(alpha: 0.2),
+                          blurRadius: 20,
+                          spreadRadius: 5,
+                        ),
+                      ],
                     ),
-                  ],
+                    child: Icon(Icons.rocket_launch_rounded,
+                        size: 60, color: AppColors.accent),
+                  ),
                 ),
-                child: Icon(Icons.rocket_launch_rounded,
-                    size: 60, color: AppColors.accent),
-              ),
+                const SizedBox(height: 30),
+                Text(
+                  "Get Started".i18n,
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.text,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                _buildSelectionCard(
+                  title: "Create Account".i18n,
+                  description: "New to ThisJowi? Sign up here.".i18n,
+                  icon: Icons.person_add_outlined,
+                  isSelected: false,
+                  onTap: () {
+                    Navigator.of(context).pushReplacementNamed('/register');
+                  },
+                ),
+                const SizedBox(height: 20),
+                _buildSelectionCard(
+                  title: "Log In".i18n,
+                  description: "Already have an account?".i18n,
+                  icon: Icons.login,
+                  isSelected: false,
+                  onTap: () {
+                    Navigator.of(context).pushReplacementNamed('/login');
+                  },
+                ),
+              ],
             ),
-            const SizedBox(height: 30),
-            Text(
-              "Get Started".i18n,
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: AppColors.text,
-              ),
-            ),
-            const SizedBox(height: 40),
-            _buildSelectionCard(
-              title: "Create Account".i18n,
-              description: "New to ThisJowi? Sign up here.".i18n,
-              icon: Icons.person_add_outlined,
-              isSelected: false,
-              onTap: () {
-                Navigator.of(context).pushReplacementNamed('/register');
-              },
-            ),
-            const SizedBox(height: 20),
-            _buildSelectionCard(
-              title: "Log In".i18n,
-              description: "Already have an account?".i18n,
-              icon: Icons.login,
-              isSelected: false,
-              onTap: () {
-                Navigator.of(context).pushReplacementNamed('/login');
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );
