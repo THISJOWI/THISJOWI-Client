@@ -129,28 +129,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     // Auth Choice (First question after intro)
     pages.add(_buildAuthChoicePage());
 
-    // Path A: Register
-    if (_authChoice == 'register') {
-      // Account Type
-      pages.add(_buildAccountTypePage());
-
-      // Hosting Mode (Only if account type selected)
-      if (_accountType != null) {
-        pages.add(_buildHostingModePage());
-      }
-    }
-
-    // Path B: Login
-    if (_authChoice == 'login') {
-      // Hosting Mode (Need to know if self-hosted)
-      pages.add(_buildHostingModePage());
-
-      // Server Config (Only if Self-Hosted)
-      if (_hostingMode == 'self-hosted') {
-        pages.add(_buildLoginServerConfigPage());
-      }
-    }
-
     return pages;
   }
 
@@ -618,10 +596,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               title: "Create Account".i18n,
               description: "New to ThisJowi? Sign up here.".i18n,
               icon: Icons.person_add_outlined,
-              isSelected: _authChoice == 'register',
+              isSelected: false,
               onTap: () {
-                setState(() => _authChoice = 'register');
-                _nextPage();
+                Navigator.of(context).pushReplacementNamed('/register');
               },
             ),
             const SizedBox(height: 20),
@@ -629,10 +606,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               title: "Log In".i18n,
               description: "Already have an account?".i18n,
               icon: Icons.login,
-              isSelected: _authChoice == 'login',
+              isSelected: false,
               onTap: () {
-                setState(() => _authChoice = 'login');
-                _nextPage();
+                Navigator.of(context).pushReplacementNamed('/login');
               },
             ),
           ],
