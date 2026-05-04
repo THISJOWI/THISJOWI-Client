@@ -143,7 +143,7 @@ class Navigation extends State<MyBottomNavigation>
           );
         }
 
-        return IOSNativeBottomNav(
+        return LiquidGlassBottomNav(
           currentIndex: _currentIndex,
           navItems: _navItems,
           onTabSelected: (index) {
@@ -157,13 +157,17 @@ class Navigation extends State<MyBottomNavigation>
   }
 }
 
-class IOSNativeBottomNav extends StatefulWidget {
+double lerpDouble(double a, double b, double t) {
+  return a + (b - a) * t;
+}
+
+class LiquidGlassBottomNav extends StatefulWidget {
   final int currentIndex;
   final List<_NavItem> navItems;
   final ValueChanged<int> onTabSelected;
   final List<Widget> pages;
 
-  const IOSNativeBottomNav({
+  const LiquidGlassBottomNav({
     super.key,
     required this.currentIndex,
     required this.navItems,
@@ -172,11 +176,45 @@ class IOSNativeBottomNav extends StatefulWidget {
   });
 
   @override
-  State<IOSNativeBottomNav> createState() => IOSNativeBottomNavState();
+  State<LiquidGlassBottomNav> createState() => _LiquidGlassBottomNavState();
 }
 
-class IOSNativeBottomNavState extends State<IOSNativeBottomNav> {
+class _LiquidGlassBottomNavState extends State<LiquidGlassBottomNav>
+    with TickerProviderStateMixin {
+  late AnimationController _indicatorController;
+  late Animation<double> _indicatorAnimation;
+  int _previousIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _previousIndex = widget.currentIndex;
+    _indicatorController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _indicatorAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _indicatorController, curve: Curves.easeOutCubic),
+    );
+  }
+
+  @override
+  void dispose() {
+    _indicatorController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant LiquidGlassBottomNav oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentIndex != widget.currentIndex) {
+      _previousIndex = oldWidget.currentIndex;
+      _indicatorController.forward(from: 0);
+    }
+  }
+
   void _onTabTap(int index) {
+    HapticFeedback.lightImpact();
     widget.onTabSelected(index);
   }
 
@@ -185,25 +223,89 @@ class IOSNativeBottomNavState extends State<IOSNativeBottomNav> {
     return Scaffold(
       backgroundColor: AppColors.background,
       extendBody: true,
-      body: IndexedStack(
-        index: widget.currentIndex,
-        children: widget.pages,
+      body: _AnimatedPageStack(
+        currentIndex: widget.currentIndex,
+        pages: widget.pages,
       ),
-      bottomNavigationBar: _buildGlassTabBar(),
+      bottomNavigationBar: _LiquidGlassTabBar(
+        currentIndex: widget.currentIndex,
+        previousIndex: _previousIndex,
+        navItems: widget.navItems,
+        indicatorAnimation: _indicatorAnimation,
+        onTabTap: _onTabTap,
+      ),
     );
   }
+}
 
-  Widget _buildGlassTabBar() {
+class _AnimatedPageStack extends StatelessWidget {
+  final int currentIndex;
+  final List<Widget> pages;
+
+  const _AnimatedPageStack({
+    required this.currentIndex,
+    required this.pages,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 250),
+      switchInCurve: Curves.easeInOut,
+      switchOutCurve: Curves.easeInOut,
+      transitionBuilder: (child, animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: child,
+        );
+      },
+      child: IndexedStack(
+        key: ValueKey(currentIndex),
+        index: currentIndex,
+        children: pages,
+      ),
+    );
+  }
+}
+
+class _LiquidGlassTabBar extends StatelessWidget {
+  final int currentIndex;
+  final int previousIndex;
+  final List<_NavItem> navItems;
+  final Animation<double> indicatorAnimation;
+  final ValueChanged<int> onTabTap;
+
+  const _LiquidGlassTabBar({
+    required this.currentIndex,
+    required this.previousIndex,
+    required this.navItems,
+    required this.indicatorAnimation,
+    required this.onTabTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final totalPadding = 16.0 * 2;
+    final tabWidth = (screenWidth - totalPadding) / navItems.length;
+    
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
         child: Container(
           height: 56 + MediaQuery.of(context).padding.bottom,
           decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.1),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.white.withAlpha(30),
+                Colors.white.withAlpha(15),
+              ],
+            ),
             border: Border(
               top: BorderSide(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: Colors.white.withAlpha(40),
                 width: 0.5,
               ),
             ),
@@ -212,9 +314,27 @@ class IOSNativeBottomNavState extends State<IOSNativeBottomNav> {
             top: false,
             child: SizedBox(
               height: 56,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: _buildTabItems(),
+              child: Stack(
+                children: [
+                  _SlidingIndicator(
+                    currentIndex: currentIndex,
+                    previousIndex: previousIndex,
+                    tabWidth: tabWidth,
+                    animation: indicatorAnimation,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: List.generate(navItems.length, (index) {
+                      final item = navItems[index];
+                      return _AnimatedTabButton(
+                        icon: item.icon,
+                        label: item.label,
+                        isSelected: currentIndex == index,
+                        onTap: () => onTabTap(index),
+                      );
+                    }),
+                  ),
+                ],
               ),
             ),
           ),
@@ -222,28 +342,61 @@ class IOSNativeBottomNavState extends State<IOSNativeBottomNav> {
       ),
     );
   }
+}
 
-  List<Widget> _buildTabItems() {
-    return List.generate(widget.navItems.length, (index) {
-      final item = widget.navItems[index];
-      final isSelected = widget.currentIndex == index;
-      return _TabButton(
-        icon: item.icon,
-        label: item.label,
-        isSelected: isSelected,
-        onTap: () => _onTabTap(index),
-      );
-    });
+class _SlidingIndicator extends StatelessWidget {
+  final int currentIndex;
+  final int previousIndex;
+  final double tabWidth;
+  final Animation<double> animation;
+
+  const _SlidingIndicator({
+    required this.currentIndex,
+    required this.previousIndex,
+    required this.tabWidth,
+    required this.animation,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, child) {
+        final startPosition = previousIndex * tabWidth;
+        final endPosition = currentIndex * tabWidth;
+        final position = lerpDouble(startPosition, endPosition, animation.value);
+        
+        return Positioned(
+          left: position + (tabWidth - 48) / 2,
+          top: 8,
+          child: Container(
+            width: 48,
+            height: 32,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withAlpha(50),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withAlpha(30),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 
-class _TabButton extends StatelessWidget {
+class _AnimatedTabButton extends StatefulWidget {
   final IconData icon;
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _TabButton({
+  const _AnimatedTabButton({
     required this.icon,
     required this.label,
     required this.isSelected,
@@ -251,31 +404,80 @@ class _TabButton extends StatelessWidget {
   });
 
   @override
+  State<_AnimatedTabButton> createState() => _AnimatedTabButtonState();
+}
+
+class _AnimatedTabButtonState extends State<_AnimatedTabButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _scaleController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _opacityAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _scaleController = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.9).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.easeOut),
+    );
+    _opacityAnimation = Tween<double>(begin: 1.0, end: 0.7).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.easeOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scaleController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTapDown: (_) => _scaleController.forward(),
+      onTapUp: (_) {
+        _scaleController.reverse();
+        widget.onTap();
+      },
+      onTapCancel: () => _scaleController.reverse(),
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
         width: 64,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AnimatedContainer(
+            AnimatedBuilder(
+              animation: _scaleAnimation,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _scaleAnimation.value,
+                  child: Opacity(
+                    opacity: _opacityAnimation.value,
+                    child: Icon(
+                      widget.icon,
+                      size: 24,
+                      color: widget.isSelected
+                          ? AppColors.primary
+                          : AppColors.text.withAlpha(128),
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 2),
+            AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.2)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(
-                icon,
-                size: 24,
-                color: isSelected
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w400,
+                color: widget.isSelected
                     ? AppColors.primary
-                    : AppColors.text.withValues(alpha: 0.5),
+                    : AppColors.text.withAlpha(128),
               ),
+              child: Text(widget.label),
             ),
           ],
         ),
