@@ -126,7 +126,7 @@
 
 | Home Page | OTP Page | OnBoarding |
 |--------------|----------------|------------------|
-| ![Home](https://pub-9030d6e053cc40b380e0f63662daf8ed.r2.dev/AppImages/home-screen.png) | ![OTP](https://pub-9030d6e053cc40b380e0f63662daf8ed.r2.dev/AppImages/otp-screen.png) | ![Onboarding](https://pub-9030d6e053cc40b380e0f63662daf8ed.r2.dev/AppImages/Onboarding.png) |
+| ![Home](https://pub-9030d6e053cc40b380e0f63662daf8ed.r2.dev/AppImages/home-screen.png) | ![OTP](https://pub-9030d6e053cc40b380e0f63662daf8ed.r2.dev/AppImages/otp-screen.png) | ![Onboarding](https://pub-9030d6e053cc40b380e0f63662daf8ed.r2.dev/AppImages/onboarding-screen.png) |
 
 </div>
 
