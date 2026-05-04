@@ -1,7 +1,7 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/screens/otp/TOPT.dart';
 import 'package:thisjowi/screens/home/HomeScreen.dart';
@@ -143,42 +143,143 @@ class Navigation extends State<MyBottomNavigation>
           );
         }
 
-        return GlassBackdropScope(
-          child: Scaffold(
-            backgroundColor: AppColors.background,
-            extendBody: true,
-            extendBodyBehindAppBar: true,
-            body: IndexedStack(
-              index: _currentIndex,
-              children: _pages,
-            ),
-            bottomNavigationBar: GlassBottomBar(
-              tabs: _navItems
-                  .map((item) => GlassBottomBarTab(
-                        icon: Icon(item.icon, size: 22),
-                        label: item.label,
-                      ))
-                  .toList(),
-              selectedIndex: _currentIndex,
-              onTabSelected: (index) {
-                HapticFeedback.lightImpact();
-                setState(() => _currentIndex = index);
-              },
-              barHeight: 56,
-              barBorderRadius: 28,
-              horizontalPadding: 16,
-              verticalPadding: 12,
-              iconSize: 24,
-              maskingQuality: MaskingQuality.high,
-              selectedIconColor: AppColors.primary,
-              unselectedIconColor: AppColors.text.withValues(alpha: 0.5),
-              quality: GlassQuality.standard,
-              showIndicator: true,
-              indicatorColor: AppColors.primary.withValues(alpha: 0.2),
-            ),
-          ),
+        return IOSNativeBottomNav(
+          currentIndex: _currentIndex,
+          navItems: _navItems,
+          onTabSelected: (index) {
+            HapticFeedback.lightImpact();
+            setState(() => _currentIndex = index);
+          },
+          pages: _pages,
         );
       },
+    );
+  }
+}
+
+class IOSNativeBottomNav extends StatefulWidget {
+  final int currentIndex;
+  final List<_NavItem> navItems;
+  final ValueChanged<int> onTabSelected;
+  final List<Widget> pages;
+
+  const IOSNativeBottomNav({
+    super.key,
+    required this.currentIndex,
+    required this.navItems,
+    required this.onTabSelected,
+    required this.pages,
+  });
+
+  @override
+  State<IOSNativeBottomNav> createState() => IOSNativeBottomNavState();
+}
+
+class IOSNativeBottomNavState extends State<IOSNativeBottomNav> {
+  void _onTabTap(int index) {
+    widget.onTabSelected(index);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      extendBody: true,
+      body: IndexedStack(
+        index: widget.currentIndex,
+        children: widget.pages,
+      ),
+      bottomNavigationBar: _buildGlassTabBar(),
+    );
+  }
+
+  Widget _buildGlassTabBar() {
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+        child: Container(
+          height: 56 + MediaQuery.of(context).padding.bottom,
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.1),
+            border: Border(
+              top: BorderSide(
+                color: Colors.white.withValues(alpha: 0.1),
+                width: 0.5,
+              ),
+            ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: SizedBox(
+              height: 56,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: _buildTabItems(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildTabItems() {
+    return List.generate(widget.navItems.length, (index) {
+      final item = widget.navItems[index];
+      final isSelected = widget.currentIndex == index;
+      return _TabButton(
+        icon: item.icon,
+        label: item.label,
+        isSelected: isSelected,
+        onTap: () => _onTabTap(index),
+      );
+    });
+  }
+}
+
+class _TabButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _TabButton({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 64,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppColors.primary.withValues(alpha: 0.2)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                icon,
+                size: 24,
+                color: isSelected
+                    ? AppColors.primary
+                    : AppColors.text.withValues(alpha: 0.5),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
