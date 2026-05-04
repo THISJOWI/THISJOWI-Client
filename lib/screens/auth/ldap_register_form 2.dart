@@ -139,9 +139,9 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
     try {
       final result = await _ldapAuthService.testLdapConnection({
         'ldapUrl': ldapUrl,
-        'adminCn': adminCn,
-        'adminPassword': adminPassword,
-        'dc': dc,
+        'ldapBaseDn': dc,
+        'ldapBindDn': adminCn,
+        'ldapBindPassword': adminPassword,
       });
 
       if (mounted) {

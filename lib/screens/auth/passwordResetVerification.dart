@@ -24,11 +24,25 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
   bool _obscurePassword = true;
 
   @override
+  void initState() {
+    super.initState();
+    _codeController.addListener(_onCodeChanged);
+  }
+
+  @override
   void dispose() {
+    _codeController.removeListener(_onCodeChanged);
     _codeController.dispose();
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  void _onCodeChanged() {
+    final code = _codeController.text.trim();
+    if (code.length == 6 && !_isLoading && !_isVerified) {
+      _verifyOtp();
+    }
   }
 
   // Step 1: Verify OTP

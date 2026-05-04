@@ -90,7 +90,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
     _animateToNextStep(() {
       setState(() {
         hostingMode = mode;
-        // Si es Business, preguntar por LDAP. Si no, ir directo al formulario
+        // Si es Business, preguntar por LDAP
         if (accountType == 'Business') {
           currentStep = 2; // Paso de selección LDAP
         } else {
@@ -314,29 +314,26 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
                           : Colors.white.withValues(alpha: 0.1),
                     ),
                   ),
-                  // Paso 2: LDAP (solo Business) o Formulario
+                  // Paso 2: Deprecated (was LDAP)
                   Expanded(
                     flex: currentStep >= 2 ? 1 : 0,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 500),
                       color: currentStep >= 2
-                          ? (accountType == 'Business'
-                              ? AppColors.accent
-                              : AppColors.accent)
+                          ? AppColors.accent
                           : Colors.white.withValues(alpha: 0.1),
                     ),
                   ),
-                  // Paso 3: Formulario (solo si hay LDAP)
-                  if (accountType == 'Business' && useLdap != null)
-                    Expanded(
-                      flex: currentStep >= 3 ? 1 : 0,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 500),
-                        color: currentStep >= 3
-                            ? AppColors.accent
-                            : Colors.white.withValues(alpha: 0.1),
-                      ),
+                  // Paso 3: Formulario
+                  Expanded(
+                    flex: currentStep >= 3 ? 1 : 0,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 500),
+                      color: currentStep >= 3
+                          ? AppColors.accent
+                          : Colors.white.withValues(alpha: 0.1),
                     ),
+                  ),
                 ],
               ),
             ),

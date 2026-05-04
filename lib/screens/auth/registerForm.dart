@@ -301,6 +301,7 @@ class _RegisterFormState extends State<RegisterForm>
       }
     }
 
+    // LDAP validation for Business
     if (widget.accountType == 'Business') {
       final ldapUrlError = _validateLdapUrl(ldapUrl);
       if (ldapUrlError != null) {
@@ -331,6 +332,18 @@ class _RegisterFormState extends State<RegisterForm>
   void _showOtpDialog() {
     final otpController = TextEditingController();
     bool isVerifying = false;
+
+    // Auto-verify when 6 digits entered
+    otpController.addListener(() {
+      if (otpController.text.length == 6 && !isVerifying) {
+        setState(() => isVerifying = true);
+        _completeRegistration(otpController.text, context).then((_) {
+          if (mounted) setState(() => isVerifying = false);
+        }).catchError((_) {
+          if (mounted) setState(() => isVerifying = false);
+        });
+      }
+    });
 
     showDialog(
       context: context,
@@ -477,9 +490,10 @@ class _RegisterFormState extends State<RegisterForm>
                             : () async {
                                 if (otpController.text.length < 6) return;
                                 setDialogState(() => isVerifying = true);
-                                await _completeRegistration(
+                                final success = await _completeRegistration(
                                     otpController.text, dialogContext);
                                 if (mounted) {
+                                  if (success) Navigator.pop(dialogContext);
                                   setDialogState(() => isVerifying = false);
                                 }
                               },
@@ -523,8 +537,8 @@ class _RegisterFormState extends State<RegisterForm>
     );
   }
 
-  Future<void> _completeRegistration(
-      String otp, BuildContext dialogContext) async {
+  Future<bool> _completeRegistration(
+      String otp, [BuildContext? dialogContext]) async {
     final fullName = _fullNameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
@@ -545,7 +559,7 @@ class _RegisterFormState extends State<RegisterForm>
         ldapUrl: widget.accountType == 'Business' ? ldapUrl : null,
       );
 
-      if (!mounted) return;
+      if (!mounted) return false;
 
       final profileService = ProfileService();
       await profileService.updateProfileFields(
@@ -553,18 +567,19 @@ class _RegisterFormState extends State<RegisterForm>
         country: country,
       );
 
-      if (!mounted) return;
-
-      Navigator.pop(dialogContext);
+      if (!mounted) return false;
 
       widget.onSuccess({
         'email': authUser.email,
         'token': authUser.token,
         'userId': authUser.id,
       });
+      
+      return true;
     } on AuthException catch (e) {
-      if (!mounted) return;
+      if (!mounted) return false;
       ErrorSnackBar.show(context, e.message);
+      return false;
     }
   }
 

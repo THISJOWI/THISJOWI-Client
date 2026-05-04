@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:i18n_extension/default.i18n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/api.dart';
 import '../data/models/user.dart';
@@ -169,20 +170,24 @@ class LdapAuthService {
     }
   }
 
-  /// Probar conexión LDAP antes de guardar configuración
+/// Probar conexión LDAP antes de guardar configuración
   Future<Map<String, dynamic>> testLdapConnection(
       Map<String, dynamic> config) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
+      final headers = token != null
+          ? {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            }
+          : {'Content-Type': 'application/json'};
+
       final response = await http
           .post(
             Uri.parse('$baseUrl/ldap/test-connection'),
-            headers: {
-              'Content-Type': 'application/json',
-              if (token != null) 'Authorization': 'Bearer $token',
-            },
+            headers: headers,
             body: jsonEncode(config),
           )
           .timeout(
@@ -335,41 +340,85 @@ class LdapAuthService {
     required String hostingMode,
   }) async {
     try {
-      final response = await http
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      // 1. Derivar el dominio desde el DC (ej: dc=thisjowi,dc=local -> thisjowi.local)
+      String domain = dc
+          .split(',')
+          .where((part) => part.trim().toLowerCase().startsWith('dc='))
+          .map((part) => part.split('=')[1].trim())
+          .join('.');
+
+      if (domain.isEmpty) domain = 'unknown.local';
+
+      // Usamos la URL base general ya que los tenants están en /api/v1/tenants
+      final String tenantsUrl = '${ApiConfig.baseUrl}/api/v1/tenants';
+      final headers = token != null
+          ? {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            }
+          : {'Content-Type': 'application/json'};
+
+      // PASO 1: Crear el Tenant/Organización
+      final tenantResponse = await http
           .post(
-            Uri.parse('$baseUrl/ldap/register-organization'),
-            headers: {'Content-Type': 'application/json'},
+            Uri.parse(tenantsUrl),
+            headers: headers,
             body: jsonEncode({
-              'organizationName': organizationName,
-              'ldapUrl': ldapUrl,
-              'adminCn': adminCn,
-              'dc': dc,
-              'adminPassword': adminPassword,
-              'baseDn': baseDn,
-              'hostingMode': hostingMode,
+              'name': organizationName,
+              'domain': domain,
+              'description': 'LDAP Managed Organization ($hostingMode)',
             }),
           )
-          .timeout(
-            const Duration(seconds: 30),
-            onTimeout: () =>
-                throw Exception('Timeout al registrar organización LDAP'),
-          );
+          .timeout(const Duration(seconds: 15));
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
+      if (tenantResponse.statusCode != 200 &&
+          tenantResponse.statusCode != 201) {
+        return {
+          'success': false,
+          'message':
+              'Error al crear organización: ${tenantResponse.statusCode}',
+        };
+      }
+
+      final tenantData = jsonDecode(tenantResponse.body);
+      final String orgId = tenantData['data']['id'];
+
+      // PASO 2: Configurar LDAP para esta organización
+      final ldapConfigUrl = '$tenantsUrl/$orgId/ldap/config';
+      final configResponse = await http
+          .post(
+            Uri.parse(ldapConfigUrl),
+            headers: headers,
+            body: jsonEncode({
+              'ldapUrl': ldapUrl,
+              'ldapBaseDn': baseDn ?? dc,
+              'ldapBindDn': adminCn,
+              'ldapBindPassword': adminPassword,
+              'userSearchFilter': '(&(objectClass=person)(uid={0}))',
+              'emailAttribute': 'mail',
+              'fullNameAttribute': 'cn',
+              'enabled': true,
+            }),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      if (configResponse.statusCode == 200) {
         return {
           'success': true,
-          'message': data['message'] ?? 'Organización registrada exitosamente',
+          'message': 'Organización y LDAP configurados exitosamente',
           'data': {
-            'orgId': data['orgId'],
-            'domain': data['domain'],
+            'orgId': orgId,
+            'domain': domain,
             'ldapEnabled': true,
           },
         };
       } else {
         return {
           'success': false,
-          'message': _parseError(response),
+          'message': 'Organización creada pero falló la configuración LDAP',
         };
       }
     } on http.ClientException {

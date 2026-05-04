@@ -590,21 +590,41 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
       ),
       child: Stack(
         children: [
-          SafeArea(
+SafeArea(
             child: Column(
               children: [
-// Header
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0, vertical: 16.0),
-                        child: RepaintBoundary(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(25),
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                              child: Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
+// Header with icon and title
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.home_rounded,
+                          color: AppColors.primary, size: 28),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Home'.i18n,
+                        style: const TextStyle(
+                          color: AppColors.text,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Search bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 16.0),
+                  child: RepaintBoundary(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(25),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
                           borderRadius: BorderRadius.circular(25),
                           border:
                               Border.all(color: Colors.white.withValues(alpha: 0.1)),

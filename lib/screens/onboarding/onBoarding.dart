@@ -13,13 +13,19 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen>
     with TickerProviderStateMixin {
-  final PageController _pageController = PageController();
+  final PageController _pageController = PageController(initialPage: 0);
   int _currentPage = 0;
 
   late AnimationController _fadeController;
   late AnimationController _scaleController;
+  late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  // Staggered animation controllers
+  late AnimationController _iconAnimationController;
+  late AnimationController _textAnimationController;
 
   // User Choices
   String? _accountType; // 'business', 'community'
@@ -43,6 +49,21 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       vsync: this,
     );
 
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+
+    _iconAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+
+    _textAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
     );
@@ -51,8 +72,18 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       CurvedAnimation(parent: _scaleController, curve: Curves.elasticOut),
     );
 
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+
     _fadeController.forward();
     _scaleController.forward();
+    _iconAnimationController.forward();
+    _textAnimationController.forward();
   }
 
   @override
@@ -60,6 +91,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     _pageController.dispose();
     _fadeController.dispose();
     _scaleController.dispose();
+    _slideController.dispose();
+    _iconAnimationController.dispose();
+    _textAnimationController.dispose();
     _loginServerUrlController.dispose();
     super.dispose();
   }
@@ -72,8 +106,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     // Reset and replay animations
     _fadeController.reset();
     _scaleController.reset();
+    _slideController.reset();
+    _iconAnimationController.reset();
+    _textAnimationController.reset();
     _fadeController.forward();
     _scaleController.forward();
+    _slideController.forward();
+    _iconAnimationController.forward();
+    _textAnimationController.forward();
   }
 
   Future<void> _completeOnboarding() async {
@@ -135,20 +175,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   @override
   Widget build(BuildContext context) {
     final pages = _buildPages(context);
-
-    // Safety check: Ensure controller is in sync with current page
-    if (_currentPage >= 5 &&
-        _pageController.hasClients &&
-        _pageController.page != null) {
-      final page = _pageController.page!.round();
-      if (page < 5) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (_pageController.hasClients) {
-            _pageController.jumpToPage(_currentPage);
-          }
-        });
-      }
-    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -265,58 +291,71 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   // --- Page Builders ---
 
-  Widget _buildIntroPage(OnboardingPage page) {
+Widget _buildIntroPage(OnboardingPage page) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
           children: [
-            ScaleTransition(
-              scale: _scaleAnimation,
-              child: Container(
-                width: 160,
-                height: 160,
-                decoration: BoxDecoration(
-                  color: page.color.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: page.color.withValues(alpha: 0.3),
-                      blurRadius: 20,
-                      spreadRadius: 5,
+            Expanded(
+              child: Center(
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      color: page.color.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: page.color.withValues(alpha: 0.3),
+                          blurRadius: 20,
+                          spreadRadius: 5,
+                        ),
+                      ],
                     ),
-                  ],
+                    child: Icon(
+                      page.icon,
+                      size: 80,
+                      color: page.color,
+                    ),
+                  ),
                 ),
-                child: Icon(
-                  page.icon,
-                  size: 80,
-                  color: page.color,
-                ),
               ),
             ),
-            const SizedBox(height: 60),
-            Text(
-              page.title,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: AppColors.text,
-                height: 1.2,
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    page.title,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.text,
+                      height: 1.2,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    page.description,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.text.withValues(alpha: 0.7),
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
-              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
-            Text(
-              page.description,
-              style: TextStyle(
-                fontSize: 16,
-                color: AppColors.text.withValues(alpha: 0.7),
-                height: 1.5,
-              ),
-              textAlign: TextAlign.center,
-            ),
+            const SizedBox(height: 40),
           ],
         ),
       ),
