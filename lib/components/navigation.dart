@@ -164,16 +164,7 @@ class Navigation extends State<MyBottomNavigation>
                               ? AppColors.primary
                               : AppColors.text.withValues(alpha: 0.6),
                         ),
-                        label: Text(
-                          entry.value.label,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
-                            color: _currentIndex == entry.key
-                                ? AppColors.primary
-                                : AppColors.text.withValues(alpha: 0.6),
-                          ),
-                        ),
+                        label: entry.value.label,
                       ))
                   .toList(),
               selectedIndex: _currentIndex,
