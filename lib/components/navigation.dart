@@ -156,13 +156,23 @@ class Navigation extends State<MyBottomNavigation>
               tabs: _navItems
                   .asMap()
                   .entries
-                  .map((entry) => GlassBottomBarTab(
+.map((entry) => GlassBottomBarTab(
                         icon: Icon(
                           entry.value.icon,
-size: 26,
+                          size: 26,
                           color: _currentIndex == entry.key
                               ? AppColors.primary
                               : AppColors.text.withValues(alpha: 0.6),
+                        ),
+                        label: Text(
+                          entry.value.label,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            color: _currentIndex == entry.key
+                                ? AppColors.primary
+                                : AppColors.text.withValues(alpha: 0.6),
+                          ),
                         ),
                       ))
                   .toList(),
