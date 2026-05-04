@@ -156,10 +156,10 @@ class Navigation extends State<MyBottomNavigation>
               tabs: _navItems
                   .asMap()
                   .entries
-.map((entry) => GlassBottomBarTab(
+                  .map((entry) => GlassBottomBarTab(
                         icon: Icon(
                           entry.value.icon,
-size: 18,
+                          size: 28,
                           color: _currentIndex == entry.key
                               ? AppColors.primary
                               : AppColors.text.withValues(alpha: 0.6),
@@ -303,8 +303,9 @@ class _SidebarItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Material(
-        color:
-            isSelected ? AppColors.primary.withValues(alpha: 0.15) : Colors.transparent,
+        color: isSelected
+            ? AppColors.primary.withValues(alpha: 0.15)
+            : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
           onTap: onTap,
