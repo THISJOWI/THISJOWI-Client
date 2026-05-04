@@ -159,7 +159,7 @@ class Navigation extends State<MyBottomNavigation>
                   .map((entry) => GlassBottomBarTab(
                         icon: Icon(
                           entry.value.icon,
-                          size: 22,
+size: 26,
                           color: _currentIndex == entry.key
                               ? AppColors.primary
                               : AppColors.text.withValues(alpha: 0.6),
