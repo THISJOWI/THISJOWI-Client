@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:liquid_glass_nav/liquid_glass_nav.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/screens/otp/TOPT.dart';
 import 'package:thisjowi/screens/home/HomeScreen.dart';
@@ -143,29 +143,37 @@ class Navigation extends State<MyBottomNavigation>
           );
         }
 
-        return Scaffold(
-          body: IndexedStack(
-            index: _currentIndex,
-            children: _pages,
-          ),
-          bottomNavigationBar: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: LiquidGlassBottomNav(
-              currentIndex: _currentIndex,
-              onTap: (index) {
-                HapticFeedback.lightImpact();
-                setState(() => _currentIndex = index);
-              },
-              blurStrength: 20,
-              enableHapticFeedback: true,
-              hapticFeedbackType: HapticFeedbackType.light,
-              animationType: NavAnimationType.scale,
-              items: _navItems
-                  .map((item) => LiquidGlassNavItem(
-                        icon: item.icon,
+        return GlassBackdropScope(
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            extendBody: true,
+            extendBodyBehindAppBar: true,
+            body: IndexedStack(
+              index: _currentIndex,
+              children: _pages,
+            ),
+            bottomNavigationBar: GlassBottomBar(
+              tabs: _navItems
+                  .map((item) => GlassBottomBarTab(
+                        icon: Icon(item.icon, size: 22),
                         label: item.label,
                       ))
                   .toList(),
+              selectedIndex: _currentIndex,
+              onTabSelected: (index) {
+                HapticFeedback.lightImpact();
+                setState(() => _currentIndex = index);
+              },
+              barHeight: 64,
+              barBorderRadius: 28,
+              horizontalPadding: 20,
+              spacing: 8,
+              glassSettings: const LiquidGlassSettings(
+                thickness: 30,
+                blur: 3,
+                refractiveIndex: 1.59,
+              ),
+              showIndicator: true,
             ),
           ),
         );
