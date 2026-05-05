@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:thisjowi/components/auth_method_selector.dart';
 import 'login.dart';
 import 'ldapLogin.dart';
+import 'samlLogin.dart';
 
 /// Pantalla inicial que muestra opciones de autenticación
 class AuthSelectionScreen extends StatelessWidget {
@@ -82,6 +83,13 @@ class AuthSelectionScreen extends StatelessWidget {
                           ),
                         );
                       },
+                      onSamlTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const SamlLoginScreen(),
+                          ),
+                        );
+                      },
                     ),
 
                     const SizedBox(height: 40),
@@ -117,7 +125,7 @@ class AuthSelectionScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Usa LDAP Corporativo si tu empresa está registrada en ThisJowi. Si no tienes una cuenta LDAP, crea una cuenta regular con tu email.',
+                            'Usa LDAP Corporativo si tu empresa está registrada en ThisJowi. Usa SSO Empresarial si tu empresa usa Azure AD u otro proveedor SAML. Si no tienes una cuenta LDAP, crea una cuenta regular con tu email.',
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.blue.shade900,

@@ -50,9 +50,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
       }
     }
-}
+  }
 
-Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     // Usar el nuevo flujo de registro interactivo
     return RegisterFlowScreen(
       isEmbedded: widget.isEmbedded,

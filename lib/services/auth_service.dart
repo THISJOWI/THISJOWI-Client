@@ -21,7 +21,7 @@ class AuthService extends BaseService {
   AuthService._internal() : super('AuthService');
 
   final CryptoService _cryptoService = CryptoService();
-final TokenManager _tokenManager = TokenManager();
+  final TokenManager _tokenManager = TokenManager();
 
 // Configuracion de Google Sign In - singleton instance
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
@@ -130,9 +130,9 @@ final TokenManager _tokenManager = TokenManager();
 
       logInfo('Login successful for user: ${authUser.id}');
       return authUser;
-} on AuthException {
-  rethrow;
-} on SocketException catch (e) {
+    } on AuthException {
+      rethrow;
+    } on SocketException catch (e) {
       logWarning('Network error during login: $e');
       throw NetworkException(
         message: 'Error de conexion. Verifica tu internet.',
@@ -155,16 +155,16 @@ final TokenManager _tokenManager = TokenManager();
     try {
       await _initGoogleSignIn();
 
-final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate(
-    scopeHint: ['email', 'profile'],
-  );
+      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate(
+        scopeHint: ['email', 'profile'],
+      );
 
-  if (googleUser == null) {
-    logWarning('Google Sign In aborted by user');
-    throw const AuthException(
-      message: 'Inicio de sesion cancelado',
-      code: 'GOOGLE_SIGN_IN_ABORTED',
-    );
+      if (googleUser == null) {
+        logWarning('Google Sign In aborted by user');
+        throw const AuthException(
+          message: 'Inicio de sesion cancelado',
+          code: 'GOOGLE_SIGN_IN_ABORTED',
+        );
       }
 
       logInfo('Google User signed in: ${googleUser.email}');
@@ -371,9 +371,9 @@ final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate(
 
       logInfo('LDAP login successful for user: ${authUser.id}');
       return authUser;
-} on AuthException {
-  rethrow;
-} on SocketException catch (e) {
+    } on AuthException {
+      rethrow;
+    } on SocketException catch (e) {
       logWarning('Network error during LDAP login: $e');
       throw NetworkException(
         message: 'Error de conexion LDAP.',
@@ -383,6 +383,63 @@ final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate(
       logError('LDAP login error', e, stackTrace);
       throw LdapException(
         message: 'Error en autenticacion LDAP: $e',
+        domain: domain,
+        details: e,
+      );
+    }
+  }
+
+  /// Login con SAML
+  Future<AuthUser> loginWithSaml({
+    required String domain,
+    required String samlResponse,
+    String? relayState,
+  }) async {
+    logInfo('Attempting SAML login for domain: $domain');
+
+    try {
+      final response = await apiClient.post(
+        '/v1/auth/saml/login',
+        body: {
+          'domain': domain,
+          'samlResponse': samlResponse,
+          if (relayState != null) 'relayState': relayState,
+        },
+        requiresAuth: false,
+      );
+
+      validateResponse(response);
+
+      final body = parseJsonBody(response);
+      final authUser = AuthUser.fromJson(body);
+
+      await _tokenManager.setToken(
+        authUser.token,
+        expiry: authUser.tokenExpiry,
+        refreshToken: authUser.refreshToken,
+      );
+      await _tokenManager.setUserId(authUser.id);
+
+      final secureStorage = SecureStorageService();
+      await secureStorage.saveValue('cached_email', authUser.email);
+      await secureStorage.saveValue('is_saml_user', 'true');
+
+      await _cryptoService.initKeys();
+
+      logInfo('SAML login successful for user: ${authUser.id}');
+      return authUser;
+    } on AuthException {
+      rethrow;
+    } on SocketException catch (e) {
+      logWarning('Network error during SAML login: $e');
+      throw NetworkException(
+        message: 'Error de conexion SAML.',
+        details: e,
+      );
+    } catch (e, stackTrace) {
+      logError('SAML login error', e, stackTrace);
+      throw SamlException(
+        message: 'Error en autenticacion SAML: $e',
         domain: domain,
         details: e,
       );
@@ -403,9 +460,9 @@ final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate(
       validateResponse(response);
 
       logInfo('OTP sent successfully to: $email');
-} on AuthException {
-  rethrow;
-} catch (e, stackTrace) {
+    } on AuthException {
+      rethrow;
+    } catch (e, stackTrace) {
       logError('Error initiating registration', e, stackTrace);
       throw RegistrationException(
         message: 'Error al iniciar registro: $e',
@@ -470,9 +527,9 @@ final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate(
 
       logInfo('Registration successful for user: ${authUser.id}');
       return authUser;
-} on AuthException {
-  rethrow;
-} catch (e, stackTrace) {
+    } on AuthException {
+      rethrow;
+    } catch (e, stackTrace) {
       logError('Registration error', e, stackTrace);
       throw RegistrationException(
         message: 'Error en el registro: $e',
@@ -649,6 +706,8 @@ final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate(
         ldapUsername: authUser.ldapUsername,
         ldapDomain: authUser.ldapDomain,
         isLdapUser: authUser.isLdapUser,
+        isSamlUser: authUser.isSamlUser,
+        samlNameId: authUser.samlNameId,
         publicKey: payload?['publicKey'] ?? payload?['public_key'],
       );
     } catch (e) {

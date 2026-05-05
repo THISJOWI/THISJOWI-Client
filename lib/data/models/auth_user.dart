@@ -10,6 +10,8 @@ class AuthUser {
   final String? ldapUsername;
   final String? ldapDomain;
   final bool isLdapUser;
+  final bool isSamlUser;
+  final String? samlNameId;
   final DateTime? lastValidated;
   final String accountType;
   final String hostingMode;
@@ -25,6 +27,8 @@ class AuthUser {
     this.ldapUsername,
     this.ldapDomain,
     this.isLdapUser = false,
+    this.isSamlUser = false,
+    this.samlNameId,
     this.lastValidated,
     this.accountType = 'Community',
     this.hostingMode = 'Cloud',
@@ -62,6 +66,11 @@ class AuthUser {
           json['ldapUser'] ??
           json['is_ldap_user'] ??
           (ldapUsr != null),
+      isSamlUser: json['isSamlUser'] ??
+          json['samlUser'] ??
+          json['is_saml_user'] ??
+          false,
+      samlNameId: json['samlNameId'] ?? json['saml_name_id'],
       lastValidated: lastValidated,
       accountType: json['accountType']?.toString() ??
           json['account_type']?.toString() ??
@@ -84,6 +93,8 @@ class AuthUser {
       'ldapUsername': ldapUsername,
       'ldapDomain': ldapDomain,
       'isLdapUser': isLdapUser,
+      'isSamlUser': isSamlUser,
+      'samlNameId': samlNameId,
       'lastValidated': lastValidated?.toIso8601String(),
       'accountType': accountType,
       'hostingMode': hostingMode,
@@ -101,7 +112,9 @@ class AuthUser {
     String? orgId,
     String? ldapUsername,
     String? ldapDomain,
-    bool? isLdapUser,
+bool? isLdapUser,
+    bool? isSamlUser,
+    String? samlNameId,
     DateTime? lastValidated,
     String? accountType,
     String? hostingMode,
@@ -117,6 +130,8 @@ class AuthUser {
       ldapUsername: ldapUsername ?? this.ldapUsername,
       ldapDomain: ldapDomain ?? this.ldapDomain,
       isLdapUser: isLdapUser ?? this.isLdapUser,
+      isSamlUser: isSamlUser ?? this.isSamlUser,
+      samlNameId: samlNameId ?? this.samlNameId,
       lastValidated: lastValidated ?? this.lastValidated,
       accountType: accountType ?? this.accountType,
       hostingMode: hostingMode ?? this.hostingMode,

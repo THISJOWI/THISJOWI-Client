@@ -10,6 +10,8 @@ class User {
   final String? ldapUsername;
   final String? ldapDomain;
   final bool isLdapUser;
+  final bool isSamlUser;
+  final String? samlNameId;
   final String? publicKey;
 
   User({
@@ -24,6 +26,8 @@ class User {
     this.ldapUsername,
     this.ldapDomain,
     this.isLdapUser = false,
+    this.isSamlUser = false,
+    this.samlNameId,
     this.publicKey,
   });
 
@@ -44,6 +48,11 @@ class User {
           json['ldapUser'] ??
           json['is_ldap_user'] ??
           (ldapUsr != null),
+      isSamlUser: json['isSamlUser'] ??
+          json['samlUser'] ??
+          json['is_saml_user'] ??
+          false,
+      samlNameId: json['samlNameId'] ?? json['saml_name_id'],
       publicKey: json['publicKey'] ?? json['public_key'],
     );
   }
@@ -61,6 +70,8 @@ class User {
       'ldapUsername': ldapUsername,
       'ldapDomain': ldapDomain,
       'isLdapUser': isLdapUser,
+      'isSamlUser': isSamlUser,
+      'samlNameId': samlNameId,
       'publicKey': publicKey,
     };
   }

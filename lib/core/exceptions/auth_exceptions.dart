@@ -86,6 +86,19 @@ class LdapException extends AuthException {
         );
 }
 
+/// Error en autenticacion SAML
+class SamlException extends AuthException {
+  final String? domain;
+
+  const SamlException({
+    super.message = 'Error en autenticacion SAML',
+    this.domain,
+    super.details,
+  }) : super(
+          code: 'SAML_ERROR',
+        );
+}
+
 /// Token expirado
 class TokenExpiredException extends AuthException {
   const TokenExpiredException({

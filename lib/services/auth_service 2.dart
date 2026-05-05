@@ -21,7 +21,7 @@ class AuthService extends BaseService {
   AuthService._internal() : super('AuthService');
 
   final CryptoService _cryptoService = CryptoService();
-final TokenManager _tokenManager = TokenManager();
+  final TokenManager _tokenManager = TokenManager();
 
 // Configuracion de Google Sign In - singleton instance
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
@@ -130,9 +130,9 @@ final TokenManager _tokenManager = TokenManager();
 
       logInfo('Login successful for user: ${authUser.id}');
       return authUser;
-} on AuthException {
-  rethrow;
-} on SocketException catch (e) {
+    } on AuthException {
+      rethrow;
+    } on SocketException catch (e) {
       logWarning('Network error during login: $e');
       throw NetworkException(
         message: 'Error de conexion. Verifica tu internet.',
@@ -155,16 +155,16 @@ final TokenManager _tokenManager = TokenManager();
     try {
       await _initGoogleSignIn();
 
-final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate(
-    scopeHint: ['email', 'profile'],
-  );
+      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate(
+        scopeHint: ['email', 'profile'],
+      );
 
-  if (googleUser == null) {
-    logWarning('Google Sign In aborted by user');
-    throw const AuthException(
-      message: 'Inicio de sesion cancelado',
-      code: 'GOOGLE_SIGN_IN_ABORTED',
-    );
+      if (googleUser == null) {
+        logWarning('Google Sign In aborted by user');
+        throw const AuthException(
+          message: 'Inicio de sesion cancelado',
+          code: 'GOOGLE_SIGN_IN_ABORTED',
+        );
       }
 
       logInfo('Google User signed in: ${googleUser.email}');
@@ -371,9 +371,9 @@ final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate(
 
       logInfo('LDAP login successful for user: ${authUser.id}');
       return authUser;
-} on AuthException {
-  rethrow;
-} on SocketException catch (e) {
+    } on AuthException {
+      rethrow;
+    } on SocketException catch (e) {
       logWarning('Network error during LDAP login: $e');
       throw NetworkException(
         message: 'Error de conexion LDAP.',
@@ -403,9 +403,9 @@ final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate(
       validateResponse(response);
 
       logInfo('OTP sent successfully to: $email');
-} on AuthException {
-  rethrow;
-} catch (e, stackTrace) {
+    } on AuthException {
+      rethrow;
+    } catch (e, stackTrace) {
       logError('Error initiating registration', e, stackTrace);
       throw RegistrationException(
         message: 'Error al iniciar registro: $e',
@@ -470,9 +470,9 @@ final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate(
 
       logInfo('Registration successful for user: ${authUser.id}');
       return authUser;
-} on AuthException {
-  rethrow;
-} catch (e, stackTrace) {
+    } on AuthException {
+      rethrow;
+    } catch (e, stackTrace) {
       logError('Registration error', e, stackTrace);
       throw RegistrationException(
         message: 'Error en el registro: $e',

@@ -24,12 +24,14 @@ class LdapRegisterForm extends StatefulWidget {
 
 class _LdapRegisterFormState extends State<LdapRegisterForm>
     with TickerProviderStateMixin {
+  final TextEditingController _orgNameController = TextEditingController();
   final TextEditingController _ldapUrlController = TextEditingController();
   final TextEditingController _adminCnController = TextEditingController();
   final TextEditingController _dcController = TextEditingController();
   final TextEditingController _adminPasswordController =
       TextEditingController();
 
+  final FocusNode _orgNameFocusNode = FocusNode();
   final FocusNode _ldapUrlFocusNode = FocusNode();
   final FocusNode _adminCnFocusNode = FocusNode();
   final FocusNode _dcFocusNode = FocusNode();
@@ -56,6 +58,8 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
     );
     _controller.forward();
 
+    _orgNameFocusNode
+        .addListener(() => _onFocusChange(0, _orgNameFocusNode.hasFocus));
     _ldapUrlFocusNode
         .addListener(() => _onFocusChange(1, _ldapUrlFocusNode.hasFocus));
     _adminCnFocusNode
@@ -72,10 +76,12 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
   @override
   void dispose() {
     _controller.dispose();
+    _orgNameController.dispose();
     _ldapUrlController.dispose();
     _adminCnController.dispose();
     _dcController.dispose();
     _adminPasswordController.dispose();
+    _orgNameFocusNode.dispose();
     _ldapUrlFocusNode.dispose();
     _adminCnFocusNode.dispose();
     _dcFocusNode.dispose();
@@ -171,33 +177,18 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
   }
 
   Future<void> _handleRegister() async {
+    final orgName = _orgNameController.text.trim();
     final ldapUrl = _ldapUrlController.text.trim();
     final adminCn = _adminCnController.text.trim();
     final dc = _dcController.text.trim();
     final adminPassword = _adminPasswordController.text;
 
-    // Derive organization name from DC
-    // Example: dc=thisjowi,dc=com -> thisjowi
-    String orgName = '';
-    if (dc.isNotEmpty) {
-      try {
-        final parts = dc.split(',');
-        for (var part in parts) {
-          if (part.trim().toLowerCase().startsWith('dc=')) {
-            orgName = part.split('=')[1].trim();
-            break;
-          }
-        }
-      } catch (e) {
-        orgName = dc;
-      }
-    }
-    
-    if (orgName.isEmpty) {
-      orgName = dc.isNotEmpty ? dc : 'LDAP Organization';
+    final ldapBaseDn = dc.trim();
+    if (ldapBaseDn.isEmpty) {
+      ErrorSnackBar.show(context, 'DC es requerido'.i18n);
+      return;
     }
 
-    // Validaciones
     final urlError = _validateLdapUrl(ldapUrl);
     if (urlError != null) {
       ErrorSnackBar.show(context, urlError);
@@ -210,15 +201,15 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
       return;
     }
 
-    final dcError = _validateRequired(dc, 'DC');
-    if (dcError != null) {
-      ErrorSnackBar.show(context, dcError);
-      return;
-    }
-
     if (adminPassword.isEmpty) {
       ErrorSnackBar.show(
           context, 'Contraseña del administrador es requerida'.i18n);
+      return;
+    }
+
+    if (orgName.isEmpty) {
+      ErrorSnackBar.show(
+          context, 'Nombre de organización es requerido'.i18n);
       return;
     }
 
@@ -231,24 +222,23 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
     setState(() => _isLoading = true);
 
     try {
-      final result = await _ldapAuthService.registerLdapOrganization(
-        organizationName: orgName,
+      final result = await _ldapAuthService.registerSelfHosted(
         ldapUrl: ldapUrl,
-        adminCn: adminCn,
-        dc: dc,
-        adminPassword: adminPassword,
-        baseDn: null,
-        hostingMode: widget.hostingMode,
+        ldapBaseDn: ldapBaseDn,
+        ldapBindDn: adminCn,
+        ldapBindPassword: adminPassword,
+        orgName: orgName,
       );
 
       if (!mounted) return;
       setState(() => _isLoading = false);
 
       if (result['success'] == true) {
+        final data = result['data'] as Map<String, dynamic>?;
         widget.onSuccess({
-          'orgId': result['data']?['orgId'],
-          'domain': result['data']?['domain'],
-          'ldapEnabled': true,
+          'orgId': data?['orgId'],
+          'userId': data?['userId'],
+          'email': data?['email'],
           'message': result['message'],
         });
       } else {
@@ -418,6 +408,20 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
                   const SizedBox(height: 32),
                   _buildSelectionSummary(),
                   const SizedBox(height: 32),
+                  _buildAnimatedField(
+                    index: 0,
+                    child: _buildTextField(
+                      controller: _orgNameController,
+                      focusNode: _orgNameFocusNode,
+                      icon: Icons.business,
+                      label: "Nombre de la organización".i18n,
+                      hint: "Mi Empresa".i18n,
+                      isFocused: _focusedField == 0,
+                      textInputAction: TextInputAction.next,
+                      onSubmitted: () => _ldapUrlFocusNode.requestFocus(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   _buildAnimatedField(
                     index: 1,
                     child: _buildTextField(

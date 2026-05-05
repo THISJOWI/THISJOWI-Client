@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:cryptography/cryptography.dart';
 import 'package:thisjowi/data/local/dao/offline_auth.dart';
 import 'package:thisjowi/data/local/secure_storage_service.dart';
@@ -42,15 +41,15 @@ class OfflineAuthService {
     try {
       final parts = storedHash.split(':');
       if (parts.length != 2) return false;
-      
+
       final salt = parts[0];
       final storedHashBytes = parts[1];
-      
+
       final key = await _algorithm.deriveKeyFromPassword(
         password: password,
         nonce: utf8.encode(salt),
       );
-      
+
       return base64.encode(await key.extractBytes()) == storedHashBytes;
     } catch (e) {
       return false;
@@ -68,7 +67,7 @@ class OfflineAuthService {
     await _dao.updateLastLogin(email);
 
     await _tokenManager.setUserId(user.id);
-    
+
     final secureStorage = SecureStorageService();
     await secureStorage.saveValue('cached_email', user.email);
 
@@ -119,7 +118,7 @@ class OfflineAuthService {
     await _dao.setActiveUser(email);
 
     await _tokenManager.setUserId(user.id);
-    
+
     final secureStorage = SecureStorageService();
     await secureStorage.saveValue('cached_email', email);
 
@@ -153,7 +152,7 @@ class OfflineAuthService {
     await _dao.updateLastLogin(email);
 
     await _tokenManager.setUserId(user.id);
-    
+
     final secureStorage = SecureStorageService();
     await secureStorage.saveValue('cached_email', user.email);
   }

@@ -27,11 +27,15 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
   String? accountType;
   String? hostingMode;
   bool? useLdap;
+  bool _isGoingBack = false;
 
   late AnimationController _slideController;
   late AnimationController _fadeController;
+  late AnimationController _slideBackController;
   late Animation<Offset> _slideAnimation;
+  late Animation<Offset> _slideBackAnimation;
   late Animation<double> _fadeAnimation;
+  late Animation<double> _fadeBackAnimation;
 
   @override
   void initState() {
@@ -44,6 +48,10 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
+    _slideBackController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0.3, 0),
       end: Offset.zero,
@@ -51,11 +59,25 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
       parent: _slideController,
       curve: Curves.easeOutCubic,
     ));
+    _slideBackAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0.3, 0),
+    ).animate(CurvedAnimation(
+      parent: _slideBackController,
+      curve: Curves.easeOutCubic,
+    ));
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _fadeController,
+      curve: Curves.easeOut,
+    ));
+    _fadeBackAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(
+      parent: _slideBackController,
       curve: Curves.easeOut,
     ));
     _slideController.forward();
@@ -66,6 +88,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
   void dispose() {
     _slideController.dispose();
     _fadeController.dispose();
+    _slideBackController.dispose();
     super.dispose();
   }
 
@@ -90,11 +113,10 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
     _animateToNextStep(() {
       setState(() {
         hostingMode = mode;
-        // Si es Business, preguntar por LDAP
         if (accountType == 'Business') {
-          currentStep = 2; // Paso de selección LDAP
+          currentStep = 2;
         } else {
-          currentStep = 3; // Formulario normal
+          currentStep = 3;
         }
       });
     });
@@ -104,29 +126,35 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
     _animateToNextStep(() {
       setState(() {
         useLdap = useLdapValue;
-        currentStep = 3; // Formulario (LDAP o normal)
+        currentStep = 3;
       });
     });
   }
 
   void _goBack() {
     if (currentStep > 0) {
-      setState(() {
-        currentStep--;
-        if (currentStep == 0) {
-          hostingMode = null;
-          accountType = null;
-          useLdap = null;
-        } else if (currentStep == 1) {
-          useLdap = null;
-        } else if (currentStep == 2 && accountType != 'Business') {
-          // Si no es Business, saltamos el paso 2
-          currentStep = 1;
-          useLdap = null;
-        }
+      _isGoingBack = true;
+      _slideBackController.forward(from: 0.0).then((_) {
+        setState(() {
+          currentStep--;
+          if (currentStep == 0) {
+            hostingMode = null;
+            accountType = null;
+            useLdap = null;
+          } else if (currentStep == 1) {
+            useLdap = null;
+          } else if (currentStep == 2 && accountType != 'Business') {
+            currentStep = 1;
+            useLdap = null;
+          }
+        });
+        _slideController.forward(from: 0.0);
+        _fadeController.forward();
+        _slideBackController.reset();
+        _isGoingBack = false;
       });
-      _slideController.forward(from: 0.0);
-      _fadeController.forward(from: 0.0);
+    } else {
+      Navigator.of(context).pushReplacementNamed('/login');
     }
   }
 
@@ -147,13 +175,11 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
           onDeploymentModeSelected: _handleDeploymentModeSelected,
         );
       case 2:
-        // Solo para Business: selección LDAP
         if (accountType == 'Business') {
           return LdapSelector(
             onLdapSelected: _handleLdapSelected,
           );
         }
-        // Para no-Business, ir directo al formulario
         if (accountType != null && hostingMode != null) {
           return RegisterForm(
             accountType: accountType!,
@@ -164,17 +190,14 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
         }
         return const Center(child: CircularProgressIndicator());
       case 3:
-        // Formulario de registro (LDAP o normal)
         if (accountType != null && hostingMode != null) {
           if (accountType == 'Business' && useLdap == true) {
-            // Formulario LDAP
             return LdapRegisterForm(
               hostingMode: hostingMode!,
               onSuccess: _handleSuccess,
               onBack: _goBack,
             );
           } else {
-            // Formulario normal
             return RegisterForm(
               accountType: accountType!,
               hostingMode: hostingMode!,
@@ -192,8 +215,21 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
   @override
   Widget build(BuildContext context) {
     final content = AnimatedBuilder(
-      animation: Listenable.merge([_slideController, _fadeController]),
+      animation: Listenable.merge([
+        _slideController,
+        _fadeController,
+        _slideBackController,
+      ]),
       builder: (context, child) {
+        if (_isGoingBack) {
+          return FadeTransition(
+            opacity: _fadeBackAnimation,
+            child: SlideTransition(
+              position: _slideBackAnimation,
+              child: child,
+            ),
+          );
+        }
         return FadeTransition(
           opacity: _fadeAnimation,
           child: SlideTransition(
@@ -213,7 +249,6 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Animated Background Gradients
           AnimatedPositioned(
             duration: const Duration(milliseconds: 2000),
             curve: Curves.easeInOut,
@@ -256,7 +291,6 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
               ),
             ),
           ),
-          // Additional ambient glow
           Positioned(
             top: MediaQuery.of(context).size.height * 0.3,
             right: -80,
@@ -278,114 +312,40 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
               ),
             ),
           ),
-          // Blur effect
           BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
             child: Container(color: Colors.transparent),
           ),
-          // Progress indicator
           Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeOutCubic,
-              height: 3,
-              child: Row(
-                children: [
-                  // Paso 0: Tipo de cuenta
-                  Expanded(
-                    flex: currentStep >= 0 ? 1 : 0,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 500),
-                      color: currentStep >= 0
-                          ? AppColors.secondary
-                          : Colors.white.withValues(alpha: 0.1),
-                    ),
-                  ),
-                  // Paso 1: Modo de despliegue
-                  Expanded(
-                    flex: currentStep >= 1 ? 1 : 0,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 500),
-                      color: currentStep >= 1
-                          ? AppColors.primary
-                          : Colors.white.withValues(alpha: 0.1),
-                    ),
-                  ),
-                  // Paso 2: Deprecated (was LDAP)
-                  Expanded(
-                    flex: currentStep >= 2 ? 1 : 0,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 500),
-                      color: currentStep >= 2
-                          ? AppColors.accent
-                          : Colors.white.withValues(alpha: 0.1),
-                    ),
-                  ),
-                  // Paso 3: Formulario
-                  Expanded(
-                    flex: currentStep >= 3 ? 1 : 0,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 500),
-                      color: currentStep >= 3
-                          ? AppColors.accent
-                          : Colors.white.withValues(alpha: 0.1),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          // Back button (only when not on first step)
-          if (currentStep > 0)
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 16,
-              left: 16,
-              child: GestureDetector(
-                onTap: _goBack,
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
+            top: MediaQuery.of(context).padding.top + 16,
+            left: 16,
+            child: GestureDetector(
+              onTap: _goBack,
+              child: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
                     color: Colors.white.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: AppColors.text,
-                    size: 22,
-                  ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: AppColors.text,
+                  size: 22,
                 ),
               ),
             ),
-          // Close button to return to login
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 8,
-            right: 16,
-            child: TextButton(
-              onPressed: () {
-                Navigator.of(context).pushReplacementNamed('/login');
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.text.withValues(alpha: 0.7),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              ),
-              child: const Icon(Icons.close, size: 24),
-            ),
           ),
-          // Content
           SafeArea(
             top: false,
             child: Center(

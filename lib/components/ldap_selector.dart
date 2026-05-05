@@ -21,15 +21,15 @@ class _LdapSelectorState extends State<LdapSelector>
   int? _hoveredIndex;
   late AnimationController _controller;
 
-  final List<_LdapOption> _options = [
-    _LdapOption(
+  final List<_AuthOption> _options = [
+    _AuthOption(
       icon: Icons.account_tree_outlined,
-      title: 'Usar autenticación LDAP',
-      subtitle: 'Configurar servidor LDAP para autenticación empresarial',
+      title: 'LDAP Corporativo',
+      subtitle: 'Servidor LDAP propio',
       useLdap: true,
       gradient: [const Color(0xFF4CAF50), const Color(0xFF8BC34A)],
     ),
-    _LdapOption(
+    _AuthOption(
       icon: Icons.person_outline,
       title: 'Registro tradicional',
       subtitle: 'Crear cuenta con email y contraseña',
@@ -167,7 +167,7 @@ class _LdapSelectorState extends State<LdapSelector>
     );
   }
 
-  Widget _buildOptionCard(int index, _LdapOption option) {
+  Widget _buildOptionCard(int index, _AuthOption option) {
     final isHovered = _hoveredIndex == index;
     final delay = 0.2 + (index * 0.15);
 
@@ -315,18 +315,18 @@ class _LdapSelectorState extends State<LdapSelector>
   }
 }
 
-class _LdapOption {
+class _AuthOption {
   final IconData icon;
   final String title;
   final String subtitle;
   final bool useLdap;
   final List<Color> gradient;
 
-  _LdapOption({
+  _AuthOption({
     required this.icon,
     required this.title,
     required this.subtitle,
-    required this.useLdap,
+    this.useLdap = false,
     required this.gradient,
   });
 }

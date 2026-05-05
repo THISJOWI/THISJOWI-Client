@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:i18n_extension/default.i18n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/api.dart';
 import '../data/models/user.dart';
@@ -170,7 +169,7 @@ class LdapAuthService {
     }
   }
 
-/// Probar conexión LDAP antes de guardar configuración
+  /// Probar conexión LDAP antes de guardar configuración
   Future<Map<String, dynamic>> testLdapConnection(
       Map<String, dynamic> config) async {
     try {
@@ -426,6 +425,65 @@ class LdapAuthService {
         'success': false,
         'message': 'Error de conexión con el servidor',
       };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error: ${e.toString()}',
+      };
+    }
+  }
+
+  /// Registrar organización self-hosted (nuevo endpoint)
+  Future<Map<String, dynamic>> registerSelfHosted({
+    required String ldapUrl,
+    required String ldapBaseDn,
+    required String ldapBindDn,
+    required String ldapBindPassword,
+    required String orgName,
+    String userSearchFilter = "(&(objectClass=person)(uid={0}))",
+    String emailAttribute = "mail",
+    String fullNameAttribute = "cn",
+  }) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/register/self-hosted'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'ldapUrl': ldapUrl,
+              'ldapBaseDn': ldapBaseDn,
+              'ldapBindDn': ldapBindDn,
+              'ldapBindPassword': ldapBindPassword,
+              'userSearchFilter': userSearchFilter,
+              'emailAttribute': emailAttribute,
+              'fullNameAttribute': fullNameAttribute,
+              'orgName': orgName,
+            }),
+          )
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () =>
+                throw Exception('Timeout al registrar organización'),
+          );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 201 && data['success'] == true) {
+        return {
+          'success': true,
+          'message': data['message'] ?? 'Registro exitoso',
+          'data': {
+            'userId': data['userId'],
+            'orgId': data['orgId'],
+            'email': data['email'],
+          },
+        };
+      } else {
+        return {
+          'success': false,
+          'message': data['error'] ?? data['message'] ?? 'Error en registro',
+        };
+      }
     } catch (e) {
       return {
         'success': false,

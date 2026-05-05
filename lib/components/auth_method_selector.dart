@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class AuthMethodSelector extends StatelessWidget {
   final VoidCallback onLdapTap;
   final VoidCallback onRegularTap;
+  final VoidCallback? onSamlTap;
 
   const AuthMethodSelector({
     super.key,
     required this.onLdapTap,
     required this.onRegularTap,
+    this.onSamlTap,
   });
 
   @override
@@ -26,6 +28,63 @@ class AuthMethodSelector extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
+          if (onSamlTap != null) ...[
+            Row(
+              children: [
+                // Opción SAML
+                Expanded(
+                  child: GestureDetector(
+                    onTap: onSamlTap,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.indigo.shade700, width: 2),
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.indigo.shade50,
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.indigo.shade700,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.shield_outlined,
+                              color: Colors.white,
+                              size: 28,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'SSO Empresarial',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'SAML / Azure AD',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+          ],
           Row(
             children: [
               // Opción LDAP

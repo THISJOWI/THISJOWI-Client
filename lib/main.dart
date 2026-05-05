@@ -11,6 +11,7 @@ import 'package:thisjowi/screens/auth/login.dart';
 import 'package:thisjowi/screens/auth/register.dart';
 import 'package:thisjowi/screens/auth/authSelection.dart';
 import 'package:thisjowi/screens/auth/ldapLogin.dart';
+import 'package:thisjowi/screens/auth/samlLogin.dart';
 import 'package:thisjowi/screens/otp/OtpQrScannerScreen.dart';
 import 'package:thisjowi/screens/splash/splash.dart';
 import 'package:thisjowi/screens/onboarding/onBoarding.dart';
@@ -169,6 +170,7 @@ class MainApp extends StatelessWidget {
       routes: {
         '/authSelection': (context) => const AuthSelectionScreen(),
         '/ldapLogin': (context) => const LdapLoginScreen(),
+        '/samlLogin': (context) => const SamlLoginScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
