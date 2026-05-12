@@ -22,6 +22,20 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.thisjowi.app</string>
+				<string>com.googleusercontent.apps.874520303548-914qta0s68na91gvohb2etr5r7khv51h</string>
+			</array>
+		</dict>
+	</array>
+	<key>GIDClientID</key>
+	<string>874520303548-914qta0s68na91gvohb2etr5r7khv51h.apps.googleusercontent.com</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>

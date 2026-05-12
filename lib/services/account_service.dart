@@ -70,7 +70,7 @@ class AccountService {
   }
 
   Future<AccountUser?> getCurrentAccount() async {
-    final response = await _get('/auth/me');
+    final response = await _get('/v1/auth/me');
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
       return AccountUser.fromJson(json);
@@ -80,7 +80,7 @@ class AccountService {
 
   Future<void> changePassword(
       String oldPassword, String newPassword, String confirmPassword) async {
-    await _post('/auth/change-password', {
+    await _post('/v1/auth/change-password', {
       'oldPassword': oldPassword,
       'newPassword': newPassword,
       'confirmPassword': confirmPassword,

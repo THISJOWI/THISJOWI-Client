@@ -5,8 +5,10 @@ import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/exceptions/auth_exceptions.dart';
 import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/services/biometricService.dart';
+import 'package:thisjowi/services/google_auth_service.dart';
 import 'package:thisjowi/services/token_manager.dart';
 import 'package:thisjowi/services/offline_auth_service.dart';
+import 'package:thisjowi/components/social_login_button.dart';
 import 'package:thisjowi/components/navigation.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/i18n/translationService.dart';
@@ -31,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final AuthService _authService = AuthService();
   final OfflineAuthService _offlineAuthService = OfflineAuthService();
   final TokenManager _tokenManager = TokenManager();
+  final GoogleAuthService _googleAuthService = GoogleAuthService();
   bool _isLoading = false;
   bool _hasSavedSession = false;
   bool _biometricAvailable = false;
@@ -42,6 +45,25 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     _checkBiometricAvailability();
   }
+
+  Future<void> _handleGoogleLogin() async {
+    setState(() => _isLoading = true);
+    try {
+      await _googleAuthService.login();
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ErrorSnackBar.show(context, e.toString().replaceFirst('Exception: ', ''));
+    }
+  }
+
+  Future<void> _handleGithubLogin() async {}
 
   Future<void> _checkBiometricAvailability() async {
     final token = await _tokenManager.getToken();
@@ -84,58 +106,6 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
     _passwordFocusNode.dispose();
     super.dispose();
-  }
-
-  Future<void> _handleGoogleLogin() async {
-    setState(() => _isLoading = true);
-    try {
-      await _authService.loginWithGoogle();
-
-      if (mounted) {
-        setState(() => _isLoading = false);
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
-          (route) => false,
-        );
-      }
-    } on AuthException catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        ErrorSnackBar.show(context, e.message);
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        ErrorSnackBar.show(context, 'Error en login con Google: $e');
-      }
-    }
-  }
-
-  Future<void> _handleGitHubLogin() async {
-    setState(() => _isLoading = true);
-
-    try {
-      await _authService.loginWithGitHub();
-
-      if (mounted) {
-        setState(() => _isLoading = false);
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
-          (route) => false,
-        );
-      }
-    } on AuthException catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        ErrorSnackBar.show(context, e.message);
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        String errorMsg = e.toString().replaceFirst('Exception: ', '');
-        ErrorSnackBar.show(context, errorMsg);
-      }
-    }
   }
 
   /// Login automático con LDAP cuando el dominio del email lo tiene habilitado
@@ -619,31 +589,27 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Google
-                            _buildSocialButton(
-                              asset: 'assets/google_logo.png',
+                            SocialLoginButton(
+                              imagePath: 'assets/google_logo.png',
+                              color: Colors.red,
                               onTap: _handleGoogleLogin,
                             ),
                             const SizedBox(width: 20),
-                            // GitHub
-                            _buildSocialButton(
-                              asset: 'assets/github_logo_black.png',
-                              useWhiteLogoBackground: true,
-                              onTap: _handleGitHubLogin,
-                              isIcon: false,
+                            SocialLoginButton(
+                              imagePath: 'assets/github_logo.png',
+                              color: Colors.black,
+                              onTap: _handleGithubLogin,
                             ),
-
                             if (_biometricAvailable) ...[
                               const SizedBox(width: 20),
-                              // Biometric
                               GestureDetector(
                                 onTap: _handleBiometricLogin,
                                 child: Container(
-                                  width: 60,
-                                  height: 60,
+                                  width: 56,
+                                  height: 56,
                                   decoration: BoxDecoration(
                                     color: Colors.white.withValues(alpha: 0.05),
-                                    borderRadius: BorderRadius.circular(18),
+                                    borderRadius: BorderRadius.circular(28),
                                     border: Border.all(
                                         color: Colors.white.withValues(alpha: 0.1)),
                                   ),
@@ -693,59 +659,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSocialButton({
-    required String asset,
-    required VoidCallback onTap,
-    Color? color,
-    Color? backgroundColor,
-    bool isIcon = false,
-    bool useWhiteLogoBackground = false,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          color: backgroundColor ?? Colors.white.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-        ),
-        padding: const EdgeInsets.all(15),
-        child: useWhiteLogoBackground
-            ? Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                padding: const EdgeInsets.all(2),
-                child: asset.startsWith('http')
-                    ? Image.network(
-                        asset,
-                        color: color,
-                        errorBuilder: (context, error, stackTrace) =>
-                            Icon(Icons.code, color: AppColors.text, size: 30),
-                      )
-                    : Image.asset(
-                        asset,
-                        color: color,
-                      ),
-              )
-            : (asset.startsWith('http')
-                ? Image.network(
-                    asset,
-                    color: color,
-                    errorBuilder: (context, error, stackTrace) =>
-                        Icon(Icons.code, color: AppColors.text, size: 30),
-                  )
-                : Image.asset(
-                    asset,
-                    color: color,
-                  )),
       ),
     );
   }

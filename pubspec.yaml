@@ -34,11 +34,11 @@ dependencies:
   flutter_map: ^8.3.0
   latlong2: ^0.9.0
   mobile_scanner: ^7.1.4
-  google_sign_in: ^7.2.0
-  flutter_web_auth_2: ^5.0.2
   flutter_quill: ^11.5.0
   cryptography: ^2.5.0
   flutter_secure_storage: ^10.0.0
+  google_sign_in: ^6.2.1
+  app_links: ^6.4.0
 
   liquid_glass_widgets: ^0.9.0
   image_picker: ^1.1.2

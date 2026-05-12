@@ -1,12 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:thisjowi/components/auth_method_selector.dart';
+import 'package:thisjowi/services/google_auth_service.dart';
 import 'login.dart';
 import 'ldapLogin.dart';
 import 'samlLogin.dart';
 
 /// Pantalla inicial que muestra opciones de autenticación
-class AuthSelectionScreen extends StatelessWidget {
+class AuthSelectionScreen extends StatefulWidget {
   const AuthSelectionScreen({super.key});
+
+  @override
+  State<AuthSelectionScreen> createState() => _AuthSelectionScreenState();
+}
+
+class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
+  final GoogleAuthService _googleAuthService = GoogleAuthService();
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _googleAuthService.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleGoogleLogin() async {
+    setState(() => _isLoading = true);
+    try {
+      await _googleAuthService.login();
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      Navigator.of(context).pushReplacementNamed('/home');
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceFirst('Exception: ', '')),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +129,13 @@ class AuthSelectionScreen extends StatelessWidget {
                           ),
                         );
                       },
+                      onGoogleTap: _isLoading ? null : _handleGoogleLogin,
                     ),
+                    if (_isLoading)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 16),
+                        child: CircularProgressIndicator(),
+                      ),
 
                     const SizedBox(height: 40),
 

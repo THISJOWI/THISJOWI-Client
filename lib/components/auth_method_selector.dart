@@ -4,12 +4,14 @@ class AuthMethodSelector extends StatelessWidget {
   final VoidCallback onLdapTap;
   final VoidCallback onRegularTap;
   final VoidCallback? onSamlTap;
+  final VoidCallback? onGoogleTap;
 
   const AuthMethodSelector({
     super.key,
     required this.onLdapTap,
     required this.onRegularTap,
     this.onSamlTap,
+    this.onGoogleTap,
   });
 
   @override
@@ -189,6 +191,38 @@ class AuthMethodSelector extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 12),
+          // Opción Google
+          GestureDetector(
+            onTap: onGoogleTap,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300, width: 1),
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/google_logo.png',
+                    width: 24,
+                    height: 24,
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Continuar con Google',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
