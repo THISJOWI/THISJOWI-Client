@@ -171,7 +171,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: AppColors.primary))
+              child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
           : SafeArea(
               child: Column(
                 children: [

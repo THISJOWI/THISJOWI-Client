@@ -149,7 +149,7 @@ Future<void> _loadCurrentUser() async {
                   Text(
                     title,
                     style: const TextStyle(
-                      color: AppColors.text,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
@@ -159,7 +159,7 @@ Future<void> _loadCurrentUser() async {
                     content,
                     textAlign: TextAlign.justify,
                     style: TextStyle(
-                      color: AppColors.text.withValues(alpha: 0.7),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       fontSize: 14,
                       height: 1.5,
                     ),
@@ -179,7 +179,7 @@ Future<void> _loadCurrentUser() async {
                           child: Text(
                             'Cancel'.i18n,
                             style: TextStyle(
-                              color: AppColors.text.withValues(alpha: 0.6),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
@@ -259,7 +259,7 @@ Future<void> _loadCurrentUser() async {
                         Text(
                           'Confirm Deletion'.i18n,
                           style: const TextStyle(
-                            color: AppColors.text,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
@@ -268,7 +268,7 @@ Future<void> _loadCurrentUser() async {
                           onTap: () => Navigator.pop(context),
                           child: Icon(
                             Icons.close,
-                            color: AppColors.text.withValues(alpha: 0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             size: 20,
                           ),
                         ),
@@ -278,17 +278,17 @@ Future<void> _loadCurrentUser() async {
                     Text(
                       'Enter your password to confirm account deletion.'.i18n,
                       style: TextStyle(
-                        color: AppColors.text.withValues(alpha: 0.7),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                         fontSize: 14,
                       ),
                     ),
                     const SizedBox(height: 24),
                     Container(
                       decoration: BoxDecoration(
-                        color: AppColors.text.withValues(alpha: 0.05),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: AppColors.text.withValues(alpha: 0.1),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                           width: 1,
                         ),
                       ),
@@ -296,16 +296,16 @@ Future<void> _loadCurrentUser() async {
                         controller: passwordController,
                         obscureText: obscurePassword,
                         style:
-                            const TextStyle(color: AppColors.text, fontSize: 16),
+                            const TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
                         decoration: InputDecoration(
                           labelText: 'Password'.i18n,
                           labelStyle: TextStyle(
-                            color: AppColors.text.withValues(alpha: 0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             fontSize: 14,
                           ),
                           prefixIcon: Icon(
                             Icons.lock,
-                            color: AppColors.text.withValues(alpha: 0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             size: 20,
                           ),
                           suffixIcon: Padding(
@@ -315,7 +315,7 @@ Future<void> _loadCurrentUser() async {
                                 obscurePassword
                                     ? Icons.visibility_off
                                     : Icons.visibility,
-                                color: AppColors.text.withValues(alpha: 0.7),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                 size: 24,
                               ),
                               onPressed: () => setState(
@@ -346,7 +346,7 @@ Future<void> _loadCurrentUser() async {
                             child: Text(
                               'Cancel'.i18n,
                               style: TextStyle(
-                                color: AppColors.text.withValues(alpha: 0.6),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -445,7 +445,7 @@ Future<void> _loadCurrentUser() async {
                         Text(
                           'Change Password'.i18n,
                           style: const TextStyle(
-                            color: AppColors.text,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
@@ -454,7 +454,7 @@ Future<void> _loadCurrentUser() async {
                           onTap: () => Navigator.pop(context),
                           child: Icon(
                             Icons.close,
-                            color: AppColors.text.withValues(alpha: 0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             size: 20,
                           ),
                         ),
@@ -495,7 +495,7 @@ Future<void> _loadCurrentUser() async {
                             child: Text(
                               'Cancel'.i18n,
                               style: TextStyle(
-                                color: AppColors.text.withValues(alpha: 0.6),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -507,7 +507,7 @@ Future<void> _loadCurrentUser() async {
                           child: ElevatedButton(
                             onPressed: () => _handleChangePassword(),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.text,
+                              backgroundColor: Theme.of(context).colorScheme.onSurface,
                               foregroundColor: AppColors.background,
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
@@ -544,23 +544,23 @@ Future<void> _loadCurrentUser() async {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.text.withValues(alpha: 0.05),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.text.withValues(alpha: 0.1), width: 1),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1), width: 1),
       ),
       child: TextField(
         controller: controller,
         obscureText: obscure,
-        style: const TextStyle(color: AppColors.text, fontSize: 16),
+        style: const TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(
-            color: AppColors.text.withValues(alpha: 0.6),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             fontSize: 14,
           ),
           prefixIcon: Icon(
             Icons.lock,
-            color: AppColors.text.withValues(alpha: 0.6),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             size: 20,
           ),
           suffixIcon: Padding(
@@ -568,7 +568,7 @@ Future<void> _loadCurrentUser() async {
             child: IconButton(
               icon: Icon(
                 obscure ? Icons.visibility_off : Icons.visibility,
-                color: AppColors.text.withValues(alpha: 0.7),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 size: 24,
               ),
               onPressed: onVisibilityToggle,
@@ -639,7 +639,7 @@ Future<void> _loadCurrentUser() async {
               Text(
                 'Select Country'.i18n,
                 style: const TextStyle(
-                  color: AppColors.text,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -672,7 +672,7 @@ Future<void> _loadCurrentUser() async {
                     onPressed: () => Navigator.pop(context),
                     child: Text('Cancel'.i18n,
                         style: TextStyle(
-                            color: AppColors.text.withValues(alpha: 0.7))),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
                   ),
                 ],
               ),
@@ -691,13 +691,13 @@ Future<void> _loadCurrentUser() async {
         builder: (context, setState) => AlertDialog(
           backgroundColor: AppColors.background,
           title: Text('Account Type'.i18n,
-              style: const TextStyle(color: AppColors.text)),
+              style: const TextStyle(color: Theme.of(context).colorScheme.onSurface)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: ['Business', 'Community']
                 .map((type) => RadioListTile<String>(
                       title: Text(type,
-                          style: const TextStyle(color: AppColors.text)),
+                          style: const TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                       value: type,
                       groupValue: accountType,
                       activeColor: AppColors.primary,
@@ -709,7 +709,7 @@ Future<void> _loadCurrentUser() async {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text('Cancel'.i18n,
-                  style: TextStyle(color: AppColors.text.withValues(alpha: 0.7))),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -747,13 +747,13 @@ Future<void> _loadCurrentUser() async {
         builder: (context, setState) => AlertDialog(
           backgroundColor: AppColors.background,
           title: Text('Hosting Mode'.i18n,
-              style: const TextStyle(color: AppColors.text)),
+              style: const TextStyle(color: Theme.of(context).colorScheme.onSurface)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: ['Cloud', 'Self-Hosted']
                 .map((mode) => RadioListTile<String>(
                       title: Text(mode,
-                          style: const TextStyle(color: AppColors.text)),
+                          style: const TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                       value: mode,
                       groupValue: hostingMode,
                       activeColor: AppColors.primary,
@@ -765,7 +765,7 @@ Future<void> _loadCurrentUser() async {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text('Cancel'.i18n,
-                  style: TextStyle(color: AppColors.text.withValues(alpha: 0.7))),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -817,7 +817,7 @@ Future<void> _loadCurrentUser() async {
                 Text(
                   'Edit Full Name'.i18n,
                   style: const TextStyle(
-                    color: AppColors.text,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -825,25 +825,25 @@ Future<void> _loadCurrentUser() async {
                 const SizedBox(height: 24),
                 Container(
                   decoration: BoxDecoration(
-                    color: AppColors.text.withValues(alpha: 0.05),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.text.withValues(alpha: 0.1),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                       width: 1,
                     ),
                   ),
                   child: TextField(
                     controller: fullNameController,
-                    style: const TextStyle(color: AppColors.text, fontSize: 16),
+                    style: const TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
                     decoration: InputDecoration(
                       labelText: 'Full Name'.i18n,
                       labelStyle: TextStyle(
-                        color: AppColors.text.withValues(alpha: 0.6),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         fontSize: 14,
                       ),
                       prefixIcon: Icon(
                         Icons.person,
-                        color: AppColors.text.withValues(alpha: 0.6),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         size: 20,
                       ),
                       border: InputBorder.none,
@@ -863,7 +863,7 @@ Future<void> _loadCurrentUser() async {
                       child: Text(
                         'Cancel'.i18n,
                         style: TextStyle(
-                          color: AppColors.text.withValues(alpha: 0.7),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
                     ),
@@ -973,7 +973,7 @@ Future<void> _loadCurrentUser() async {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.text.withValues(alpha: 0.3),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -981,7 +981,7 @@ Future<void> _loadCurrentUser() async {
               Text(
                 'Profile Picture'.i18n,
                 style: const TextStyle(
-                  color: AppColors.text,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
@@ -990,11 +990,11 @@ Future<void> _loadCurrentUser() async {
               ListTile(
                 leading: Icon(
                   Icons.photo_library,
-                  color: AppColors.text.withValues(alpha: 0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
                 title: Text(
                   'Choose from Gallery'.i18n,
-                  style: const TextStyle(color: AppColors.text),
+                  style: const TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -1052,7 +1052,7 @@ Future<void> _loadCurrentUser() async {
                       Text(
                         'Settings'.i18n,
                         style: const TextStyle(
-                          color: AppColors.text,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1077,9 +1077,9 @@ Future<void> _loadCurrentUser() async {
                         height: 64,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.text.withValues(alpha: 0.1),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                           border: Border.all(
-                            color: AppColors.text.withValues(alpha: 0.2),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                             width: 2,
                           ),
                           image: _currentProfile?.avatarUrl != null &&
@@ -1095,7 +1095,7 @@ Future<void> _loadCurrentUser() async {
                                 child: Text(
                                   _currentProfile?.initials ?? 'U',
                                   style: TextStyle(
-                                    color: AppColors.text.withValues(alpha: 0.7),
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                     fontSize: 24,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -1111,7 +1111,7 @@ Future<void> _loadCurrentUser() async {
                             Text(
                               'Profile Picture'.i18n,
                               style: const TextStyle(
-                                color: AppColors.text,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -1120,7 +1120,7 @@ Future<void> _loadCurrentUser() async {
                             Text(
                               'Tap to change'.i18n,
                               style: TextStyle(
-                                color: AppColors.text.withValues(alpha: 0.6),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                 fontSize: 14,
                               ),
                             ),
@@ -1129,7 +1129,7 @@ Future<void> _loadCurrentUser() async {
                       ),
                       Icon(
                         Icons.chevron_right,
-                        color: AppColors.text.withValues(alpha: 0.4),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                       ),
                     ],
                   ),
@@ -1208,10 +1208,10 @@ Future<void> _loadCurrentUser() async {
                     trailing: Switch(
                       value: _biometricEnabled,
                       onChanged: _toggleBiometric,
-                      activeThumbColor: AppColors.text,
-                      activeTrackColor: AppColors.text.withValues(alpha: 0.3),
-                      inactiveThumbColor: AppColors.text.withValues(alpha: 0.5),
-                      inactiveTrackColor: AppColors.text.withValues(alpha: 0.1),
+                      activeThumbColor: Theme.of(context).colorScheme.onSurface,
+                      activeTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                      inactiveThumbColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                      inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                     ),
                   ),
 

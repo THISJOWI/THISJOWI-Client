@@ -6,6 +6,7 @@ import 'package:thisjowi/core/exceptions/auth_exceptions.dart';
 import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/services/biometricService.dart';
 import 'package:thisjowi/services/google_auth_service.dart';
+import 'package:thisjowi/services/github_auth_service.dart';
 import 'package:thisjowi/services/token_manager.dart';
 import 'package:thisjowi/services/offline_auth_service.dart';
 import 'package:thisjowi/components/social_login_button.dart';
@@ -34,6 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final OfflineAuthService _offlineAuthService = OfflineAuthService();
   final TokenManager _tokenManager = TokenManager();
   final GoogleAuthService _googleAuthService = GoogleAuthService();
+  final GithubAuthService _githubAuthService = GithubAuthService();
   bool _isLoading = false;
   bool _hasSavedSession = false;
   bool _biometricAvailable = false;
@@ -63,7 +65,22 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _handleGithubLogin() async {}
+  Future<void> _handleGithubLogin() async {
+    setState(() => _isLoading = true);
+    try {
+      await _githubAuthService.login();
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ErrorSnackBar.show(context, e.toString().replaceFirst('Exception: ', ''));
+    }
+  }
 
   Future<void> _checkBiometricAvailability() async {
     final token = await _tokenManager.getToken();

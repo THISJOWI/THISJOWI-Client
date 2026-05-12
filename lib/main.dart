@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:i18n_extension/i18n_extension.dart' show Translations, I18n;
 import 'package:provider/provider.dart';
-import 'package:thisjowi/core/app_colors.dart';
+import 'package:thisjowi/core/app_theme.dart';
 import 'package:thisjowi/core/api.dart';
 import 'package:thisjowi/core/env_loader.dart';
 import 'package:thisjowi/core/providers/otp_provider.dart';
@@ -87,15 +87,6 @@ void main() async {
   Translations.missingKeyCallback = (key, locale) {};
   Translations.missingTranslationCallback = ({required key, required locale, required translations, required supportedLocales}) => false;
 
-  // Configurar el estilo de la barra de estado (iconos claros para fondo oscuro)
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light, // Iconos claros (Android)
-    statusBarBrightness: Brightness.dark, // Barra oscura = iconos claros (iOS)
-    systemNavigationBarColor: AppColors.bottomNavBar,
-    systemNavigationBarIconBrightness: Brightness.light,
-  ));
-
   await EnvLoader.load();
   await ApiConfig.init();
 
@@ -144,29 +135,9 @@ class MainApp extends StatelessWidget {
           ),
         ),
         
-        theme: ThemeData(
-          brightness: Brightness.dark,
-          scaffoldBackgroundColor: AppColors.background,
-          iconTheme: const IconThemeData(
-            color: AppColors.text,
-          ),
-          // Configurar AppBar para que use iconos claros
-          appBarTheme: const AppBarTheme(
-          backgroundColor: AppColors.background,
-          foregroundColor: AppColors.text,
-          elevation: 0,
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: Brightness.light,
-            statusBarBrightness: Brightness.dark,
-          ),
-        ),
-        textSelectionTheme: TextSelectionThemeData(
-          cursorColor: AppColors.text,
-          selectionColor: AppColors.text.withValues(alpha: 0.3),
-          selectionHandleColor: AppColors.text,
-        ),
-      ),
+        themeMode: ThemeMode.system,
+        theme: AppTheme.getLightTheme(),
+        darkTheme: AppTheme.getDarkTheme(),
       routes: {
         '/authSelection': (context) => const AuthSelectionScreen(),
         '/ldapLogin': (context) => const LdapLoginScreen(),

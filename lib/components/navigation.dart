@@ -145,7 +145,7 @@ class Navigation extends State<MyBottomNavigation>
 
         return GlassBackdropScope(
           child: Scaffold(
-            backgroundColor: AppColors.background,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             extendBody: true,
             extendBodyBehindAppBar: true,
             body: IndexedStack(
@@ -218,12 +218,12 @@ class _DesktopLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Row(
         children: [
           Container(
             width: 220,
-            color: AppColors.surface,
+            color: Theme.of(context).cardColor,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -272,7 +272,7 @@ class _DesktopLayout extends StatelessWidget {
           ),
           Expanded(
             child: Container(
-              color: AppColors.background,
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: IndexedStack(
                 index: currentIndex,
                 children: pages,

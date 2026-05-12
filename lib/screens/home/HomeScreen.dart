@@ -312,7 +312,7 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
     return await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: AppColors.background,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             title: Text('Delete password?'.i18n,
                 style: TextStyle(color: AppColors.text)),
             content: Text(
@@ -355,7 +355,7 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
     return await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: AppColors.background,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             title: Text('Delete Note?'.i18n,
                 style: TextStyle(color: AppColors.text)),
             content: Text(

@@ -83,18 +83,18 @@ class _NotesScreenState extends State<NotesScreen> {
             backgroundColor: AppColors.background,
             title: Text(
               'Delete Note?'.tr(context),
-              style: TextStyle(color: AppColors.text),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
             content: Text(
               '${'Are you sure you want to delete'.tr(context)} "${note.title}"?',
-              style: TextStyle(color: AppColors.text),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
                 child: Text(
                   'Cancel'.tr(context),
-                  style: TextStyle(color: AppColors.text),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 ),
               ),
               TextButton(
@@ -207,7 +207,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   title: Text(
                     'Notes'.tr(context),
                     style: const TextStyle(
-                        color: AppColors.text, fontWeight: FontWeight.bold),
+                        color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
                   ),
                   centerTitle: false,
                   pinned: true,
@@ -229,15 +229,15 @@ class _NotesScreenState extends State<NotesScreen> {
                       ),
                       child: TextField(
                         style: const TextStyle(
-                            color: AppColors.text, fontSize: 17),
+                            color: Theme.of(context).colorScheme.onSurface, fontSize: 17),
                         textAlignVertical: TextAlignVertical.center,
                         decoration: InputDecoration(
                           hintText: 'Search'.tr(context),
                           hintStyle: TextStyle(
-                              color: AppColors.text.withValues(alpha: 0.6),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               fontSize: 17),
                           prefixIcon: Icon(Icons.search,
-                              color: AppColors.text.withValues(alpha: 0.6), size: 18),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 18),
                           prefixIconConstraints:
                               const BoxConstraints(minWidth: 32, minHeight: 36),
                           border: InputBorder.none,
@@ -250,7 +250,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                     _loadNotes();
                                   },
                                   child: Icon(Icons.close,
-                                      color: AppColors.text.withValues(alpha: 0.6),
+                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                       size: 18),
                                 )
                               : null,
@@ -267,7 +267,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   const SliverFillRemaining(
                     child: Center(
                         child:
-                            CircularProgressIndicator(color: AppColors.text)),
+                            CircularProgressIndicator(color: Theme.of(context).colorScheme.onSurface)),
                   )
                 else if (_notes.isEmpty)
                   SliverFillRemaining(
@@ -275,7 +275,7 @@ class _NotesScreenState extends State<NotesScreen> {
                       child: Text(
                         'No have notes yet'.tr(context),
                         style: TextStyle(
-                            color: AppColors.text.withValues(alpha: 0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             fontSize: 16),
                       ),
                     ),
@@ -300,7 +300,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                 ? null
                                 : Border(
                                     bottom: BorderSide(
-                                        color: AppColors.text.withValues(alpha: 0.2),
+                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                                         width: 0.5),
                                   ),
                           ),
@@ -348,7 +348,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                           ? note.title
                                           : 'No Title'.tr(context),
                                       style: const TextStyle(
-                                        color: AppColors.text,
+                                        color: Theme.of(context).colorScheme.onSurface,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
                                       ),
@@ -359,13 +359,13 @@ class _NotesScreenState extends State<NotesScreen> {
                                     Row(
                                       children: [
                                         // Fecha iría aquí
-                                        // Text('10/10/24', style: TextStyle(color: AppColors.text.withValues(alpha: 0.4), fontSize: 14)),
+                                        // Text('10/10/24', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4), fontSize: 14)),
                                         // SizedBox(width: 8),
                                         Expanded(
                                           child: Text(
                                             _getPreviewText(note.content),
                                             style: TextStyle(
-                                              color: AppColors.text
+                                              color: Theme.of(context).colorScheme.onSurface
                                                   .withValues(alpha: 0.6),
                                               fontSize: 14,
                                             ),
@@ -396,7 +396,7 @@ class _NotesScreenState extends State<NotesScreen> {
               color: AppColors.background.withValues(alpha: 0.95), // Casi sólido
               border: Border(
                   top: BorderSide(
-                      color: AppColors.text.withValues(alpha: 0.2), width: 0.5)),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2), width: 0.5)),
             ),
             child: SafeArea(
               child: Row(
@@ -413,7 +413,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   Text(
                     '${_notes.length} ${'Notes'.tr(context)}',
                     style: TextStyle(
-                        color: AppColors.text.withValues(alpha: 0.8), fontSize: 11),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 11),
                   ),
                   const Spacer(),
                   // Botón Nueva Nota (Icono lápiz sobre papel)

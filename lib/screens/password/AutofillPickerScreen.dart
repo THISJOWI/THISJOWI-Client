@@ -113,7 +113,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text('${'Autofill for'.i18n} ${widget.request.appName}'),
         leading: IconButton(
@@ -306,7 +306,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
   void _showSelectionConfirmation(PasswordEntry entry) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
