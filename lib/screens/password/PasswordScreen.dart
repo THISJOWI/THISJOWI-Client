@@ -374,7 +374,6 @@ class _PasswordScreenState extends State<PasswordScreen> {
                 borderRadius: 25,
                 padding: EdgeInsets.zero,
                 showBorder: false,
-                tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
                 child: TextField(
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
@@ -428,7 +427,6 @@ class _PasswordScreenState extends State<PasswordScreen> {
                               opacity: 0.5,
                               borderRadius: 12,
                               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                              tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
                               padding: EdgeInsets.zero,
                               child: Material(
                                 color: Colors.transparent,

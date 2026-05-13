@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:thisjowi/components/country_selector.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/exceptions/auth_exceptions.dart';
 import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/services/profile_service.dart';
@@ -188,31 +187,33 @@ class _RegisterFormState extends State<RegisterForm>
 
     if (!mounted) return;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+          side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08)),
         ),
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.secondary.withValues(alpha: 0.2),
+                color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.description_outlined,
-                  color: AppColors.secondary, size: 24),
+              child: Icon(Icons.description_outlined,
+                  color: Theme.of(context).colorScheme.secondary, size: 24),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 "Terms and Conditions".i18n,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: textColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                 ),
@@ -225,9 +226,9 @@ class _RegisterFormState extends State<RegisterForm>
           height: MediaQuery.of(context).size.height * 0.6,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.3),
+              color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.grey.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08)),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
@@ -237,7 +238,7 @@ class _RegisterFormState extends State<RegisterForm>
                 child: SelectableText(
                   termsContent,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: textColor.withValues(alpha: 0.85),
                     fontSize: 14,
                     height: 1.6,
                   ),
@@ -257,8 +258,8 @@ class _RegisterFormState extends State<RegisterForm>
             ),
             child: Text(
               "Close".i18n,
-              style: const TextStyle(
-                color: AppColors.secondary,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.secondary,
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
               ),
@@ -345,6 +346,8 @@ class _RegisterFormState extends State<RegisterForm>
       }
     });
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -352,10 +355,10 @@ class _RegisterFormState extends State<RegisterForm>
         builder: (context, setDialogState) => BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: AlertDialog(
-            backgroundColor: const Color(0xFF1E1E1E).withValues(alpha: 0.95),
+            backgroundColor: isDark ? const Color(0xFF1E1E1E).withValues(alpha: 0.95) : Colors.white.withValues(alpha: 0.95),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(28),
-              side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+              side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08)),
             ),
             title: Column(
               children: [
@@ -363,23 +366,23 @@ class _RegisterFormState extends State<RegisterForm>
                   width: 64,
                   height: 64,
                   decoration: BoxDecoration(
-                    color: AppColors.secondary.withValues(alpha: 0.2),
+                    color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: AppColors.secondary.withValues(alpha: 0.3),
+                      color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.mark_email_read_outlined,
-                    color: AppColors.secondary,
+                    color: Theme.of(context).colorScheme.secondary,
                     size: 32,
                   ),
                 ),
                 const SizedBox(height: 20),
                 Text(
                   "Verify Email".i18n,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: textColor,
                     fontWeight: FontWeight.bold,
                     fontSize: 24,
                   ),
@@ -392,7 +395,7 @@ class _RegisterFormState extends State<RegisterForm>
                 Text(
                   "We sent a code to".i18n,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color: textColor.withValues(alpha: 0.6),
                     fontSize: 15,
                   ),
                   textAlign: TextAlign.center,
@@ -400,8 +403,8 @@ class _RegisterFormState extends State<RegisterForm>
                 const SizedBox(height: 4),
                 Text(
                   _emailController.text,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: textColor,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
@@ -410,16 +413,16 @@ class _RegisterFormState extends State<RegisterForm>
                 const SizedBox(height: 28),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.3),
+                    color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.grey.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                    border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08)),
                   ),
                   child: TextField(
                     controller: otpController,
                     keyboardType: TextInputType.number,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: textColor,
                       fontSize: 28,
                       letterSpacing: 12,
                       fontWeight: FontWeight.bold,
@@ -429,7 +432,7 @@ class _RegisterFormState extends State<RegisterForm>
                       counterText: "",
                       hintText: "• • • • • •",
                       hintStyle: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: textColor.withValues(alpha: 0.2),
                         letterSpacing: 8,
                         fontSize: 24,
                       ),
@@ -451,7 +454,7 @@ class _RegisterFormState extends State<RegisterForm>
                           ? null
                           : () => Navigator.pop(dialogContext),
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                        side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.2)),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -460,7 +463,7 @@ class _RegisterFormState extends State<RegisterForm>
                       child: Text(
                         "Cancel".i18n,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
+                          color: textColor.withValues(alpha: 0.7),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -473,12 +476,12 @@ class _RegisterFormState extends State<RegisterForm>
                       height: 52,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
-                        gradient: const LinearGradient(
-                          colors: [AppColors.secondary, AppColors.accent],
+                        gradient: LinearGradient(
+                          colors: [Theme.of(context).colorScheme.secondary, Theme.of(context).colorScheme.tertiary],
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.secondary.withValues(alpha: 0.4),
+                            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.4),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -753,6 +756,7 @@ class _RegisterFormState extends State<RegisterForm>
   }
 
   Widget _buildLogo() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Center(
       child: Container(
         width: 80,
@@ -761,37 +765,39 @@ class _RegisterFormState extends State<RegisterForm>
           shape: BoxShape.circle,
           gradient: LinearGradient(
             colors: [
-              AppColors.accent.withValues(alpha: 0.3),
-              AppColors.secondary.withValues(alpha: 0.2),
+              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.3),
+              Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
             ],
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.accent.withValues(alpha: 0.2),
+              color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.2),
               blurRadius: 30,
               spreadRadius: 5,
             ),
           ],
         ),
-        child: const Icon(
+        child: Icon(
           Icons.edit_note_outlined,
           size: 36,
-          color: Colors.white,
+          color: isDark ? Colors.white : Theme.of(context).colorScheme.onSurface,
         ),
       ),
     );
   }
 
   Widget _buildTitle() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Column(
       children: [
         Text(
           'Completa tu registro'.i18n,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: isDark ? Colors.white : onSurface,
             letterSpacing: -0.5,
           ),
         ),
@@ -801,7 +807,7 @@ class _RegisterFormState extends State<RegisterForm>
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 15,
-            color: Colors.white.withValues(alpha: 0.5),
+            color: (isDark ? Colors.white : onSurface).withValues(alpha: 0.5),
           ),
         ),
       ],
@@ -819,6 +825,9 @@ class _RegisterFormState extends State<RegisterForm>
     TextInputAction? textInputAction,
     VoidCallback? onSubmitted,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
+    final baseAlpha = isDark ? Colors.white : Colors.black;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -827,20 +836,20 @@ class _RegisterFormState extends State<RegisterForm>
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
             color: isFocused
-                ? Colors.white.withValues(alpha: 0.1)
-                : Colors.white.withValues(alpha: 0.05),
+                ? baseAlpha.withValues(alpha: isDark ? 0.1 : 0.08)
+                : baseAlpha.withValues(alpha: isDark ? 0.05 : 0.04),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isFocused
-                  ? Colors.white.withValues(alpha: 0.3)
-                  : Colors.white.withValues(alpha: 0.1),
+                  ? baseAlpha.withValues(alpha: isDark ? 0.3 : 0.2)
+                  : baseAlpha.withValues(alpha: isDark ? 0.1 : 0.08),
               width: isFocused ? 1.5 : 1,
             ),
           ),
           child: TextFormField(
             controller: controller,
             focusNode: focusNode,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
+            style: TextStyle(color: textColor, fontSize: 16),
             textInputAction: textInputAction,
             keyboardType: keyboardType,
             onFieldSubmitted: (_) => onSubmitted?.call(),
@@ -848,8 +857,8 @@ class _RegisterFormState extends State<RegisterForm>
               prefixIcon: Icon(
                 icon,
                 color: isFocused
-                    ? Colors.white.withValues(alpha: 0.8)
-                    : Colors.white.withValues(alpha: 0.4),
+                    ? textColor.withValues(alpha: 0.8)
+                    : textColor.withValues(alpha: 0.4),
                 size: 20,
               ),
               contentPadding:
@@ -858,12 +867,12 @@ class _RegisterFormState extends State<RegisterForm>
               hintText: hint,
               labelStyle: TextStyle(
                 color: isFocused
-                    ? Colors.white.withValues(alpha: 0.8)
-                    : Colors.white.withValues(alpha: 0.4),
+                    ? textColor.withValues(alpha: 0.8)
+                    : textColor.withValues(alpha: 0.4),
                 fontSize: 14,
               ),
               hintStyle: TextStyle(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: textColor.withValues(alpha: 0.3),
                 fontSize: 14,
               ),
               border: InputBorder.none,
@@ -875,6 +884,9 @@ class _RegisterFormState extends State<RegisterForm>
   }
 
   Widget _buildPasswordField() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
+    final baseAlpha = isDark ? Colors.white : Colors.black;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -883,13 +895,13 @@ class _RegisterFormState extends State<RegisterForm>
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
             color: _focusedField == 2
-                ? Colors.white.withValues(alpha: 0.1)
-                : Colors.white.withValues(alpha: 0.05),
+                ? baseAlpha.withValues(alpha: isDark ? 0.1 : 0.08)
+                : baseAlpha.withValues(alpha: isDark ? 0.05 : 0.04),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: _focusedField == 2
-                  ? Colors.white.withValues(alpha: 0.3)
-                  : Colors.white.withValues(alpha: 0.1),
+                  ? baseAlpha.withValues(alpha: isDark ? 0.3 : 0.2)
+                  : baseAlpha.withValues(alpha: isDark ? 0.1 : 0.08),
               width: _focusedField == 2 ? 1.5 : 1,
             ),
           ),
@@ -897,14 +909,14 @@ class _RegisterFormState extends State<RegisterForm>
             controller: _passwordController,
             focusNode: _passwordFocusNode,
             obscureText: _obscurePassword,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
+            style: TextStyle(color: textColor, fontSize: 16),
             textInputAction: TextInputAction.done,
             decoration: InputDecoration(
               prefixIcon: Icon(
                 Icons.lock_outline,
                 color: _focusedField == 2
-                    ? Colors.white.withValues(alpha: 0.8)
-                    : Colors.white.withValues(alpha: 0.4),
+                    ? textColor.withValues(alpha: 0.8)
+                    : textColor.withValues(alpha: 0.4),
                 size: 20,
               ),
               contentPadding:
@@ -915,8 +927,8 @@ class _RegisterFormState extends State<RegisterForm>
                       ? Icons.visibility_outlined
                       : Icons.visibility_off_outlined,
                   color: _focusedField == 2
-                      ? Colors.white.withValues(alpha: 0.8)
-                      : Colors.white.withValues(alpha: 0.4),
+                      ? textColor.withValues(alpha: 0.8)
+                      : textColor.withValues(alpha: 0.4),
                   size: 20,
                 ),
                 onPressed: () =>
@@ -925,8 +937,8 @@ class _RegisterFormState extends State<RegisterForm>
               labelText: "Password".i18n,
               labelStyle: TextStyle(
                 color: _focusedField == 2
-                    ? Colors.white.withValues(alpha: 0.8)
-                    : Colors.white.withValues(alpha: 0.4),
+                    ? textColor.withValues(alpha: 0.8)
+                    : textColor.withValues(alpha: 0.4),
                 fontSize: 14,
               ),
               border: InputBorder.none,
@@ -938,18 +950,20 @@ class _RegisterFormState extends State<RegisterForm>
   }
 
   Widget _buildConnectionButton() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isDark ? Colors.white : Colors.black;
     return ElevatedButton.icon(
       onPressed: _isTestingConnection ? null : _testServerConnection,
       icon: _isTestingConnection
-          ? const SizedBox(
+          ? SizedBox(
               width: 18,
               height: 18,
               child: CircularProgressIndicator(
-                  strokeWidth: 2, color: Colors.white),
+                  strokeWidth: 2, color: isDark ? Colors.white : Theme.of(context).colorScheme.primary),
             )
           : Icon(
               _connectionTested ? Icons.check_circle : Icons.wifi_tethering,
-              color: _connectionTested ? Colors.green : Colors.white,
+              color: _connectionTested ? Colors.green : (isDark ? Colors.white : Theme.of(context).colorScheme.onSurface),
               size: 20,
             ),
       label: Text(
@@ -959,21 +973,21 @@ class _RegisterFormState extends State<RegisterForm>
         style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: _connectionTested ? Colors.green : Colors.white,
+          color: _connectionTested ? Colors.green : (isDark ? Colors.white : Theme.of(context).colorScheme.onSurface),
         ),
       ),
       style: ElevatedButton.styleFrom(
         backgroundColor: _connectionTested
             ? Colors.green.withValues(alpha: 0.15)
-            : Colors.white.withValues(alpha: 0.1),
-        foregroundColor: _connectionTested ? Colors.green : Colors.white,
+            : baseColor.withValues(alpha: isDark ? 0.1 : 0.08),
+        foregroundColor: _connectionTested ? Colors.green : (isDark ? Colors.white : Theme.of(context).colorScheme.onSurface),
         padding: const EdgeInsets.symmetric(vertical: 14),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
             color: _connectionTested
                 ? Colors.green.withValues(alpha: 0.3)
-                : Colors.white.withValues(alpha: 0.1),
+                : baseColor.withValues(alpha: isDark ? 0.1 : 0.08),
           ),
         ),
         elevation: 0,
@@ -982,6 +996,8 @@ class _RegisterFormState extends State<RegisterForm>
   }
 
   Widget _buildTermsCheckbox() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
     return Row(
       children: [
         GestureDetector(
@@ -992,18 +1008,18 @@ class _RegisterFormState extends State<RegisterForm>
             height: 24,
             decoration: BoxDecoration(
               color: _acceptedTerms
-                  ? AppColors.secondary.withValues(alpha: 0.3)
+                  ? Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: _acceptedTerms
-                    ? AppColors.secondary
-                    : Colors.white.withValues(alpha: 0.3),
+                    ? Theme.of(context).colorScheme.secondary
+                    : textColor.withValues(alpha: 0.3),
                 width: 2,
               ),
             ),
             child: _acceptedTerms
-                ? const Icon(Icons.check, size: 16, color: Colors.white)
+                ? Icon(Icons.check, size: 16, color: isDark ? Colors.white : Theme.of(context).colorScheme.onSecondary)
                 : null,
           ),
         ),
@@ -1015,14 +1031,14 @@ class _RegisterFormState extends State<RegisterForm>
               text: TextSpan(
                 text: "I accept the ".i18n,
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.6),
+                  color: textColor.withValues(alpha: 0.6),
                   fontSize: 14,
                 ),
                 children: [
                   TextSpan(
                     text: "Terms and Conditions".i18n,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: textColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -1040,14 +1056,14 @@ class _RegisterFormState extends State<RegisterForm>
       height: 56,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(
-          colors: [AppColors.secondary, AppColors.accent],
+        gradient: LinearGradient(
+          colors: [Theme.of(context).colorScheme.secondary, Theme.of(context).colorScheme.tertiary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.secondary.withValues(alpha: 0.4),
+            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -1064,7 +1080,7 @@ class _RegisterFormState extends State<RegisterForm>
           padding: const EdgeInsets.symmetric(vertical: 16),
         ),
         child: _isLoading
-            ? const SizedBox(
+            ? SizedBox(
                 height: 24,
                 width: 24,
                 child: CircularProgressIndicator(
@@ -1083,6 +1099,9 @@ class _RegisterFormState extends State<RegisterForm>
   }
 
   Widget _buildSelectionSummary() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
+    final baseAlpha = isDark ? Colors.white : Colors.black;
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
@@ -1090,9 +1109,9 @@ class _RegisterFormState extends State<RegisterForm>
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.06),
+            color: baseAlpha.withValues(alpha: isDark ? 0.06 : 0.05),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            border: Border.all(color: baseAlpha.withValues(alpha: isDark ? 0.1 : 0.08)),
           ),
           child: Row(
             children: [
@@ -1124,10 +1143,10 @@ class _RegisterFormState extends State<RegisterForm>
                       widget.accountType == 'Business'
                           ? 'Business'
                           : 'Personal',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: textColor,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -1138,7 +1157,7 @@ class _RegisterFormState extends State<RegisterForm>
                               ? Icons.cloud
                               : Icons.computer,
                           size: 14,
-                          color: Colors.white.withValues(alpha: 0.5),
+                          color: textColor.withValues(alpha: 0.5),
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -1147,7 +1166,7 @@ class _RegisterFormState extends State<RegisterForm>
                               : 'Self-Hosted',
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.white.withValues(alpha: 0.5),
+                            color: textColor.withValues(alpha: 0.5),
                           ),
                         ),
                       ],

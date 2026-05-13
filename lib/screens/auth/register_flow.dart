@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:thisjowi/components/account_type_selector.dart';
 import 'package:thisjowi/components/deployment_mode_selector.dart';
 import 'package:thisjowi/components/ldap_selector.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/screens/auth/registerForm.dart';
 import 'package:thisjowi/screens/auth/ldap_register_form.dart';
 
@@ -246,7 +245,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
     }
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           AnimatedPositioned(
@@ -262,7 +261,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.secondary
+                    Theme.of(context).colorScheme.secondary
                         .withValues(alpha: currentStep == 0 ? 0.3 : 0.2),
                     Colors.transparent,
                   ],
@@ -283,7 +282,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.primary
+                    Theme.of(context).colorScheme.primary
                         .withValues(alpha: currentStep == 1 ? 0.35 : 0.2),
                     Colors.transparent,
                   ],
@@ -304,7 +303,7 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      AppColors.accent.withValues(alpha: 0.3),
+                      Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.3),
                       Colors.transparent,
                     ],
                   ),
@@ -325,10 +324,10 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -338,9 +337,9 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen>
                     ),
                   ],
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back,
-                  color: AppColors.text,
+                  color: Theme.of(context).colorScheme.onSurface,
                   size: 22,
                 ),
               ),

@@ -175,19 +175,17 @@ class LiquidGlass {
       return tint.withValues(alpha: opacity);
     }
     if (brightness == Brightness.light) {
-      // Subtle cool-gray tint for light mode glass
-      return const Color(0xFFDCE4F0).withValues(alpha: opacity);
+      return Colors.white.withValues(alpha: opacity * 0.9);
     }
-    // White tint for dark mode
-    return Colors.white.withValues(alpha: opacity);
+    return const Color(0xFF1C1C1E).withValues(alpha: opacity * 0.85);
   }
 
   /// Helper method to get border color based on theme
   static Color _getBorderColor(Brightness brightness) {
     if (brightness == Brightness.light) {
-      return const Color(0xFFB0B8C8).withValues(alpha: 0.3);
+      return Colors.white.withValues(alpha: 0.3);
     }
-    return Colors.white.withValues(alpha: 0.1);
+    return const Color(0xFF2C2C2E).withValues(alpha: 0.3);
   }
 
   /// Helper method to create glass gradient with multi-layer reflection effect
@@ -207,19 +205,18 @@ class LiquidGlass {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          const Color(0xFFE8EEF8).withValues(alpha: opacity * 0.8),
-          const Color(0xFFD0D8E8).withValues(alpha: opacity * 0.4),
+          Colors.white.withValues(alpha: opacity * 0.8),
+          Colors.white.withValues(alpha: opacity * 0.5),
         ],
         stops: const [0.0, 1.0],
       );
     }
-    // Multi-layer gradient for authentic liquid glass reflection in dark mode
     return LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
       colors: [
-        Colors.white.withValues(alpha: opacity * 0.8),
-        Colors.white.withValues(alpha: opacity * 0.4),
+        const Color(0xFF2C2C2E).withValues(alpha: opacity * 0.6),
+        const Color(0xFF1C1C1E).withValues(alpha: opacity * 0.4),
       ],
       stops: const [0.0, 1.0],
     );
@@ -458,13 +455,13 @@ class _MorphingGlassContainerState extends State<_MorphingGlassContainer>
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: isLight
-                      ? const Color(0xFFDCE4F0).withValues(alpha: currentOpacity)
-                      : Colors.white.withValues(alpha: currentOpacity),
+                      ? Colors.white.withValues(alpha: currentOpacity)
+                      : const Color(0xFF1C1C1E).withValues(alpha: currentOpacity),
                   borderRadius: BorderRadius.circular(currentRadius),
                   border: Border.all(
-                    color: isLight
-                        ? const Color(0xFFB0B8C8).withValues(alpha: widget.isActive ? 0.4 : 0.25)
-                        : Colors.white.withValues(alpha: widget.isActive ? 0.2 : 0.1),
+                      color: isLight
+                          ? Colors.white.withValues(alpha: widget.isActive ? 0.4 : 0.25)
+                          : const Color(0xFF2C2C2E).withValues(alpha: widget.isActive ? 0.4 : 0.25),
                     width: widget.isActive ? 1.0 : 0.5,
                   ),
                   gradient: LinearGradient(
@@ -472,12 +469,12 @@ class _MorphingGlassContainerState extends State<_MorphingGlassContainer>
                     end: Alignment.bottomRight,
                     colors: isLight
                         ? [
-                            const Color(0xFFE8EEF8).withValues(alpha: currentOpacity * 0.8),
-                            const Color(0xFFD0D8E8).withValues(alpha: currentOpacity * 0.4),
+                            Colors.white.withValues(alpha: currentOpacity * 0.8),
+                            Colors.white.withValues(alpha: currentOpacity * 0.5),
                           ]
                         : [
-                            Colors.white.withValues(alpha: currentOpacity * 0.8),
-                            Colors.white.withValues(alpha: currentOpacity * 0.4),
+                            const Color(0xFF2C2C2E).withValues(alpha: currentOpacity * 0.6),
+                            const Color(0xFF1C1C1E).withValues(alpha: currentOpacity * 0.4),
                           ],
                   ),
                 ),
@@ -554,13 +551,13 @@ class GlassEffectContainer extends StatelessWidget {
             padding: padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             decoration: BoxDecoration(
               color: isLight
-                  ? const Color(0xFFDCE4F0).withValues(alpha: opacity)
-                  : Colors.white.withValues(alpha: opacity),
+                  ? Colors.white.withValues(alpha: opacity)
+                  : const Color(0xFF1C1C1E).withValues(alpha: opacity),
               borderRadius: BorderRadius.circular(borderRadius),
               border: Border.all(
                 color: isLight
-                    ? const Color(0xFFB0B8C8).withValues(alpha: 0.3)
-                    : Colors.white.withValues(alpha: 0.1),
+                    ? Colors.white.withValues(alpha: 0.3)
+                    : const Color(0xFF2C2C2E).withValues(alpha: 0.3),
                 width: 0.5,
               ),
               gradient: LinearGradient(
@@ -568,12 +565,12 @@ class GlassEffectContainer extends StatelessWidget {
                 end: Alignment.bottomRight,
                 colors: isLight
                     ? [
-                        const Color(0xFFE8EEF8).withValues(alpha: opacity * 0.8),
-                        const Color(0xFFD0D8E8).withValues(alpha: opacity * 0.4),
+                        Colors.white.withValues(alpha: opacity * 0.8),
+                        Colors.white.withValues(alpha: opacity * 0.5),
                       ]
                     : [
-                        Colors.white.withValues(alpha: opacity * 0.8),
-                        Colors.white.withValues(alpha: opacity * 0.4),
+                        const Color(0xFF2C2C2E).withValues(alpha: opacity * 0.6),
+                        const Color(0xFF1C1C1E).withValues(alpha: opacity * 0.4),
                       ],
               ),
             ),
@@ -734,17 +731,17 @@ class _NavigationItem extends StatelessWidget {
         final color = Color.lerp(inactiveColor, activeColor, progress)!;
 
         final bgColor = isLight
-            ? const Color(0xFFDCE4F0).withValues(alpha: opacity * (0.5 + 0.5 * progress))
-            : Colors.white.withValues(alpha: opacity * (0.5 + 0.5 * progress));
+            ? Colors.white.withValues(alpha: opacity * (0.5 + 0.5 * progress))
+            : const Color(0xFF1C1C1E).withValues(alpha: opacity * (0.5 + 0.5 * progress));
         final borderColor = isLight
-            ? const Color(0xFFB0B8C8).withValues(alpha: 0.25 + 0.15 * progress)
-            : Colors.white.withValues(alpha: 0.1 + 0.1 * progress);
+            ? Colors.white.withValues(alpha: 0.25 + 0.15 * progress)
+            : const Color(0xFF2C2C2E).withValues(alpha: 0.25 + 0.15 * progress);
         final gradStart = isLight
-            ? const Color(0xFFE8EEF8).withValues(alpha: opacity * 0.8)
-            : Colors.white.withValues(alpha: opacity * 0.8);
+            ? Colors.white.withValues(alpha: opacity * 0.8)
+            : const Color(0xFF2C2C2E).withValues(alpha: opacity * 0.6);
         final gradEnd = isLight
-            ? const Color(0xFFD0D8E8).withValues(alpha: opacity * 0.4)
-            : Colors.white.withValues(alpha: opacity * 0.4);
+            ? Colors.white.withValues(alpha: opacity * 0.5)
+            : const Color(0xFF1C1C1E).withValues(alpha: opacity * 0.4);
 
         return GestureDetector(
           onTap: onTap,

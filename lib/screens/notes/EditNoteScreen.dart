@@ -140,35 +140,40 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon:
-              Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface, size: 18),
-          onPressed: () => Navigator.pop(context),
-        ),
-        leadingWidth: 50,
-        title: null,
-        toolbarHeight: 70,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: TextButton(
-              onPressed: _isLoading ? null : _saveNote,
-              child: Text(
-                'Done'.tr(context),
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
-                ),
+      body: Column(
+        children: [
+          SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_back_ios,
+                        color: Theme.of(context).colorScheme.onSurface, size: 18),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: _isLoading ? null : _saveNote,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      child: Text(
+                        'Done'.tr(context),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-        ],
-      ),
-      body: _isLoading
+          Expanded(
+            child: _isLoading
           ? Center(
               child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
           : SafeArea(
@@ -304,6 +309,9 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                 ],
               ),
             ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -674,7 +674,6 @@ Widget _buildIntroPage(OnboardingPage page) {
       opacity: 0.4,
       borderRadius: 15,
       padding: EdgeInsets.zero,
-      tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
       child: GestureDetector(
         onTap: onTap,
         child: Padding(

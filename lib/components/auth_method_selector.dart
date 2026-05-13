@@ -76,7 +76,6 @@ class AuthMethodSelector extends StatelessWidget {
               opacity: 0.35,
               borderRadius: 12,
               padding: EdgeInsets.zero,
-              tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -120,7 +119,6 @@ class AuthMethodSelector extends StatelessWidget {
       opacity: 0.35,
       borderRadius: 12,
       padding: EdgeInsets.zero,
-      tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
       child: GestureDetector(
         onTap: onTap,
         child: Padding(

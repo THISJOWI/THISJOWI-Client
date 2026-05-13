@@ -89,6 +89,7 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector>
   }
 
   Widget _buildLogo() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Center(
       child: Container(
         width: 80,
@@ -109,16 +110,18 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector>
             ),
           ],
         ),
-        child: const Icon(
+        child: Icon(
           Icons.person_add_outlined,
           size: 36,
-          color: Colors.white,
+          color: isDark ? Colors.white : Theme.of(context).colorScheme.onSurface,
         ),
       ),
     );
   }
 
   Widget _buildTitle() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -144,10 +147,10 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector>
           Text(
             'Crear Cuenta'.i18n,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: textColor,
               letterSpacing: -0.5,
             ),
           ),
@@ -157,7 +160,7 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector>
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
-              color: Colors.white.withValues(alpha: 0.5),
+              color: textColor.withValues(alpha: 0.5),
               letterSpacing: 0.3,
             ),
           ),
@@ -173,6 +176,9 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final textColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
+        final baseAlpha = isDark ? Colors.white : Colors.black;
         final fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
           CurvedAnimation(
             parent: _controller,
@@ -192,117 +198,136 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector>
           opacity: fadeAnimation,
           child: SlideTransition(
             position: slideAnimation,
-            child: child,
+            child: Builder(
+              builder: (context) => _buildOptionCardContent(
+                index: index,
+                option: option,
+                isHovered: isHovered,
+                isDark: isDark,
+                textColor: textColor,
+                baseAlpha: baseAlpha,
+              ),
+            ),
           ),
         );
       },
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: MouseRegion(
-          onEnter: (_) => setState(() => _hoveredIndex = index),
-          onExit: (_) => setState(() => _hoveredIndex = null),
-          child: GestureDetector(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              widget.onAccountTypeSelected(option.type);
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOutCubic,
-              transform: Matrix4.identity()
-                ..translate(0.0, isHovered ? -4.0 : 0.0, 0.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
+    );
+  }
+
+  Widget _buildOptionCardContent({
+    required int index,
+    required _AccountOption option,
+    required bool isHovered,
+    required bool isDark,
+    required Color textColor,
+    required Color baseAlpha,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hoveredIndex = index),
+        onExit: (_) => setState(() => _hoveredIndex = null),
+        child: GestureDetector(
+          onTap: () {
+            HapticFeedback.lightImpact();
+            widget.onAccountTypeSelected(option.type);
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutCubic,
+            transform: Matrix4.identity()
+              ..translate(0.0, isHovered ? -4.0 : 0.0, 0.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: isHovered
+                        ? baseAlpha.withValues(alpha: isDark ? 0.12 : 0.1)
+                        : baseAlpha.withValues(alpha: isDark ? 0.06 : 0.05),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
                       color: isHovered
-                          ? Colors.white.withValues(alpha: 0.12)
-                          : Colors.white.withValues(alpha: 0.06),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: isHovered
-                            ? Colors.white.withValues(alpha: 0.25)
-                            : Colors.white.withValues(alpha: 0.1),
-                        width: isHovered ? 1.5 : 1,
+                          ? baseAlpha.withValues(alpha: isDark ? 0.25 : 0.2)
+                          : baseAlpha.withValues(alpha: isDark ? 0.1 : 0.08),
+                      width: isHovered ? 1.5 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          gradient: LinearGradient(
+                            colors: option.gradient,
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          boxShadow: isHovered
+                              ? [
+                                  BoxShadow(
+                                    color: option.gradient[0].withValues(alpha: 0.4),
+                                    blurRadius: 20,
+                                    spreadRadius: 2,
+                                  ),
+                                ]
+                              : [],
+                        ),
+                        child: Icon(
+                          option.icon,
+                          size: 26,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(18),
-                            gradient: LinearGradient(
-                              colors: option.gradient,
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              option.title,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: textColor,
+                              ),
                             ),
-                            boxShadow: isHovered
-                                ? [
-                                    BoxShadow(
-                                      color: option.gradient[0].withValues(alpha: 0.4),
-                                      blurRadius: 20,
-                                      spreadRadius: 2,
-                                    ),
-                                  ]
-                                : [],
-                          ),
-                          child: Icon(
-                            option.icon,
-                            size: 26,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                option.title,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
+                            const SizedBox(height: 4),
+                            Text(
+                              option.subtitle,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: textColor.withValues(alpha: 0.5),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                option.subtitle,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.white.withValues(alpha: 0.5),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: isHovered
-                                ? Colors.white.withValues(alpha: 0.15)
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            Icons.arrow_forward_ios,
-                            size: 16,
-                            color: isHovered
-                                ? Colors.white
-                                : Colors.white.withValues(alpha: 0.4),
-                          ),
+                      ),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: isHovered
+                              ? baseAlpha.withValues(alpha: isDark ? 0.15 : 0.12)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ],
-                    ),
+                        child: Icon(
+                          Icons.arrow_forward_ios,
+                          size: 16,
+                          color: isHovered
+                              ? textColor
+                              : textColor.withValues(alpha: 0.4),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

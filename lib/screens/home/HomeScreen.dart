@@ -628,7 +628,6 @@ SafeArea(
                     borderRadius: 25,
                     padding: EdgeInsets.zero,
                     showBorder: false,
-                    tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
                     child: TextField(
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
@@ -785,7 +784,6 @@ SafeArea(
       opacity: 0.5,
       borderRadius: 20,
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-      tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
       padding: EdgeInsets.zero,
       child: Material(
         color: Colors.transparent,
@@ -871,7 +869,6 @@ SafeArea(
       opacity: 0.5,
       borderRadius: 20,
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-      tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
       padding: EdgeInsets.zero,
       child: Material(
         color: Colors.transparent,

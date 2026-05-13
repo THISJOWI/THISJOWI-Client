@@ -228,7 +228,6 @@ class _NotesScreenState extends State<NotesScreen> {
                       borderRadius: 10,
                       padding: EdgeInsets.zero,
                       showBorder: false,
-                      tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
                       child: SizedBox(
                         height: 36,
                         child: TextField(
@@ -307,7 +306,6 @@ class _NotesScreenState extends State<NotesScreen> {
                           borderRadius: 12,
                           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                           showBorder: false,
-                          tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
                           padding: EdgeInsets.zero,
                           child: Dismissible(
                             key: Key(note.localId ?? note.id.toString()),
@@ -401,7 +399,6 @@ class _NotesScreenState extends State<NotesScreen> {
             borderRadius: 0,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             margin: EdgeInsets.zero,
-            tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
             child: SafeArea(
               child: Row(
                 children: [

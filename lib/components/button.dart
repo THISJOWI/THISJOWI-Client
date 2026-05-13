@@ -108,7 +108,6 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
             opacity: 0.45,
             borderRadius: 24,
             padding: EdgeInsets.zero,
-            tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
             child: GestureDetector(
               onTap: onTap,
               child: Container(
@@ -190,7 +189,6 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
                 opacity: 0.5,
                 borderRadius: 28,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

@@ -189,8 +189,8 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                 filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                 child: Container(
                   color: isDarkMode
-                      ? Colors.black.withAlpha(30)
-                      : Colors.white.withAlpha(20),
+                      ? (Theme.of(context).brightness == Brightness.light ? Colors.white.withAlpha(180) : Colors.black.withAlpha(40))
+                      : Theme.of(context).colorScheme.onSurface.withAlpha(20),
                 ),
               ),
 
@@ -354,11 +354,11 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                               vertical: 12,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.green.withAlpha(200),
+                              color: Theme.of(context).colorScheme.primary.withAlpha(200),
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.green.withAlpha(100),
+                                  color: Theme.of(context).colorScheme.primary.withAlpha(100),
                                   blurRadius: 15,
                                   offset: const Offset(0, 8),
                                 ),
@@ -399,10 +399,10 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                               vertical: 12,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.red.withAlpha(100),
+                              color: Theme.of(context).colorScheme.error.withAlpha(100),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: Colors.red.withAlpha(200),
+                                color: Theme.of(context).colorScheme.error.withAlpha(200),
                                 width: 1,
                               ),
                             ),
@@ -412,7 +412,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                                   .textTheme
                                   .bodyMedium
                                   ?.copyWith(
-                                    color: Colors.red,
+                                    color: Theme.of(context).colorScheme.error,
                                     fontWeight: FontWeight.w500,
                                   ),
                               textAlign: TextAlign.center,

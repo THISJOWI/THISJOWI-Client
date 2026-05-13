@@ -188,8 +188,8 @@ class _LoginScreenState extends State<LoginScreen> {
       // Por ahora, mostrar mensaje de configuración necesaria
       if (mounted) {
         setState(() => _isLoading = false);
-        ErrorSnackBar.show(context,
-            'Usa el botón de SSO empresarial para login con SAML');
+        ErrorSnackBar.show(
+            context, 'Usa el botón de SSO empresarial para login con SAML');
       }
     } catch (e) {
       if (mounted) {
@@ -206,7 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       ErrorSnackBar.show(
-        context, 'Please complete email and password'.tr(context));
+          context, 'Please complete email and password'.tr(context));
       return;
     }
 
@@ -270,24 +270,25 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       // Verificar si el usuario existe localmente
       final isLocalUser = await _offlineAuthService.isUserLocal(email);
-      
+
       if (!isLocalUser) {
         if (!mounted) return;
         setState(() => _isLoading = false);
         ErrorSnackBar.show(
-          context, 
-          'No hay conexión al servidor y el usuario no existe localmente'.tr(context),
+          context,
+          'No hay conexión al servidor y el usuario no existe localmente'
+              .tr(context),
         );
         return;
       }
 
       // Intentar login offline
       final user = await _offlineAuthService.loginOffline(email, password);
-      
+
       if (user != null) {
         if (!mounted) return;
         setState(() => _isLoading = false);
-        
+
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
           (route) => false,
@@ -296,7 +297,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (!mounted) return;
         setState(() => _isLoading = false);
         ErrorSnackBar.show(
-          context, 
+          context,
           'Contraseña incorrecta para usuario local'.tr(context),
         );
       }
@@ -304,7 +305,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       setState(() => _isLoading = false);
       ErrorSnackBar.show(
-        context, 
+        context,
         'Error en login offline: $e'.tr(context),
       );
     }
@@ -312,11 +313,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.black, // Darker background for better contrast
+      backgroundColor: isDark ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
-          // Ambient Background Gradients
           Positioned(
             top: -100,
             right: -100,
@@ -327,7 +328,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.primary.withValues(alpha: 0.3),
+                    Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -344,7 +348,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.accent.withValues(alpha: 0.3),
+                    (isDark ? AppColors.accent : Theme.of(context).colorScheme.primary)
+                        .withValues(alpha: 0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -352,7 +357,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Blur effect for the background
           BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
             child: Container(color: Colors.transparent),
@@ -369,13 +373,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Logo/Icon with Glow
                       Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.4),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withValues(alpha: 0.4),
                               blurRadius: 40,
                               spreadRadius: 0,
                             ),
@@ -384,18 +390,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Icon(
                           Icons.lock_person_rounded,
                           size: 70,
-                          color: AppColors.text,
+                          color: isDark ? AppColors.text : Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 32),
 
-                      // Welcome Text
                       Text(
                         "Welcome Back".tr(context),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 32,
-                          color: AppColors.text,
+                          color: isDark ? AppColors.text : Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.w700,
                           letterSpacing: -0.5,
                         ),
@@ -406,13 +411,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
-                          color: AppColors.text.withValues(alpha: 0.6),
+                          color: isDark ? AppColors.text.withValues(alpha: 0.6) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                           letterSpacing: 0.5,
                         ),
                       ),
                       const SizedBox(height: 40),
 
-                      // Glassmorphism Login Form
                       ClipRRect(
                         borderRadius: BorderRadius.circular(30),
                         child: BackdropFilter(
@@ -420,15 +424,19 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(32.0),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
+                              color: isDark
+                                  ? const Color(0xFF1E1E1E).withValues(alpha: 0.6)
+                                  : Colors.white.withValues(alpha: 0.8),
                               borderRadius: BorderRadius.circular(30),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.1),
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.1)
+                                    : Colors.black.withValues(alpha: 0.08),
                                 width: 1,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.2),
+                                  color: (isDark ? Colors.black : Colors.black).withValues(alpha: isDark ? 0.2 : 0.08),
                                   blurRadius: 30,
                                   offset: const Offset(0, 10),
                                 ),
@@ -436,51 +444,61 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             child: Column(
                               children: [
-                                // Email Field
                                 TextFormField(
                                   controller: _emailController,
-                                  style: const TextStyle(color: Colors.white),
+                                  style: TextStyle(color: isDark ? Colors.white : Theme.of(context).colorScheme.onSurface),
                                   textInputAction: TextInputAction.next,
                                   keyboardType: TextInputType.emailAddress,
                                   onFieldSubmitted: (_) =>
                                       _passwordFocusNode.requestFocus(),
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(Icons.email_outlined,
-                                        color: AppColors.text.withValues(alpha: 0.7),
+                                        color: isDark
+                                            ? AppColors.text.withValues(alpha: 0.7)
+                                            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                         size: 20),
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 20, horizontal: 20),
                                     labelText: "Email".tr(context),
                                     labelStyle: TextStyle(
-                                        color: AppColors.text.withValues(alpha: 0.5)),
+                                        color: isDark
+                                            ? AppColors.text.withValues(alpha: 0.5)
+                                            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(20),
                                       borderSide: BorderSide(
-                                          color: Colors.white.withValues(alpha: 0.1)),
+                                          color: isDark
+                                              ? Colors.white.withValues(alpha: 0.1)
+                                              : Colors.black.withValues(alpha: 0.1)),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(20),
                                       borderSide: BorderSide(
-                                          color: AppColors.primary
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary
                                               .withValues(alpha: 0.5)),
                                     ),
                                     filled: true,
-                                    fillColor: Colors.black.withValues(alpha: 0.2),
+                                    fillColor: isDark
+                                        ? Colors.black.withValues(alpha: 0.2)
+                                        : Colors.black.withValues(alpha: 0.03),
                                   ),
                                 ),
                                 const SizedBox(height: 20),
 
-                                // Password Field
                                 TextFormField(
                                   controller: _passwordController,
                                   focusNode: _passwordFocusNode,
                                   obscureText: _obscurePassword,
-                                  style: const TextStyle(color: Colors.white),
+                                  style: TextStyle(color: isDark ? Colors.white : Theme.of(context).colorScheme.onSurface),
                                   textInputAction: TextInputAction.done,
                                   onFieldSubmitted: (_) => _handleLogin(),
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(Icons.lock_outline,
-                                        color: AppColors.text.withValues(alpha: 0.7),
+                                        color: isDark
+                                            ? AppColors.text.withValues(alpha: 0.7)
+                                            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                         size: 20),
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 20, horizontal: 20),
@@ -489,7 +507,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                         _obscurePassword
                                             ? Icons.visibility_outlined
                                             : Icons.visibility_off_outlined,
-                                        color: AppColors.text.withValues(alpha: 0.5),
+                                        color: isDark
+                                            ? AppColors.text.withValues(alpha: 0.5)
+                                            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                                         size: 20,
                                       ),
                                       onPressed: () {
@@ -500,20 +520,28 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     labelText: "Password".tr(context),
                                     labelStyle: TextStyle(
-                                        color: AppColors.text.withValues(alpha: 0.5)),
+                                        color: isDark
+                                            ? AppColors.text.withValues(alpha: 0.5)
+                                            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(20),
                                       borderSide: BorderSide(
-                                          color: Colors.white.withValues(alpha: 0.1)),
+                                          color: isDark
+                                              ? Colors.white.withValues(alpha: 0.1)
+                                              : Colors.black.withValues(alpha: 0.1)),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(20),
                                       borderSide: BorderSide(
-                                          color: AppColors.primary
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary
                                               .withValues(alpha: 0.5)),
                                     ),
                                     filled: true,
-                                    fillColor: Colors.black.withValues(alpha: 0.2),
+                                    fillColor: isDark
+                                        ? Colors.black.withValues(alpha: 0.2)
+                                        : Colors.black.withValues(alpha: 0.03),
                                   ),
                                 ),
 
@@ -532,7 +560,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     child: Text(
                                       'Forgot Password?'.tr(context),
                                       style: TextStyle(
-                                        color: AppColors.text.withValues(alpha: 0.7),
+                                        color: isDark
+                                            ? AppColors.text.withValues(alpha: 0.7)
+                                            : Theme.of(context).colorScheme.primary,
                                         fontWeight: FontWeight.w500,
                                         fontSize: 13,
                                       ),
@@ -547,18 +577,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                   height: 56,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(20),
-                                    gradient: const LinearGradient(
+                                    gradient: LinearGradient(
                                       colors: [
-                                        AppColors.primary,
-                                        AppColors.accent
+                                        Theme.of(context).colorScheme.primary,
+                                        Theme.of(context).colorScheme.tertiary
                                       ],
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color:
-                                            AppColors.primary.withValues(alpha: 0.3),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withValues(alpha: 0.3),
                                         blurRadius: 12,
                                         offset: const Offset(0, 6),
                                       ),
@@ -625,17 +657,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                   width: 56,
                                   height: 56,
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.05),
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.05)
+                                        : Colors.black.withValues(alpha: 0.05),
                                     borderRadius: BorderRadius.circular(28),
                                     border: Border.all(
-                                        color: Colors.white.withValues(alpha: 0.1)),
+                                        color: isDark
+                                            ? Colors.white.withValues(alpha: 0.1)
+                                            : Colors.black.withValues(alpha: 0.1)),
                                   ),
                                   child: Icon(
                                     _biometricType == 'Face ID'
                                         ? Icons.face_rounded
                                         : Icons.fingerprint_rounded,
                                     size: 30,
-                                    color: Colors.white,
+                                    color: isDark ? Colors.white : Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
                               ),
@@ -645,14 +681,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       const SizedBox(height: 30),
 
-                      // Register Link
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             "Don't have an account? ".tr(context),
                             style: TextStyle(
-                                color: AppColors.text.withValues(alpha: 0.6),
+                                color: isDark
+                                    ? AppColors.text.withValues(alpha: 0.6)
+                                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                 fontSize: 14),
                           ),
                           GestureDetector(
@@ -660,8 +697,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 context, '/register'),
                             child: Text(
                               "Sign Up".tr(context),
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
                               ),

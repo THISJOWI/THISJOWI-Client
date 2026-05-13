@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/exceptions/auth_exceptions.dart';
 import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/components/error_bar.dart';
@@ -77,18 +76,18 @@ class _LoginFormState extends State<LoginForm> {
         // Email Field
         TextField(
           controller: _emailController,
-          style: const TextStyle(color: AppColors.text),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
             labelText: 'Email'.i18n,
-            labelStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.7)),
+            labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
             filled: true,
-            fillColor: Colors.white.withValues(alpha: 0.05),
+            fillColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide.none,
             ),
-            prefixIcon: Icon(Icons.email_outlined, color: AppColors.primary),
+            prefixIcon: Icon(Icons.email_outlined, color: Theme.of(context).colorScheme.primary),
           ),
           onSubmitted: (_) => _passwordFocusNode.requestFocus(),
         ),
@@ -99,21 +98,21 @@ class _LoginFormState extends State<LoginForm> {
           controller: _passwordController,
           focusNode: _passwordFocusNode,
           obscureText: _obscurePassword,
-          style: const TextStyle(color: AppColors.text),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           decoration: InputDecoration(
             labelText: 'Password'.i18n,
-            labelStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.7)),
+            labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
             filled: true,
-            fillColor: Colors.white.withValues(alpha: 0.05),
+            fillColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide.none,
             ),
-            prefixIcon: Icon(Icons.lock_outline, color: AppColors.primary),
+            prefixIcon: Icon(Icons.lock_outline, color: Theme.of(context).colorScheme.primary),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                color: AppColors.text.withValues(alpha: 0.5),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
               ),
               onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
             ),
@@ -133,7 +132,7 @@ class _LoginFormState extends State<LoginForm> {
             child: Text(
               'Forgot Password?'.i18n,
               style: TextStyle(
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -147,24 +146,27 @@ class _LoginFormState extends State<LoginForm> {
           child: ElevatedButton(
             onPressed: _isLoading ? null : _handleLogin,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),
               elevation: 5,
             ),
             child: _isLoading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 24,
                     height: 24,
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      strokeWidth: 2,
+                    ),
                   )
                 : Text(
                     'Sign In'.i18n,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
           ),

@@ -212,7 +212,6 @@ Widget build(BuildContext context) {
                           borderRadius: 25,
                           padding: EdgeInsets.zero,
                           showBorder: false,
-                          tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
                           child: TextField(
                             onChanged: (value) {
                               otpProvider.setSearchQuery(value);
@@ -502,7 +501,6 @@ class _OtpCardState extends State<_OtpCard>
       opacity: 0.5,
       borderRadius: 16,
       margin: const EdgeInsets.only(bottom: 12),
-      tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
       child: Material(
         color: Colors.transparent,
         child: InkWell(

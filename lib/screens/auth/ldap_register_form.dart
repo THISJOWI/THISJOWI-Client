@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/exceptions/auth_exceptions.dart';
 import 'package:thisjowi/services/ldapAuthService.dart';
 import 'package:thisjowi/components/error_bar.dart';
@@ -272,31 +271,33 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
 
     if (!mounted) return;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+          side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08)),
         ),
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.secondary.withValues(alpha: 0.2),
+                color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.description_outlined,
-                  color: AppColors.secondary, size: 24),
+              child: Icon(Icons.description_outlined,
+                  color: Theme.of(context).colorScheme.secondary, size: 24),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 "Terms and Conditions".i18n,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: textColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                 ),
@@ -309,9 +310,9 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
           height: MediaQuery.of(context).size.height * 0.6,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.3),
+              color: isDark ? Colors.black.withValues(alpha: 0.3) : Colors.grey.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08)),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
@@ -321,7 +322,7 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
                 child: SelectableText(
                   termsContent,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: textColor.withValues(alpha: 0.85),
                     fontSize: 14,
                     height: 1.6,
                   ),
@@ -341,8 +342,8 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
             ),
             child: Text(
               "Close".i18n,
-              style: const TextStyle(
-                color: AppColors.secondary,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.secondary,
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
               ),
@@ -494,6 +495,7 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
   }
 
   Widget _buildLogo() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Center(
       child: Container(
         width: 80,
@@ -514,25 +516,27 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
             ),
           ],
         ),
-        child: const Icon(
+        child: Icon(
           Icons.account_tree_outlined,
           size: 36,
-          color: Colors.white,
+          color: isDark ? Colors.white : Theme.of(context).colorScheme.onSurface,
         ),
       ),
     );
   }
 
   Widget _buildTitle() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
     return Column(
       children: [
         Text(
           'Configuración LDAP'.i18n,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: textColor,
             letterSpacing: -0.5,
           ),
         ),
@@ -542,7 +546,7 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 15,
-            color: Colors.white.withValues(alpha: 0.5),
+            color: textColor.withValues(alpha: 0.5),
           ),
         ),
       ],
@@ -559,6 +563,9 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
     TextInputAction? textInputAction,
     VoidCallback? onSubmitted,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
+    final baseAlpha = isDark ? Colors.white : Colors.black;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -567,28 +574,28 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
             color: isFocused
-                ? Colors.white.withValues(alpha: 0.1)
-                : Colors.white.withValues(alpha: 0.05),
+                ? baseAlpha.withValues(alpha: isDark ? 0.1 : 0.08)
+                : baseAlpha.withValues(alpha: isDark ? 0.05 : 0.04),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isFocused
-                  ? Colors.white.withValues(alpha: 0.3)
-                  : Colors.white.withValues(alpha: 0.1),
+                  ? baseAlpha.withValues(alpha: isDark ? 0.3 : 0.2)
+                  : baseAlpha.withValues(alpha: isDark ? 0.1 : 0.08),
               width: isFocused ? 1.5 : 1,
             ),
           ),
           child: TextFormField(
             controller: controller,
             focusNode: focusNode,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
+            style: TextStyle(color: textColor, fontSize: 16),
             textInputAction: textInputAction,
             onFieldSubmitted: (_) => onSubmitted?.call(),
             decoration: InputDecoration(
               prefixIcon: Icon(
                 icon,
                 color: isFocused
-                    ? Colors.white.withValues(alpha: 0.8)
-                    : Colors.white.withValues(alpha: 0.4),
+                    ? textColor.withValues(alpha: 0.8)
+                    : textColor.withValues(alpha: 0.4),
                 size: 20,
               ),
               contentPadding:
@@ -597,12 +604,12 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
               hintText: hint,
               labelStyle: TextStyle(
                 color: isFocused
-                    ? Colors.white.withValues(alpha: 0.8)
-                    : Colors.white.withValues(alpha: 0.4),
+                    ? textColor.withValues(alpha: 0.8)
+                    : textColor.withValues(alpha: 0.4),
                 fontSize: 14,
               ),
               hintStyle: TextStyle(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: textColor.withValues(alpha: 0.3),
                 fontSize: 14,
               ),
               border: InputBorder.none,
@@ -614,6 +621,9 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
   }
 
   Widget _buildPasswordField() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
+    final baseAlpha = isDark ? Colors.white : Colors.black;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -622,13 +632,13 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
             color: _focusedField == 4
-                ? Colors.white.withValues(alpha: 0.1)
-                : Colors.white.withValues(alpha: 0.05),
+                ? baseAlpha.withValues(alpha: isDark ? 0.1 : 0.08)
+                : baseAlpha.withValues(alpha: isDark ? 0.05 : 0.04),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: _focusedField == 4
-                  ? Colors.white.withValues(alpha: 0.3)
-                  : Colors.white.withValues(alpha: 0.1),
+                  ? baseAlpha.withValues(alpha: isDark ? 0.3 : 0.2)
+                  : baseAlpha.withValues(alpha: isDark ? 0.1 : 0.08),
               width: _focusedField == 4 ? 1.5 : 1,
             ),
           ),
@@ -636,15 +646,15 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
             controller: _adminPasswordController,
             focusNode: _adminPasswordFocusNode,
             obscureText: _obscurePassword,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
+            style: TextStyle(color: textColor, fontSize: 16),
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
             decoration: InputDecoration(
               prefixIcon: Icon(
                 Icons.lock_outline,
                 color: _focusedField == 4
-                    ? Colors.white.withValues(alpha: 0.8)
-                    : Colors.white.withValues(alpha: 0.4),
+                    ? textColor.withValues(alpha: 0.8)
+                    : textColor.withValues(alpha: 0.4),
                 size: 20,
               ),
               contentPadding:
@@ -655,8 +665,8 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
                       ? Icons.visibility_outlined
                       : Icons.visibility_off_outlined,
                   color: _focusedField == 4
-                      ? Colors.white.withValues(alpha: 0.8)
-                      : Colors.white.withValues(alpha: 0.4),
+                      ? textColor.withValues(alpha: 0.8)
+                      : textColor.withValues(alpha: 0.4),
                   size: 20,
                 ),
                 onPressed: () =>
@@ -665,8 +675,8 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
               labelText: "Contraseña del administrador LDAP".i18n,
               labelStyle: TextStyle(
                 color: _focusedField == 4
-                    ? Colors.white.withValues(alpha: 0.8)
-                    : Colors.white.withValues(alpha: 0.4),
+                    ? textColor.withValues(alpha: 0.8)
+                    : textColor.withValues(alpha: 0.4),
                 fontSize: 14,
               ),
               border: InputBorder.none,
@@ -678,14 +688,17 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
   }
 
   Widget _buildTestConnectionButton() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isDark ? Colors.white : Colors.black;
+    final defaultFg = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
     return ElevatedButton.icon(
       onPressed: _isTestingConnection ? null : _testLdapConnection,
       icon: _isTestingConnection
-          ? const SizedBox(
+          ? SizedBox(
               width: 18,
               height: 18,
               child: CircularProgressIndicator(
-                  strokeWidth: 2, color: Colors.white),
+                  strokeWidth: 2, color: isDark ? Colors.white : Theme.of(context).colorScheme.primary),
             )
           : Icon(
               _connectionTested
@@ -693,7 +706,7 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
                   : Icons.wifi_tethering,
               color: _connectionTested
                   ? (_connectionValid ? Colors.green : Colors.red)
-                  : Colors.white,
+                  : defaultFg,
               size: 20,
             ),
       label: Text(
@@ -709,7 +722,7 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
           fontWeight: FontWeight.w600,
           color: _connectionTested
               ? (_connectionValid ? Colors.green : Colors.red)
-              : Colors.white,
+              : defaultFg,
         ),
       ),
       style: ElevatedButton.styleFrom(
@@ -717,10 +730,10 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
             ? (_connectionValid
                 ? Colors.green.withValues(alpha: 0.15)
                 : Colors.red.withValues(alpha: 0.15))
-            : Colors.white.withValues(alpha: 0.1),
+            : baseColor.withValues(alpha: isDark ? 0.1 : 0.08),
         foregroundColor: _connectionTested
             ? (_connectionValid ? Colors.green : Colors.red)
-            : Colors.white,
+            : defaultFg,
         padding: const EdgeInsets.symmetric(vertical: 14),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -729,7 +742,7 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
                 ? (_connectionValid
                     ? Colors.green.withValues(alpha: 0.3)
                     : Colors.red.withValues(alpha: 0.3))
-                : Colors.white.withValues(alpha: 0.1),
+                : baseColor.withValues(alpha: isDark ? 0.1 : 0.08),
           ),
         ),
         elevation: 0,
@@ -738,6 +751,8 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
   }
 
   Widget _buildTermsCheckbox() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
     return Row(
       children: [
         GestureDetector(
@@ -748,18 +763,18 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
             height: 24,
             decoration: BoxDecoration(
               color: _acceptedTerms
-                  ? AppColors.secondary.withValues(alpha: 0.3)
+                  ? Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: _acceptedTerms
-                    ? AppColors.secondary
-                    : Colors.white.withValues(alpha: 0.3),
+                    ? Theme.of(context).colorScheme.secondary
+                    : textColor.withValues(alpha: 0.3),
                 width: 2,
               ),
             ),
             child: _acceptedTerms
-                ? const Icon(Icons.check, size: 16, color: Colors.white)
+                ? Icon(Icons.check, size: 16, color: isDark ? Colors.white : Theme.of(context).colorScheme.onSecondary)
                 : null,
           ),
         ),
@@ -771,14 +786,14 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
               text: TextSpan(
                 text: "Acepto los ".i18n,
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.6),
+                  color: textColor.withValues(alpha: 0.6),
                   fontSize: 14,
                 ),
                 children: [
                   TextSpan(
                     text: "Términos y Condiciones".i18n,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: textColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -796,14 +811,14 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
       height: 56,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(
-          colors: [AppColors.secondary, AppColors.accent],
+        gradient: LinearGradient(
+          colors: [Theme.of(context).colorScheme.secondary, Theme.of(context).colorScheme.tertiary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.secondary.withValues(alpha: 0.4),
+            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -839,6 +854,9 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
   }
 
   Widget _buildSelectionSummary() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
+    final baseAlpha = isDark ? Colors.white : Colors.black;
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
@@ -846,9 +864,9 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.06),
+            color: baseAlpha.withValues(alpha: isDark ? 0.06 : 0.05),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            border: Border.all(color: baseAlpha.withValues(alpha: isDark ? 0.1 : 0.08)),
           ),
           child: Row(
             children: [
@@ -872,12 +890,12 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Business + LDAP',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: textColor,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -888,7 +906,7 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
                               ? Icons.cloud
                               : Icons.computer,
                           size: 14,
-                          color: Colors.white.withValues(alpha: 0.5),
+                          color: textColor.withValues(alpha: 0.5),
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -897,7 +915,7 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
                               : 'Self-Hosted',
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.white.withValues(alpha: 0.5),
+                            color: textColor.withValues(alpha: 0.5),
                           ),
                         ),
                       ],

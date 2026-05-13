@@ -247,7 +247,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ListTile(
                   leading:
                       Icon(Icons.copy_rounded, color: Theme.of(context).colorScheme.primary),
-                  title: const Text('Copiar mensaje',
+                  title: Text('Copiar mensaje',
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: msg.content));
@@ -321,7 +321,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       color: Colors.red, size: 32),
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   '¿Eliminar mensaje?',
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
@@ -351,7 +351,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15)),
                           ),
-                          child: const Text('Cancelar',
+                          child: Text('Cancelar',
                               style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                         ),
                       ),
@@ -435,7 +435,7 @@ class _ChatScreenState extends State<ChatScreen> {
               backgroundColor: Theme.of(context).colorScheme.primary,
               child: Text(
                 _chatTitle.isNotEmpty ? _chatTitle[0].toUpperCase() : '?',
-                style: const TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
+                style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
               ),
             ),
           ),
@@ -504,7 +504,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           child: TextField(
                             controller: _textController,
                             style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               hintText: 'THISMessages',
                               hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                               border: InputBorder.none,
@@ -517,7 +517,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       const SizedBox(width: 8),
                       IconButton(
                         onPressed: _sendMessage,
-                        icon: const Icon(Icons.arrow_upward_rounded,
+                        icon: Icon(Icons.arrow_upward_rounded,
                             color: Theme.of(context).colorScheme.onSurface),
                         style: IconButton.styleFrom(
                           backgroundColor: Theme.of(context).colorScheme.primary,
@@ -561,7 +561,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Text(
               message.content,
-              style: const TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
             ),
             if (message.isEncrypted)
               Padding(

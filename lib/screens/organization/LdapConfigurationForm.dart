@@ -126,7 +126,7 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
 
     if (!_connectionValid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('⚠️ Debe probar la conexión LDAP antes de guardar'),
           backgroundColor: Theme.of(context).colorScheme.tertiary,
         ),
@@ -160,7 +160,7 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
       if (mounted) {
         if (response['success'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text('✅ Configuración guardada exitosamente'),
               backgroundColor: Theme.of(context).colorScheme.primary,
             ),
@@ -372,7 +372,7 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: _connectionValid ? Theme.of(context).colorScheme.primary.shade50 : Theme.of(context).colorScheme.error.shade50,
+                          color: _connectionValid ? Theme.of(context).colorScheme.primaryContainer : Theme.of(context).colorScheme.errorContainer,
                           border: Border.all(
                             color: _connectionValid ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
                           ),
@@ -389,7 +389,7 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
                               child: Text(
                                 _connectionStatus!,
                                 style: TextStyle(
-                                  color: _connectionValid ? Theme.of(context).colorScheme.primary.shade800 : Theme.of(context).colorScheme.error.shade800,
+                                  color: _connectionValid ? Theme.of(context).colorScheme.onPrimaryContainer : Theme.of(context).colorScheme.onErrorContainer,
                                 ),
                               ),
                             ),

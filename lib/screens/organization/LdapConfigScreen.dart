@@ -425,17 +425,17 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20)),
                               ),
-                              child: _isSaving
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                          color: Theme.of(context).colorScheme.onSurface, strokeWidth: 2))
-                                  : Text('Save Configuration'.i18n,
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(context).colorScheme.onSurface)),
+                                      child: _isSaving
+                                          ? SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                  color: Theme.of(context).colorScheme.onSurface, strokeWidth: 2))
+                                          : Text('Save Configuration'.i18n,
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Theme.of(context).colorScheme.onSurface)),
                             ),
                           ),
                         ),

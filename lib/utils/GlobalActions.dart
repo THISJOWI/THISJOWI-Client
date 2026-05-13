@@ -126,7 +126,7 @@ class GlobalActions {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Colors.black,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
             ),
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Add'),

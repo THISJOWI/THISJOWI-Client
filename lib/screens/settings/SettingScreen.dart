@@ -130,7 +130,7 @@ Future<void> _loadCurrentUser() async {
     required String title,
     required String content,
     required VoidCallback onConfirm,
-    Color confirmColor = Theme.of(context).colorScheme.error,
+    Color confirmColor = Colors.red,
   }) {
     showDialog(
       context: context,
@@ -1003,13 +1003,13 @@ Future<void> _loadCurrentUser() async {
               ),
               if (_currentProfile?.avatarUrl != null)
                 ListTile(
-                  leading: const Icon(
+                  leading: Icon(
                     Icons.delete,
                     color: Theme.of(context).colorScheme.error,
                   ),
                   title: Text(
                     'Remove Photo'.i18n,
-                    style: const TextStyle(color: Theme.of(context).colorScheme.error),
+                    style: TextStyle(color: Theme.of(context).colorScheme.error),
                   ),
                   onTap: () {
                     Navigator.pop(context);

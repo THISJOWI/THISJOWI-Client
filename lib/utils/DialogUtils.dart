@@ -122,8 +122,8 @@ class DialogUtils {
                 const SizedBox(height: 8),
                 Text(
                   loadingError,
-                  style: const TextStyle(
-                    color: Colors.yellow,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
                     fontSize: 12,
                   ),
                 ),
@@ -140,7 +140,7 @@ class DialogUtils {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Colors.black,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
             ),
             onPressed: () =>
                 Navigator.pop(context, emailController.text.trim()),
