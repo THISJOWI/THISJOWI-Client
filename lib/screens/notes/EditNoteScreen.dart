@@ -3,7 +3,6 @@ import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/data/models/note_entry.dart';
 import 'package:thisjowi/i18n/translationService.dart';
 
-import 'package:thisjowi/core/app_colors.dart';
 import '../../data/repository/notes_repository.dart';
 import '../../i18n/translations.dart';
 
@@ -140,13 +139,13 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
           icon:
-              const Icon(Icons.arrow_back_ios, color: AppColors.text, size: 18),
+              Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
         leadingWidth: 50,
@@ -159,8 +158,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
               onPressed: _isLoading ? null : _saveNote,
               child: Text(
                 'Done'.tr(context),
-                style: const TextStyle(
-                  color: AppColors.text,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
                 ),
@@ -170,7 +169,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(
+          ? Center(
               child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
           : SafeArea(
               child: Column(
@@ -179,8 +178,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: TextFormField(
                       controller: _titleController,
-                      style: const TextStyle(
-                        color: AppColors.text,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                       ),
@@ -189,11 +188,13 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                       decoration: InputDecoration(
                         hintText: 'Title'.i18n,
                         hintStyle: TextStyle(
-                          color: AppColors.text.withValues(alpha: 0.3),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                         ),
                         border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
                         contentPadding:
                             const EdgeInsets.symmetric(vertical: 12),
                       ),
@@ -236,7 +237,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                                     child: Text(
                                       isChecked ? '✓' : '◯',
                                       style: TextStyle(
-                                        color: AppColors.text,
+                                        color: Theme.of(context).colorScheme.onSurface,
                                         fontSize: 16,
                                       ),
                                     ),
@@ -277,16 +278,18 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                                   },
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
                                     hintText: 'Start typing...',
                                     hintStyle: TextStyle(
-                                      color: AppColors.text.withValues(alpha: 0.3),
+                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                                       fontSize: 16,
                                       height: 1.6,
                                     ),
                                     contentPadding: EdgeInsets.zero,
                                   ),
-                                  style: const TextStyle(
-                                    color: AppColors.text,
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     fontSize: 16,
                                     height: 1.6,
                                   ),

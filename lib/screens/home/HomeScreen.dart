@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:thisjowi/core/app_colors.dart';
+import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/core/service_locator.dart';
 import 'package:thisjowi/data/models/password_entry.dart';
 import 'package:thisjowi/data/models/note_entry.dart';
@@ -110,12 +110,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.security_rounded,
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                     size: 48,
                   ),
                 ),
@@ -123,8 +123,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text(
                   'Password Manager'.i18n,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AppColors.text,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       .i18n,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: AppColors.text.withValues(alpha: 0.7),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                     fontSize: 15,
                     height: 1.5,
                   ),
@@ -156,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Text(
                           'Later'.i18n,
                           style: TextStyle(
-                            color: AppColors.text.withValues(alpha: 0.5),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           AutofillService().openAutofillSettings();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
                           foregroundColor: Colors.black,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
@@ -314,15 +314,15 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
           builder: (context) => AlertDialog(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             title: Text('Delete password?'.i18n,
-                style: TextStyle(color: AppColors.text)),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             content: Text(
                 '${'Are you sure you want to delete'.i18n} "${entry.title}"?',
-                style: TextStyle(color: AppColors.text)),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
                 child: Text('Cancel'.i18n,
-                    style: TextStyle(color: AppColors.text)),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
@@ -357,15 +357,15 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
           builder: (context) => AlertDialog(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             title: Text('Delete Note?'.i18n,
-                style: TextStyle(color: AppColors.text)),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             content: Text(
                 '${'Are you sure you want to delete'.i18n} "${note.title}"?',
-                style: TextStyle(color: AppColors.text)),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
                 child: Text('Cancel'.i18n,
-                    style: TextStyle(color: AppColors.text)),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
@@ -407,7 +407,7 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
       barrierColor: Colors.black.withValues(alpha: 0.5),
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => Dialog(
-          backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
+          backgroundColor: Theme.of(context).cardColor,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           insetPadding:
@@ -427,8 +427,8 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
                         Expanded(
                           child: Text(
                             entry.title,
-                            style: const TextStyle(
-                                color: AppColors.text,
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold),
                           ),
@@ -436,7 +436,7 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
                         GestureDetector(
                           onTap: () => Navigator.pop(context),
                           child: Icon(Icons.close,
-                              color: AppColors.text.withValues(alpha: 0.6), size: 24),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 24),
                         ),
                       ],
                     ),
@@ -444,43 +444,43 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
                     if (entry.website.isNotEmpty) ...[
                       Text('Website'.i18n,
                           style: TextStyle(
-                              color: AppColors.text.withValues(alpha: 0.6),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               fontSize: 13,
                               fontWeight: FontWeight.w500)),
                       const SizedBox(height: 6),
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                            color: AppColors.text.withValues(alpha: 0.05),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(8)),
                         child: Text(entry.website,
-                            style: const TextStyle(
-                                color: AppColors.text, fontSize: 14)),
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
                       ),
                       const SizedBox(height: 16),
                     ],
                     if (entry.username.isNotEmpty) ...[
                       Text('User'.i18n,
                           style: TextStyle(
-                              color: AppColors.text.withValues(alpha: 0.6),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               fontSize: 13,
                               fontWeight: FontWeight.w500)),
                       const SizedBox(height: 6),
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                            color: AppColors.text.withValues(alpha: 0.05),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(8)),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(
                                 child: Text(entry.username,
-                                    style: const TextStyle(
-                                        color: AppColors.text, fontSize: 14))),
+                                    style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onSurface, fontSize: 14))),
                             IconButton(
                               icon: Icon(Icons.copy,
-                                  color: AppColors.text.withValues(alpha: 0.7),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                   size: 18),
                               onPressed: () {
                                 Clipboard.setData(
@@ -498,14 +498,14 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
                     ],
                     Text('Password'.i18n,
                         style: TextStyle(
-                            color: AppColors.text.withValues(alpha: 0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             fontSize: 13,
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                          color: AppColors.text.withValues(alpha: 0.05),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(8)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -515,8 +515,8 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
                               showPassword
                                   ? entry.password
                                   : '•' * entry.password.length,
-                              style: const TextStyle(
-                                  color: AppColors.text,
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontSize: 14,
                                   letterSpacing: 1),
                               maxLines: 2,
@@ -528,7 +528,7 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
                                 showPassword
                                     ? Icons.visibility
                                     : Icons.visibility_off,
-                                color: AppColors.text.withValues(alpha: 0.7),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                 size: 18),
                             onPressed: () =>
                                 setState(() => showPassword = !showPassword),
@@ -538,7 +538,7 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
                           const SizedBox(width: 8),
                           IconButton(
                             icon: Icon(Icons.copy,
-                                color: AppColors.text.withValues(alpha: 0.7),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                 size: 18),
                             onPressed: () {
                               Clipboard.setData(
@@ -557,8 +557,8 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
                       width: double.infinity,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.text.withValues(alpha: 0.1),
-                          foregroundColor: AppColors.text,
+                          backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                          foregroundColor: Theme.of(context).colorScheme.onSurface,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10)),
@@ -583,10 +583,14 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
+      value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
+        statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark,
+        statusBarBrightness: Theme.of(context).brightness == Brightness.dark
+            ? Brightness.dark
+            : Brightness.light,
       ),
       child: Stack(
         children: [
@@ -598,13 +602,13 @@ SafeArea(
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                   child: Row(
                     children: [
-                      const Icon(Icons.home_rounded,
-                          color: AppColors.primary, size: 28),
+                      Icon(Icons.home_rounded,
+                          color: Theme.of(context).colorScheme.primary, size: 28),
                       const SizedBox(width: 12),
                       Text(
                         'Home'.i18n,
-                        style: const TextStyle(
-                          color: AppColors.text,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
@@ -617,63 +621,58 @@ SafeArea(
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 16.0),
-                  child: RepaintBoundary(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(25),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
-                          borderRadius: BorderRadius.circular(25),
-                          border:
-                              Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                        ),
-                        child: TextField(
-                          style: const TextStyle(
-                              color: AppColors.text, fontSize: 16),
-                          decoration: InputDecoration(
-                            hintText: 'Search'.i18n,
-                            hintStyle: TextStyle(
-                                color: AppColors.text.withValues(alpha: 0.5),
-                                fontSize: 16),
-                            prefixIcon: Icon(Icons.search,
-                                color: AppColors.text.withValues(alpha: 0.6),
-                                size: 22),
-                            suffixIcon: _searchQuery.isNotEmpty
-                                ? IconButton(
-                                    icon: Icon(Icons.close,
-                                        color: AppColors.text.withValues(alpha: 0.6),
-                                        size: 20),
-                                    onPressed: () {
-                                      setState(() => _searchQuery = '');
-                                      _loadData();
-                                    },
-                                  )
-                                : null,
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 14),
-                          ),
-onChanged: (value) {
-                              setState(() => _searchQuery = value);
-                              _searchDebounce.debounce(() => _loadData());
-                            },
-                            ),
-                          ),
-                        ),
+                  child: LiquidGlass.container(
+                    context: context,
+                    blur: 10,
+                    opacity: 0.5,
+                    borderRadius: 25,
+                    padding: EdgeInsets.zero,
+                    showBorder: false,
+                    tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+                    child: TextField(
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                      decoration: InputDecoration(
+                        hintText: 'Search'.i18n,
+                        hintStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                            fontSize: 16),
+                        prefixIcon: Icon(Icons.search,
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            size: 22),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: Icon(Icons.close,
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                    size: 20),
+                                onPressed: () {
+                                  setState(() => _searchQuery = '');
+                                  _loadData();
+                                },
+                              )
+                            : null,
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 14),
                       ),
+                      onChanged: (value) {
+                        setState(() => _searchQuery = value);
+                        _searchDebounce.debounce(() => _loadData());
+                      },
                     ),
                   ),
-                  // Content
+                ),
+                // Content
                 Expanded(
                   child: _isLoading
                       ? Center(
                           child:
-                              CircularProgressIndicator(color: AppColors.text))
+                              CircularProgressIndicator(color: Theme.of(context).colorScheme.onSurface))
                       : RefreshIndicator(
                           onRefresh: _loadData,
-                          color: AppColors.text,
+                          color: Theme.of(context).colorScheme.onSurface,
                           child: _passwords.isEmpty && _notes.isEmpty
                               ? _buildEmptyState()
                               : ListView(
@@ -698,7 +697,7 @@ onChanged: (value) {
                                             horizontal: 24, vertical: 8),
                                         child: Divider(
                                           color:
-                                              AppColors.text.withValues(alpha: 0.1),
+                                              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                                           thickness: 1,
                                         ),
                                       ),
@@ -747,12 +746,12 @@ onChanged: (value) {
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Row(
         children: [
-          Icon(icon, color: AppColors.text.withValues(alpha: 0.7), size: 20),
+          Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), size: 20),
           const SizedBox(width: 8),
           Text(
             title,
             style: TextStyle(
-              color: AppColors.text.withValues(alpha: 0.7),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               fontSize: 14,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
@@ -762,13 +761,13 @@ onChanged: (value) {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: AppColors.text.withValues(alpha: 0.1),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               count.toString(),
               style: TextStyle(
-                color: AppColors.text.withValues(alpha: 0.6),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
@@ -780,25 +779,20 @@ onChanged: (value) {
   }
 
   Widget _buildPasswordItem(PasswordEntry entry) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(20),
-              border:
-                  Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => _showPasswordDetails(entry),
-                borderRadius: BorderRadius.circular(20),
-                child: Padding(
+    return LiquidGlass.container(
+      context: context,
+      blur: 10,
+      opacity: 0.5,
+      borderRadius: 20,
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+      tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+      padding: EdgeInsets.zero,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _showPasswordDetails(entry),
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 16.0),
                   child: Row(
@@ -809,7 +803,7 @@ onChanged: (value) {
                           color: Colors.white.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Icon(Icons.key, color: AppColors.text, size: 20),
+                        child: Icon(Icons.key, color: Theme.of(context).colorScheme.onSurface, size: 20),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -818,8 +812,8 @@ onChanged: (value) {
                           children: [
                             Text(
                               entry.title,
-                              style: const TextStyle(
-                                  color: AppColors.text,
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16),
                             ),
@@ -828,7 +822,7 @@ onChanged: (value) {
                               Text(
                                 entry.username,
                                 style: TextStyle(
-                                    color: AppColors.text.withValues(alpha: 0.6),
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                     fontSize: 13),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -839,7 +833,7 @@ onChanged: (value) {
                       ),
                       IconButton(
                         icon: Icon(Icons.edit_outlined,
-                            color: AppColors.text.withValues(alpha: 0.6), size: 20),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 20),
                         onPressed: () async {
                           final edited = await Navigator.push<bool>(
                             context,
@@ -857,7 +851,7 @@ onChanged: (value) {
                       ),
                       IconButton(
                         icon: Icon(Icons.delete_outline,
-                            color: AppColors.text.withValues(alpha: 0.6), size: 20),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 20),
                         onPressed: () => _deletePassword(entry),
                         constraints: const BoxConstraints(),
                         padding: const EdgeInsets.all(8),
@@ -867,43 +861,35 @@ onChanged: (value) {
                 ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
   }
 
   Widget _buildNoteItem(Note note) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(20),
-              border:
-                  Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () async {
-                  final edited = await Navigator.push<bool>(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditNoteScreen(
-                        notesRepository: _notesRepository,
-                        note: note,
-                      ),
-                    ),
-                  );
-                  if (edited == true) _loadData();
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: Padding(
+    return LiquidGlass.container(
+      context: context,
+      blur: 10,
+      opacity: 0.5,
+      borderRadius: 20,
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+      tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+      padding: EdgeInsets.zero,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () async {
+            final edited = await Navigator.push<bool>(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditNoteScreen(
+                  notesRepository: _notesRepository,
+                  note: note,
+                ),
+              ),
+            );
+            if (edited == true) _loadData();
+          },
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 16.0),
                   child: Row(
@@ -915,7 +901,7 @@ onChanged: (value) {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(Icons.description_outlined,
-                            color: AppColors.text, size: 20),
+                            color: Theme.of(context).colorScheme.onSurface, size: 20),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -924,8 +910,8 @@ onChanged: (value) {
                           children: [
                             Text(
                               note.title,
-                              style: const TextStyle(
-                                  color: AppColors.text,
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16),
                             ),
@@ -933,7 +919,7 @@ onChanged: (value) {
                             Text(
                               _extractPlainText(note.content),
                               style: TextStyle(
-                                  color: AppColors.text.withValues(alpha: 0.6),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                   fontSize: 13),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -943,7 +929,7 @@ onChanged: (value) {
                       ),
                       IconButton(
                         icon: Icon(Icons.delete_outline,
-                            color: AppColors.text.withValues(alpha: 0.6), size: 20),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 20),
                         onPressed: () => _deleteNote(note),
                         constraints: const BoxConstraints(),
                         padding: const EdgeInsets.all(8),
@@ -953,10 +939,7 @@ onChanged: (value) {
                 ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
   }
 
   Widget _buildEmptyState() {
@@ -966,17 +949,17 @@ onChanged: (value) {
         children: [
           Opacity(
             opacity: 0.2,
-            child: const Icon(
+            child: Icon(
               Icons.house_rounded,
               size: 100,
-              color: AppColors.text,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             'No data yet'.tr(context),
             style: TextStyle(
-              color: AppColors.text.withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
               fontSize: 18,
             ),
           ),
@@ -984,7 +967,7 @@ onChanged: (value) {
           Text(
             'Add your first password or note'.tr(context),
             style: TextStyle(
-              color: AppColors.text.withValues(alpha: 0.3),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
               fontSize: 14,
             ),
           ),

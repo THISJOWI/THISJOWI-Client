@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/data/models/user.dart';
 import 'package:thisjowi/data/models/message.dart';
 import 'package:thisjowi/screens/messages/ChatScreen.dart';
@@ -36,10 +35,10 @@ class DialogUtils {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
+        backgroundColor: Theme.of(context).cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title:
-            const Text('New Message', style: TextStyle(color: AppColors.text)),
+            Text('New Message', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -47,11 +46,11 @@ class DialogUtils {
               if (ldapUsers.isEmpty)
                 Text('Enter email of the recipient',
                     style: TextStyle(
-                        color: AppColors.text.withValues(alpha: 0.7), fontSize: 13))
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13))
               else
                 Text('Select a contact or enter an email',
                     style: TextStyle(
-                        color: AppColors.text.withValues(alpha: 0.7), fontSize: 13)),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13)),
               const SizedBox(height: 16),
               // LDAP Users List
               if (ldapUsers.isNotEmpty)
@@ -60,7 +59,7 @@ class DialogUtils {
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                     borderRadius: BorderRadius.circular(12),
-                    color: AppColors.text.withValues(alpha: 0.05),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                   ),
                   child: ListView.builder(
                     shrinkWrap: true,
@@ -75,8 +74,8 @@ class DialogUtils {
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                         title: Text(
                           fullName,
-                          style: const TextStyle(
-                            color: AppColors.text,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
@@ -84,7 +83,7 @@ class DialogUtils {
                         subtitle: Text(
                           userEmail,
                           style: TextStyle(
-                            color: AppColors.text.withValues(alpha: 0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             fontSize: 12,
                           ),
                         ),
@@ -92,7 +91,7 @@ class DialogUtils {
                           emailController.text = userEmail;
                         },
                         selected: emailController.text == userEmail,
-                        selectedTileColor: AppColors.primary.withValues(alpha: 0.2),
+                        selectedTileColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                       );
                     },
                   ),
@@ -103,14 +102,14 @@ class DialogUtils {
               TextField(
                 controller: emailController,
                 autofocus: true,
-                style: const TextStyle(color: AppColors.text),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 decoration: InputDecoration(
                   labelText: 'Email',
                   hintText: 'or type email',
-                  labelStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.6)),
-                  hintStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.4)),
+                  labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                  hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
                   filled: true,
-                  fillColor: AppColors.text.withValues(alpha: 0.05),
+                  fillColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                   border:
                       OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   enabledBorder: OutlineInputBorder(
@@ -136,11 +135,11 @@ class DialogUtils {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel',
-                style: TextStyle(color: AppColors.text.withValues(alpha: 0.6))),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.black,
             ),
             onPressed: () =>

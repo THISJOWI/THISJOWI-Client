@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/services/token_manager.dart';
 import 'package:thisjowi/services/messageService.dart';
 import 'package:thisjowi/data/models/message.dart';
@@ -227,10 +226,10 @@ class _ChatScreenState extends State<ChatScreen> {
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF1C1C1E).withValues(alpha: 0.9),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.9),
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(30)),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -240,16 +239,16 @@ class _ChatScreenState extends State<ChatScreen> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
                 const SizedBox(height: 10),
                 ListTile(
                   leading:
-                      const Icon(Icons.copy_rounded, color: AppColors.primary),
+                      Icon(Icons.copy_rounded, color: Theme.of(context).colorScheme.primary),
                   title: const Text('Copiar mensaje',
-                      style: TextStyle(color: Colors.white)),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: msg.content));
                     Navigator.pop(context);
@@ -257,7 +256,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       SnackBar(
                         content: const Text('¡Mensaje copiado!'),
                         behavior: SnackBarBehavior.floating,
-                        backgroundColor: AppColors.primary.withValues(alpha: 0.9),
+                        backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.9),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                       ),
@@ -294,10 +293,10 @@ class _ChatScreenState extends State<ChatScreen> {
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF1C1C1E).withValues(alpha: 0.9),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.9),
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(30)),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -307,7 +306,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -315,7 +314,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.1),
+                    color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.delete_sweep_rounded,
@@ -325,7 +324,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 const Text(
                   '¿Eliminar mensaje?',
                   style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 20,
                       fontWeight: FontWeight.bold),
                 ),
@@ -336,7 +335,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     'Esta acción no se puede deshacer y el mensaje desaparecerá para todos.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.5), fontSize: 14),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 14),
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -353,7 +352,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 borderRadius: BorderRadius.circular(15)),
                           ),
                           child: const Text('Cancelar',
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -365,7 +364,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
+                            foregroundColor: Theme.of(context).colorScheme.onSurface,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
@@ -390,20 +389,20 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor:
-            const Color(0xFF1E1E1E).withValues(alpha: 0.9), // Glassmorphism-ish
+            Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.9), // Glassmorphism-ish
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
+          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.primary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
           children: [
             Text(_chatTitle,
-                style: const TextStyle(color: AppColors.text, fontSize: 16)),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16)),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -412,13 +411,13 @@ class _ChatScreenState extends State<ChatScreen> {
                       ? Icons.lock_rounded
                       : Icons.lock_open_rounded,
                   size: 10,
-                  color: _isE2EEAvailable ? Colors.green : Colors.orange,
+                  color: _isE2EEAvailable ? Theme.of(context).colorScheme.primary : Colors.orange,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   _isE2EEAvailable ? 'Cifrado' : 'No cifrado',
                   style: TextStyle(
-                    color: _isE2EEAvailable ? Colors.green : Colors.orange,
+                    color: _isE2EEAvailable ? Theme.of(context).colorScheme.primary : Colors.orange,
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
                   ),
@@ -433,10 +432,10 @@ class _ChatScreenState extends State<ChatScreen> {
             padding: const EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
               radius: 16,
-              backgroundColor: AppColors.primary,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               child: Text(
                 _chatTitle.isNotEmpty ? _chatTitle[0].toUpperCase() : '?',
-                style: const TextStyle(fontSize: 14, color: Colors.white),
+                style: const TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
               ),
             ),
           ),
@@ -446,13 +445,13 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Expanded(
             child: _isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(color: AppColors.primary))
+                ? Center(
+                    child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
                 : _messages.isEmpty
                     ? Center(
                         child: Text('Start the conversation!',
                             style: TextStyle(
-                                color: AppColors.text.withValues(alpha: 0.5))))
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5))))
                     : ListView.builder(
                         controller: _scrollController,
                         reverse: true, // Newest at bottom
@@ -483,7 +482,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 decoration: BoxDecoration(
                   color: const Color(0xFF1E1E1E).withValues(alpha: 0.8),
                   border: Border(
-                      top: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
+                      top: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1))),
                 ),
                 child: SafeArea(
                   top: false,
@@ -491,23 +490,23 @@ class _ChatScreenState extends State<ChatScreen> {
                     children: [
                       IconButton(
                         onPressed: () {}, // Attachments
-                        icon: const Icon(Icons.add, color: AppColors.primary),
+                        icon: Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
                       ),
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           decoration: BoxDecoration(
-                            color: AppColors.text.withValues(alpha: 0.1),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.1)),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
                           ),
                           child: TextField(
                             controller: _textController,
-                            style: const TextStyle(color: AppColors.text),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                             decoration: const InputDecoration(
                               hintText: 'THISMessages',
-                              hintStyle: TextStyle(color: Colors.grey),
+                              hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                               border: InputBorder.none,
                             ),
                             minLines: 1,
@@ -519,9 +518,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       IconButton(
                         onPressed: _sendMessage,
                         icon: const Icon(Icons.arrow_upward_rounded,
-                            color: Colors.white),
+                            color: Theme.of(context).colorScheme.onSurface),
                         style: IconButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
                           shape: const CircleBorder(),
                           padding: const EdgeInsets.all(8),
                           minimumSize: const Size(32, 32),
@@ -549,7 +548,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isMe ? AppColors.primary : const Color(0xFF2C2C2E),
+          color: isMe ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(20),
             topRight: const Radius.circular(20),
@@ -562,7 +561,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Text(
               message.content,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+              style: const TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
             ),
             if (message.isEncrypted)
               Padding(
@@ -570,7 +569,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: Icon(
                   Icons.lock_outline_rounded,
                   size: 10,
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ),
           ],

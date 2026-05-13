@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/screens/auth/register.dart';
 
@@ -47,13 +46,13 @@ class _CountryMapScreenState extends State<CountryMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text("Select Country".i18n),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.text),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -63,7 +62,7 @@ class _CountryMapScreenState extends State<CountryMapScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Text(
               "Please select your country from the map".i18n,
-              style: const TextStyle(color: AppColors.text, fontSize: 16),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
               textAlign: TextAlign.center,
             ),
           ),
@@ -103,8 +102,8 @@ class _CountryMapScreenState extends State<CountryMapScreen> {
                                 Icon(
                                   Icons.location_on,
                                   color: isSelected
-                                      ? AppColors.secondary
-                                      : AppColors.primary,
+                                      ? Theme.of(context).colorScheme.secondary
+                                      : Theme.of(context).colorScheme.primary,
                                   size: 40,
                                 ),
                                 if (isSelected)
@@ -113,15 +112,15 @@ class _CountryMapScreenState extends State<CountryMapScreen> {
                                         horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
                                       color:
-                                          AppColors.background.withValues(alpha: 0.9),
+                                          Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
                                       borderRadius: BorderRadius.circular(8),
                                       border: Border.all(
-                                          color: AppColors.secondary),
+                                          color: Theme.of(context).colorScheme.secondary),
                                     ),
                                     child: Text(
                                       entry.key,
-                                      style: const TextStyle(
-                                        color: AppColors.text,
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onSurface,
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -141,7 +140,7 @@ class _CountryMapScreenState extends State<CountryMapScreen> {
           Container(
             padding: const EdgeInsets.all(24.0),
             decoration: BoxDecoration(
-              color: AppColors.background,
+              color: Theme.of(context).scaffoldBackgroundColor,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.2),
@@ -157,8 +156,8 @@ class _CountryMapScreenState extends State<CountryMapScreen> {
                     padding: const EdgeInsets.only(bottom: 16.0),
                     child: Text(
                       "Selected: $_selectedCountry",
-                      style: const TextStyle(
-                        color: AppColors.secondary,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -179,7 +178,7 @@ class _CountryMapScreenState extends State<CountryMapScreen> {
                             );
                           },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),

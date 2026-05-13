@@ -1,9 +1,8 @@
 import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/providers/otp_provider.dart';
 import 'package:thisjowi/data/models/otp_entry.dart';
 import 'package:thisjowi/i18n/translationService.dart';
@@ -119,18 +118,18 @@ class _OtpScreenState extends State<OtpScreen> with WidgetsBindingObserver {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
+        backgroundColor: Theme.of(context).cardColor,
         title: Text('Delete OTP?'.tr(context),
-            style: const TextStyle(color: AppColors.text)),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         content: Text(
           'Are you sure you want to delete "${entry.issuer.isNotEmpty ? entry.issuer : entry.name}"?',
-          style: const TextStyle(color: AppColors.text),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text('Cancel'.tr(context),
-                style: TextStyle(color: AppColors.text.withValues(alpha: 0.6))),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
@@ -164,10 +163,14 @@ class _OtpScreenState extends State<OtpScreen> with WidgetsBindingObserver {
 @override
 Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
+      value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
+        statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark,
+        statusBarBrightness: Theme.of(context).brightness == Brightness.dark
+            ? Brightness.dark
+            : Brightness.light,
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -183,13 +186,13 @@ Widget build(BuildContext context) {
                         padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                         child: Row(
                           children: [
-                            const Icon(Icons.security,
-                                color: AppColors.primary, size: 28),
+                            Icon(Icons.security,
+                                color: Theme.of(context).colorScheme.primary, size: 28),
                             const SizedBox(width: 12),
                             Text(
                               'Authenticator'.tr(context),
-                              style: const TextStyle(
-                                color: AppColors.text,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -202,51 +205,45 @@ Widget build(BuildContext context) {
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 16.0),
-                        child: RepaintBoundary(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(25),
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color:
-                                      const Color(0xFF1E1E1E).withValues(alpha: 0.6),
-                                  borderRadius: BorderRadius.circular(25),
-                                  border: Border.all(
-                                      color: Colors.white.withValues(alpha: 0.1)),
-                                ),
-                                child: TextField(
-                                  onChanged: (value) {
-                                    otpProvider.setSearchQuery(value);
-                                  },
-                                  style: const TextStyle(
-                                      color: AppColors.text, fontSize: 16),
-                                  decoration: InputDecoration(
-                                    hintText: 'Search'.i18n,
-                                    hintStyle: TextStyle(
-                                        color: AppColors.text.withValues(alpha: 0.5),
-                                        fontSize: 16),
-                                    prefixIcon: Icon(Icons.search,
-                                        color: AppColors.text.withValues(alpha: 0.6),
-                                        size: 22),
-                                    suffixIcon:
-                                        otpProvider.searchQuery.isNotEmpty
-                                            ? IconButton(
-                                                icon: Icon(Icons.close,
-                                                    color: AppColors.text
-                                                        .withValues(alpha: 0.6),
-                                                    size: 20),
-                                                onPressed: () {
-                                                  otpProvider.clearSearch();
-                                                },
-                                              )
-                                            : null,
-                                    border: InputBorder.none,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 14),
-                                  ),
-                                ),
-                              ),
+                        child: LiquidGlass.container(
+                          context: context,
+                          blur: 10,
+                          opacity: 0.5,
+                          borderRadius: 25,
+                          padding: EdgeInsets.zero,
+                          showBorder: false,
+                          tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+                          child: TextField(
+                            onChanged: (value) {
+                              otpProvider.setSearchQuery(value);
+                            },
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                            decoration: InputDecoration(
+                              hintText: 'Search'.i18n,
+                              hintStyle: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                                  fontSize: 16),
+                              prefixIcon: Icon(Icons.search,
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                  size: 22),
+                              suffixIcon:
+                                  otpProvider.searchQuery.isNotEmpty
+                                      ? IconButton(
+                                          icon: Icon(Icons.close,
+                                              color: Theme.of(context).colorScheme.onSurface
+                                                  .withValues(alpha: 0.6),
+                                              size: 20),
+                                          onPressed: () {
+                                            otpProvider.clearSearch();
+                                          },
+                                        )
+                                      : null,
+                              border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 14),
                             ),
                           ),
                         ),
@@ -255,14 +252,14 @@ Widget build(BuildContext context) {
                       // List
                       Expanded(
                         child: otpProvider.isLoading
-                            ? const Center(
+                            ? Center(
                                 child: CircularProgressIndicator(
-                                    color: AppColors.primary))
+                                    color: Theme.of(context).colorScheme.primary))
                             : otpProvider.filteredEntries.isEmpty
                                 ? _buildEmptyState()
                                 : RefreshIndicator(
                                     onRefresh: _refreshFromServer,
-                                    color: AppColors.primary,
+                                    color: Theme.of(context).colorScheme.primary,
                                     child: ListView.builder(
                                       padding: const EdgeInsets.fromLTRB(
                                           20, 0, 20, 150),
@@ -312,13 +309,13 @@ Widget build(BuildContext context) {
           Icon(
             Icons.security,
             size: 80,
-            color: AppColors.text.withValues(alpha: 0.2),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
           ),
           const SizedBox(height: 16),
           Text(
             'No OTP entries yet'.tr(context),
             style: TextStyle(
-              color: AppColors.text.withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
               fontSize: 18,
             ),
           ),
@@ -326,7 +323,7 @@ Widget build(BuildContext context) {
           Text(
             'Add your first authenticator code'.tr(context),
             style: TextStyle(
-              color: AppColors.text.withValues(alpha: 0.3),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
               fontSize: 14,
             ),
           ),
@@ -499,163 +496,139 @@ class _OtpCardState extends State<_OtpCard>
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: widget.onCopy,
-                borderRadius: BorderRadius.circular(16),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          // Icon with issuer initial
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Center(
-                              child: Text(
-                                _initial,
-                                style: const TextStyle(
-                                  color: AppColors.primary,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-
-                          // Info
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  widget.entry.issuer.isNotEmpty
-                                      ? widget.entry.issuer
-                                      : widget.entry.name,
-                                  style: const TextStyle(
-                                    color: AppColors.text,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                if (widget.entry.issuer.isNotEmpty)
-                                  Text(
-                                    widget.entry.name,
-                                    style: TextStyle(
-                                      color: AppColors.text.withValues(alpha: 0.5),
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-
-                          // Delete button
-                          IconButton(
-                            onPressed: widget.onDelete,
-                            icon: Icon(
-                              Icons.delete_outline,
-                              color: AppColors.text.withValues(alpha: 0.3),
-                              size: 20,
-                            ),
-                          ),
-                        ],
+    return LiquidGlass.container(
+      context: context,
+      blur: 10,
+      opacity: 0.5,
+      borderRadius: 16,
+      margin: const EdgeInsets.only(bottom: 12),
+      tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: widget.onCopy,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-
-                      const SizedBox(height: 16),
-
-                      // Code and timer
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // Code
-                          Expanded(
-                            child: Text(
-                              _formattedCode,
-                              style: const TextStyle(
-                                color: AppColors.primary,
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 4,
-                                fontFamily: 'monospace',
-                              ),
-                            ),
+                      child: Center(
+                        child: Text(
+                          _initial,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
-
-                          // Timer
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              SizedBox(
-                                width: 40,
-                                height: 40,
-                                child: CircularProgressIndicator(
-                                  value: _progress,
-                                  strokeWidth: 3,
-                                  backgroundColor:
-                                      AppColors.text.withValues(alpha: 0.1),
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      _progressColor),
-                                ),
-                              ),
-                              Text(
-                                '$_remainingSeconds',
-                                style: TextStyle(
-                                  color: _progressColor,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                        ),
                       ),
-
-                      const SizedBox(height: 8),
-
-                      // Copy hint
-                      Row(
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            Icons.touch_app,
-                            size: 14,
-                            color: AppColors.text.withValues(alpha: 0.3),
-                          ),
-                          const SizedBox(width: 4),
                           Text(
-                            'Tap to copy'.tr(context),
+                            widget.entry.issuer.isNotEmpty
+                                ? widget.entry.issuer
+                                : widget.entry.name,
                             style: TextStyle(
-                              color: AppColors.text.withValues(alpha: 0.3),
-                              fontSize: 12,
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
+                          if (widget.entry.issuer.isNotEmpty)
+                            Text(
+                              widget.entry.name,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                                fontSize: 13,
+                              ),
+                            ),
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+                    IconButton(
+                      onPressed: widget.onDelete,
+                      icon: Icon(
+                        Icons.delete_outline,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                        size: 20,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
+                const SizedBox(height: 16),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _formattedCode,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 4,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ),
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: CircularProgressIndicator(
+                            value: _progress,
+                            strokeWidth: 3,
+                            backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                            valueColor: AlwaysStoppedAnimation<Color>(_progressColor),
+                          ),
+                        ),
+                        Text(
+                          '$_remainingSeconds',
+                          style: TextStyle(
+                            color: _progressColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.touch_app,
+                      size: 14,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Tap to copy'.tr(context),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),

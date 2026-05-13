@@ -1,63 +1,84 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Dark Mode Colors
-  static const Color darkBackground = Color.fromRGBO(23, 23, 23, 1.0);
-  static const Color darkText = Color.fromRGBO(229, 228, 226, 1.0);
-  static const Color darkBottomNavBar = Color.fromRGBO(13, 13, 13, 1.0);
-  static const Color darkCardBg = Color.fromRGBO(30, 30, 30, 1.0);
+  // --- Seed Color (Material 3 generation base) ---
+  static const Color seedColor = Color(0xFF2563EB);
 
-  // Light Mode Colors
-  static const Color lightBackground = Color.fromRGBO(250, 250, 250, 1.0);
-  static const Color lightText = Color.fromRGBO(25, 25, 25, 1.0);
-  static const Color lightBottomNavBar = Color.fromRGBO(240, 240, 240, 1.0);
-  static const Color lightCardBg = Color.fromRGBO(245, 245, 245, 1.0);
+  // --- Semantic helpers (kept for direct references) ---
+  static const Color success = Color(0xFF22C55E);
+  static const Color error = Color(0xFFEF4444);
+  static const Color warning = Color(0xFFF59E0B);
 
-  // Accent Colors (same for both themes)
-  static const Color primary = Color.fromRGBO(33, 150, 243, 1.0);
-  static const Color accent = Color.fromRGBO(33, 150, 243, 1.0);
-  static const Color success = Color.fromRGBO(76, 175, 80, 1.0);
-  static const Color error = Color.fromRGBO(244, 67, 54, 1.0);
-  static const Color warning = Color.fromRGBO(255, 152, 0, 1.0);
+  // Light mode raw values (for biometric screens & legacy code)
+  static const Color lightBackground = Color(0xFFEEF2F8);
+  static const Color lightText = Color(0xFF1A1D21);
+  static const Color lightBottomNavBar = Color(0xFFFFFFFF);
+  static const Color lightCardBg = Color(0xFFFFFFFF);
 
+  // Dark mode raw values (for biometric screens & legacy code)
+  static const Color darkBackground = Color(0xFF121212);
+  static const Color darkText = Color(0xFFE2E2E2);
+  static const Color darkBottomNavBar = Color(0xFF1E1E1E);
+  static const Color darkCardBg = Color(0xFF1E1E1E);
+
+  // --- Dark Theme ---
   static ThemeData getDarkTheme() {
+    final cs = ColorScheme.fromSeed(
+      seedColor: seedColor,
+      brightness: Brightness.dark,
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
+      colorScheme: cs,
       scaffoldBackgroundColor: darkBackground,
-      primaryColor: primary,
+      canvasColor: darkBackground,
+      cardColor: darkCardBg,
+      shadowColor: cs.shadow,
+      dividerTheme: DividerThemeData(
+        color: cs.outlineVariant.withValues(alpha: 0.3),
+        thickness: 1,
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: darkBackground,
-        foregroundColor: darkText,
+        foregroundColor: cs.onSurface,
         elevation: 0,
         centerTitle: true,
+        surfaceTintColor: cs.surfaceTint,
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: darkBottomNavBar,
+        selectedItemColor: cs.primary,
+        unselectedItemColor: cs.onSurfaceVariant,
+        elevation: 0,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: darkText.withValues(alpha: 0.05),
+        fillColor: cs.surfaceContainerHighest.withValues(alpha: 0.4),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: darkText.withValues(alpha: 0.1),
+            color: cs.outlineVariant,
             width: 1,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: darkText.withValues(alpha: 0.1),
+            color: cs.outlineVariant,
             width: 1,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: darkText.withValues(alpha: 0.3),
-            width: 1,
+            color: cs.primary,
+            width: 2,
           ),
         ),
         labelStyle: TextStyle(
-          color: darkText.withValues(alpha: 0.6),
+          color: cs.onSurfaceVariant,
           fontSize: 14,
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -66,14 +87,14 @@ class AppTheme {
         ),
       ),
       textSelectionTheme: TextSelectionThemeData(
-        cursorColor: darkText,
-        selectionColor: darkText.withValues(alpha: 0.3),
-        selectionHandleColor: darkText,
+        cursorColor: cs.primary,
+        selectionColor: cs.primary.withValues(alpha: 0.3),
+        selectionHandleColor: cs.primary,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: darkText,
-          foregroundColor: darkBackground,
+          backgroundColor: cs.primary,
+          foregroundColor: cs.onPrimary,
           padding: const EdgeInsets.symmetric(vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -83,66 +104,106 @@ class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: darkText,
+          foregroundColor: cs.primary,
           padding: const EdgeInsets.symmetric(vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
         ),
       ),
-      cardColor: darkCardBg,
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: cs.primary,
+          side: BorderSide(color: cs.outline),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
       textTheme: TextTheme(
-        bodyLarge: TextStyle(color: darkText),
-        bodyMedium: TextStyle(color: darkText),
-        bodySmall: TextStyle(color: darkText.withValues(alpha: 0.7)),
+        bodyLarge: TextStyle(color: cs.onSurface),
+        bodyMedium: TextStyle(color: cs.onSurface),
+        bodySmall: TextStyle(color: cs.onSurfaceVariant),
         titleLarge: TextStyle(
-          color: darkText,
+          color: cs.onSurface,
           fontWeight: FontWeight.bold,
         ),
-        titleMedium: TextStyle(color: darkText),
-        titleSmall: TextStyle(color: darkText.withValues(alpha: 0.6)),
-      ), dialogTheme: DialogThemeData(backgroundColor: darkBackground),
+        titleMedium: TextStyle(color: cs.onSurface),
+        titleSmall: TextStyle(color: cs.onSurfaceVariant),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: darkCardBg,
+        surfaceTintColor: cs.surfaceTint,
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: cs.surfaceContainerHighest,
+        selectedColor: cs.primaryContainer,
+        labelStyle: TextStyle(color: cs.onSurface),
+        secondaryLabelStyle: TextStyle(color: cs.onPrimaryContainer),
+        side: BorderSide.none,
+      ),
     );
   }
 
+  // --- Light Theme ---
   static ThemeData getLightTheme() {
+    final cs = ColorScheme.fromSeed(
+      seedColor: seedColor,
+      brightness: Brightness.light,
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
+      colorScheme: cs,
       scaffoldBackgroundColor: lightBackground,
-      primaryColor: primary,
+      canvasColor: lightBackground,
+      cardColor: lightCardBg,
+      shadowColor: cs.shadow,
+      dividerTheme: DividerThemeData(
+        color: cs.outlineVariant.withValues(alpha: 0.5),
+        thickness: 1,
+      ),
       appBarTheme: AppBarTheme(
-        backgroundColor: lightBackground,
-        foregroundColor: lightText,
+        backgroundColor: Colors.white,
+        foregroundColor: cs.onSurface,
         elevation: 0,
         centerTitle: true,
+        surfaceTintColor: cs.surfaceTint,
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: Colors.white,
+        selectedItemColor: cs.primary,
+        unselectedItemColor: cs.onSurfaceVariant,
+        elevation: 0,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: lightText.withValues(alpha: 0.05),
+        fillColor: cs.surfaceContainerHighest.withValues(alpha: 0.4),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: lightText.withValues(alpha: 0.1),
+            color: cs.outlineVariant,
             width: 1,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: lightText.withValues(alpha: 0.1),
+            color: cs.outlineVariant,
             width: 1,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: primary,
+            color: cs.primary,
             width: 2,
           ),
         ),
         labelStyle: TextStyle(
-          color: lightText.withValues(alpha: 0.6),
+          color: cs.onSurfaceVariant,
           fontSize: 14,
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -150,10 +211,15 @@ class AppTheme {
           vertical: 14,
         ),
       ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: cs.primary,
+        selectionColor: cs.primary.withValues(alpha: 0.2),
+        selectionHandleColor: cs.primary,
+      ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: lightText,
-          foregroundColor: lightBackground,
+          backgroundColor: cs.primary,
+          foregroundColor: cs.onPrimary,
           padding: const EdgeInsets.symmetric(vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -163,25 +229,45 @@ class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: lightText,
+          foregroundColor: cs.primary,
           padding: const EdgeInsets.symmetric(vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
         ),
       ),
-      cardColor: lightCardBg,
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: cs.primary,
+          side: BorderSide(color: cs.outline),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
       textTheme: TextTheme(
-        bodyLarge: TextStyle(color: lightText),
-        bodyMedium: TextStyle(color: lightText),
-        bodySmall: TextStyle(color: lightText.withValues(alpha: 0.7)),
+        bodyLarge: TextStyle(color: cs.onSurface),
+        bodyMedium: TextStyle(color: cs.onSurface),
+        bodySmall: TextStyle(color: cs.onSurfaceVariant),
         titleLarge: TextStyle(
-          color: lightText,
+          color: cs.onSurface,
           fontWeight: FontWeight.bold,
         ),
-        titleMedium: TextStyle(color: lightText),
-        titleSmall: TextStyle(color: lightText.withValues(alpha: 0.6)),
-      ), dialogTheme: DialogThemeData(backgroundColor: lightBackground),
+        titleMedium: TextStyle(color: cs.onSurface),
+        titleSmall: TextStyle(color: cs.onSurfaceVariant),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: Colors.white,
+        surfaceTintColor: cs.surfaceTint,
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: cs.surfaceContainerHighest,
+        selectedColor: cs.primaryContainer,
+        labelStyle: TextStyle(color: cs.onSurface),
+        secondaryLabelStyle: TextStyle(color: cs.onPrimaryContainer),
+        side: BorderSide.none,
+      ),
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/app_colors.dart';
 
 class PrivacyOverlay extends StatefulWidget {
   final Widget child;
@@ -57,17 +56,17 @@ class _PrivacyOverlayState extends State<PrivacyOverlay> with WidgetsBindingObse
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
               child: Container(
-                color: AppColors.background.withValues(alpha: 0.5),
+                color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
                 child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.lock_outline_rounded, size: 64, color: AppColors.text.withValues(alpha: 0.5)),
+                      Icon(Icons.lock_outline_rounded, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                       const SizedBox(height: 16),
                       Text(
                         "ThisJowi Secured",
                         style: TextStyle(
-                          color: AppColors.text.withValues(alpha: 0.7),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
                           decoration: TextDecoration.none,

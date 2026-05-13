@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/core/api.dart';
 
@@ -138,31 +138,31 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         title: 'Welcome to THISJOWI'.i18n,
         description: 'Your productivity secured manager'.i18n,
         icon: Icons.lock_person_rounded,
-        color: AppColors.primary,
+        color: Theme.of(context).colorScheme.primary,
       )),
       _buildIntroPage(OnboardingPage(
         title: 'Secure Storage'.i18n,
         description: 'All your passwords encrypted and safe'.i18n,
         icon: Icons.security,
-        color: AppColors.accent,
+        color: Theme.of(context).colorScheme.tertiary,
       )),
       _buildIntroPage(OnboardingPage(
         title: 'Offline Access'.i18n,
         description: 'Access your data anytime, anywhere'.i18n,
         icon: Icons.cloud_off,
-        color: AppColors.secondary,
+        color: Theme.of(context).colorScheme.secondary,
       )),
       _buildIntroPage(OnboardingPage(
         title: 'Synchronization'.i18n,
         description: 'Keep your data synced'.i18n,
         icon: Icons.cloud_sync,
-        color: AppColors.primary,
+        color: Theme.of(context).colorScheme.primary,
       )),
       _buildIntroPage(OnboardingPage(
         title: 'Biometric Security'.i18n,
         description: 'Quick and secure access with your fingerprint'.i18n,
         icon: Icons.fingerprint_rounded,
-        color: AppColors.accent,
+        color: Theme.of(context).colorScheme.tertiary,
       )),
     ];
 
@@ -177,7 +177,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     final pages = _buildPages(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -192,7 +192,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     child: Text(
                       'Skip'.i18n,
                       style: TextStyle(
-                        color: AppColors.text.withValues(alpha: 0.6),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -233,12 +233,12 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       },
                       child: Row(
                         children: [
-                          Icon(Icons.arrow_back_ios, color: AppColors.text),
+                          Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface),
                           const SizedBox(width: 4),
                           Text(
                             'Back'.i18n,
                             style: TextStyle(
-                              color: AppColors.text,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 16,
                             ),
                           ),
@@ -253,7 +253,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     ElevatedButton(
                       onPressed: _nextPage,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 32,
@@ -337,7 +337,7 @@ Widget _buildIntroPage(OnboardingPage page) {
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.text,
+                      color: Theme.of(context).colorScheme.onSurface,
                       height: 1.2,
                     ),
                     textAlign: TextAlign.center,
@@ -347,7 +347,7 @@ Widget _buildIntroPage(OnboardingPage page) {
                     page.description,
                     style: TextStyle(
                       fontSize: 16,
-                      color: AppColors.text.withValues(alpha: 0.7),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       height: 1.5,
                     ),
                     textAlign: TextAlign.center,
@@ -375,27 +375,27 @@ Widget _buildIntroPage(OnboardingPage page) {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.2),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
                   ],
                 ),
                 child: Icon(Icons.manage_accounts_outlined,
-                    size: 60, color: AppColors.primary),
+                    size: 60, color: Theme.of(context).colorScheme.primary),
               ),
             ),
             const SizedBox(height: 30),
             Text(
               "Choose Account Type".i18n,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: AppColors.text,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 40),
@@ -439,27 +439,27 @@ Widget _buildIntroPage(OnboardingPage page) {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.secondary.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.secondary.withValues(alpha: 0.2),
+                      color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
                   ],
                 ),
                 child: Icon(Icons.storage_rounded,
-                    size: 60, color: AppColors.secondary),
+                    size: 60, color: Theme.of(context).colorScheme.secondary),
               ),
             ),
             const SizedBox(height: 30),
             Text(
               "Select Hosting Mode".i18n,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: AppColors.text,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 40),
@@ -511,27 +511,27 @@ Widget _buildIntroPage(OnboardingPage page) {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.text.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.text.withValues(alpha: 0.1),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
                   ],
                 ),
                 child: Icon(Icons.settings_ethernet,
-                    size: 60, color: AppColors.text),
+                    size: 60, color: Theme.of(context).colorScheme.onSurface),
               ),
             ),
             const SizedBox(height: 30),
             Text(
               "Server Configuration".i18n,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: AppColors.text,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 16),
@@ -539,18 +539,18 @@ Widget _buildIntroPage(OnboardingPage page) {
               "Enter your self-hosted server URL".i18n,
               style: TextStyle(
                 fontSize: 16,
-                color: AppColors.text.withValues(alpha: 0.7),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 40),
             TextField(
               controller: _loginServerUrlController,
-              style: const TextStyle(color: AppColors.text),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
               decoration: InputDecoration(
                 labelText: "Server URL (e.g. https://api.myserver.com)".i18n,
-                labelStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.6)),
-                prefixIcon: Icon(Icons.link, color: AppColors.secondary),
+                labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                prefixIcon: Icon(Icons.link, color: Theme.of(context).colorScheme.secondary),
                 filled: true,
                 fillColor: Colors.white.withValues(alpha: 0.05),
                 border: OutlineInputBorder(
@@ -564,7 +564,7 @@ Widget _buildIntroPage(OnboardingPage page) {
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
                   borderSide:
-                      const BorderSide(color: AppColors.secondary, width: 1),
+                      BorderSide(color: Theme.of(context).colorScheme.secondary, width: 1),
                 ),
               ),
             ),
@@ -578,7 +578,7 @@ Widget _buildIntroPage(OnboardingPage page) {
                 _completeOnboarding();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Colors.white,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
@@ -610,27 +610,27 @@ Widget _buildIntroPage(OnboardingPage page) {
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: AppColors.accent.withValues(alpha: 0.1),
+                      color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.accent.withValues(alpha: 0.2),
+                          color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.2),
                           blurRadius: 20,
                           spreadRadius: 5,
                         ),
                       ],
                     ),
                     child: Icon(Icons.rocket_launch_rounded,
-                        size: 60, color: AppColors.accent),
+                        size: 60, color: Theme.of(context).colorScheme.tertiary),
                   ),
                 ),
                 const SizedBox(height: 30),
                 Text(
                   "Get Started".i18n,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.text,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -668,63 +668,65 @@ Widget _buildIntroPage(OnboardingPage page) {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.1)
-              : Colors.white.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(15),
-          border: isSelected
-              ? Border.all(color: AppColors.primary, width: 1.5)
-              : Border.all(color: Colors.transparent),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.primary
-                    : Colors.white.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+    return LiquidGlass.container(
+      context: context,
+      blur: 10,
+      opacity: 0.4,
+      borderRadius: 15,
+      padding: EdgeInsets.zero,
+      tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.onPrimary
+                      : Theme.of(context).colorScheme.onSurface,
+                  size: 24,
+                ),
               ),
-              child: Icon(
-                icon,
-                color: isSelected ? Colors.white : AppColors.text,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: isSelected ? AppColors.primary : AppColors.text,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.text.withValues(alpha: 0.6),
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            if (isSelected)
-              const Icon(Icons.check_circle, color: AppColors.primary),
-          ],
+              if (isSelected)
+                Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary),
+            ],
+          ),
         ),
       ),
     );
@@ -742,8 +744,8 @@ Widget _buildIntroPage(OnboardingPage page) {
           height: 8,
           decoration: BoxDecoration(
             color: _currentPage == index
-                ? AppColors.primary
-                : AppColors.text.withValues(alpha: 0.2),
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(4),
           ),
         ),

@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:thisjowi/core/app_colors.dart';
+import 'package:thisjowi/core/app_theme.dart';
 
 enum BiometricType { face, fingerprint, both }
 
@@ -245,8 +245,8 @@ class _BiometricScreenState extends State<BiometricScreen>
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: isDarkMode
-                    ? [AppColors.background, AppColors.surface]
-                    : [AppColors.lightBackground, AppColors.lightSurface],
+                    ? [Theme.of(context).scaffoldBackgroundColor, Theme.of(context).cardColor]
+                    : [AppTheme.lightBackground, AppTheme.lightCardBg],
               ),
             ),
           ),
@@ -275,7 +275,7 @@ class _BiometricScreenState extends State<BiometricScreen>
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
-                            AppColors.primary.withAlpha(30),
+                            Theme.of(context).colorScheme.primary.withAlpha(30),
                             Colors.transparent,
                           ],
                           stops: [
@@ -312,21 +312,21 @@ class _BiometricScreenState extends State<BiometricScreen>
                               shape: BoxShape.circle,
                               gradient: RadialGradient(
                                 colors: [
-                                  AppColors.primary.withAlpha(200),
-                                  AppColors.primary.withAlpha(100),
-                                  AppColors.accent.withAlpha(80),
+                                  Theme.of(context).colorScheme.primary.withAlpha(200),
+                                  Theme.of(context).colorScheme.primary.withAlpha(100),
+                                  Theme.of(context).colorScheme.tertiary.withAlpha(80),
                                   Colors.transparent,
                                 ],
                                 stops: const [0.0, 0.5, 0.8, 1.0],
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withAlpha(80),
+                                  color: Theme.of(context).colorScheme.primary.withAlpha(80),
                                   blurRadius: 40,
                                   spreadRadius: 5,
                                 ),
                                 BoxShadow(
-                                  color: AppColors.accent.withAlpha(50),
+                                  color: Theme.of(context).colorScheme.tertiary.withAlpha(50),
                                   blurRadius: 60,
                                   spreadRadius: 10,
                                 ),
@@ -354,8 +354,8 @@ class _BiometricScreenState extends State<BiometricScreen>
                             fontWeight: FontWeight.w700,
                             letterSpacing: -1,
                             color: isDarkMode
-                                ? AppColors.text
-                                : AppColors.lightText,
+                                ? Theme.of(context).colorScheme.onSurface
+                                : AppTheme.lightText,
                           ),
                       textAlign: TextAlign.center,
                     ),
@@ -377,8 +377,8 @@ class _BiometricScreenState extends State<BiometricScreen>
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             fontSize: 16,
                             color: (isDarkMode
-                                    ? AppColors.text
-                                    : AppColors.lightText)
+                                    ? Theme.of(context).colorScheme.onSurface
+                                    : AppTheme.lightText)
                                 .withAlpha(180),
                             fontWeight: FontWeight.w400,
                           ),
@@ -413,8 +413,8 @@ class _BiometricScreenState extends State<BiometricScreen>
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: (isDarkMode
-                              ? AppColors.text
-                              : AppColors.lightText)
+                              ? Theme.of(context).colorScheme.onSurface
+                              : AppTheme.lightText)
                           .withAlpha(100),
                       fontSize: 12,
                     ),
@@ -431,19 +431,19 @@ class _BiometricScreenState extends State<BiometricScreen>
       return Icon(
         Icons.fingerprint,
         size: 90,
-        color: AppColors.background,
+        color: Theme.of(context).scaffoldBackgroundColor,
       );
     } else if (type == BiometricType.both) {
       return Icon(
         Icons.verified_user,
         size: 90,
-        color: AppColors.background,
+        color: Theme.of(context).scaffoldBackgroundColor,
       );
     } else {
       return Icon(
         Icons.face,
         size: 90,
-        color: AppColors.background,
+        color: Theme.of(context).scaffoldBackgroundColor,
       );
     }
   }
@@ -456,14 +456,14 @@ class _BiometricScreenState extends State<BiometricScreen>
           height: 50,
           child: CircularProgressIndicator(
             strokeWidth: 3,
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+            valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
           ),
         ),
         const SizedBox(height: 24),
         Text(
           'Waiting for biometrics...',
           style: TextStyle(
-            color: AppColors.text.withAlpha(150),
+            color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
             fontSize: 14,
           ),
         ),
@@ -479,14 +479,14 @@ class _BiometricScreenState extends State<BiometricScreen>
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.primary,
-              AppColors.accent,
+              Theme.of(context).colorScheme.primary,
+              Theme.of(context).colorScheme.tertiary,
             ],
           ),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withAlpha(100),
+              color: Theme.of(context).colorScheme.primary.withAlpha(100),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -519,11 +519,11 @@ class _BiometricScreenState extends State<BiometricScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       decoration: BoxDecoration(
-        color: (isDarkMode ? AppColors.surface : AppColors.lightSurface)
+        color: (isDarkMode ? Theme.of(context).cardColor : AppTheme.lightCardBg)
             .withAlpha(150),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: AppColors.primary.withAlpha(100),
+          color: Theme.of(context).colorScheme.primary.withAlpha(100),
           width: 1,
         ),
       ),
@@ -533,13 +533,13 @@ class _BiometricScreenState extends State<BiometricScreen>
           Icon(
             Icons.touch_app,
             size: 20,
-            color: AppColors.primary,
+            color: Theme.of(context).colorScheme.primary,
           ),
           const SizedBox(width: 8),
           Text(
             'Touch to authenticate',
             style: TextStyle(
-              color: isDarkMode ? AppColors.text : AppColors.lightText,
+              color: isDarkMode ? Theme.of(context).colorScheme.onSurface : AppTheme.lightText,
               fontSize: 14,
             ),
           ),

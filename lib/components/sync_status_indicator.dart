@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import '../services/connectivityService.dart';
 
 /// Widget to display connectivity and sync status
@@ -137,7 +136,7 @@ class _SyncStatusBannerState extends State<SyncStatusBanner> {
             child: Text(
               'Working offline. Changes will sync when connection is restored.',
               style: TextStyle(
-                color: AppColors.text,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 12,
               ),
             ),
@@ -165,7 +164,7 @@ class SyncNotification {
           ],
         ),
         duration: const Duration(seconds: 2),
-        backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
+        backgroundColor: Theme.of(context).cardColor,
       ),
     );
   }
@@ -181,7 +180,7 @@ class SyncNotification {
           ],
         ),
         duration: const Duration(seconds: 3),
-        backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
+        backgroundColor: Theme.of(context).cardColor,
       ),
     );
   }
@@ -197,7 +196,7 @@ class SyncNotification {
           ],
         ),
         duration: const Duration(seconds: 2),
-        backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
+        backgroundColor: Theme.of(context).cardColor,
       ),
     );
   }
@@ -213,7 +212,7 @@ class SyncNotification {
           ],
         ),
         duration: const Duration(seconds: 2),
-        backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
+        backgroundColor: Theme.of(context).cardColor,
       ),
     );
   }

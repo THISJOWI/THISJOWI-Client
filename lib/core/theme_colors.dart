@@ -1,24 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/app_colors.dart';
 
+/// Helper para obtener colores del tema actual de forma segura.
+/// Usa Theme.of(context) para respetar el modo claro/oscuro.
 class ThemeColors {
   static Color background(BuildContext context) {
-    return AppColors.backgroundOf(context);
+    return Theme.of(context).scaffoldBackgroundColor;
   }
 
   static Color text(BuildContext context) {
-    return AppColors.textOf(context);
+    return Theme.of(context).colorScheme.onSurface;
   }
 
   static Color surface(BuildContext context) {
-    return AppColors.surfaceOf(context);
+    return Theme.of(context).cardColor;
   }
 
   static Color bottomNavBar(BuildContext context) {
-    return AppColors.bottomNavBarOf(context);
+    return Theme.of(context).bottomNavigationBarTheme.backgroundColor 
+        ?? Theme.of(context).scaffoldBackgroundColor;
   }
 
-  static Color primary = AppColors.primary;
-  static Color secondary = AppColors.secondary;
-  static Color accent = AppColors.accent;
+  static Color primary(BuildContext context) {
+    return Theme.of(context).colorScheme.primary;
+  }
+
+  static Color secondary(BuildContext context) {
+    return Theme.of(context).colorScheme.secondary;
+  }
+
+  static Color accent(BuildContext context) {
+    return Theme.of(context).colorScheme.tertiary;
+  }
 }

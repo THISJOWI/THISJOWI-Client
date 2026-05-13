@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thisjowi/services/biometricService.dart';
 import 'package:thisjowi/services/auth_service.dart';
@@ -211,7 +210,7 @@ class _SplashScreenState extends State<SplashScreen>
                   height: 40,
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primary.withValues(alpha: 0.7),
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
                     ),
                     strokeWidth: 3,
                   ),

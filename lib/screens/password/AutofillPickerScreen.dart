@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/service_locator.dart';
 import 'package:thisjowi/data/models/password_entry.dart';
 import 'package:thisjowi/data/repository/passwordsRepository.dart';
@@ -146,15 +145,15 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                                 TextPosition(offset: _searchQuery.length)),
                           onChanged: (value) =>
                               setState(() => _searchQuery = value),
-                          style: const TextStyle(
-                              color: AppColors.text, fontSize: 16),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
                           decoration: InputDecoration(
                             hintText: 'Search passwords'.i18n,
                             hintStyle: TextStyle(
-                                color: AppColors.text.withValues(alpha: 0.5),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                                 fontSize: 16),
                             prefixIcon: Icon(Icons.search,
-                                color: AppColors.text.withValues(alpha: 0.6),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                 size: 22),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
@@ -186,8 +185,8 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                               children: [
                                 Text(
                                   '${'Do you want to save credentials for'.i18n} ${widget.request.appName}?',
-                                  style: const TextStyle(
-                                      color: AppColors.text,
+                                  style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface,
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -195,7 +194,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                                   Text(
                                     'Usuario: ${widget.request.username}',
                                     style: TextStyle(
-                                        color: AppColors.text.withValues(alpha: 0.7),
+                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                         fontSize: 12),
                                   ),
                               ],
@@ -223,12 +222,12 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                                 children: [
                                   Icon(Icons.search_off,
                                       size: 64,
-                                      color: AppColors.text.withValues(alpha: 0.2)),
+                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
                                   const SizedBox(height: 16),
                                   Text(
                                     'No matching passwords found'.i18n,
                                     style:
-                                        const TextStyle(color: AppColors.text),
+                                        TextStyle(color: Theme.of(context).colorScheme.onSurface),
                                   ),
                                   if (_searchQuery.isNotEmpty)
                                     TextButton(
@@ -247,7 +246,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                                   margin: const EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: AppColors.text.withValues(alpha: 0.05),
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: ListTile(
@@ -255,14 +254,14 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                                         horizontal: 16, vertical: 8),
                                     leading: CircleAvatar(
                                       backgroundColor:
-                                          AppColors.primary.withValues(alpha: 0.1),
-                                      child: const Icon(Icons.account_circle,
-                                          color: AppColors.primary),
+                                          Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                                      child: Icon(Icons.account_circle,
+                                          color: Theme.of(context).colorScheme.primary),
                                     ),
                                     title: Text(
                                       entry.title,
-                                      style: const TextStyle(
-                                          color: AppColors.text,
+                                      style: TextStyle(
+                                          color: Theme.of(context).colorScheme.onSurface,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     subtitle: Column(
@@ -273,7 +272,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                                         Text(
                                           '${'User'.i18n}: ${entry.username}',
                                           style: TextStyle(
-                                              color: AppColors.text
+                                              color: Theme.of(context).colorScheme.onSurface
                                                   .withValues(alpha: 0.8),
                                               fontSize: 13),
                                         ),
@@ -281,7 +280,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                                           Text(
                                             entry.website,
                                             style: TextStyle(
-                                                color: AppColors.text
+                                                color: Theme.of(context).colorScheme.onSurface
                                                     .withValues(alpha: 0.4),
                                                 fontSize: 11),
                                             maxLines: 1,
@@ -289,8 +288,8 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                                           ),
                                       ],
                                     ),
-                                    trailing: const Icon(Icons.chevron_right,
-                                        color: AppColors.text),
+                                    trailing: Icon(Icons.chevron_right,
+                                        color: Theme.of(context).colorScheme.onSurface),
                                     onTap: () =>
                                         _showSelectionConfirmation(entry),
                                   ),
@@ -319,23 +318,23 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
             Text(
               'Confirmar autorrelleno',
               style: TextStyle(
-                  color: AppColors.text,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 18,
                   fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Text(
               'Se usarán estas credenciales para ${widget.request.appName}:',
-              style: TextStyle(color: AppColors.text.withValues(alpha: 0.7)),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
             ),
             const SizedBox(height: 24),
             Row(
               children: [
-                const Icon(Icons.person, color: AppColors.primary, size: 20),
+                Icon(Icons.person, color: Theme.of(context).colorScheme.primary, size: 20),
                 const SizedBox(width: 12),
                 Text(entry.username,
-                    style: const TextStyle(
-                        color: AppColors.text,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.w600)),
               ],
@@ -345,7 +344,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -365,7 +364,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
               child: TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text('Cancelar'.i18n,
-                    style: TextStyle(color: AppColors.text.withValues(alpha: 0.6))),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
               ),
             ),
             const SizedBox(height: 16),

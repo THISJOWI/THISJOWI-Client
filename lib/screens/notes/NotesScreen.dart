@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:thisjowi/components/error_bar.dart';
-import 'package:thisjowi/core/app_colors.dart';
+import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/core/service_locator.dart';
 import 'package:thisjowi/data/models/note_entry.dart';
 import 'package:thisjowi/data/repository/notes_repository.dart';
@@ -80,7 +80,7 @@ class _NotesScreenState extends State<NotesScreen> {
     return await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: AppColors.background,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             title: Text(
               'Delete Note?'.tr(context),
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
@@ -196,17 +196,17 @@ class _NotesScreenState extends State<NotesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
           Expanded(
             child: CustomScrollView(
               slivers: [
                 SliverAppBar.large(
-                  backgroundColor: AppColors.background,
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                   title: Text(
                     'Notes'.tr(context),
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
                   ),
                   centerTitle: false,
@@ -221,50 +221,57 @@ class _NotesScreenState extends State<NotesScreen> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
-                    child: Container(
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2C2C2E), // Apple-ish dark grey
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: TextField(
-                        style: const TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface, fontSize: 17),
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                          hintText: 'Search'.tr(context),
-                          hintStyle: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                              fontSize: 17),
-                          prefixIcon: Icon(Icons.search,
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 18),
-                          prefixIconConstraints:
-                              const BoxConstraints(minWidth: 32, minHeight: 36),
-                          border: InputBorder.none,
-                          isDense: true,
-                          contentPadding: const EdgeInsets.only(right: 16),
-                          suffixIcon: _searchQuery.isNotEmpty
-                              ? GestureDetector(
-                                  onTap: () {
-                                    setState(() => _searchQuery = '');
-                                    _loadNotes();
-                                  },
-                                  child: Icon(Icons.close,
-                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                                      size: 18),
-                                )
-                              : null,
+                    child: LiquidGlass.container(
+                      context: context,
+                      blur: 10,
+                      opacity: 0.5,
+                      borderRadius: 10,
+                      padding: EdgeInsets.zero,
+                      showBorder: false,
+                      tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+                      child: SizedBox(
+                        height: 36,
+                        child: TextField(
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface, fontSize: 17),
+                          textAlignVertical: TextAlignVertical.center,
+                          decoration: InputDecoration(
+                            hintText: 'Search'.tr(context),
+                            hintStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                fontSize: 17),
+                            prefixIcon: Icon(Icons.search,
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 18),
+                            prefixIconConstraints:
+                                const BoxConstraints(minWidth: 32, minHeight: 36),
+                            border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                            isDense: true,
+                            contentPadding: const EdgeInsets.only(right: 16),
+                            suffixIcon: _searchQuery.isNotEmpty
+                                ? GestureDetector(
+                                    onTap: () {
+                                      setState(() => _searchQuery = '');
+                                      _loadNotes();
+                                    },
+                                    child: Icon(Icons.close,
+                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                        size: 18),
+                                  )
+                                : null,
+                          ),
+                          onChanged: (value) {
+                            setState(() => _searchQuery = value);
+                            _loadNotes();
+                          },
                         ),
-                        onChanged: (value) {
-                          setState(() => _searchQuery = value);
-                          _loadNotes();
-                        },
                       ),
                     ),
                   ),
                 ),
                 if (_isLoading)
-                  const SliverFillRemaining(
+                  SliverFillRemaining(
                     child: Center(
                         child:
                             CircularProgressIndicator(color: Theme.of(context).colorScheme.onSurface)),
@@ -293,17 +300,15 @@ class _NotesScreenState extends State<NotesScreen> {
                         // Revisando el código anterior, Note no mostraba fecha, pero el diseño de Apple lleva fecha.
                         // Lo dejaremos sin fecha por compatibilidad inmediata hasta ver el modelo completo.
 
-                        return Container(
-                          margin: const EdgeInsets.only(left: 16.0),
-                          decoration: BoxDecoration(
-                            border: isLast
-                                ? null
-                                : Border(
-                                    bottom: BorderSide(
-                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
-                                        width: 0.5),
-                                  ),
-                          ),
+                        return LiquidGlass.container(
+                          context: context,
+                          blur: 10,
+                          opacity: 0.5,
+                          borderRadius: 12,
+                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          showBorder: false,
+                          tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+                          padding: EdgeInsets.zero,
                           child: Dismissible(
                             key: Key(note.localId ?? note.id.toString()),
                             direction: DismissDirection.endToStart,
@@ -312,7 +317,7 @@ class _NotesScreenState extends State<NotesScreen> {
                               padding: const EdgeInsets.only(right: 20.0),
                               color: Colors.red,
                               child:
-                                  const Icon(Icons.delete, color: Colors.white),
+                                  Icon(Icons.delete, color: Theme.of(context).colorScheme.onSurface),
                             ),
                             confirmDismiss: (direction) async {
                               return await _showDeleteConfirmation(note);
@@ -347,7 +352,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                       note.title.isNotEmpty
                                           ? note.title
                                           : 'No Title'.tr(context),
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         color: Theme.of(context).colorScheme.onSurface,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
@@ -388,23 +393,22 @@ class _NotesScreenState extends State<NotesScreen> {
               ],
             ),
           ),
-          // Bottom Toolbar similar a Apple Notes
-          Container(
-            height: 80, // Altura suficiente para safe area
+          // Bottom Toolbar
+          LiquidGlass.container(
+            context: context,
+            blur: 10,
+            opacity: 0.5,
+            borderRadius: 0,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.background.withValues(alpha: 0.95), // Casi sólido
-              border: Border(
-                  top: BorderSide(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2), width: 0.5)),
-            ),
+            margin: EdgeInsets.zero,
+            tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
             child: SafeArea(
               child: Row(
                 children: [
                   // Botón de opciones o grid (opcional, placeholder para equilibrio)
                   IconButton(
                     icon: Icon(Icons.grid_view,
-                        color: AppColors.primary
+                        color: Theme.of(context).colorScheme.primary
                             .withValues(alpha: 0.0)), // Invisible para spacing
                     onPressed: null,
                   ),
@@ -419,7 +423,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   // Botón Nueva Nota (Icono lápiz sobre papel)
                   IconButton(
                     icon:
-                        const Icon(Icons.edit_square, color: AppColors.primary),
+                        Icon(Icons.edit_square, color: Theme.of(context).colorScheme.primary),
                     onPressed: _createNote,
                   ),
                 ],

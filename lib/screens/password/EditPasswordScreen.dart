@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/data/models/password_entry.dart';
 import '../../data/repository/passwordsRepository.dart';
 import 'package:thisjowi/components/error_bar.dart';
@@ -137,14 +136,14 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           widget.passwordEntry == null ? 'Add Password'.i18n : 'Edit Password'.i18n,
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
         backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.text,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
         elevation: 0,
         centerTitle: true,
       ),
@@ -215,19 +214,19 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
           decoration: BoxDecoration(
             color: hasError 
                 ? Colors.red.withValues(alpha: 0.08) 
-                : AppColors.text.withValues(alpha: 0.05),
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: hasError 
                   ? Colors.red.withValues(alpha: 0.6) 
-                  : AppColors.text.withValues(alpha: 0.1), 
+                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1), 
               width: hasError ? 1.5 : 1,
             ),
           ),
           child: TextFormField(
             controller: controller,
             focusNode: focusNode,
-            style: const TextStyle(color: AppColors.text, fontSize: 16),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
             textInputAction: isLast ? TextInputAction.done : TextInputAction.next,
             onFieldSubmitted: (_) {
               if (isLast) {
@@ -240,12 +239,12 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
             decoration: InputDecoration(
               labelText: label,
               labelStyle: TextStyle(
-                color: hasError ? Colors.red.withValues(alpha: 0.8) : AppColors.text.withValues(alpha: 0.6), 
+                color: hasError ? Colors.red.withValues(alpha: 0.8) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), 
                 fontSize: 14,
               ),
               prefixIcon: Icon(
                 icon, 
-                color: hasError ? Colors.red.withValues(alpha: 0.7) : AppColors.text.withValues(alpha: 0.6), 
+                color: hasError ? Colors.red.withValues(alpha: 0.7) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), 
                 size: 20,
               ),
               border: InputBorder.none,
@@ -279,19 +278,19 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
           decoration: BoxDecoration(
             color: hasError 
                 ? Colors.red.withValues(alpha: 0.08) 
-                : AppColors.text.withValues(alpha: 0.05),
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: hasError 
                   ? Colors.red.withValues(alpha: 0.6) 
-                  : AppColors.text.withValues(alpha: 0.1), 
+                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1), 
               width: hasError ? 1.5 : 1,
             ),
           ),
           child: TextFormField(
             controller: _passwordController,
             focusNode: _passwordFocusNode,
-            style: const TextStyle(color: AppColors.text, fontSize: 16),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
             obscureText: !_showPassword,
             textInputAction: TextInputAction.next,
             onFieldSubmitted: (_) => _websiteFocusNode.requestFocus(),
@@ -299,12 +298,12 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
             decoration: InputDecoration(
               labelText: 'Password'.i18n,
               labelStyle: TextStyle(
-                color: hasError ? Colors.red.withValues(alpha: 0.8) : AppColors.text.withValues(alpha: 0.6), 
+                color: hasError ? Colors.red.withValues(alpha: 0.8) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), 
                 fontSize: 14,
               ),
               prefixIcon: Icon(
                 Icons.lock, 
-                color: hasError ? Colors.red.withValues(alpha: 0.7) : AppColors.text.withValues(alpha: 0.6), 
+                color: hasError ? Colors.red.withValues(alpha: 0.7) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), 
                 size: 20,
               ),
               suffixIcon: Row(
@@ -313,7 +312,7 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
               IconButton(
                 icon: Icon(
                   _showPassword ? Icons.visibility : Icons.visibility_off,
-                  color: AppColors.text.withValues(alpha: 0.6),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                   size: 20,
                 ),
                 onPressed: () {
@@ -323,7 +322,7 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
               ),
               IconButton(
-                icon: Icon(Icons.copy, color: AppColors.text.withValues(alpha: 0.6), size: 20),
+                icon: Icon(Icons.copy, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 20),
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: _passwordController.text));
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -362,19 +361,19 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
       child: ElevatedButton(
         onPressed: _isSaving ? null : _save,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.text,
-          foregroundColor: AppColors.background,
+          backgroundColor: Theme.of(context).colorScheme.onSurface,
+          foregroundColor: Theme.of(context).scaffoldBackgroundColor,
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 2,
-          disabledBackgroundColor: AppColors.text.withValues(alpha: 0.5),
+          disabledBackgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
         ),
         child: _isSaving
             ? SizedBox(
                 height: 20,
                 width: 20,
                 child: CircularProgressIndicator(
-                  color: AppColors.background,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   strokeWidth: 2,
                 ),
               )

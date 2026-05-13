@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:thisjowi/core/app_colors.dart';
+import 'package:thisjowi/core/app_theme.dart';
 
 // Tipos de biometría
 enum BiometricType { face, fingerprint, both }
@@ -173,12 +173,12 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                     end: Alignment.bottomRight,
                     colors: isDarkMode
                         ? [
-                            AppColors.background,
-                            AppColors.surface.withAlpha(200),
+                            Theme.of(context).scaffoldBackgroundColor,
+                            Theme.of(context).cardColor.withAlpha(200),
                           ]
                         : [
-                            AppColors.lightBackground,
-                            AppColors.lightSurface,
+                            AppTheme.lightBackground,
+                            AppTheme.lightCardBg,
                           ],
                   ),
                 ),
@@ -219,13 +219,13 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                     colors: [
-                                      AppColors.primary.withAlpha(200),
-                                      AppColors.accent.withAlpha(150),
+                                      Theme.of(context).colorScheme.primary.withAlpha(200),
+                                      Theme.of(context).colorScheme.tertiary.withAlpha(150),
                                     ],
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.primary.withAlpha(100),
+                                      color: Theme.of(context).colorScheme.primary.withAlpha(100),
                                       blurRadius: 30,
                                       spreadRadius: 10,
                                     ),
@@ -239,8 +239,8 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                                         : Icons.face,
                                     size: 80,
                                     color: isDarkMode
-                                        ? AppColors.background
-                                        : AppColors.lightBackground,
+                                        ? Theme.of(context).scaffoldBackgroundColor
+                                        : AppTheme.lightBackground,
                                   ),
                                 ),
                               ),
@@ -280,8 +280,8 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                               ?.copyWith(
                                 fontSize: 16,
                                 color: isDarkMode
-                                    ? AppColors.text.withAlpha(180)
-                                    : AppColors.lightText.withAlpha(180),
+                                    ? Theme.of(context).colorScheme.onSurface.withAlpha(180)
+                                    : AppTheme.lightText.withAlpha(180),
                                 fontWeight: FontWeight.w400,
                               ),
                           textAlign: TextAlign.center,
@@ -308,14 +308,14 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      AppColors.primary,
-                                      AppColors.accent,
+                                      Theme.of(context).colorScheme.primary,
+                                      Theme.of(context).colorScheme.tertiary,
                                     ],
                                   ),
                                   borderRadius: BorderRadius.circular(12),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.primary.withAlpha(100),
+                                      color: Theme.of(context).colorScheme.primary.withAlpha(100),
                                       blurRadius: 15,
                                       offset: const Offset(0, 8),
                                     ),

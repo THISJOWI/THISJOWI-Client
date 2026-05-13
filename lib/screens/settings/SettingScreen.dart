@@ -1,7 +1,7 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/exceptions/account_exceptions.dart';
 import 'package:thisjowi/core/exceptions/profile_exceptions.dart';
 import 'package:thisjowi/services/auth_service.dart';
@@ -130,7 +130,7 @@ Future<void> _loadCurrentUser() async {
     required String title,
     required String content,
     required VoidCallback onConfirm,
-    Color confirmColor = Colors.red,
+    Color confirmColor = Theme.of(context).colorScheme.error,
   }) {
     showDialog(
       context: context,
@@ -138,7 +138,7 @@ Future<void> _loadCurrentUser() async {
         child: SizedBox(
           width: 400,
           child: Dialog(
-            backgroundColor: AppColors.background,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Padding(
@@ -148,7 +148,7 @@ Future<void> _loadCurrentUser() async {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -195,7 +195,7 @@ Future<void> _loadCurrentUser() async {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: confirmColor,
-                            foregroundColor: Colors.white,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -245,7 +245,7 @@ Future<void> _loadCurrentUser() async {
           child: SizedBox(
             width: 400,
             child: Dialog(
-              backgroundColor: AppColors.background,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
               child: Padding(
@@ -258,7 +258,7 @@ Future<void> _loadCurrentUser() async {
                       children: [
                         Text(
                           'Confirm Deletion'.i18n,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -296,7 +296,7 @@ Future<void> _loadCurrentUser() async {
                         controller: passwordController,
                         obscureText: obscurePassword,
                         style:
-                            const TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                            TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
                         decoration: InputDecoration(
                           labelText: 'Password'.i18n,
                           labelStyle: TextStyle(
@@ -369,8 +369,8 @@ Future<void> _loadCurrentUser() async {
                               await _performAccountDeletion(password);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.white,
+                              backgroundColor: Theme.of(context).colorScheme.error,
+                              foregroundColor: Theme.of(context).colorScheme.onPrimary,
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -431,7 +431,7 @@ Future<void> _loadCurrentUser() async {
           child: SizedBox(
             width: 400,
             child: Dialog(
-              backgroundColor: AppColors.background,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
               child: Padding(
@@ -444,7 +444,7 @@ Future<void> _loadCurrentUser() async {
                       children: [
                         Text(
                           'Change Password'.i18n,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -508,7 +508,7 @@ Future<void> _loadCurrentUser() async {
                             onPressed: () => _handleChangePassword(),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).colorScheme.onSurface,
-                              foregroundColor: AppColors.background,
+                              foregroundColor: Theme.of(context).scaffoldBackgroundColor,
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -551,7 +551,7 @@ Future<void> _loadCurrentUser() async {
       child: TextField(
         controller: controller,
         obscureText: obscure,
-        style: const TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(
@@ -628,7 +628,7 @@ Future<void> _loadCurrentUser() async {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Container(
           width: 400,
@@ -638,7 +638,7 @@ Future<void> _loadCurrentUser() async {
             children: [
               Text(
                 'Select Country'.i18n,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -689,18 +689,18 @@ Future<void> _loadCurrentUser() async {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          backgroundColor: AppColors.background,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           title: Text('Account Type'.i18n,
-              style: const TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: ['Business', 'Community']
                 .map((type) => RadioListTile<String>(
                       title: Text(type,
-                          style: const TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                       value: type,
                       groupValue: accountType,
-                      activeColor: AppColors.primary,
+                      activeColor: Theme.of(context).colorScheme.primary,
                       onChanged: (value) => setState(() => accountType = value),
                     ))
                 .toList(),
@@ -729,8 +729,8 @@ Future<void> _loadCurrentUser() async {
                 }
               },
               style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary),
               child: Text('Save'.i18n),
             ),
           ],
@@ -745,18 +745,18 @@ Future<void> _loadCurrentUser() async {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          backgroundColor: AppColors.background,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           title: Text('Hosting Mode'.i18n,
-              style: const TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: ['Cloud', 'Self-Hosted']
                 .map((mode) => RadioListTile<String>(
                       title: Text(mode,
-                          style: const TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                       value: mode,
                       groupValue: hostingMode,
-                      activeColor: AppColors.primary,
+                      activeColor: Theme.of(context).colorScheme.primary,
                       onChanged: (value) => setState(() => hostingMode = value),
                     ))
                 .toList(),
@@ -785,8 +785,8 @@ Future<void> _loadCurrentUser() async {
                 }
               },
               style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary),
               child: Text('Save'.i18n),
             ),
           ],
@@ -804,7 +804,7 @@ Future<void> _loadCurrentUser() async {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => Dialog(
-          backgroundColor: AppColors.background,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -816,7 +816,7 @@ Future<void> _loadCurrentUser() async {
               children: [
                 Text(
                   'Edit Full Name'.i18n,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -834,7 +834,7 @@ Future<void> _loadCurrentUser() async {
                   ),
                   child: TextField(
                     controller: fullNameController,
-                    style: const TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
                     decoration: InputDecoration(
                       labelText: 'Full Name'.i18n,
                       labelStyle: TextStyle(
@@ -895,8 +895,8 @@ Future<void> _loadCurrentUser() async {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
                       ),
                       child: Text('Save'.i18n),
                     ),
@@ -941,7 +941,7 @@ Future<void> _loadCurrentUser() async {
     _showConfirmationDialog(
       title: 'Delete Avatar'.i18n,
       content: 'Are you sure you want to remove your profile picture?'.i18n,
-      confirmColor: Colors.red,
+      confirmColor: Theme.of(context).colorScheme.error,
       onConfirm: () async {
         try {
           await _profileService.deleteAvatar();
@@ -959,7 +959,7 @@ Future<void> _loadCurrentUser() async {
   void _showAvatarOptions() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -980,7 +980,7 @@ Future<void> _loadCurrentUser() async {
               const SizedBox(height: 20),
               Text(
                 'Profile Picture'.i18n,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -994,7 +994,7 @@ Future<void> _loadCurrentUser() async {
                 ),
                 title: Text(
                   'Choose from Gallery'.i18n,
-                  style: const TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -1005,11 +1005,11 @@ Future<void> _loadCurrentUser() async {
                 ListTile(
                   leading: const Icon(
                     Icons.delete,
-                    color: Colors.red,
+                    color: Theme.of(context).colorScheme.error,
                   ),
                   title: Text(
                     'Remove Photo'.i18n,
-                    style: const TextStyle(color: Colors.red),
+                    style: const TextStyle(color: Theme.of(context).colorScheme.error),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -1034,7 +1034,10 @@ Future<void> _loadCurrentUser() async {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Stack(
+      body: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Stack(
         children: [
           SafeArea(
             bottom: false,
@@ -1046,12 +1049,12 @@ Future<void> _loadCurrentUser() async {
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                   child: Row(
                     children: [
-                      const Icon(Icons.settings,
-                          color: AppColors.primary, size: 28),
+                      Icon(Icons.settings,
+                          color: Theme.of(context).colorScheme.primary, size: 28),
                       const SizedBox(width: 12),
                       Text(
                         'Settings'.i18n,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -1110,7 +1113,7 @@ Future<void> _loadCurrentUser() async {
                           children: [
                             Text(
                               'Profile Picture'.i18n,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -1235,14 +1238,14 @@ Future<void> _loadCurrentUser() async {
                 _buildSettingItem(
                   icon: Icons.logout,
                   title: 'Logout'.i18n,
-                  iconColor: Colors.orange,
+                  iconColor: Theme.of(context).colorScheme.tertiary,
                   onTap: _handleLogout,
                 ),
                 _buildSettingItem(
                   icon: Icons.delete_forever,
                   title: 'Delete Account'.i18n,
                   subtitle: 'This action cannot be undone'.i18n,
-                  iconColor: Colors.red,
+                  iconColor: Theme.of(context).colorScheme.error,
                   onTap: _handleDeleteAccount,
                   isWarning: true,
                 ),
@@ -1255,6 +1258,8 @@ Future<void> _loadCurrentUser() async {
           ),
         ],
       ),
+    ),
+  ),
     );
   }
 }

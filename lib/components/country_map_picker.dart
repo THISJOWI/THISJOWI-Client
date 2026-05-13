@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
-import 'package:thisjowi/core/app_colors.dart';
 
 class CountryMapPicker extends StatefulWidget {
   const CountryMapPicker({super.key});
@@ -77,7 +76,7 @@ class _CountryMapPickerState extends State<CountryMapPicker> {
               onPressed: () {
                 Navigator.pop(context, _selectedCountry);
               },
-              child: const Text("Confirm", style: TextStyle(color: AppColors.secondary, fontWeight: FontWeight.bold)),
+              child: Text("Confirm", style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontWeight: FontWeight.bold)),
             )
         ],
       ),
@@ -104,9 +103,9 @@ class _CountryMapPickerState extends State<CountryMapPicker> {
                       point: _selectedPoint!,
                       width: 40,
                       height: 40,
-                      child: const Icon(
+                      child: Icon(
                         Icons.location_on,
-                        color: AppColors.secondary,
+                        color: Theme.of(context).colorScheme.secondary,
                         size: 40,
                       ),
                     ),
@@ -115,8 +114,8 @@ class _CountryMapPickerState extends State<CountryMapPicker> {
             ],
           ),
           if (_loading)
-            const Center(
-              child: CircularProgressIndicator(color: AppColors.secondary),
+            Center(
+              child: CircularProgressIndicator(color: Theme.of(context).colorScheme.secondary),
             ),
           if (_selectedCountry != null && !_loading)
             Positioned(

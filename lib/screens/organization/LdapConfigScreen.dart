@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/services/organizationService.dart';
 import 'package:thisjowi/data/models/organization.dart';
 import 'package:thisjowi/components/error_bar.dart';
@@ -164,9 +163,9 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
       margin: const EdgeInsets.only(bottom: 24),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E).withValues(alpha: 0.4),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,8 +173,8 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
           if (title != null) ...[
             Text(
               title,
-              style: const TextStyle(
-                color: AppColors.primary,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -201,7 +200,7 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
       child: TextFormField(
         controller: controller,
         obscureText: isPassword,
-        style: const TextStyle(color: AppColors.text),
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         validator: required
             ? (value) {
                 if (value == null || value.isEmpty) {
@@ -214,20 +213,20 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
           labelText: label,
           hintText: hint,
           prefixIcon: icon != null
-              ? Icon(icon, color: AppColors.text.withValues(alpha: 0.5), size: 20)
+              ? Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), size: 20)
               : null,
-          labelStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.5)),
-          hintStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.2)),
+          labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: AppColors.primary),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
           ),
           filled: true,
-          fillColor: Colors.black.withValues(alpha: 0.2),
+          fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         ),
@@ -238,15 +237,15 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        backgroundColor: Colors.black,
+      return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body:
-            Center(child: CircularProgressIndicator(color: AppColors.primary)),
+            Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary)),
       );
     }
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text('LDAP Configuration'.i18n,
@@ -268,7 +267,7 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.primary.withValues(alpha: 0.15),
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
                     Colors.transparent,
                   ],
                 ),
@@ -285,7 +284,7 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.accent.withValues(alpha: 0.1),
+                    Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.1),
                     Colors.transparent,
                   ],
                 ),
@@ -357,19 +356,19 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.2),
+                            color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.05)),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05)),
                           ),
                           child: SwitchListTile(
                             title: Text('Enable LDAP Login'.i18n,
-                                style: const TextStyle(
-                                    color: AppColors.text, fontSize: 15)),
+                                style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onSurface, fontSize: 15)),
                             value: _ldapEnabled,
                             onChanged: (val) =>
                                 setState(() => _ldapEnabled = val),
-                            activeThumbColor: AppColors.primary,
+                            activeThumbColor: Theme.of(context).colorScheme.primary,
                             contentPadding: EdgeInsets.zero,
                           ),
                         ),
@@ -384,19 +383,19 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 18),
                               side: BorderSide(
-                                  color: Colors.white.withValues(alpha: 0.1)),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20)),
                             ),
                             child: _isTesting
-                                ? const SizedBox(
+                                ? SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: CircularProgressIndicator(
-                                        strokeWidth: 2, color: AppColors.text))
+                                        strokeWidth: 2, color: Theme.of(context).colorScheme.onSurface))
                                 : Text('Test Connection'.i18n,
-                                    style: const TextStyle(
-                                        color: AppColors.text,
+                                    style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onSurface,
                                         fontWeight: FontWeight.bold)),
                           ),
                         ),
@@ -405,12 +404,12 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
-                              gradient: const LinearGradient(
-                                colors: [AppColors.primary, AppColors.accent],
+                              gradient: LinearGradient(
+                                colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.tertiary],
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.3),
+                                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                                   blurRadius: 12,
                                   offset: const Offset(0, 6),
                                 ),
@@ -431,12 +430,12 @@ class _LdapConfigScreenState extends State<LdapConfigScreen> {
                                       width: 20,
                                       height: 20,
                                       child: CircularProgressIndicator(
-                                          color: Colors.white, strokeWidth: 2))
+                                          color: Theme.of(context).colorScheme.onSurface, strokeWidth: 2))
                                   : Text('Save Configuration'.i18n,
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white)),
+                                          color: Theme.of(context).colorScheme.onSurface)),
                             ),
                           ),
                         ),

@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/i18n/translations.dart';
 
 class DeploymentModeSelector extends StatefulWidget {
@@ -100,13 +99,13 @@ class _DeploymentModeSelectorState extends State<DeploymentModeSelector>
           shape: BoxShape.circle,
           gradient: LinearGradient(
             colors: [
-              AppColors.primary.withValues(alpha: 0.3),
-              AppColors.accent.withValues(alpha: 0.2),
+              Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.2),
             ],
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.2),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
               blurRadius: 30,
               spreadRadius: 5,
             ),

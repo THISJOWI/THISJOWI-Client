@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thisjowi/components/liquid_glass.dart';
 
 class ExpandableActionButton extends StatefulWidget {
   final VoidCallback onCreatePassword;
@@ -101,47 +102,35 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
         alignment: Alignment.bottomRight,
         child: Padding(
           padding: EdgeInsets.only(bottom: bottomPadding),
-          child: GestureDetector(
-            onTap: onTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.18),
-                    Colors.white.withValues(alpha: 0.08),
+          child: LiquidGlass.container(
+            context: context,
+            blur: 15,
+            opacity: 0.45,
+            borderRadius: 24,
+            padding: EdgeInsets.zero,
+            tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+            child: GestureDetector(
+              onTap: onTap,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(icon,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
+                        size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
                   ],
                 ),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.25),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.25),
-                    blurRadius: 16,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 18),
-                  const SizedBox(width: 8),
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                ],
               ),
             ),
           ),
@@ -187,7 +176,7 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
             label: 'Nota',
             bottomPadding: 75.0,
           ),
-        // Main FAB button - Pill shape with premium look
+        // Main FAB button - Pill shape
         GestureDetector(
           onTap: _toggleExpand,
           child: TweenAnimationBuilder<double>(
@@ -195,32 +184,13 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOutCubic,
             builder: (context, value, child) {
-              return Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(28),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color.lerp(
-                        const Color(0xFF3A3A3C),
-                        const Color(0xFF48484A),
-                        value,
-                      )!,
-                      Color.lerp(
-                        const Color(0xFF2C2C2E),
-                        const Color(0xFF3A3A3C),
-                        value,
-                      )!,
-                    ],
-                  ),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.15 + (value * 0.1)),
-                    width: 1,
-                  ),
-                ),
+              return LiquidGlass.container(
+                context: context,
+                blur: 10,
+                opacity: 0.5,
+                borderRadius: 28,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -228,7 +198,7 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
                       angle: value * 0.785,
                       child: Icon(
                         _isExpanded ? Icons.close_rounded : Icons.add_rounded,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         size: 22,
                       ),
                     ),
@@ -244,10 +214,10 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
                         width: _isExpanded ? 0 : null,
                         child: _isExpanded
                             ? const SizedBox.shrink()
-                            : const Text(
+                            : Text(
                                 'Crear',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 0.5,

@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../services/ldapAuthService.dart';
 import 'package:thisjowi/components/navigation.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import '../../i18n/translationService.dart';
 
@@ -125,7 +124,7 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.primary.withValues(alpha: 0.2),
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                     Colors.transparent,
                   ],
                 ),
@@ -142,7 +141,7 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.accent.withValues(alpha: 0.2),
+                    Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.2),
                     Colors.transparent,
                   ],
                 ),
@@ -179,10 +178,10 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                                 border: Border.all(
                                     color: Colors.white.withValues(alpha: 0.1)),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.business_rounded,
                                 size: 40,
-                                color: AppColors.primary,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                             ),
                             const SizedBox(height: 24),
@@ -250,8 +249,8 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(20),
-                                        borderSide: const BorderSide(
-                                            color: AppColors.primary),
+                                        borderSide: BorderSide(
+                                            color: Theme.of(context).colorScheme.primary),
                                       ),
                                       filled: true,
                                       fillColor: Colors.black.withValues(alpha: 0.2),
@@ -304,8 +303,8 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(20),
-                                        borderSide: const BorderSide(
-                                            color: AppColors.primary),
+                                        borderSide: BorderSide(
+                                            color: Theme.of(context).colorScheme.primary),
                                       ),
                                       filled: true,
                                       fillColor: Colors.black.withValues(alpha: 0.2),
@@ -359,15 +358,15 @@ class _LdapLoginScreenState extends State<LdapLoginScreen> {
                                     height: 56,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
-                                      gradient: const LinearGradient(
+                                      gradient: LinearGradient(
                                         colors: [
-                                          AppColors.primary,
-                                          AppColors.accent
+                                          Theme.of(context).colorScheme.primary,
+                                          Theme.of(context).colorScheme.tertiary
                                         ],
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppColors.primary
+                                          color: Theme.of(context).colorScheme.primary
                                               .withValues(alpha: 0.3),
                                           blurRadius: 12,
                                           offset: const Offset(0, 6),

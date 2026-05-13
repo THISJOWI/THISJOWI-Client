@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thisjowi/components/liquid_glass.dart';
 
 class AuthMethodSelector extends StatelessWidget {
   final VoidCallback onLdapTap;
@@ -16,215 +17,147 @@ class AuthMethodSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Column(
         children: [
-          const Text(
+          Text(
             'Selecciona cómo deseas ingresar',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: Colors.grey,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
           if (onSamlTap != null) ...[
-            Row(
-              children: [
-                // Opción SAML
-                Expanded(
-                  child: GestureDetector(
-                    onTap: onSamlTap,
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.indigo.shade700, width: 2),
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.indigo.shade50,
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: Colors.indigo.shade700,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.shield_outlined,
-                              color: Colors.white,
-                              size: 28,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'SSO Empresarial',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'SAML / Azure AD',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade600,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            _buildOption(
+              context: context,
+              onTap: onSamlTap!,
+              icon: Icons.shield_outlined,
+              title: 'SSO Empresarial',
+              subtitle: 'SAML / Azure AD',
+              accentColor: Theme.of(context).colorScheme.primary,
             ),
             const SizedBox(height: 12),
           ],
           Row(
             children: [
-              // Opción LDAP
               Expanded(
-                child: GestureDetector(
+                child: _buildOption(
+                  context: context,
                   onTap: onLdapTap,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blue.shade700, width: 2),
-                      borderRadius: BorderRadius.circular(12),
-                      color: Colors.blue.shade50,
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.blue.shade700,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.business,
-                            color: Colors.white,
-                            size: 28,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'LDAP Corporativo',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Cuenta empresarial',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
+                  icon: Icons.business,
+                  title: 'LDAP Corporativo',
+                  subtitle: 'Cuenta empresarial',
+                  accentColor: Theme.of(context).colorScheme.tertiary,
                 ),
               ),
               const SizedBox(width: 12),
-              // Opción Regular
               Expanded(
-                child: GestureDetector(
+                child: _buildOption(
+                  context: context,
                   onTap: onRegularTap,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade400, width: 1),
-                      borderRadius: BorderRadius.circular(12),
-                      color: Colors.grey.shade50,
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade400,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.person,
-                            color: Colors.white,
-                            size: 28,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Cuenta Regular',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Email y contraseña',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
+                  icon: Icons.person,
+                  title: 'Cuenta Regular',
+                  subtitle: 'Email y contraseña',
+                  accentColor: Theme.of(context).colorScheme.secondary,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          // Opción Google
           GestureDetector(
             onTap: onGoogleTap,
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300, width: 1),
-                borderRadius: BorderRadius.circular(12),
-                color: Colors.white,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    'assets/google_logo.png',
-                    width: 24,
-                    height: 24,
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Continuar con Google',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+            child: LiquidGlass.container(
+              context: context,
+              blur: 8,
+              opacity: 0.35,
+              borderRadius: 12,
+              padding: EdgeInsets.zero,
+              tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/google_logo.png',
+                      width: 24,
+                      height: 24,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 12),
+                    Text(
+                      'Continuar con Google',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildOption({
+    required BuildContext context,
+    required VoidCallback onTap,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color accentColor,
+  }) {
+    return LiquidGlass.container(
+      context: context,
+      blur: 8,
+      opacity: 0.35,
+      borderRadius: 12,
+      padding: EdgeInsets.zero,
+      tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: accentColor,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: Theme.of(context).colorScheme.onPrimary, size: 28),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

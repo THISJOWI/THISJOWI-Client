@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:thisjowi/services/biometricService.dart';
-import 'package:thisjowi/core/app_colors.dart';
 
 /// Widget to configure biometric app lock settings
 class BiometricLockSettings extends StatefulWidget {
@@ -106,18 +105,18 @@ class _BiometricLockSettingsState extends State<BiometricLockSettings> {
       return ListTile(
         leading: Icon(
           Icons.lock_outline,
-          color: AppColors.text.withValues(alpha: 0.4),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
         ),
         title: Text(
           'Bloqueo biométrico',
           style: TextStyle(
-            color: AppColors.text.withValues(alpha: 0.4),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
           ),
         ),
         subtitle: Text(
           'No disponible en este dispositivo',
           style: TextStyle(
-            color: AppColors.text.withValues(alpha: 0.3),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
             fontSize: 12,
           ),
         ),
@@ -127,12 +126,12 @@ class _BiometricLockSettingsState extends State<BiometricLockSettings> {
     return ListTile(
       leading: Icon(
         _getBiometricIcon(),
-        color: _isLockEnabled ? AppColors.primary : AppColors.text.withValues(alpha: 0.6),
+        color: _isLockEnabled ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
       ),
       title: Text(
         'Bloquear con $_biometricTypeName',
         style: TextStyle(
-          color: AppColors.text,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
       subtitle: Text(
@@ -140,14 +139,14 @@ class _BiometricLockSettingsState extends State<BiometricLockSettings> {
             ? 'Se pedirá $_biometricTypeName al abrir la app'
             : 'La app se abrirá sin verificación',
         style: TextStyle(
-          color: AppColors.text.withValues(alpha: 0.6),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           fontSize: 12,
         ),
       ),
       trailing: Switch(
         value: _isLockEnabled,
         onChanged: _toggleBiometricLock,
-        activeThumbColor: AppColors.primary,
+        activeThumbColor: Theme.of(context).colorScheme.primary,
       ),
     );
   }
@@ -244,13 +243,13 @@ class _BiometricLockSettingsCardState extends State<BiometricLockSettingsCard> {
               height: 48,
               decoration: BoxDecoration(
                 color: _isLockEnabled 
-                    ? AppColors.primary.withValues(alpha: 0.1)
-                    : AppColors.text.withValues(alpha: 0.05),
+                    ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 _getBiometricIcon(),
-                color: _isLockEnabled ? AppColors.primary : AppColors.text.withValues(alpha: 0.4),
+                color: _isLockEnabled ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                 size: 28,
               ),
             ),
@@ -264,7 +263,7 @@ class _BiometricLockSettingsCardState extends State<BiometricLockSettingsCard> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.text,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -274,7 +273,7 @@ class _BiometricLockSettingsCardState extends State<BiometricLockSettingsCard> {
                         : 'Desactivado',
                     style: TextStyle(
                       fontSize: 12,
-                      color: _isLockEnabled ? Colors.green : AppColors.text.withValues(alpha: 0.5),
+                      color: _isLockEnabled ? Colors.green : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                 ],
@@ -283,7 +282,7 @@ class _BiometricLockSettingsCardState extends State<BiometricLockSettingsCard> {
             Switch(
               value: _isLockEnabled,
               onChanged: _toggleBiometricLock,
-              activeThumbColor: AppColors.primary,
+              activeThumbColor: Theme.of(context).colorScheme.primary,
             ),
           ],
         ),

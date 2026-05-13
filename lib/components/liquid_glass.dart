@@ -35,6 +35,7 @@ class LiquidGlass {
   /// Creates a subtle glass effect container
   static Widget container({
     required Widget child,
+    BuildContext? context,
     double blur = subtleBlur,
     double opacity = subtleOpacity,
     double borderRadius = mediumRadius,
@@ -44,8 +45,13 @@ class LiquidGlass {
     double? width,
     double? height,
     bool interactive = false,
+    bool showBorder = true,
     VoidCallback? onTap,
   }) {
+    final brightness = context != null
+        ? Theme.of(context).brightness
+        : Brightness.dark;
+
     Widget glassWidget = Container(
       width: width,
       height: height,
@@ -57,13 +63,15 @@ class LiquidGlass {
           child: Container(
             padding: padding,
             decoration: BoxDecoration(
-              color: _getGlassColor(tint, opacity),
+              color: _getGlassColor(tint, opacity, brightness),
               borderRadius: BorderRadius.circular(borderRadius),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.1),
-                width: 0.5,
-              ),
-              gradient: _getGlassGradient(tint, opacity),
+              border: showBorder
+                  ? Border.all(
+                      color: _getBorderColor(brightness),
+                      width: 0.5,
+                    )
+                  : null,
+              gradient: _getGlassGradient(tint, opacity, brightness),
             ),
             child: child,
           ),
@@ -90,6 +98,7 @@ class LiquidGlass {
   /// Creates a warning glass container with subtle red tint
   static Widget warningContainer({
     required Widget child,
+    BuildContext? context,
     double blur = mediumBlur,
     double opacity = mediumOpacity,
     double borderRadius = mediumRadius,
@@ -98,6 +107,7 @@ class LiquidGlass {
     VoidCallback? onTap,
   }) {
     return container(
+      context: context,
       child: child,
       blur: blur,
       opacity: opacity,
@@ -112,6 +122,7 @@ class LiquidGlass {
   /// Creates a prominent glass container for important sections
   static Widget prominentContainer({
     required Widget child,
+    BuildContext? context,
     double blur = mediumBlur,
     double opacity = mediumOpacity,
     double borderRadius = largeRadius,
@@ -121,6 +132,7 @@ class LiquidGlass {
     VoidCallback? onTap,
   }) {
     return container(
+      context: context,
       child: child,
       blur: blur,
       opacity: opacity,
@@ -135,6 +147,7 @@ class LiquidGlass {
   /// Creates a glass card with enhanced styling
   static Widget card({
     required Widget child,
+    BuildContext? context,
     double blur = subtleBlur,
     double opacity = subtleOpacity,
     double borderRadius = mediumRadius,
@@ -144,6 +157,7 @@ class LiquidGlass {
     VoidCallback? onTap,
   }) {
     return container(
+      context: context,
       child: child,
       blur: blur,
       opacity: opacity,
@@ -156,15 +170,28 @@ class LiquidGlass {
   }
 
   /// Helper method to get glass color based on theme
-  static Color _getGlassColor(Color? tint, double opacity) {
+  static Color _getGlassColor(Color? tint, double opacity, Brightness brightness) {
     if (tint != null) {
       return tint.withValues(alpha: opacity);
     }
+    if (brightness == Brightness.light) {
+      // Subtle cool-gray tint for light mode glass
+      return const Color(0xFFDCE4F0).withValues(alpha: opacity);
+    }
+    // White tint for dark mode
     return Colors.white.withValues(alpha: opacity);
   }
 
+  /// Helper method to get border color based on theme
+  static Color _getBorderColor(Brightness brightness) {
+    if (brightness == Brightness.light) {
+      return const Color(0xFFB0B8C8).withValues(alpha: 0.3);
+    }
+    return Colors.white.withValues(alpha: 0.1);
+  }
+
   /// Helper method to create glass gradient with multi-layer reflection effect
-  static LinearGradient? _getGlassGradient(Color? tint, double opacity) {
+  static LinearGradient? _getGlassGradient(Color? tint, double opacity, Brightness brightness) {
     if (tint != null) {
       return LinearGradient(
         begin: Alignment.topLeft,
@@ -175,7 +202,18 @@ class LiquidGlass {
         ],
       );
     }
-    // Multi-layer gradient for authentic liquid glass reflection
+    if (brightness == Brightness.light) {
+      return LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFFE8EEF8).withValues(alpha: opacity * 0.8),
+          const Color(0xFFD0D8E8).withValues(alpha: opacity * 0.4),
+        ],
+        stops: const [0.0, 1.0],
+      );
+    }
+    // Multi-layer gradient for authentic liquid glass reflection in dark mode
     return LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
@@ -404,6 +442,9 @@ class _MorphingGlassContainerState extends State<_MorphingGlassContainer>
         final currentRadius = _radiusAnimation.value;
         final currentScale = _scaleAnimation.value;
 
+        final brightness = Theme.of(context).brightness;
+        final isLight = brightness == Brightness.light;
+
         Widget glassContent = Transform.scale(
           scale: currentScale,
           child: ClipRRect(
@@ -416,21 +457,28 @@ class _MorphingGlassContainerState extends State<_MorphingGlassContainer>
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: currentOpacity),
+                  color: isLight
+                      ? const Color(0xFFDCE4F0).withValues(alpha: currentOpacity)
+                      : Colors.white.withValues(alpha: currentOpacity),
                   borderRadius: BorderRadius.circular(currentRadius),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 
-                      widget.isActive ? 0.2 : 0.1,
-                    ),
+                    color: isLight
+                        ? const Color(0xFFB0B8C8).withValues(alpha: widget.isActive ? 0.4 : 0.25)
+                        : Colors.white.withValues(alpha: widget.isActive ? 0.2 : 0.1),
                     width: widget.isActive ? 1.0 : 0.5,
                   ),
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white.withValues(alpha: currentOpacity * 0.8),
-                      Colors.white.withValues(alpha: currentOpacity * 0.4),
-                    ],
+                    colors: isLight
+                        ? [
+                            const Color(0xFFE8EEF8).withValues(alpha: currentOpacity * 0.8),
+                            const Color(0xFFD0D8E8).withValues(alpha: currentOpacity * 0.4),
+                          ]
+                        : [
+                            Colors.white.withValues(alpha: currentOpacity * 0.8),
+                            Colors.white.withValues(alpha: currentOpacity * 0.4),
+                          ],
                   ),
                 ),
                 child: widget.child,
@@ -493,6 +541,9 @@ class GlassEffectContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final isLight = brightness == Brightness.light;
+
     return Container(
       margin: margin,
       child: ClipRRect(
@@ -502,19 +553,28 @@ class GlassEffectContainer extends StatelessWidget {
           child: Container(
             padding: padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: opacity),
+              color: isLight
+                  ? const Color(0xFFDCE4F0).withValues(alpha: opacity)
+                  : Colors.white.withValues(alpha: opacity),
               borderRadius: BorderRadius.circular(borderRadius),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: isLight
+                    ? const Color(0xFFB0B8C8).withValues(alpha: 0.3)
+                    : Colors.white.withValues(alpha: 0.1),
                 width: 0.5,
               ),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withValues(alpha: opacity * 0.8),
-                  Colors.white.withValues(alpha: opacity * 0.4),
-                ],
+                colors: isLight
+                    ? [
+                        const Color(0xFFE8EEF8).withValues(alpha: opacity * 0.8),
+                        const Color(0xFFD0D8E8).withValues(alpha: opacity * 0.4),
+                      ]
+                    : [
+                        Colors.white.withValues(alpha: opacity * 0.8),
+                        Colors.white.withValues(alpha: opacity * 0.4),
+                      ],
               ),
             ),
             child: child,
@@ -659,6 +719,8 @@ class _NavigationItem extends StatelessWidget {
       animation: controller,
       builder: (context, child) {
         final progress = controller.value;
+        final brightness = Theme.of(context).brightness;
+        final isLight = brightness == Brightness.light;
         
         // Smooth interpolation values
         final blur = LiquidGlass.subtleBlur + (LiquidGlass.mediumBlur - LiquidGlass.subtleBlur) * progress;
@@ -667,9 +729,22 @@ class _NavigationItem extends StatelessWidget {
         final iconSize = 20.0 + (4.0 * progress);
         
         // Color interpolation
-        final activeColor = Theme.of(context).primaryColor;
-        final inactiveColor = Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.6) ?? Colors.grey;
+        final activeColor = Theme.of(context).colorScheme.primary;
+        final inactiveColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
         final color = Color.lerp(inactiveColor, activeColor, progress)!;
+
+        final bgColor = isLight
+            ? const Color(0xFFDCE4F0).withValues(alpha: opacity * (0.5 + 0.5 * progress))
+            : Colors.white.withValues(alpha: opacity * (0.5 + 0.5 * progress));
+        final borderColor = isLight
+            ? const Color(0xFFB0B8C8).withValues(alpha: 0.25 + 0.15 * progress)
+            : Colors.white.withValues(alpha: 0.1 + 0.1 * progress);
+        final gradStart = isLight
+            ? const Color(0xFFE8EEF8).withValues(alpha: opacity * 0.8)
+            : Colors.white.withValues(alpha: opacity * 0.8);
+        final gradEnd = isLight
+            ? const Color(0xFFD0D8E8).withValues(alpha: opacity * 0.4)
+            : Colors.white.withValues(alpha: opacity * 0.4);
 
         return GestureDetector(
           onTap: onTap,
@@ -685,19 +760,16 @@ class _NavigationItem extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: opacity * (0.5 + 0.5 * progress)),
+                      color: bgColor,
                       borderRadius: BorderRadius.circular(LiquidGlass.smallRadius + (4 * progress)),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.1 + 0.1 * progress),
+                        color: borderColor,
                         width: 0.5 + (0.5 * progress),
                       ),
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white.withValues(alpha: opacity * 0.8),
-                          Colors.white.withValues(alpha: opacity * 0.4),
-                        ],
+                        colors: [gradStart, gradEnd],
                       ),
                     ),
                     child: Column(
@@ -807,10 +879,12 @@ class LiquidGlassListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final glassWidget = isWarning
         ? LiquidGlass.warningContainer(
+            context: context,
             child: _buildContent(context),
             onTap: onTap,
           )
         : LiquidGlass.card(
+            context: context,
             child: _buildContent(context),
             onTap: onTap,
           );

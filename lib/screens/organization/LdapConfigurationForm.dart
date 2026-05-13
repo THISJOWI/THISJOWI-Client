@@ -90,7 +90,7 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('✅ Conexión LDAP exitosa'),
-              backgroundColor: Colors.green,
+              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           );
         } else {
@@ -98,7 +98,7 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('❌ Error: $_connectionStatus'),
-              backgroundColor: Colors.red,
+              backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
         }
@@ -111,7 +111,7 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error al probar conexión: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
     } finally {
@@ -128,7 +128,7 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('⚠️ Debe probar la conexión LDAP antes de guardar'),
-          backgroundColor: Colors.orange,
+          backgroundColor: Theme.of(context).colorScheme.tertiary,
         ),
       );
       return;
@@ -162,7 +162,7 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('✅ Configuración guardada exitosamente'),
-              backgroundColor: Colors.green,
+              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           );
           Navigator.pop(context);
@@ -170,7 +170,7 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error: ${response['message']}'),
-              backgroundColor: Colors.red,
+              backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
         }
@@ -180,7 +180,7 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al guardar: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -219,7 +219,7 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
                   children: [
                     // Info Card
                     Card(
-                      color: Colors.blue.shade50,
+                      color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
@@ -372,9 +372,9 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: _connectionValid ? Colors.green.shade50 : Colors.red.shade50,
+                          color: _connectionValid ? Theme.of(context).colorScheme.primary.shade50 : Theme.of(context).colorScheme.error.shade50,
                           border: Border.all(
-                            color: _connectionValid ? Colors.green : Colors.red,
+                            color: _connectionValid ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
                           ),
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -382,14 +382,14 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
                           children: [
                             Icon(
                               _connectionValid ? Icons.check_circle : Icons.error,
-                              color: _connectionValid ? Colors.green : Colors.red,
+                              color: _connectionValid ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
                             ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
                                 _connectionStatus!,
                                 style: TextStyle(
-                                  color: _connectionValid ? Colors.green.shade800 : Colors.red.shade800,
+                                  color: _connectionValid ? Theme.of(context).colorScheme.primary.shade800 : Theme.of(context).colorScheme.error.shade800,
                                 ),
                               ),
                             ),
@@ -413,8 +413,8 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
                                   )
                                 : const Text('Probar Conexión'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange,
-                              foregroundColor: Colors.white,
+                              backgroundColor: Theme.of(context).colorScheme.tertiary,
+                              foregroundColor: Theme.of(context).colorScheme.onSurface,
                               padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
                           ),
@@ -426,8 +426,8 @@ class _LdapConfigurationFormState extends State<LdapConfigurationForm> {
                             icon: const Icon(Icons.save),
                             label: const Text('Guardar'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              foregroundColor: Theme.of(context).colorScheme.onSurface,
                               padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
                           ),

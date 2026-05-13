@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/providers/otp_provider.dart';
 import 'package:thisjowi/core/service_locator.dart';
 import 'package:thisjowi/components/error_bar.dart';
@@ -67,22 +66,22 @@ class GlobalActions {
     }) {
       return TextField(
         controller: controller,
-        style: const TextStyle(color: AppColors.text),
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
-          labelStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.7)),
-          hintStyle: TextStyle(color: AppColors.text.withValues(alpha: 0.3)),
+          labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: AppColors.text.withValues(alpha: 0.2)),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.primary),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
           ),
           filled: true,
-          fillColor: AppColors.text.withValues(alpha: 0.05),
+          fillColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
         ),
       );
     }
@@ -91,9 +90,9 @@ class GlobalActions {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
+        backgroundColor: Theme.of(context).cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Add OTP', style: TextStyle(color: AppColors.text)),
+        title: Text('Add OTP', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -122,11 +121,11 @@ class GlobalActions {
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text('Cancel',
-                style: TextStyle(color: AppColors.text.withValues(alpha: 0.6))),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.black,
             ),
             onPressed: () => Navigator.pop(context, true),

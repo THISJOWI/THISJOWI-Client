@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/utils/app_logger.dart';
 
 /// Pantalla para visualizar logs de la aplicación
@@ -69,16 +68,16 @@ class _LogsScreenState extends State<LogsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.background,
-        title: const Text('Clear All Logs?', style: TextStyle(color: AppColors.text)),
-        content: const Text(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        title: Text('Clear All Logs?', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+        content: Text(
           'This will delete all log files. This action cannot be undone.',
-          style: TextStyle(color: AppColors.text),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel', style: TextStyle(color: AppColors.text)),
+            child: Text('Cancel', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
@@ -153,7 +152,7 @@ class _LogsScreenState extends State<LogsScreen> {
     } else if (line.contains('"level":"VERBOSE"') || line.contains('[VERBOSE]')) {
       return Colors.grey;
     }
-    return AppColors.text;
+    return Theme.of(context).colorScheme.onSurface;
   }
 
   String _formatFileName(String path) {
@@ -175,10 +174,10 @@ class _LogsScreenState extends State<LogsScreen> {
     final filteredLines = _getFilteredLines();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
-        foregroundColor: AppColors.text,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
         title: const Text('Application Logs'),
         actions: [
           if (_selectedLogContent != null)
@@ -208,7 +207,7 @@ class _LogsScreenState extends State<LogsScreen> {
                   width: 200,
                   decoration: BoxDecoration(
                     border: Border(
-                      right: BorderSide(color: AppColors.text.withValues(alpha: 0.1)),
+                      right: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
                     ),
                   ),
                   child: Column(
@@ -218,7 +217,7 @@ class _LogsScreenState extends State<LogsScreen> {
                         child: Text(
                           'Log Files',
                           style: TextStyle(
-                            color: AppColors.text,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
@@ -229,7 +228,7 @@ class _LogsScreenState extends State<LogsScreen> {
                             ? Center(
                                 child: Text(
                                   'No log files',
-                                  style: TextStyle(color: AppColors.text.withValues(alpha: 0.5)),
+                                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                                 ),
                               )
                             : ListView.builder(
@@ -240,11 +239,11 @@ class _LogsScreenState extends State<LogsScreen> {
 
                                   return ListTile(
                                     selected: isSelected,
-                                    selectedTileColor: AppColors.text.withValues(alpha: 0.1),
+                                    selectedTileColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                                     title: Text(
                                       _formatFileName(file.path),
                                       style: TextStyle(
-                                        color: AppColors.text,
+                                        color: Theme.of(context).colorScheme.onSurface,
                                         fontSize: 12,
                                       ),
                                       maxLines: 2,
@@ -267,30 +266,30 @@ class _LogsScreenState extends State<LogsScreen> {
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           border: Border(
-                            bottom: BorderSide(color: AppColors.text.withValues(alpha: 0.1)),
+                            bottom: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
                           ),
                         ),
                         child: Row(
                           children: [
                             Expanded(
                               child: TextField(
-                                style: const TextStyle(color: AppColors.text),
+                                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                                 decoration: InputDecoration(
                                   hintText: 'Filter logs...',
                                   hintStyle: TextStyle(
-                                    color: AppColors.text.withValues(alpha: 0.5),
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                                   ),
-                                  prefixIcon: const Icon(Icons.search, color: AppColors.text),
+                                  prefixIcon: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     borderSide: BorderSide(
-                                      color: AppColors.text.withValues(alpha: 0.3),
+                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                                     ),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     borderSide: BorderSide(
-                                      color: AppColors.text.withValues(alpha: 0.3),
+                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                                     ),
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 12),
@@ -301,11 +300,11 @@ class _LogsScreenState extends State<LogsScreen> {
                             const SizedBox(width: 8),
                             DropdownButton<LogLevel?>(
                               value: _levelFilter,
-                              dropdownColor: AppColors.background,
-                              style: const TextStyle(color: AppColors.text),
+                              dropdownColor: Theme.of(context).scaffoldBackgroundColor,
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                               hint: Text(
                                 'All Levels',
-                                style: TextStyle(color: AppColors.text.withValues(alpha: 0.7)),
+                                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                               ),
                               items: [
                                 const DropdownMenuItem(
@@ -329,7 +328,7 @@ class _LogsScreenState extends State<LogsScreen> {
                                 child: Text(
                                   'Select a log file to view',
                                   style: TextStyle(
-                                    color: AppColors.text.withValues(alpha: 0.5),
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                                   ),
                                 ),
                               )
@@ -338,7 +337,7 @@ class _LogsScreenState extends State<LogsScreen> {
                                     child: Text(
                                       'No matching logs',
                                       style: TextStyle(
-                                        color: AppColors.text.withValues(alpha: 0.5),
+                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                                       ),
                                     ),
                                   )
@@ -363,7 +362,7 @@ class _LogsScreenState extends State<LogsScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
                           border: Border(
-                            top: BorderSide(color: AppColors.text.withValues(alpha: 0.1)),
+                            top: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
                           ),
                         ),
                         child: Row(
@@ -371,7 +370,7 @@ class _LogsScreenState extends State<LogsScreen> {
                             Text(
                               '${filteredLines.length} entries',
                               style: TextStyle(
-                                color: AppColors.text.withValues(alpha: 0.7),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                 fontSize: 12,
                               ),
                             ),
@@ -380,7 +379,7 @@ class _LogsScreenState extends State<LogsScreen> {
                               Text(
                                 'File: ${_selectedFile!.path.split('/').last}',
                                 style: TextStyle(
-                                  color: AppColors.text.withValues(alpha: 0.7),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                   fontSize: 12,
                                 ),
                               ),

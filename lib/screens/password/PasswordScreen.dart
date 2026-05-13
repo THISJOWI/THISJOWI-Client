@@ -1,14 +1,13 @@
-import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/service_locator.dart';
 import 'package:thisjowi/data/models/password_entry.dart';
 import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/components/button.dart';
 import 'package:thisjowi/components/error_bar.dart';
+import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'EditPasswordScreen.dart';
 
@@ -88,16 +87,16 @@ class _PasswordScreenState extends State<PasswordScreen> {
     return await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: AppColors.background,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             title: Text('Delete password?'.i18n,
-                style: TextStyle(color: AppColors.text)),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             content: Text('Are you sure you want to delete "${entry.title}"?',
-                style: TextStyle(color: AppColors.text)),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
                 child: Text('Cancel'.i18n,
-                    style: TextStyle(color: AppColors.text)),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
@@ -135,7 +134,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
       barrierColor: Colors.black.withValues(alpha: 0.5),
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => Dialog(
-          backgroundColor: const Color.fromRGBO(30, 30, 30, 1.0),
+          backgroundColor: Theme.of(context).cardColor,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           insetPadding: const EdgeInsets.all(20),
@@ -152,8 +151,8 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       Expanded(
                         child: Text(
                           entry.title,
-                          style: const TextStyle(
-                            color: AppColors.text,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
@@ -162,7 +161,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
                         child: Icon(Icons.close,
-                            color: AppColors.text.withValues(alpha: 0.6), size: 24),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 24),
                       ),
                     ],
                   ),
@@ -170,33 +169,33 @@ class _PasswordScreenState extends State<PasswordScreen> {
                   if (entry.website.isNotEmpty) ...[
                     Text('Website'.i18n,
                         style: TextStyle(
-                            color: AppColors.text.withValues(alpha: 0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             fontSize: 13,
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.text.withValues(alpha: 0.05),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(entry.website,
-                          style: const TextStyle(
-                              color: AppColors.text, fontSize: 14)),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
                     ),
                     const SizedBox(height: 16),
                   ],
                   if (entry.username.isNotEmpty) ...[
                     Text('User',
                         style: TextStyle(
-                            color: AppColors.text.withValues(alpha: 0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             fontSize: 13,
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.text.withValues(alpha: 0.05),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -204,11 +203,11 @@ class _PasswordScreenState extends State<PasswordScreen> {
                         children: [
                           Expanded(
                               child: Text(entry.username,
-                                  style: const TextStyle(
-                                      color: AppColors.text, fontSize: 14))),
+                                  style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface, fontSize: 14))),
                           IconButton(
                             icon: Icon(Icons.copy,
-                                color: AppColors.text.withValues(alpha: 0.7),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                 size: 18),
                             onPressed: () {
                               Clipboard.setData(
@@ -226,14 +225,14 @@ class _PasswordScreenState extends State<PasswordScreen> {
                   ],
                   Text('Password'.i18n,
                       style: TextStyle(
-                          color: AppColors.text.withValues(alpha: 0.6),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                           fontSize: 13,
                           fontWeight: FontWeight.w500)),
                   const SizedBox(height: 6),
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: AppColors.text.withValues(alpha: 0.05),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -244,8 +243,8 @@ class _PasswordScreenState extends State<PasswordScreen> {
                             showPassword
                                 ? entry.password
                                 : '•' * entry.password.length,
-                            style: const TextStyle(
-                                color: AppColors.text,
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 14,
                                 letterSpacing: 1),
                             maxLines: 2,
@@ -257,7 +256,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                             showPassword
                                 ? Icons.visibility
                                 : Icons.visibility_off,
-                            color: AppColors.text.withValues(alpha: 0.7),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             size: 18,
                           ),
                           onPressed: () =>
@@ -268,7 +267,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                         const SizedBox(width: 8),
                         IconButton(
                           icon: Icon(Icons.copy,
-                              color: AppColors.text.withValues(alpha: 0.7), size: 18),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), size: 18),
                           onPressed: () {
                             Clipboard.setData(
                                 ClipboardData(text: entry.password));
@@ -285,19 +284,19 @@ class _PasswordScreenState extends State<PasswordScreen> {
                     const SizedBox(height: 16),
                     Text('Notes'.i18n,
                         style: TextStyle(
-                            color: AppColors.text.withValues(alpha: 0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             fontSize: 13,
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.text.withValues(alpha: 0.05),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(entry.notes,
-                          style: const TextStyle(
-                              color: AppColors.text, fontSize: 14)),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
                     ),
                   ],
                   const SizedBox(height: 24),
@@ -305,8 +304,8 @@ class _PasswordScreenState extends State<PasswordScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.text.withValues(alpha: 0.1),
-                        foregroundColor: AppColors.text,
+                        backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                        foregroundColor: Theme.of(context).colorScheme.onSurface,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
@@ -368,32 +367,28 @@ class _PasswordScreenState extends State<PasswordScreen> {
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-              child: RepaintBoundary(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(25),
-                        border:
-                            Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                      ),
-                      child: TextField(
-                        style: const TextStyle(
-                            color: AppColors.text, fontSize: 16),
+              child: LiquidGlass.container(
+                context: context,
+                blur: 10,
+                opacity: 0.5,
+                borderRadius: 25,
+                padding: EdgeInsets.zero,
+                showBorder: false,
+                tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+                child: TextField(
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
                         decoration: InputDecoration(
                           hintText: 'Search passwords'.i18n,
                           hintStyle: TextStyle(
-                              color: AppColors.text.withValues(alpha: 0.5),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                               fontSize: 16),
                           prefixIcon: Icon(Icons.search,
-                              color: AppColors.text.withValues(alpha: 0.6), size: 22),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 22),
                           suffixIcon: _searchQuery.isNotEmpty
                               ? IconButton(
                                   icon: Icon(Icons.close,
-                                      color: AppColors.text.withValues(alpha: 0.6),
+                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                       size: 20),
                                   onPressed: () {
                                     setState(() => _searchQuery = '');
@@ -402,6 +397,8 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                 )
                               : null,
                           border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 14),
                         ),
@@ -412,37 +409,30 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       ),
                     ),
                   ),
-                ),
-              ),
-            ),
             Expanded(
               child: _isLoading
                   ? Center(
-                      child: CircularProgressIndicator(color: AppColors.text))
+                      child: CircularProgressIndicator(color: Theme.of(context).colorScheme.onSurface))
                   : _passwords.isEmpty
                       ? Center(
                           child: Text('No passwords stored'.i18n,
-                              style: TextStyle(color: AppColors.text)),
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                         )
                       : ListView.builder(
                           itemCount: _passwords.length,
                           itemBuilder: (context, index) {
                             final entry = _passwords[index];
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 8.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.background,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: AppColors.text.withValues(alpha: 0.15),
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
+                            return LiquidGlass.container(
+                              context: context,
+                              blur: 10,
+                              opacity: 0.5,
+                              borderRadius: 12,
+                              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                              tint: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+                              padding: EdgeInsets.zero,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
                                     onTap: () => _showPasswordDetails(entry),
                                     borderRadius: BorderRadius.circular(12),
                                     child: Padding(
@@ -457,8 +447,8 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                               children: [
                                                 Text(
                                                   entry.title,
-                                                  style: const TextStyle(
-                                                    color: AppColors.text,
+                                                  style: TextStyle(
+                                                    color: Theme.of(context).colorScheme.onSurface,
                                                     fontWeight: FontWeight.w600,
                                                     fontSize: 16,
                                                   ),
@@ -469,7 +459,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                                       ? entry.username
                                                       : entry.website,
                                                   style: TextStyle(
-                                                    color: AppColors.text
+                                                    color: Theme.of(context).colorScheme.onSurface
                                                         .withValues(alpha: 0.6),
                                                     fontSize: 13,
                                                   ),
@@ -483,7 +473,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                           const SizedBox(width: 12),
                                           IconButton(
                                             icon: Icon(Icons.edit,
-                                                color: AppColors.text
+                                                color: Theme.of(context).colorScheme.onSurface
                                                     .withValues(alpha: 0.7),
                                                 size: 20),
                                             onPressed: () async {
@@ -508,7 +498,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                           ),
                                           IconButton(
                                             icon: Icon(Icons.delete,
-                                                color: AppColors.text
+                                                color: Theme.of(context).colorScheme.onSurface
                                                     .withValues(alpha: 0.7),
                                                 size: 20),
                                             onPressed: () =>
@@ -521,9 +511,8 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                     ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
                         ),
             ),
           ],

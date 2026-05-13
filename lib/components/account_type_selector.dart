@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/i18n/translations.dart';
 
 class AccountTypeSelector extends StatefulWidget {
@@ -98,13 +97,13 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector>
           shape: BoxShape.circle,
           gradient: LinearGradient(
             colors: [
-              AppColors.secondary.withValues(alpha: 0.3),
-              AppColors.primary.withValues(alpha: 0.2),
+              Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
+              Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
             ],
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.secondary.withValues(alpha: 0.2),
+              color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
               blurRadius: 30,
               spreadRadius: 5,
             ),

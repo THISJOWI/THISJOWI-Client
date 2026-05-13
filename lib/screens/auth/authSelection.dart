@@ -5,7 +5,6 @@ import 'login.dart';
 import 'ldapLogin.dart';
 import 'samlLogin.dart';
 
-/// Pantalla inicial que muestra opciones de autenticación
 class AuthSelectionScreen extends StatefulWidget {
   const AuthSelectionScreen({super.key});
 
@@ -16,11 +15,6 @@ class AuthSelectionScreen extends StatefulWidget {
 class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
   final GoogleAuthService _googleAuthService = GoogleAuthService();
   bool _isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -41,7 +35,7 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toString().replaceFirst('Exception: ', '')),
-          backgroundColor: Colors.red,
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
     }
@@ -49,7 +43,10 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
+      backgroundColor: cs.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -59,7 +56,6 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Logo y título
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 40),
                       child: Column(
@@ -70,25 +66,25 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  Colors.blue.shade700,
-                                  Colors.blue.shade500,
+                                  cs.primary,
+                                  cs.primary.withValues(alpha: 0.7),
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.shield_outlined,
-                              color: Colors.white,
+                              color: cs.onPrimary,
                               size: 50,
                             ),
                           ),
                           const SizedBox(height: 24),
-                          const Text(
+                          Text(
                             'ThisJowi',
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                              color: cs.onSurface,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -96,17 +92,14 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                             'Administrador de contraseñas seguro',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey.shade600,
+                              color: cs.onSurface.withValues(alpha: 0.6),
                             ),
                             textAlign: TextAlign.center,
                           ),
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 40),
-
-                    // Selector de método de autenticación
                     AuthMethodSelector(
                       onLdapTap: () {
                         Navigator.of(context).push(
@@ -132,20 +125,17 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                       onGoogleTap: _isLoading ? null : _handleGoogleLogin,
                     ),
                     if (_isLoading)
-                      const Padding(
-                        padding: EdgeInsets.only(top: 16),
-                        child: CircularProgressIndicator(),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: CircularProgressIndicator(color: cs.primary),
                       ),
-
                     const SizedBox(height: 40),
-
-                    // Información adicional
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
+                        color: cs.primary.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.blue.shade200),
+                        border: Border.all(color: cs.primary.withValues(alpha: 0.2)),
                       ),
                       child: Column(
                         children: [
@@ -153,7 +143,7 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                             children: [
                               Icon(
                                 Icons.info_outline,
-                                color: Colors.blue.shade700,
+                                color: cs.primary,
                                 size: 20,
                               ),
                               const SizedBox(width: 12),
@@ -162,7 +152,7 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                                   '¿Cómo sé cuál elegir?',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.blue.shade700,
+                                    color: cs.primary,
                                   ),
                                 ),
                               ),
@@ -173,7 +163,7 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                             'Usa LDAP Corporativo si tu empresa está registrada en ThisJowi. Usa SSO Empresarial si tu empresa usa Azure AD u otro proveedor SAML. Si no tienes una cuenta LDAP, crea una cuenta regular con tu email.',
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.blue.shade900,
+                              color: cs.onSurface.withValues(alpha: 0.7),
                               height: 1.5,
                             ),
                           ),
@@ -184,15 +174,13 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                 ),
               ),
             ),
-
-            // Footer
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Text(
                 '© 2026 ThisJowi. Todos los derechos reservados.',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey.shade500,
+                  color: cs.onSurface.withValues(alpha: 0.4),
                 ),
                 textAlign: TextAlign.center,
               ),

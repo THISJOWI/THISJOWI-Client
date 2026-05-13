@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/components/sync_debug_panel.dart';
 import 'package:thisjowi/data/local/database.dart';
 
@@ -12,11 +11,11 @@ class DebugScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Debug & Sync'),
-        backgroundColor: AppColors.background,
-        foregroundColor: AppColors.text,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -35,7 +34,7 @@ class DebugScreen extends StatelessWidget {
 
   Widget _buildDangerZone(BuildContext context) {
     return Card(
-      color: Colors.red.withValues(alpha: 0.1),
+      color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -56,7 +55,7 @@ class DebugScreen extends StatelessWidget {
               label: const Text('Delete Local Database'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+                foregroundColor: Theme.of(context).colorScheme.onError,
               ),
             ),
           ],

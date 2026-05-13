@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/components/navigation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -140,7 +139,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.text),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -157,7 +156,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.secondary.withValues(alpha: 0.3),
+                    Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -174,7 +173,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.primary.withValues(alpha: 0.3),
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -205,7 +204,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                           color: Colors.white.withValues(alpha: 0.05),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.secondary.withValues(alpha: 0.2),
+                              color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
                               blurRadius: 30,
                               spreadRadius: 10,
                             ),
@@ -214,7 +213,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         child: Icon(
                           Icons.mark_email_unread_outlined,
                           size: 60,
-                          color: AppColors.text,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -222,7 +221,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       Text(
                         'Verifica tu correo',
                         style: TextStyle(
-                          color: AppColors.text,
+                          color: Colors.white,
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5,
@@ -233,7 +232,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       Text(
                         'Hemos enviado un código de verificación a tu correo electrónico: ${widget.email}. Ingrésalo a continuación para continuar.',
                         style: TextStyle(
-                          color: AppColors.text.withValues(alpha: 0.6),
+                          color: Colors.white.withValues(alpha: 0.6),
                           fontSize: 15,
                           height: 1.5,
                         ),
@@ -262,8 +261,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                   controller: _codeController,
                                   keyboardType: TextInputType.number,
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    color: AppColors.text,
+                                  style: TextStyle(
+                                    color: Colors.white,
                                     fontSize: 28,
                                     letterSpacing: 12,
                                     fontWeight: FontWeight.bold,
@@ -273,7 +272,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                     counterText: "",
                                     hintText: "******",
                                     hintStyle: TextStyle(
-                                      color: AppColors.text.withValues(alpha: 0.2),
+                                      color: Colors.white.withValues(alpha: 0.2),
                                       letterSpacing: 12,
                                     ),
                                     filled: true,
@@ -285,7 +284,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(16),
                                       borderSide: BorderSide(
-                                        color: AppColors.secondary.withValues(alpha: 0.5),
+                                        color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.5),
                                         width: 1,
                                       ),
                                     ),
@@ -307,14 +306,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                   height: 56,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(16),
-                                    gradient: const LinearGradient(
-                                      colors: [AppColors.secondary, AppColors.accent],
+                                    gradient: LinearGradient(
+                                      colors: [Theme.of(context).colorScheme.secondary, Theme.of(context).colorScheme.tertiary],
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: AppColors.secondary.withValues(alpha: 0.3),
+                                        color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
                                         blurRadius: 12,
                                         offset: const Offset(0, 6),
                                       ),
@@ -358,7 +357,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         child: Text(
                           '¿No recibiste el código? Reenviar',
                           style: TextStyle(
-                            color: AppColors.secondary,
+                            color: Theme.of(context).colorScheme.secondary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),

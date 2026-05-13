@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/i18n/translationService.dart';
 import 'package:thisjowi/services/token_manager.dart';
 import 'package:thisjowi/services/messageService.dart';
@@ -88,10 +87,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
+      value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
+        statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark,
+        statusBarBrightness: Theme.of(context).brightness == Brightness.dark
+            ? Brightness.dark
+            : Brightness.light,
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -105,13 +108,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                     child: Row(
                       children: [
-                        const Icon(Icons.chat_bubble_outline,
-                            color: AppColors.primary, size: 28),
+                        Icon(Icons.chat_bubble_outline,
+                            color: Theme.of(context).colorScheme.primary, size: 28),
                         const SizedBox(width: 12),
                         Text(
                           'Messages'.tr(context),
-                          style: const TextStyle(
-                            color: AppColors.text,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
@@ -130,27 +133,27 @@ class _MessagesScreenState extends State<MessagesScreen> {
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1E1E1E).withValues(alpha: 0.6),
+                            color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
                             borderRadius: BorderRadius.circular(25),
                             border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.1)),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
                           ),
                           child: TextField(
-                            style: const TextStyle(
-                                color: AppColors.text, fontSize: 16),
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
                             decoration: InputDecoration(
                               hintText: 'Search'.tr(context),
                               hintStyle: TextStyle(
-                                  color: AppColors.text.withValues(alpha: 0.5),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                                   fontSize: 16),
                               prefixIcon: Icon(Icons.search,
-                                  color: AppColors.text.withValues(alpha: 0.6),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                   size: 22),
                               suffixIcon: _searchQuery.isNotEmpty
                                   ? IconButton(
                                       icon: Icon(Icons.close,
                                           color:
-                                              AppColors.text.withValues(alpha: 0.6),
+                                              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                           size: 20),
                                       onPressed: () {
                                         setState(() => _searchQuery = '');
@@ -254,11 +257,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.search_off_rounded,
-                size: 64, color: AppColors.text.withValues(alpha: 0.2)),
+                size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
             const SizedBox(height: 16),
             Text(
               'No encontramos resultados'.tr(context),
-              style: TextStyle(color: AppColors.text.withValues(alpha: 0.5)),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
             ),
           ],
         ),
@@ -278,7 +281,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
             child: Text(
               item.toUpperCase().tr(context),
               style: TextStyle(
-                color: AppColors.primary.withValues(alpha: 0.7),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
@@ -349,13 +352,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
           child: Container(
             decoration: BoxDecoration(
               color: isUnread
-                  ? AppColors.primary.withValues(alpha: 0.15)
-                  : const Color(0xFF1E1E1E).withValues(alpha: 0.6),
+                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.15)
+                  : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                   color: isUnread
-                      ? AppColors.primary.withValues(alpha: 0.3)
-                      : Colors.white.withValues(alpha: 0.1)),
+                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)
+                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
             ),
             child: Material(
               color: Colors.transparent,
@@ -376,11 +379,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 },
                 leading: CircleAvatar(
                   radius: 26,
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+                  backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                   child: Text(
                     initial,
-                    style: const TextStyle(
-                      color: AppColors.primary,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),
@@ -391,8 +394,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     Expanded(
                       child: Text(
                         title,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -400,7 +403,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     ),
                     if (isEncrypted)
                       Icon(Icons.lock_outline_rounded,
-                          size: 14, color: Colors.white.withValues(alpha: 0.3)),
+                          size: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
                   ],
                 ),
                 subtitle: Padding(
@@ -411,8 +414,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: isUnread
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.5),
+                          ? Theme.of(context).colorScheme.onSurface
+                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                       fontSize: 14,
                     ),
                   ),
@@ -421,15 +424,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     ? Container(
                         width: 10,
                         height: 10,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
                           shape: BoxShape.circle,
                         ),
                       )
                     : Icon(
                         Icons.arrow_forward_ios,
                         size: 14,
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                       ),
               ),
             ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/services/passwordService.dart';
 import 'package:thisjowi/services/token_manager.dart';
 import 'package:uuid/uuid.dart';
@@ -193,12 +192,12 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.2),
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.lock_outline,
-                        color: AppColors.primary,
+                        color: Theme.of(context).colorScheme.primary,
                         size: 24,
                       ),
                     ),
@@ -210,7 +209,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                           Text(
                             '¿Guardar contraseña?',
                             style: TextStyle(
-                              color: AppColors.text,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
@@ -219,7 +218,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                           Text(
                             'THISJOWI puede guardar esta contraseña para ti',
                             style: TextStyle(
-                              color: AppColors.text.withValues(alpha: 0.6),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               fontSize: 14,
                             ),
                           ),
@@ -269,7 +268,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                       _obscurePassword
                           ? Icons.visibility_outlined
                           : Icons.visibility_off_outlined,
-                      color: AppColors.text.withValues(alpha: 0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                     onPressed: () {
                       setState(() {
@@ -324,7 +323,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                       child: Text(
                         'Cancelar',
                         style: TextStyle(
-                          color: AppColors.text.withValues(alpha: 0.6),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                           fontSize: 16,
                         ),
                       ),
@@ -333,7 +332,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                     ElevatedButton(
                       onPressed: _isLoading ? null : _savePassword,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
@@ -384,22 +383,22 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
       controller: controller,
       obscureText: obscureText,
       maxLines: maxLines,
-      style: const TextStyle(
-        color: AppColors.text,
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.onSurface,
         fontSize: 16,
       ),
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(
-          color: AppColors.text.withValues(alpha: 0.6),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
         ),
         prefixIcon: Icon(
           icon,
-          color: AppColors.text.withValues(alpha: 0.6),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
         ),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: AppColors.background,
+        fillColor: Theme.of(context).scaffoldBackgroundColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -407,13 +406,13 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: AppColors.text.withValues(alpha: 0.6).withValues(alpha: 0.2),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6).withValues(alpha: 0.2),
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: AppColors.primary,
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
             width: 2,
           ),
         ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/i18n/translationService.dart';
 import 'package:thisjowi/services/samlAuthService.dart';
@@ -124,7 +123,7 @@ class _SamlLoginScreenState extends State<SamlLoginScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.primary.withValues(alpha: 0.3),
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -141,7 +140,7 @@ class _SamlLoginScreenState extends State<SamlLoginScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.accent.withValues(alpha: 0.3),
+                    Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -163,7 +162,7 @@ class _SamlLoginScreenState extends State<SamlLoginScreen> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.4),
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
                               blurRadius: 40,
                             ),
                           ],
@@ -316,17 +315,17 @@ class _SamlLoginScreenState extends State<SamlLoginScreen> {
                                 height: 56,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20),
-                                  gradient: const LinearGradient(
+                                  gradient: LinearGradient(
                                     colors: [
-                                      AppColors.primary,
-                                      AppColors.accent,
+                                      Theme.of(context).colorScheme.primary,
+                                      Theme.of(context).colorScheme.tertiary,
                                     ],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.primary.withValues(alpha: 0.3),
+                                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                                       blurRadius: 12,
                                       offset: const Offset(0, 6),
                                     ),

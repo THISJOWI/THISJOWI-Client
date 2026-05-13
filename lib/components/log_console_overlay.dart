@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/utils/app_logger.dart';
 
 /// Overlay flotante para mostrar logs en tiempo real durante desarrollo
@@ -82,11 +81,11 @@ void _clearLogs() {
           right: 16,
           child: FloatingActionButton(
             mini: true,
-            backgroundColor: AppColors.text.withValues(alpha: 0.8),
+            backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
             onPressed: () => setState(() => _isVisible = !_isVisible),
             child: Icon(
               _isVisible ? Icons.close : Icons.bug_report,
-              color: AppColors.background,
+              color: Theme.of(context).scaffoldBackgroundColor,
               size: 20,
             ),
           ),
@@ -100,10 +99,10 @@ void _clearLogs() {
             height: _isMinimized ? 50 : 300,
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.background.withValues(alpha: 0.95),
+                color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.95),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppColors.text.withValues(alpha: 0.2),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -121,22 +120,22 @@ void _clearLogs() {
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
-                          color: AppColors.text.withValues(alpha: 0.1),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                         ),
                       ),
                     ),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.terminal,
                           size: 16,
-                          color: AppColors.text,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                         const SizedBox(width: 8),
-                        const Text(
+                        Text(
                           'Debug Console',
                           style: TextStyle(
-                            color: AppColors.text,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
@@ -145,10 +144,10 @@ void _clearLogs() {
                         // Level filter
                         DropdownButton<LogLevel>(
                           value: _minLevel,
-                          dropdownColor: AppColors.background,
-                          style: const TextStyle(color: AppColors.text, fontSize: 10),
+                          dropdownColor: Theme.of(context).scaffoldBackgroundColor,
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 10),
                           underline: const SizedBox(),
-                          icon: const Icon(Icons.filter_list, size: 16, color: AppColors.text),
+                          icon: Icon(Icons.filter_list, size: 16, color: Theme.of(context).colorScheme.onSurface),
                           items: LogLevel.values.map((level) {
                             return DropdownMenuItem(
                               value: level,
@@ -167,7 +166,7 @@ void _clearLogs() {
                           icon: Icon(
                             _isMinimized ? Icons.expand_less : Icons.expand_more,
                             size: 16,
-                            color: AppColors.text,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                           onPressed: () => setState(() => _isMinimized = !_isMinimized),
                           padding: EdgeInsets.zero,
@@ -175,10 +174,10 @@ void _clearLogs() {
                         ),
                         // Clear button
                         IconButton(
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.delete_outline,
                             size: 16,
-                            color: AppColors.text,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                           onPressed: _clearLogs,
                           padding: EdgeInsets.zero,
@@ -186,10 +185,10 @@ void _clearLogs() {
                         ),
                         // Close button
                         IconButton(
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.close,
                             size: 16,
-                            color: AppColors.text,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                           onPressed: () => setState(() => _isVisible = false),
                           padding: EdgeInsets.zero,
@@ -203,11 +202,11 @@ void _clearLogs() {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       child: TextField(
-                        style: const TextStyle(color: AppColors.text, fontSize: 11),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 11),
                         decoration: InputDecoration(
                           hintText: 'Filter...',
                           hintStyle: TextStyle(
-                            color: AppColors.text.withValues(alpha: 0.5),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                             fontSize: 11,
                           ),
                           isDense: true,
@@ -218,13 +217,13 @@ void _clearLogs() {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(4),
                             borderSide: BorderSide(
-                              color: AppColors.text.withValues(alpha: 0.2),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(4),
                             borderSide: BorderSide(
-                              color: AppColors.text.withValues(alpha: 0.2),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                             ),
                           ),
                         ),
@@ -241,7 +240,7 @@ void _clearLogs() {
                                 child: Text(
                                   'No logs yet',
                                   style: TextStyle(
-                                    color: AppColors.text.withValues(alpha: 0.5),
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                                     fontSize: 11,
                                   ),
                                 ),
@@ -295,7 +294,7 @@ class _LogEntryWidget extends StatelessWidget {
             TextSpan(
               text: '[$time] ',
               style: TextStyle(
-                color: AppColors.text.withValues(alpha: 0.5),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
             TextSpan(
@@ -307,7 +306,7 @@ class _LogEntryWidget extends StatelessWidget {
             ),
             TextSpan(
               text: entry.message,
-              style: const TextStyle(color: AppColors.text),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
           ],
         ),

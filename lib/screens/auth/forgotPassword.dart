@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/core/exceptions/account_exceptions.dart';
 import 'package:thisjowi/services/account_service.dart';
 import 'package:thisjowi/components/error_bar.dart';
@@ -72,7 +71,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.text),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -89,7 +88,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.primary.withValues(alpha: 0.3),
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -106,7 +105,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.accent.withValues(alpha: 0.3),
+                    Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -137,7 +136,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           color: Colors.white.withValues(alpha: 0.05),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.2),
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                               blurRadius: 30,
                               spreadRadius: 10,
                             ),
@@ -146,17 +145,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         child: Icon(
                           Icons.lock_reset_rounded,
                           size: 60,
-                          color: AppColors.text,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 32),
 
                       Text(
                         'Forgot Password?'.tr(context),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.text,
+                          color: Colors.white,
                           letterSpacing: 0.5,
                         ),
                         textAlign: TextAlign.center,
@@ -167,7 +166,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             .tr(context),
                         style: TextStyle(
                           fontSize: 15,
-                          color: AppColors.text.withValues(alpha: 0.6),
+                          color: Colors.white.withValues(alpha: 0.6),
                           height: 1.5,
                         ),
                         textAlign: TextAlign.center,
@@ -193,14 +192,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               children: [
                                 TextField(
                                   controller: _emailController,
-                                  style: const TextStyle(color: AppColors.text),
+                                  style: TextStyle(color: Colors.white),
                                   decoration: InputDecoration(
                                     labelText: 'Email'.tr(context),
                                     labelStyle: TextStyle(
-                                        color: AppColors.text
+                                        color: Colors.white
                                             .withValues(alpha: 0.5)),
                                     prefixIcon: Icon(Icons.email_outlined,
-                                        color: AppColors.text
+                                        color: Colors.white
                                             .withValues(alpha: 0.7),
                                         size: 20),
                                     enabledBorder: OutlineInputBorder(
@@ -212,7 +211,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(16),
                                       borderSide: BorderSide(
-                                          color: AppColors.primary
+                                          color: Theme.of(context).colorScheme.primary
                                               .withValues(alpha: 0.5)),
                                     ),
                                     filled: true,
@@ -228,17 +227,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   height: 56,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(16),
-                                    gradient: const LinearGradient(
+                                    gradient: LinearGradient(
                                       colors: [
-                                        AppColors.primary,
-                                        AppColors.accent
+                                        Theme.of(context).colorScheme.primary,
+                                        Theme.of(context).colorScheme.tertiary
                                       ],
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: AppColors.primary
+                                        color: Theme.of(context).colorScheme.primary
                                             .withValues(alpha: 0.3),
                                         blurRadius: 12,
                                         offset: const Offset(0, 6),

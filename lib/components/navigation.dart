@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
-import 'package:thisjowi/core/app_colors.dart';
 import 'package:thisjowi/screens/otp/TOPT.dart';
 import 'package:thisjowi/screens/home/HomeScreen.dart';
 import 'package:thisjowi/screens/settings/SettingScreen.dart';
@@ -156,16 +155,36 @@ class Navigation extends State<MyBottomNavigation>
               tabs: _navItems
                   .asMap()
                   .entries
-                  .map((entry) => GlassBottomBarTab(
-                        icon: Icon(
-                          entry.value.icon,
-                          size: 28,
-                          color: _currentIndex == entry.key
-                              ? AppColors.primary
-                              : AppColors.text.withValues(alpha: 0.6),
-                        ),
-                        label: entry.value.label,
-                      ))
+                  .map((entry) {
+                    final isSelected = _currentIndex == entry.key;
+                    final iconColor = isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
+                    final labelColor = isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
+                    return GlassBottomBarTab(
+                      icon: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            entry.value.icon,
+                            size: 28,
+                            color: iconColor,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            entry.value.label,
+                            style: TextStyle(
+                              color: labelColor,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  })
                   .toList(),
               selectedIndex: _currentIndex,
               onTabSelected: (index) {
@@ -178,7 +197,7 @@ class Navigation extends State<MyBottomNavigation>
               spacing: 8,
               glassSettings: const LiquidGlassSettings(
                 thickness: 30,
-                blur: 3,
+                blur: 20,
                 refractiveIndex: 1.59,
               ),
               showIndicator: true,
@@ -237,10 +256,10 @@ class _DesktopLayout extends StatelessWidget {
                         width: 40,
                       ),
                       const SizedBox(width: 12),
-                      const Text(
+                      Text(
                         'THISJOWI',
                         style: TextStyle(
-                          color: AppColors.text,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -304,7 +323,7 @@ class _SidebarItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Material(
         color: isSelected
-            ? AppColors.primary.withValues(alpha: 0.15)
+            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.15)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
@@ -317,8 +336,11 @@ class _SidebarItem extends StatelessWidget {
                 Icon(
                   icon,
                   color: isSelected
-                      ? AppColors.primary
-                      : AppColors.text.withValues(alpha: 0.7),
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                   size: 22,
                 ),
                 const SizedBox(width: 12),
@@ -326,8 +348,11 @@ class _SidebarItem extends StatelessWidget {
                   label,
                   style: TextStyle(
                     color: isSelected
-                        ? AppColors.primary
-                        : AppColors.text.withValues(alpha: 0.9),
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.9),
                     fontSize: 14,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                   ),
