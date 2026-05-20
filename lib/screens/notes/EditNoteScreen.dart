@@ -201,8 +201,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                         enabledBorder: InputBorder.none,
                         filled: false,
                         fillColor: Colors.transparent,
-                        contentPadding:
-                            const EdgeInsets.only(top: 8),
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
                       ),
                     ),
                   ),
