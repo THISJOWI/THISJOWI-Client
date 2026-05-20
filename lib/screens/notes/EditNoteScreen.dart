@@ -180,29 +180,32 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: TextFormField(
-                      controller: _titleController,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textInputAction: TextInputAction.next,
-                      onFieldSubmitted: (_) => _focusNode.requestFocus(),
-                      decoration: InputDecoration(
-                        hintText: 'Title'.i18n,
-                        hintStyle: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                    child: SizedBox(
+                      height: 48,
+                      child: TextFormField(
+                        controller: _titleController,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                         ),
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        filled: false,
-                        fillColor: Colors.transparent,
-                        isDense: true,
-                        contentPadding: EdgeInsets.zero,
+                        textInputAction: TextInputAction.next,
+                        onFieldSubmitted: (_) => _focusNode.requestFocus(),
+                        decoration: InputDecoration(
+                          hintText: 'Title'.i18n,
+                          hintStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          filled: false,
+                          fillColor: Colors.transparent,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                        ),
                       ),
                     ),
                   ),
