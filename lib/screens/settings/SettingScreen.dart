@@ -1183,12 +1183,12 @@ Future<void> _loadCurrentUser() async {
                     ),
                   ),
 
-                  const Divider(height: 1),
-
                   // Settings List
                   Expanded(
                     child: ListView(
-                      padding: const EdgeInsets.only(bottom: 100),
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).padding.bottom + 120,
+                      ),
                       children: [
                         // Full Name
                         _buildSettingItem(

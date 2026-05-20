@@ -211,8 +211,8 @@ class _NotesScreenState extends State<NotesScreen> {
                   ),
                   centerTitle: false,
                   pinned: true,
-                  expandedHeight: 120,
-                  collapsedHeight: 60,
+                  expandedHeight: 80,
+                  collapsedHeight: 44,
                   actions: [
                     // Edit button usually goes here in Apple Notes, but for now we might leave it or add bulk actions later
                   ],
@@ -220,10 +220,19 @@ class _NotesScreenState extends State<NotesScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 4.0),
-                    child: SizedBox(
-                      height: 36,
-                      child: TextField(
+                        horizontal: 16.0, vertical: 2.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: SizedBox(
+                        height: 36,
+                        child: TextField(
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface, fontSize: 17),
                         textAlignVertical: TextAlignVertical.center,
@@ -261,7 +270,10 @@ class _NotesScreenState extends State<NotesScreen> {
                       ),
                     ),
                   ),
+                  ),
                 ),
+              ),
+              ),
                 if (_isLoading)
                   SliverFillRemaining(
                     child: Center(
