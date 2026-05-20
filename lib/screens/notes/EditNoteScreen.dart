@@ -109,7 +109,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       }
 
       if (!mounted) return;
-      
+
       try {
         Navigator.pop(context, true);
       } catch (e) {
@@ -150,14 +150,16 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                 children: [
                   IconButton(
                     icon: Icon(Icons.arrow_back_ios,
-                        color: Theme.of(context).colorScheme.onSurface, size: 18),
+                        color: Theme.of(context).colorScheme.onSurface,
+                        size: 18),
                     onPressed: () => Navigator.pop(context),
                   ),
                   const Spacer(),
                   GestureDetector(
                     onTap: _isLoading ? null : _saveNote,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       child: Text(
                         'Done'.tr(context),
                         style: TextStyle(
@@ -174,145 +176,157 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
           ),
           Expanded(
             child: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
-          : Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: SizedBox(
-                      height: 48,
-                      child: TextFormField(
-                        controller: _titleController,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textInputAction: TextInputAction.next,
-                        onFieldSubmitted: (_) => _focusNode.requestFocus(),
-                        decoration: InputDecoration(
-                          hintText: 'Title'.i18n,
-                          hintStyle: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                ? Center(
+                    child: CircularProgressIndicator(
+                        color: Theme.of(context).colorScheme.primary))
+                : Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                        child: TextFormField(
+                          controller: _titleController,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
+                            height: 1.0,
                           ),
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          filled: false,
-                          fillColor: Colors.transparent,
-                          isDense: true,
-                          contentPadding: EdgeInsets.zero,
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (_) => _focusNode.requestFocus(),
+                          decoration: InputDecoration(
+                            hintText: 'Title'.i18n,
+                            hintStyle: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.3),
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              height: 1.0,
+                            ),
+                            border: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            filled: false,
+                            fillColor: Colors.transparent,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  // ListView - cada línea con su TextField
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        itemCount: _lineControllers.length,
-                        itemBuilder: (context, index) {
-                          final controller = _lineControllers[index];
-                          final lineText = controller.text;
-                          bool isCheckboxLine = _isCheckboxLine(lineText);
-                          bool isChecked = lineText.startsWith('✓ ');
+                      // ListView - cada línea con su TextField
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.only(top: 8),
+                            itemCount: _lineControllers.length,
+                            itemBuilder: (context, index) {
+                              final controller = _lineControllers[index];
+                              final lineText = controller.text;
+                              bool isCheckboxLine = _isCheckboxLine(lineText);
+                              bool isChecked = lineText.startsWith('✓ ');
 
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Checkbox
-                              if (isCheckboxLine)
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      if (isChecked) {
-                                        controller.text =
-                                            '◯ ${lineText.substring(2)}';
-                                      } else {
-                                        controller.text =
-                                            '✓ ${lineText.substring(2)}';
-                                      }
-                                    });
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 12.0, right: 8.0),
-                                    child: Text(
-                                      isChecked ? '✓' : '◯',
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Checkbox
+                                  if (isCheckboxLine)
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          if (isChecked) {
+                                            controller.text =
+                                                '◯ ${lineText.substring(2)}';
+                                          } else {
+                                            controller.text =
+                                                '✓ ${lineText.substring(2)}';
+                                          }
+                                        });
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 12.0, right: 8.0),
+                                        child: Text(
+                                          isChecked ? '✓' : '◯',
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  else
+                                    const SizedBox(width: 0),
+                                  // TextField
+                                  Expanded(
+                                    child: TextField(
+                                      controller: controller,
+                                      maxLines: null,
+                                      keyboardType: TextInputType.multiline,
+                                      textInputAction: TextInputAction.newline,
+                                      onChanged: (value) {
+                                        setState(() {});
+                                      },
+                                      onSubmitted: (value) {
+                                        // Solo crear nueva línea vacía
+                                        if (index ==
+                                            _lineControllers.length - 1) {
+                                          setState(() {
+                                            _lineControllers
+                                                .add(TextEditingController());
+                                          });
+
+                                          Future.delayed(
+                                              const Duration(milliseconds: 100),
+                                              () {
+                                            _scrollController.animateTo(
+                                              _scrollController
+                                                  .position.maxScrollExtent,
+                                              duration: const Duration(
+                                                  milliseconds: 200),
+                                              curve: Curves.easeOut,
+                                            );
+                                          });
+                                        }
+                                      },
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        focusedBorder: InputBorder.none,
+                                        enabledBorder: InputBorder.none,
+                                        filled: false,
+                                        fillColor: Colors.transparent,
+                                        hintText: 'Start typing...',
+                                        hintStyle: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.3),
+                                          fontSize: 16,
+                                          height: 1.6,
+                                        ),
+                                        contentPadding: EdgeInsets.zero,
+                                      ),
                                       style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onSurface,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
                                         fontSize: 16,
+                                        height: 1.6,
                                       ),
                                     ),
                                   ),
-                                )
-                              else
-                                const SizedBox(width: 0),
-                              // TextField
-                              Expanded(
-                                child: TextField(
-                                  controller: controller,
-                                  maxLines: null,
-                                  keyboardType: TextInputType.multiline,
-                                  textInputAction: TextInputAction.newline,
-                                  onChanged: (value) {
-                                    setState(() {});
-                                  },
-                                  onSubmitted: (value) {
-                                    // Solo crear nueva línea vacía
-                                    if (index == _lineControllers.length - 1) {
-                                      setState(() {
-                                        _lineControllers
-                                            .add(TextEditingController());
-                                      });
-
-                                      Future.delayed(
-                                          const Duration(milliseconds: 100),
-                                          () {
-                                        _scrollController.animateTo(
-                                          _scrollController
-                                              .position.maxScrollExtent,
-                                          duration:
-                                              const Duration(milliseconds: 200),
-                                          curve: Curves.easeOut,
-                                        );
-                                      });
-                                    }
-                                  },
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    filled: false,
-                                    fillColor: Colors.transparent,
-                                    hintText: 'Start typing...',
-                                    hintStyle: TextStyle(
-                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
-                                      fontSize: 16,
-                                      height: 1.6,
-                                    ),
-                                    contentPadding: EdgeInsets.zero,
-                                  ),
-                                  style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurface,
-                                    fontSize: 16,
-                                    height: 1.6,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
+                                ],
+                              );
+                            },
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-            ),
           ),
         ],
       ),
