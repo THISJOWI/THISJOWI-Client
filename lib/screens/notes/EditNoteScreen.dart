@@ -176,8 +176,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
             child: _isLoading
           ? Center(
               child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
-          : SafeArea(
-              child: Column(
+          : Column(
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -200,8 +199,10 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                         border: InputBorder.none,
                         focusedBorder: InputBorder.none,
                         enabledBorder: InputBorder.none,
+                        filled: false,
+                        fillColor: Colors.transparent,
                         contentPadding:
-                            const EdgeInsets.symmetric(vertical: 12),
+                            const EdgeInsets.only(top: 8),
                       ),
                     ),
                   ),
@@ -284,6 +285,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                                     border: InputBorder.none,
                                     focusedBorder: InputBorder.none,
                                     enabledBorder: InputBorder.none,
+                                    filled: false,
+                                    fillColor: Colors.transparent,
                                     hintText: 'Start typing...',
                                     hintStyle: TextStyle(
                                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
@@ -306,7 +309,6 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                     ),
                   ),
                 ],
-              ),
             ),
           ),
         ],

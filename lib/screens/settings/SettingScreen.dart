@@ -51,16 +51,16 @@ class _SettingScreenState extends State<SettingScreen> {
     ]);
   }
 
-Future<void> _loadCurrentUser() async {
-  final authUser = await _authService.getCurrentAuthUser();
-  final profile = await _profileService.getCurrentProfile();
+  Future<void> _loadCurrentUser() async {
+    final authUser = await _authService.getCurrentAuthUser();
+    final profile = await _profileService.getCurrentProfile();
 
-  if (mounted) {
-    setState(() {
-      _currentAuthUser = authUser;
-      _currentProfile = profile;
-    });
-  }
+    if (mounted) {
+      setState(() {
+        _currentAuthUser = authUser;
+        _currentProfile = profile;
+      });
+    }
   }
 
   Future<void> _loadBiometricStatus() async {
@@ -115,7 +115,8 @@ Future<void> _loadCurrentUser() async {
     bool isWarning = false,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final glassColor = (isDark ? const Color(0xFF2A2A2A) : Colors.white).withValues(alpha: 0.5);
+    final glassColor = (isDark ? const Color(0xFF2A2A2A) : Colors.white)
+        .withValues(alpha: 0.5);
 
     return Material(
       color: Colors.transparent,
@@ -130,7 +131,11 @@ Future<void> _loadCurrentUser() async {
             children: [
               Icon(
                 icon,
-                color: iconColor ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: iconColor ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
                 size: 22,
               ),
               const SizedBox(width: 14),
@@ -152,7 +157,10 @@ Future<void> _loadCurrentUser() async {
                       Text(
                         subtitle,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.5),
                           fontSize: 13,
                         ),
                       ),
@@ -163,7 +171,10 @@ Future<void> _loadCurrentUser() async {
               if (trailing == null && onTap != null)
                 Icon(
                   Icons.chevron_right,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.3),
                   size: 20,
                 ),
             ],
@@ -206,7 +217,10 @@ Future<void> _loadCurrentUser() async {
                     content,
                     textAlign: TextAlign.justify,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                       fontSize: 14,
                       height: 1.5,
                     ),
@@ -226,7 +240,10 @@ Future<void> _loadCurrentUser() async {
                           child: Text(
                             'Cancel'.i18n,
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.6),
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
@@ -242,7 +259,8 @@ Future<void> _loadCurrentUser() async {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: confirmColor,
-                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -315,7 +333,10 @@ Future<void> _loadCurrentUser() async {
                           onTap: () => Navigator.pop(context),
                           child: Icon(
                             Icons.close,
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.6),
                             size: 20,
                           ),
                         ),
@@ -325,34 +346,50 @@ Future<void> _loadCurrentUser() async {
                     Text(
                       'Enter your password to confirm account deletion.'.i18n,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
                         fontSize: 14,
                       ),
                     ),
                     const SizedBox(height: 24),
                     Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.1),
                           width: 1,
                         ),
                       ),
                       child: TextField(
                         controller: passwordController,
                         obscureText: obscurePassword,
-                        style:
-                            TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 16),
                         decoration: InputDecoration(
                           labelText: 'Password'.i18n,
                           labelStyle: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.6),
                             fontSize: 14,
                           ),
                           prefixIcon: Icon(
                             Icons.lock,
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.6),
                             size: 20,
                           ),
                           suffixIcon: Padding(
@@ -362,7 +399,10 @@ Future<void> _loadCurrentUser() async {
                                 obscurePassword
                                     ? Icons.visibility_off
                                     : Icons.visibility,
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.7),
                                 size: 24,
                               ),
                               onPressed: () => setState(
@@ -393,7 +433,10 @@ Future<void> _loadCurrentUser() async {
                             child: Text(
                               'Cancel'.i18n,
                               style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.6),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -416,8 +459,10 @@ Future<void> _loadCurrentUser() async {
                               await _performAccountDeletion(password);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.error,
-                              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.error,
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.onPrimary,
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -501,7 +546,10 @@ Future<void> _loadCurrentUser() async {
                           onTap: () => Navigator.pop(context),
                           child: Icon(
                             Icons.close,
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.6),
                             size: 20,
                           ),
                         ),
@@ -542,7 +590,10 @@ Future<void> _loadCurrentUser() async {
                             child: Text(
                               'Cancel'.i18n,
                               style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.6),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -554,8 +605,10 @@ Future<void> _loadCurrentUser() async {
                           child: ElevatedButton(
                             onPressed: () => _handleChangePassword(),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.onSurface,
-                              foregroundColor: Theme.of(context).scaffoldBackgroundColor,
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.onSurface,
+                              foregroundColor:
+                                  Theme.of(context).scaffoldBackgroundColor,
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -593,21 +646,27 @@ Future<void> _loadCurrentUser() async {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1), width: 1),
+        border: Border.all(
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+            width: 1),
       ),
       child: TextField(
         controller: controller,
         obscureText: obscure,
-        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+        style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             fontSize: 14,
           ),
           prefixIcon: Icon(
             Icons.lock,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             size: 20,
           ),
           suffixIcon: Padding(
@@ -615,7 +674,10 @@ Future<void> _loadCurrentUser() async {
             child: IconButton(
               icon: Icon(
                 obscure ? Icons.visibility_off : Icons.visibility,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.7),
                 size: 24,
               ),
               onPressed: onVisibilityToggle,
@@ -702,8 +764,7 @@ Future<void> _loadCurrentUser() async {
                     );
                     if (!mounted) return;
                     Navigator.pop(context);
-                    ErrorSnackBar.showSuccess(
-                        context, 'Country updated'.i18n);
+                    ErrorSnackBar.showSuccess(context, 'Country updated'.i18n);
                     await _loadCurrentUser();
                   } catch (e) {
                     if (!mounted) return;
@@ -719,7 +780,10 @@ Future<void> _loadCurrentUser() async {
                     onPressed: () => Navigator.pop(context),
                     child: Text('Cancel'.i18n,
                         style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7))),
                   ),
                 ],
               ),
@@ -744,7 +808,8 @@ Future<void> _loadCurrentUser() async {
             children: ['Business', 'Community']
                 .map((type) => RadioListTile<String>(
                       title: Text(type,
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface)),
                       value: type,
                       groupValue: accountType,
                       activeColor: Theme.of(context).colorScheme.primary,
@@ -756,7 +821,11 @@ Future<void> _loadCurrentUser() async {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text('Cancel'.i18n,
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+                  style: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7))),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -800,7 +869,8 @@ Future<void> _loadCurrentUser() async {
             children: ['Cloud', 'Self-Hosted']
                 .map((mode) => RadioListTile<String>(
                       title: Text(mode,
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface)),
                       value: mode,
                       groupValue: hostingMode,
                       activeColor: Theme.of(context).colorScheme.primary,
@@ -812,7 +882,11 @@ Future<void> _loadCurrentUser() async {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text('Cancel'.i18n,
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+                  style: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7))),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -872,25 +946,39 @@ Future<void> _loadCurrentUser() async {
                 const SizedBox(height: 24),
                 Container(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.1),
                       width: 1,
                     ),
                   ),
                   child: TextField(
                     controller: fullNameController,
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 16),
                     decoration: InputDecoration(
                       labelText: 'Full Name'.i18n,
                       labelStyle: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.6),
                         fontSize: 14,
                       ),
                       prefixIcon: Icon(
                         Icons.person,
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.6),
                         size: 20,
                       ),
                       border: InputBorder.none,
@@ -910,7 +998,10 @@ Future<void> _loadCurrentUser() async {
                       child: Text(
                         'Cancel'.i18n,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.7),
                         ),
                       ),
                     ),
@@ -943,7 +1034,8 @@ Future<void> _loadCurrentUser() async {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
                       ),
                       child: Text('Save'.i18n),
                     ),
@@ -1020,7 +1112,10 @@ Future<void> _loadCurrentUser() async {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -1037,11 +1132,15 @@ Future<void> _loadCurrentUser() async {
               ListTile(
                 leading: Icon(
                   Icons.photo_library,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
                 ),
                 title: Text(
                   'Choose from Gallery'.i18n,
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -1056,7 +1155,8 @@ Future<void> _loadCurrentUser() async {
                   ),
                   title: Text(
                     'Remove Photo'.i18n,
-                    style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.error),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -1080,7 +1180,8 @@ Future<void> _loadCurrentUser() async {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final glassColor = (isDark ? const Color(0xFF2A2A2A) : Colors.white).withValues(alpha: 0.85);
+    final glassColor = (isDark ? const Color(0xFF2A2A2A) : Colors.white)
+        .withValues(alpha: 0.85);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -1089,221 +1190,252 @@ Future<void> _loadCurrentUser() async {
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             color: glassColor,
-            child: SafeArea(
-              child: Column(
-                children: [
+            child: Column(
+              children: [
                   // Header
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                    padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 16, 20, 12),
+                  child: Row(
+                    children: [
+                      Icon(Icons.settings,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 28),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Settings'.i18n,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Profile Section
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  child: GestureDetector(
+                    onTap: _showAvatarOptions,
                     child: Row(
                       children: [
-                        Icon(Icons.settings,
-                            color: Theme.of(context).colorScheme.primary, size: 28),
-                        const SizedBox(width: 12),
-                        Text(
-                          'Settings'.i18n,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Profile Section
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    child: GestureDetector(
-                      onTap: _showAvatarOptions,
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 56,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
-                              border: Border.all(
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
-                                width: 2,
-                              ),
-                              image: _currentProfile?.avatarUrl != null &&
-                                      _currentProfile!.avatarUrl!.isNotEmpty
-                                  ? DecorationImage(
-                                      image: NetworkImage(_currentProfile!.avatarUrl!),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : null,
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.1),
+                            border: Border.all(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.2),
+                              width: 2,
                             ),
-                            child: _currentProfile?.avatarUrl == null
-                                ? Center(
-                                    child: Text(
-                                      _currentProfile?.initials ?? 'U',
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
+                            image: _currentProfile?.avatarUrl != null &&
+                                    _currentProfile!.avatarUrl!.isNotEmpty
+                                ? DecorationImage(
+                                    image: NetworkImage(
+                                        _currentProfile!.avatarUrl!),
+                                    fit: BoxFit.cover,
                                   )
                                 : null,
                           ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _currentProfile?.fullName ?? 'User'.i18n,
-                                  style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurface,
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w600,
+                          child: _currentProfile?.avatarUrl == null
+                              ? Center(
+                                  child: Text(
+                                    _currentProfile?.initials ?? 'U',
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.7),
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
+                                )
+                              : null,
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _currentProfile?.fullName ?? 'User'.i18n,
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  _currentAuthUser?.email ?? '',
-                                  style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-                                    fontSize: 13,
-                                  ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                _currentAuthUser?.email ?? '',
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.5),
+                                  fontSize: 13,
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                          Icon(
-                            Icons.chevron_right,
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Settings List
-                  Expanded(
-                    child: ListView(
-                      padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).padding.bottom + 120,
-                      ),
-                      children: [
-                        // Full Name
-                        _buildSettingItem(
-                          icon: Icons.person,
-                          title: 'Full Name'.i18n,
-                          subtitle: _currentProfile?.fullName ?? 'Not set'.i18n,
-                          onTap: _showEditFullNameDialog,
                         ),
-
-                        // Country
-                        _buildSettingItem(
-                          icon: Icons.location_on,
-                          title: 'Country'.i18n,
-                          subtitle: _currentProfile?.country ?? 'Not set'.i18n,
-                          onTap: _showEditCountryDialog,
-                        ),
-
-                        // Account Type
-                        _buildSettingItem(
-                          icon: Icons.business,
-                          title: 'Account Type'.i18n,
-                          subtitle: _currentProfile?.accountType ?? 'Not set'.i18n,
-                          onTap: _showEditAccountTypeDialog,
-                        ),
-
-                        // Hosting Mode
-                        _buildSettingItem(
-                          icon: Icons.cloud_queue,
-                          title: 'Hosting Mode'.i18n,
-                          subtitle: _currentProfile?.hostingMode ?? 'Cloud'.i18n,
-                          onTap: _showEditHostingModeDialog,
-                        ),
-
-                        if (_currentAuthUser != null &&
-                            _currentAuthUser!.isBusinessAccount) ...[
-                          // LDAP Configuration
-                          _buildSettingItem(
-                            icon: Icons.admin_panel_settings,
-                            title: 'LDAP Configuration'.i18n,
-                            subtitle: 'Manage LDAP settings'.i18n,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const LdapConfigScreen()),
-                              );
-                            },
-                          ),
-                        ],
-
-                        // Change Password
-                        if (_currentAuthUser != null &&
-                            !_currentAuthUser!.isLdapUser &&
-                            _currentAuthUser!.ldapUsername == null)
-                          _buildSettingItem(
-                            icon: Icons.password,
-                            title: 'Change Password'.i18n,
-                            subtitle: 'Update your password'.i18n,
-                            onTap: _showChangePasswordDialog,
-                          ),
-
-                        // Biometric
-                        if (_biometricAvailable)
-                          _buildSettingItem(
-                            icon: _biometricType == 'Face ID'
-                                ? Icons.face_rounded
-                                : Icons.fingerprint_rounded,
-                            title: 'Biometric Authentication'.i18n,
-                            subtitle: 'Use %s to unlock app'.i18n.fill([_biometricType]),
-                            trailing: Switch(
-                              value: _biometricEnabled,
-                              onChanged: _toggleBiometric,
-                              activeThumbColor: Theme.of(context).colorScheme.onSurface,
-                              activeTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
-                              inactiveThumbColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-                              inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
-                            ),
-                          ),
-
-                        // Application Version
-                        _buildSettingItem(
-                          icon: Icons.info_outline,
-                          title: 'Application Version'.i18n,
-                          subtitle: 'Development Version',
-                        ),
-
-                        // Account & Privacy
-                        _buildSettingItem(
-                          icon: Icons.help_outline,
-                          title: 'Account & Privacy'.i18n,
-                          onTap: () {},
-                        ),
-
-                        // Logout
-                        _buildSettingItem(
-                          icon: Icons.logout,
-                          title: 'Logout'.i18n,
-                          iconColor: Theme.of(context).colorScheme.tertiary,
-                          onTap: _handleLogout,
-                        ),
-
-                        // Delete Account
-                        _buildSettingItem(
-                          icon: Icons.delete_forever,
-                          title: 'Delete Account'.i18n,
-                          subtitle: 'This action cannot be undone'.i18n,
-                          iconColor: Theme.of(context).colorScheme.error,
-                          onTap: _handleDeleteAccount,
-                          isWarning: true,
+                        Icon(
+                          Icons.chevron_right,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.4),
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+
+                // Settings List
+                Expanded(
+                  child: ListView(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).padding.bottom + 120,
+                    ),
+                    children: [
+                      // Full Name
+                      _buildSettingItem(
+                        icon: Icons.person,
+                        title: 'Full Name'.i18n,
+                        subtitle: _currentProfile?.fullName ?? 'Not set'.i18n,
+                        onTap: _showEditFullNameDialog,
+                      ),
+
+                      // Country
+                      _buildSettingItem(
+                        icon: Icons.location_on,
+                        title: 'Country'.i18n,
+                        subtitle: _currentProfile?.country ?? 'Not set'.i18n,
+                        onTap: _showEditCountryDialog,
+                      ),
+
+                      // Account Type
+                      _buildSettingItem(
+                        icon: Icons.business,
+                        title: 'Account Type'.i18n,
+                        subtitle:
+                            _currentProfile?.accountType ?? 'Not set'.i18n,
+                        onTap: _showEditAccountTypeDialog,
+                      ),
+
+                      // Hosting Mode
+                      _buildSettingItem(
+                        icon: Icons.cloud_queue,
+                        title: 'Hosting Mode'.i18n,
+                        subtitle: _currentProfile?.hostingMode ?? 'Cloud'.i18n,
+                        onTap: _showEditHostingModeDialog,
+                      ),
+
+                      if (_currentAuthUser != null &&
+                          _currentAuthUser!.isBusinessAccount) ...[
+                        // LDAP Configuration
+                        _buildSettingItem(
+                          icon: Icons.admin_panel_settings,
+                          title: 'LDAP Configuration'.i18n,
+                          subtitle: 'Manage LDAP settings'.i18n,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const LdapConfigScreen()),
+                            );
+                          },
+                        ),
+                      ],
+
+                      // Change Password
+                      if (_currentAuthUser != null &&
+                          !_currentAuthUser!.isLdapUser &&
+                          _currentAuthUser!.ldapUsername == null)
+                        _buildSettingItem(
+                          icon: Icons.password,
+                          title: 'Change Password'.i18n,
+                          subtitle: 'Update your password'.i18n,
+                          onTap: _showChangePasswordDialog,
+                        ),
+
+                      // Biometric
+                      if (_biometricAvailable)
+                        _buildSettingItem(
+                          icon: _biometricType == 'Face ID'
+                              ? Icons.face_rounded
+                              : Icons.fingerprint_rounded,
+                          title: 'Biometric Authentication'.i18n,
+                          subtitle: 'Use %s to unlock app'
+                              .i18n
+                              .fill([_biometricType]),
+                          trailing: Switch(
+                            value: _biometricEnabled,
+                            onChanged: _toggleBiometric,
+                            activeThumbColor:
+                                Theme.of(context).colorScheme.onSurface,
+                            activeTrackColor: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.3),
+                            inactiveThumbColor: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.5),
+                            inactiveTrackColor: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.1),
+                          ),
+                        ),
+
+                      // Application Version
+                      _buildSettingItem(
+                        icon: Icons.info_outline,
+                        title: 'Application Version'.i18n,
+                        subtitle: 'Development Version',
+                      ),
+
+                      // Account & Privacy
+                      _buildSettingItem(
+                        icon: Icons.help_outline,
+                        title: 'Account & Privacy'.i18n,
+                        onTap: () {},
+                      ),
+
+                      // Logout
+                      _buildSettingItem(
+                        icon: Icons.logout,
+                        title: 'Logout'.i18n,
+                        iconColor: Theme.of(context).colorScheme.tertiary,
+                        onTap: _handleLogout,
+                      ),
+
+                      // Delete Account
+                      _buildSettingItem(
+                        icon: Icons.delete_forever,
+                        title: 'Delete Account'.i18n,
+                        subtitle: 'This action cannot be undone'.i18n,
+                        iconColor: Theme.of(context).colorScheme.error,
+                        onTap: _handleDeleteAccount,
+                        isWarning: true,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),
