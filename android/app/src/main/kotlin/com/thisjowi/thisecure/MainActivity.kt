@@ -1,4 +1,4 @@
-package com.example.frontend
+package com.thisjowi.thisecure
 
 import android.content.Intent
 import android.os.Build

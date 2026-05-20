@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "809934418722",
+    "project_id": "thi-e6684",
+    "storage_bucket": "thi-e6684.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:809934418722:android:e909d7171d03a4f980ab7b",
+        "android_client_info": {
+          "package_name": "com.thisjowi.thisecure"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkdzGWpwTd1uzbID45LnMhccDEC_MLGA4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

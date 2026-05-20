@@ -53,13 +53,18 @@ class _SettingScreenState extends State<SettingScreen> {
 
   Future<void> _loadCurrentUser() async {
     final authUser = await _authService.getCurrentAuthUser();
-    final profile = await _profileService.getCurrentProfile();
+
+    try {
+      final profile = await _profileService.getCurrentProfile();
+      if (mounted) {
+        setState(() => _currentProfile = profile);
+      }
+    } on ProfileException {
+      // Profile loading is non-critical; screen works without it
+    }
 
     if (mounted) {
-      setState(() {
-        _currentAuthUser = authUser;
-        _currentProfile = profile;
-      });
+      setState(() => _currentAuthUser = authUser);
     }
   }
 

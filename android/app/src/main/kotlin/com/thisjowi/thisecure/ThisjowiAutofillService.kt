@@ -1,4 +1,4 @@
-package com.example.frontend
+package com.thisjowi.thisecure
 
 import android.app.assist.AssistStructure
 import android.os.Build
