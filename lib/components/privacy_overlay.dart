@@ -64,7 +64,7 @@ class _PrivacyOverlayState extends State<PrivacyOverlay> with WidgetsBindingObse
                       Icon(Icons.lock_outline_rounded, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                       const SizedBox(height: 16),
                       Text(
-                        "ThisJowi Secured",
+                        "THISECURE Secured",
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                           fontSize: 18,

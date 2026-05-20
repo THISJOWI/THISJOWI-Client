@@ -130,13 +130,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(25),
                       child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                            color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
                             borderRadius: BorderRadius.circular(25),
-                            border: Border.all(
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
                           ),
                           child: TextField(
                             style: TextStyle(
@@ -167,11 +165,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             onChanged: (value) {
                               setState(() => _searchQuery = value);
                             },
+                           ),
                           ),
                         ),
                       ),
                     ),
-                  ),
 
                   // -- Unified WhatsApp-style List --
                   Expanded(

@@ -82,7 +82,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
 
     try {
       final success = await _biometricService.authenticate(
-        localizedReason: 'Verifica tu identidad para acceder a THISJOWI',
+        localizedReason: 'Verifica tu identidad para acceder a THISECURE',
       );
 
       if (mounted) {

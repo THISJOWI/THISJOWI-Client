@@ -33,7 +33,7 @@ class _LdapSelectorState extends State<LdapSelector>
       title: 'Registro tradicional',
       subtitle: 'Crear cuenta con email y contraseña',
       useLdap: false,
-      gradient: [const Color(0xFF5B8DEF), const Color(0xFF7B9FE8)],
+      gradient: [const Color(0xFF7A5C3A), const Color(0xFF9A7C5A)],
     ),
   ];
 

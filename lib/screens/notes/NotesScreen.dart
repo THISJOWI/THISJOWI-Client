@@ -1,8 +1,8 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:thisjowi/components/error_bar.dart';
-import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/core/service_locator.dart';
 import 'package:thisjowi/data/models/note_entry.dart';
 import 'package:thisjowi/data/repository/notes_repository.dart';
@@ -220,51 +220,44 @@ class _NotesScreenState extends State<NotesScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 8.0),
-                    child: LiquidGlass.container(
-                      context: context,
-                      blur: 10,
-                      opacity: 0.5,
-                      borderRadius: 10,
-                      padding: EdgeInsets.zero,
-                      showBorder: false,
-                      child: SizedBox(
-                        height: 36,
-                        child: TextField(
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface, fontSize: 17),
-                          textAlignVertical: TextAlignVertical.center,
-                          decoration: InputDecoration(
-                            hintText: 'Search'.tr(context),
-                            hintStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                                fontSize: 17),
-                            prefixIcon: Icon(Icons.search,
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 18),
-                            prefixIconConstraints:
-                                const BoxConstraints(minWidth: 32, minHeight: 36),
-                            border: InputBorder.none,
+                        horizontal: 16.0, vertical: 4.0),
+                    child: SizedBox(
+                      height: 36,
+                      child: TextField(
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface, fontSize: 17),
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: InputDecoration(
+                          hintText: 'Search'.tr(context),
+                          hintStyle: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                              fontSize: 17),
+                          prefixIcon: Icon(Icons.search,
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 18),
+                          prefixIconConstraints:
+                              const BoxConstraints(minWidth: 32, minHeight: 36),
+                          border: InputBorder.none,
                           focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                            isDense: true,
-                            contentPadding: const EdgeInsets.only(right: 16),
-                            suffixIcon: _searchQuery.isNotEmpty
-                                ? GestureDetector(
-                                    onTap: () {
-                                      setState(() => _searchQuery = '');
-                                      _loadNotes();
-                                    },
-                                    child: Icon(Icons.close,
-                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                                        size: 18),
-                                  )
-                                : null,
-                          ),
-                          onChanged: (value) {
-                            setState(() => _searchQuery = value);
-                            _loadNotes();
-                          },
+                          enabledBorder: InputBorder.none,
+                          filled: false,
+                          isDense: true,
+                          contentPadding: const EdgeInsets.only(right: 16),
+                          suffixIcon: _searchQuery.isNotEmpty
+                              ? GestureDetector(
+                                  onTap: () {
+                                    setState(() => _searchQuery = '');
+                                    _loadNotes();
+                                  },
+                                  child: Icon(Icons.close,
+                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                      size: 18),
+                                )
+                              : null,
                         ),
+                        onChanged: (value) {
+                          setState(() => _searchQuery = value);
+                          _loadNotes();
+                        },
                       ),
                     ),
                   ),
@@ -299,23 +292,18 @@ class _NotesScreenState extends State<NotesScreen> {
                         // Revisando el código anterior, Note no mostraba fecha, pero el diseño de Apple lleva fecha.
                         // Lo dejaremos sin fecha por compatibilidad inmediata hasta ver el modelo completo.
 
-                        return LiquidGlass.container(
-                          context: context,
-                          blur: 10,
-                          opacity: 0.5,
-                          borderRadius: 12,
-                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                          showBorder: false,
-                          padding: EdgeInsets.zero,
-                          child: Dismissible(
-                            key: Key(note.localId ?? note.id.toString()),
-                            direction: DismissDirection.endToStart,
-                            background: Container(
-                              alignment: Alignment.centerRight,
-                              padding: const EdgeInsets.only(right: 20.0),
-                              color: Colors.red,
-                              child:
-                                  Icon(Icons.delete, color: Theme.of(context).colorScheme.onSurface),
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Dismissible(
+                              key: Key(note.localId ?? note.id.toString()),
+                              direction: DismissDirection.endToStart,
+                              background: Container(
+                                alignment: Alignment.centerRight,
+                                padding: const EdgeInsets.only(right: 20.0),
+                                color: Colors.red,
+                                child:
+                                    Icon(Icons.delete, color: Theme.of(context).colorScheme.onSurface),
                             ),
                             confirmDismiss: (direction) async {
                               return await _showDeleteConfirmation(note);
@@ -382,24 +370,35 @@ class _NotesScreenState extends State<NotesScreen> {
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                      childCount: _notes.length,
+                           ),
+                           if (!isLast)
+                             Divider(
+                               height: 1,
+                               indent: 16,
+                               endIndent: 16,
+                               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+                             ),
+                         ],
+                       );
+                       },
+                       childCount: _notes.length,
                     ),
                   ),
               ],
             ),
           ),
           // Bottom Toolbar
-          LiquidGlass.container(
-            context: context,
-            blur: 10,
-            opacity: 0.5,
-            borderRadius: 0,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            margin: EdgeInsets.zero,
-            child: SafeArea(
+          ClipRRect(
+            borderRadius: BorderRadius.circular(0),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+                  borderRadius: BorderRadius.circular(0),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: SafeArea(
               child: Row(
                 children: [
                   // Botón de opciones o grid (opcional, placeholder para equilibrio)
@@ -424,6 +423,8 @@ class _NotesScreenState extends State<NotesScreen> {
                     onPressed: _createNote,
                   ),
                 ],
+              ),
+            ),
               ),
             ),
           ),

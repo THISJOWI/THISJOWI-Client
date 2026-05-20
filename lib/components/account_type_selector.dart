@@ -26,7 +26,7 @@ class _AccountTypeSelectorState extends State<AccountTypeSelector>
       title: 'Personal',
       subtitle: 'Para uso individual',
       type: 'Community',
-      gradient: [const Color(0xFF5B8DEF), const Color(0xFF7B9FE8)],
+      gradient: [const Color(0xFF7A5C3A), const Color(0xFF9A7C5A)],
     ),
     _AccountOption(
       icon: Icons.business_center_outlined,

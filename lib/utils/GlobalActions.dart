@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:thisjowi/core/providers/otp_provider.dart';
@@ -81,7 +82,7 @@ class GlobalActions {
             borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
           ),
           filled: true,
-          fillColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+          fillColor: Theme.of(context).scaffoldBackgroundColor,
         ),
       );
     }
@@ -89,49 +90,80 @@ class GlobalActions {
     // Show Dialog
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Add OTP', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              buildTextField(
-                controller: nameController,
-                label: 'Account name',
-                hint: 'user@example.com',
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              decoration: BoxDecoration(
+                color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+                borderRadius: BorderRadius.circular(16),
               ),
-              const SizedBox(height: 16),
-              buildTextField(
-                controller: issuerController,
-                label: 'Issuer',
-                hint: 'Google, GitHub...',
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                    child: Text('Add OTP',
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.w600)),
+                  ),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          buildTextField(
+                            controller: nameController,
+                            label: 'Account name',
+                            hint: 'user@example.com',
+                          ),
+                          const SizedBox(height: 16),
+                          buildTextField(
+                            controller: issuerController,
+                            label: 'Issuer',
+                            hint: 'Google, GitHub...',
+                          ),
+                          const SizedBox(height: 16),
+                          buildTextField(
+                            controller: secretController,
+                            label: 'Secret key',
+                            hint: 'JBSWY3DPEHPK3PXP',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8, bottom: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: Text('Cancel',
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text('Add'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              buildTextField(
-                controller: secretController,
-                label: 'Secret key',
-                hint: 'JBSWY3DPEHPK3PXP',
-              ),
-            ],
+            ),
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel',
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
-            ),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Add'),
-          ),
-        ],
       ),
     );
 

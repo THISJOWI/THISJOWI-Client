@@ -32,12 +32,12 @@ class LdapUserCard extends StatelessWidget {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade100,
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     Icons.business,
-                    color: Colors.blue.shade700,
+                    color: Theme.of(context).colorScheme.primary,
                     size: 28,
                   ),
                 ),

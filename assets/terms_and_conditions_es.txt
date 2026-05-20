@@ -1,12 +1,12 @@
-TÉRMINOS Y CONDICIONES DE USO DE THISJOWI
+TÉRMINOS Y CONDICIONES DE USO DE THISECURE
 
 Última actualización: 15 de febrero de 2026
 
-Bienvenido a THISJOWI. Estos Términos y Condiciones ("Términos") rigen el uso de nuestra aplicación móvil y servicios relacionados (el "Servicio"). Al registrarse y utilizar THISJOWI, usted acepta estar legalmente vinculado por estos Términos.
+Bienvenido a THISECURE. Estos Términos y Condiciones ("Términos") rigen el uso de nuestra aplicación móvil y servicios relacionados (el "Servicio"). Al registrarse y utilizar THISECURE, usted acepta estar legalmente vinculado por estos Términos.
 
 1. ACEPTACIÓN DE LOS TÉRMINOS
 
-1.1. Al crear una cuenta, acceder o utilizar THISJOWI, usted confirma que ha leído, comprendido y acepta estar sujeto a estos Términos y a nuestra Política de Privacidad.
+1.1. Al crear una cuenta, acceder o utilizar THISECURE, usted confirma que ha leído, comprendido y acepta estar sujeto a estos Términos y a nuestra Política de Privacidad.
 
 1.2. Si no está de acuerdo con estos Términos, no debe utilizar nuestro Servicio.
 
@@ -14,7 +14,7 @@ Bienvenido a THISJOWI. Estos Términos y Condiciones ("Términos") rigen el uso 
 
 2. DESCRIPCIÓN DEL SERVICIO
 
-2.1. THISJOWI es una plataforma de comunicación segura y gestión de información que ofrece:
+2.1. THISECURE es una plataforma de comunicación segura y gestión de información que ofrece:
    - Mensajería cifrada de extremo a extremo (E2EE)
    - Gestión segura de notas
    - Gestor de contraseñas
@@ -25,7 +25,7 @@ Bienvenido a THISJOWI. Estos Términos y Condiciones ("Términos") rigen el uso 
 
 3. REQUISITOS DE ELEGIBILIDAD
 
-3.1. Debe tener al menos 16 años de edad para utilizar THISJOWI.
+3.1. Debe tener al menos 16 años de edad para utilizar THISECURE.
 
 3.2. Al registrarse, declara que toda la información proporcionada es veraz, precisa y completa.
 
@@ -33,7 +33,7 @@ Bienvenido a THISJOWI. Estos Términos y Condiciones ("Términos") rigen el uso 
 
 4. REGISTRO Y SEGURIDAD DE LA CUENTA
 
-4.1. Para utilizar THISJOWI, debe crear una cuenta proporcionando:
+4.1. Para utilizar THISECURE, debe crear una cuenta proporcionando:
    - Nombre de usuario único
    - Dirección de correo electrónico válida
    - Contraseña segura
@@ -44,11 +44,11 @@ Bienvenido a THISJOWI. Estos Términos y Condiciones ("Términos") rigen el uso 
    - Todas las actividades realizadas desde su cuenta
    - Notificarnos inmediatamente sobre cualquier uso no autorizado
 
-4.3. THISJOWI no será responsable de pérdidas derivadas del uso no autorizado de su cuenta.
+4.3. THISECURE no será responsable de pérdidas derivadas del uso no autorizado de su cuenta.
 
 5. CIFRADO Y PRIVACIDAD
 
-5.1. THISJOWI implementa cifrado de extremo a extremo (E2EE) para proteger sus comunicaciones.
+5.1. THISECURE implementa cifrado de extremo a extremo (E2EE) para proteger sus comunicaciones.
 
 5.2. Generamos claves criptográficas únicas para cada usuario. Usted es responsable de:
    - Mantener seguras sus claves privadas
@@ -61,7 +61,7 @@ Bienvenido a THISJOWI. Estos Términos y Condiciones ("Términos") rigen el uso 
 
 6. USO ACEPTABLE
 
-6.1. Usted se compromete a utilizar THISJOWI únicamente para fines legales y de acuerdo con estos Términos.
+6.1. Usted se compromete a utilizar THISECURE únicamente para fines legales y de acuerdo con estos Términos.
 
 6.2. Está PROHIBIDO:
    - Utilizar el Servicio para actividades ilegales, fraudulentas o maliciosas
@@ -86,22 +86,22 @@ Bienvenido a THISJOWI. Estos Términos y Condiciones ("Términos") rigen el uso 
    - La gestión de usuarios dentro de su organización
    - El cumplimiento de sus propias políticas de seguridad corporativa
 
-7.3. THISJOWI no es responsable de problemas derivados de configuraciones LDAP incorrectas.
+7.3. THISECURE no es responsable de problemas derivados de configuraciones LDAP incorrectas.
 
 8. GESTOR DE CONTRASEÑAS
 
-8.1. El gestor de contraseñas de THISJOWI almacena sus credenciales de forma cifrada.
+8.1. El gestor de contraseñas de THISECURE almacena sus credenciales de forma cifrada.
 
 8.2. Usted reconoce que:
    - Es responsable de recordar su contraseña maestra
    - La pérdida de la contraseña maestra puede resultar en pérdida permanente de acceso a contraseñas almacenadas
-   - THISJOWI no puede recuperar contraseñas olvidadas debido al cifrado E2EE
+   - THISECURE no puede recuperar contraseñas olvidadas debido al cifrado E2EE
 
 8.3. Recomendamos mantener copias de seguridad de información crítica.
 
 9. PROPIEDAD INTELECTUAL
 
-9.1. THISJOWI y todos sus componentes (código, diseño, logotipos, marcas) son propiedad exclusiva de THISJOWI o sus licenciantes.
+9.1. THISECURE y todos sus componentes (código, diseño, logotipos, marcas) son propiedad exclusiva de THISECURE o sus licenciantes.
 
 9.2. Se le otorga una licencia limitada, no exclusiva, intransferible y revocable para usar la aplicación.
 
@@ -111,14 +111,14 @@ Bienvenido a THISJOWI. Estos Términos y Condiciones ("Términos") rigen el uso 
 
 10. LIMITACIÓN DE RESPONSABILIDAD
 
-10.1. THISJOWI se proporciona "TAL CUAL" y "SEGÚN DISPONIBILIDAD", sin garantías de ningún tipo.
+10.1. THISECURE se proporciona "TAL CUAL" y "SEGÚN DISPONIBILIDAD", sin garantías de ningún tipo.
 
 10.2. No garantizamos que el Servicio:
    - Esté libre de errores o interrupciones
    - Sea completamente seguro o inmune a accesos no autorizados
    - Cumpla con todos sus requisitos específicos
 
-10.3. En la máxima medida permitida por la ley, THISJOWI no será responsable de:
+10.3. En la máxima medida permitida por la ley, THISECURE no será responsable de:
    - Pérdida de datos, beneficios o información
    - Daños indirectos, incidentales o consecuentes
    - Interrupciones del servicio
@@ -175,7 +175,7 @@ Bienvenido a THISJOWI. Estos Términos y Condiciones ("Términos") rigen el uso 
 
 16. MENORES DE EDAD
 
-16.1. Si tiene entre 16 y 18 años, debe tener el consentimiento de un padre o tutor legal para usar THISJOWI.
+16.1. Si tiene entre 16 y 18 años, debe tener el consentimiento de un padre o tutor legal para usar THISECURE.
 
 16.2. Los padres/tutores son responsables de supervisar el uso del Servicio por parte de menores.
 
@@ -190,7 +190,7 @@ Bienvenido a THISJOWI. Estos Términos y Condiciones ("Términos") rigen el uso 
 
 18. COMUNICACIONES
 
-18.1. Al usar THISJOWI, acepta recibir comunicaciones electrónicas relacionadas con:
+18.1. Al usar THISECURE, acepta recibir comunicaciones electrónicas relacionadas con:
    - Actualizaciones del servicio
    - Cambios en los Términos
    - Notificaciones de seguridad
@@ -200,7 +200,7 @@ Bienvenido a THISJOWI. Estos Términos y Condiciones ("Términos") rigen el uso 
 
 19. INDEMNIZACIÓN
 
-19.1. Usted acepta indemnizar y eximir de responsabilidad a THISJOWI, sus directores, empleados y afiliados de cualquier reclamación derivada de:
+19.1. Usted acepta indemnizar y eximir de responsabilidad a THISECURE, sus directores, empleados y afiliados de cualquier reclamación derivada de:
    - Su uso del Servicio
    - Violación de estos Términos
    - Violación de derechos de terceros
@@ -216,7 +216,7 @@ Bienvenido a THISJOWI. Estos Términos y Condiciones ("Términos") rigen el uso 
 
 22. ACUERDO COMPLETO
 
-22.1. Estos Términos, junto con nuestra Política de Privacidad, constituyen el acuerdo completo entre usted y THISJOWI.
+22.1. Estos Términos, junto con nuestra Política de Privacidad, constituyen el acuerdo completo entre usted y THISECURE.
 
 22.2. Estos Términos reemplazan cualquier acuerdo o entendimiento previo.
 
@@ -228,12 +228,12 @@ Bienvenido a THISJOWI. Estos Términos y Condiciones ("Términos") rigen el uso 
 
 24. RECONOCIMIENTO
 
-24.1. Al hacer clic en "Acepto" o al usar THISJOWI, usted reconoce que:
+24.1. Al hacer clic en "Acepto" o al usar THISECURE, usted reconoce que:
    - Ha leído y comprendido estos Términos
    - Acepta estar legalmente vinculado por estos Términos
    - Tiene la capacidad legal para aceptar estos Términos
 
 ---
 
-THISJOWI - Comunicación Segura y Privada
-© 2026 THISJOWI. Todos los derechos reservados.
+THISECURE - Comunicación Segura y Privada
+© 2026 THISECURE. Todos los derechos reservados.

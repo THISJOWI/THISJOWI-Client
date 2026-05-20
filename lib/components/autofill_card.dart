@@ -52,14 +52,14 @@ class _AutofillSettingsCardState extends State<AutofillSettingsCard> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Para activar THISJOWI como gestor de contraseñas:'),
+            Text('Para activar THISECURE como gestor de contraseñas:'),
             SizedBox(height: 16),
             Text('1. Abre la app de Ajustes'),
             Text('2. Ve a "Contraseñas"'),
             Text('3. Toca "Autorrellenar contraseñas"'),
-            Text('4. Activa "THISJOWI"'),
+            Text('4. Activa "THISECURE"'),
             SizedBox(height: 16),
-            Text('Después de esto, THISJOWI podrá sugerir contraseñas en Safari y otras apps.'),
+            Text('Después de esto, THISECURE podrá sugerir contraseñas en Safari y otras apps.'),
           ],
         ),
         actions: [

@@ -216,15 +216,15 @@ class InfoSnackBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.blue.shade700,
+        color: Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.blue.shade600,
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withValues(alpha: 0.3),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -238,7 +238,7 @@ class InfoSnackBar extends StatelessWidget {
               width: 4,
               height: 24,
               decoration: BoxDecoration(
-                color: Colors.blue.shade600,
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),

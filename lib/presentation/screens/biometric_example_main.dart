@@ -21,7 +21,7 @@ class _MyAppState extends State<MyApp> {
     return ChangeNotifierProvider(
       create: (_) => BiometricNotifier(),
       child: MaterialApp(
-        title: 'ThisJowi',
+        title: 'THISECURE',
         debugShowCheckedModeBanner: false,
         theme: ThemeData.dark(),
         home: _isAuthenticated

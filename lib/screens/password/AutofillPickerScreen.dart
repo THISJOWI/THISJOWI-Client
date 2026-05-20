@@ -171,13 +171,13 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.blue.withValues(alpha: 0.1),
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
+                        border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.save, color: Colors.blue),
+                          Icon(Icons.save, color: Theme.of(context).colorScheme.primary),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(

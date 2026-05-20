@@ -170,7 +170,7 @@ class _SyncDebugPanelState extends State<SyncDebugPanel> {
                   : const Icon(Icons.sync),
               label: Text(_isLoading ? 'Sincronizando...' : 'Sincronizar Ahora'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),

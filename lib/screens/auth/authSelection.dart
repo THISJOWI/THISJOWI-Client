@@ -80,7 +80,7 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                           ),
                           const SizedBox(height: 24),
                           Text(
-                            'ThisJowi',
+                            'THISECURE',
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -160,7 +160,7 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Usa LDAP Corporativo si tu empresa está registrada en ThisJowi. Usa SSO Empresarial si tu empresa usa Azure AD u otro proveedor SAML. Si no tienes una cuenta LDAP, crea una cuenta regular con tu email.',
+                            'Usa LDAP Corporativo si tu empresa está registrada en THISECURE. Usa SSO Empresarial si tu empresa usa Azure AD u otro proveedor SAML. Si no tienes una cuenta LDAP, crea una cuenta regular con tu email.',
                             style: TextStyle(
                               fontSize: 13,
                               color: cs.onSurface.withValues(alpha: 0.7),
@@ -177,7 +177,7 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Text(
-                '© 2026 ThisJowi. Todos los derechos reservados.',
+                '© 2026 THISECURE. Todos los derechos reservados.',
                 style: TextStyle(
                   fontSize: 12,
                   color: cs.onSurface.withValues(alpha: 0.4),

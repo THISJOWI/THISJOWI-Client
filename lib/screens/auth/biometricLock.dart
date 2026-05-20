@@ -74,7 +74,7 @@ class _BiometricLockScreenState extends State<BiometricLockScreen>
     setState(() => _isAuthenticating = true);
 
     final authenticated = await _biometricService.authenticate(
-      localizedReason: 'Authenticate to access ThisJowi'.i18n,
+      localizedReason: 'Authenticate to access THISECURE'.i18n,
     );
 
     if (mounted) {

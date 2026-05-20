@@ -1,12 +1,12 @@
-THISJOWI TERMS AND CONDITIONS OF USE
+THISECURE TERMS AND CONDITIONS OF USE
 
 Last updated: February 15, 2026
 
-Welcome to THISJOWI. These Terms and Conditions ("Terms") govern your use of our mobile application and related services (the "Service"). By registering for and using THISJOWI, you agree to be legally bound by these Terms.
+Welcome to THISECURE. These Terms and Conditions ("Terms") govern your use of our mobile application and related services (the "Service"). By registering for and using THISECURE, you agree to be legally bound by these Terms.
 
 1. ACCEPTANCE OF TERMS
 
-1.1. By creating an account, accessing, or using THISJOWI, you confirm that you have read, understood, and agree to be bound by these Terms and our Privacy Policy.
+1.1. By creating an account, accessing, or using THISECURE, you confirm that you have read, understood, and agree to be bound by these Terms and our Privacy Policy.
 
 1.2. If you do not agree to these Terms, you must not use our Service.
 
@@ -14,7 +14,7 @@ Welcome to THISJOWI. These Terms and Conditions ("Terms") govern your use of our
 
 2. DESCRIPTION OF THE SERVICE
 
-2.1. THISJOWI is a secure communication and information management platform that offers:
+2.1. THISECURE is a secure communication and information management platform that offers:
 
 - End-to-end encrypted messaging (E2EE)
 
@@ -30,7 +30,7 @@ Welcome to THISJOWI. These Terms and Conditions ("Terms") govern your use of our
 
 3. ELIGIBILITY REQUIREMENTS
 
-3.1. You must be at least 16 years old to use THISJOWI.
+3.1. You must be at least 16 years old to use THISECURE.
 
 3.2. By registering, you declare that all information provided is true, accurate, and complete.
 
@@ -38,7 +38,7 @@ Welcome to THISJOWI. These Terms and Conditions ("Terms") govern your use of our
 
 4. ACCOUNT REGISTRATION AND SECURITY
 
-4.1. To use THISJOWI, you must create an account by providing:
+4.1. To use THISECURE, you must create an account by providing:
 
 - A unique username
 
@@ -56,11 +56,11 @@ Welcome to THISJOWI. These Terms and Conditions ("Terms") govern your use of our
 
 - Notifying us immediately of any unauthorized use
 
-4.3. THISJOWI will not be liable for any losses resulting from the unauthorized use of your account.
+4.3. THISECURE will not be liable for any losses resulting from the unauthorized use of your account.
 
 5. ENCRYPTION AND PRIVACY
 
-5.1. THISJOWI implements end-to-end encryption (E2EE) to protect your communications.
+5.1. THISECURE implements end-to-end encryption (E2EE) to protect your communications.
 
 5.2. We generate unique cryptographic keys for each user. You are responsible for:
 
@@ -76,7 +76,7 @@ Welcome to THISJOWI. These Terms and Conditions ("Terms") govern your use of our
 
 6. ACCEPTABLE USE
 
-6.1. You agree to use THISJOWI only for lawful purposes and in accordance with these Terms.
+6.1. You agree to use THISECURE only for lawful purposes and in accordance with these Terms.
 
 6.2. It is PROHIBITED to:
 
@@ -114,11 +114,11 @@ Welcome to THISJOWI. These Terms and Conditions ("Terms") govern your use of our
 
 - Compliance with their own corporate security policies
 
-7.3. THISJOWI is not responsible for problems arising from incorrect LDAP configurations.
+7.3. THISECURE is not responsible for problems arising from incorrect LDAP configurations.
 
 8. PASSWORD MANAGER
 
-8.1. The THISJOWI password manager stores your credentials in encrypted form.
+8.1. The THISECURE password manager stores your credentials in encrypted form.
 
 8.2. You acknowledge that:
 
@@ -126,13 +126,13 @@ Welcome to THISJOWI. These Terms and Conditions ("Terms") govern your use of our
 
 - Losing your master password may result in permanent loss of access to stored passwords
 
-- THISJOWI cannot recover forgotten passwords due to end-to-end encryption
+- THISECURE cannot recover forgotten passwords due to end-to-end encryption
 
 8.3. We recommend maintaining backups of critical information.
 
 9. INTELLECTUAL PROPERTY
 
-9.1. THISJOWI and all its components (code, design, logos, trademarks) are the exclusive property of THISJOWI or its licensors.
+9.1. THISECURE and all its components (code, design, logos, trademarks) are the exclusive property of THISECURE or its licensors.
 
 9.2. You are granted a limited, non-exclusive, non-transferable, and revocable license to use the application.
 

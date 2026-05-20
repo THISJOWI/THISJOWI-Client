@@ -27,7 +27,7 @@ class _DeploymentModeSelectorState extends State<DeploymentModeSelector>
       subtitle: 'Servicio gestionado en la nube',
       type: 'Cloud',
       features: ['Automático', 'Escalable'],
-      gradient: [const Color(0xFF64B5F6), const Color(0xFF90CAF9)],
+      gradient: [const Color(0xFF7A5C3A), const Color(0xFF9A7C5A)],
     ),
     _DeploymentOption(
       icon: Icons.computer_outlined,

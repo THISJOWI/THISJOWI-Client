@@ -613,8 +613,8 @@ extension Localization on String {
         "es": "Autentícate para continuar",
       } +
       {
-        "en": "Authenticate to access THISJOWI",
-        "es": "Autentícate para acceder a THISJOWI",
+        "en": "Authenticate to access THISECURE",
+        "es": "Autentícate para acceder a THISECURE",
       } +
       {
         "en": "Authenticate to enable biometric lock",
@@ -655,8 +655,8 @@ extension Localization on String {
 
       // ==================== ONBOARDING ====================
       {
-        "en": "Welcome to THISJOWI",
-        "es": "Bienvenido a THISJOWI",
+        "en": "Welcome to THISECURE",
+        "es": "Bienvenido a THISECURE",
       } +
       {
         "en": "Your productivity secured manager",
@@ -720,9 +720,9 @@ extension Localization on String {
       } +
       {
         "en":
-            "Make THISJOWI your primary password manager to automatically fill in data in all your applications.",
+            "Make THISECURE your primary password manager to automatically fill in data in all your applications.",
         "es":
-            "Hacer de THISJOWI tu gestor de contraseñas principal para completar datos automáticamente en todas tus aplicaciones.",
+            "Hacer de THISECURE tu gestor de contraseñas principal para completar datos automáticamente en todas tus aplicaciones.",
       } +
       {
         "en": "Later",

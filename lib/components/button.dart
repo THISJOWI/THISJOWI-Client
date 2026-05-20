@@ -1,5 +1,5 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:thisjowi/components/liquid_glass.dart';
 
 class ExpandableActionButton extends StatefulWidget {
   final VoidCallback onCreatePassword;
@@ -102,14 +102,17 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
         alignment: Alignment.bottomRight,
         child: Padding(
           padding: EdgeInsets.only(bottom: bottomPadding),
-          child: LiquidGlass.container(
-            context: context,
-            blur: 15,
-            opacity: 0.45,
-            borderRadius: 24,
-            padding: EdgeInsets.zero,
-            child: GestureDetector(
-              onTap: onTap,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: GestureDetector(
+                  onTap: onTap,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
@@ -135,7 +138,9 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
           ),
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 
   @override
@@ -183,13 +188,17 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOutCubic,
             builder: (context, value, child) {
-              return LiquidGlass.container(
-                context: context,
-                blur: 10,
-                opacity: 0.5,
-                borderRadius: 28,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                child: Row(
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+                      borderRadius: BorderRadius.circular(28),
+                    ),
+                    child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Transform.rotate(
@@ -224,6 +233,8 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
                       ),
                     ),
                   ],
+                ),
+                  ),
                 ),
               );
             },

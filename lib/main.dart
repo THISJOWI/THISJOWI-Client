@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:thisjowi/core/app_theme.dart';
 import 'package:thisjowi/core/api.dart';
 import 'package:thisjowi/core/env_loader.dart';
+import 'package:thisjowi/core/theme_provider.dart';
 import 'package:thisjowi/core/providers/otp_provider.dart';
 import 'package:thisjowi/screens/auth/login.dart';
 import 'package:thisjowi/screens/auth/register.dart';
@@ -96,6 +97,17 @@ void main() async {
   runApp(const MainApp());
 }
 
+class _SystemUIUpdater extends StatelessWidget {
+  final Widget child;
+  const _SystemUIUpdater({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    context.read<ThemeProvider>().updateSystemUI(context);
+    return child;
+  }
+}
+
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
@@ -103,52 +115,54 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => OtpProvider()),
       ],
       child: KeyboardEventFix(
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: "ThisJowi",
-        
-        // Localization support
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('en'),
-          Locale('es'),
-        ],
-        localeResolutionCallback: (locale, supportedLocales) {
-          // Si el idioma del dispositivo es español (cualquier variante), usar 'es'
-          if (locale != null && locale.languageCode == 'es') {
-            return const Locale('es');
-          }
-          // Por defecto, usar inglés
-          return const Locale('en');
-        },
-        builder: (context, child) => PrivacyOverlay(
-          child: I18n(
-            initialLocale: const Locale('en'),
-            child: child!
-          ),
+        child: Consumer<ThemeProvider>(
+          builder: (context, themeProvider, _) {
+            return _SystemUIUpdater(
+              child: MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: "THISECURE",
+                localizationsDelegates: const [
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                supportedLocales: const [
+                  Locale('en'),
+                  Locale('es'),
+                ],
+                localeResolutionCallback: (locale, supportedLocales) {
+                  if (locale != null && locale.languageCode == 'es') {
+                    return const Locale('es');
+                  }
+                  return const Locale('en');
+                },
+                builder: (context, child) => PrivacyOverlay(
+                  child: I18n(
+                    initialLocale: const Locale('en'),
+                    child: child!
+                  ),
+                ),
+                themeMode: themeProvider.flutterThemeMode,
+                theme: AppTheme.getLightTheme(),
+                darkTheme: AppTheme.getDarkTheme(),
+                routes: {
+                  '/authSelection': (context) => const AuthSelectionScreen(),
+                  '/ldapLogin': (context) => const LdapLoginScreen(),
+                  '/samlLogin': (context) => const SamlLoginScreen(),
+                  '/login': (context) => const LoginScreen(),
+                  '/register': (context) => const RegisterScreen(),
+                  '/onboarding': (context) => const OnboardingScreen(),
+                  '/otp/qrscan': (context) => const OtpQrScannerScreen(),
+                },
+                home: const SplashScreen(),
+              ),
+            );
+          },
         ),
-        
-        themeMode: ThemeMode.system,
-        theme: AppTheme.getLightTheme(),
-        darkTheme: AppTheme.getDarkTheme(),
-      routes: {
-        '/authSelection': (context) => const AuthSelectionScreen(),
-        '/ldapLogin': (context) => const LdapLoginScreen(),
-        '/samlLogin': (context) => const SamlLoginScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/onboarding': (context) => const OnboardingScreen(),
-        '/otp/qrscan': (context) => const OtpQrScannerScreen(),
-      },
-      home: const SplashScreen(),
-      ),
       ),
     );
   }

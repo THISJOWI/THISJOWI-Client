@@ -216,7 +216,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'THISJOWI puede guardar esta contraseña para ti',
+                            'THISECURE puede guardar esta contraseña para ti',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               fontSize: 14,

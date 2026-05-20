@@ -214,12 +214,12 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
           decoration: BoxDecoration(
             color: hasError 
                 ? Colors.red.withValues(alpha: 0.08) 
-                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+                : Theme.of(context).scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: hasError 
                   ? Colors.red.withValues(alpha: 0.6) 
-                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1), 
+                  : Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.3),
               width: hasError ? 1.5 : 1,
             ),
           ),
@@ -278,12 +278,12 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
           decoration: BoxDecoration(
             color: hasError 
                 ? Colors.red.withValues(alpha: 0.08) 
-                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+                : Theme.of(context).scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: hasError 
                   ? Colors.red.withValues(alpha: 0.6) 
-                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1), 
+                  : Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.3), 
               width: hasError ? 1.5 : 1,
             ),
           ),

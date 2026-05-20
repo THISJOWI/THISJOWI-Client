@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppTheme {
   // --- Seed Color (Material 3 generation base) ---
-  static const Color seedColor = Color(0xFF2563EB);
+  static const Color seedColor = Color(0xFFFFB74D);
 
   // --- Semantic helpers (kept for direct references) ---
   static const Color success = Color(0xFF22C55E);
@@ -10,9 +11,9 @@ class AppTheme {
   static const Color warning = Color(0xFFF59E0B);
 
   // Light mode raw values (for biometric screens & legacy code)
-  static const Color lightBackground = Color(0xFFEEF2F8);
+  static const Color lightBackground = Color(0xFFF0F2F7);
   static const Color lightText = Color(0xFF1A1D21);
-  static const Color lightBottomNavBar = Color(0xFFFFFFFF);
+  static const Color lightBottomNavBar = Color(0xFFF0F2F7);
   static const Color lightCardBg = Color(0xFFFFFFFF);
 
   // Dark mode raw values (for biometric screens & legacy code)
@@ -46,6 +47,11 @@ class AppTheme {
         elevation: 0,
         centerTitle: true,
         surfaceTintColor: cs.surfaceTint,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: darkBottomNavBar,
@@ -55,7 +61,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: cs.surfaceContainerHighest.withValues(alpha: 0.4),
+        fillColor: cs.surface.withValues(alpha: 0.4),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
@@ -171,6 +177,11 @@ class AppTheme {
         elevation: 0,
         centerTitle: true,
         surfaceTintColor: cs.surfaceTint,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+        ),
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Colors.white,
@@ -180,7 +191,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: cs.surfaceContainerHighest.withValues(alpha: 0.4),
+        fillColor: cs.surface.withValues(alpha: 0.4),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(

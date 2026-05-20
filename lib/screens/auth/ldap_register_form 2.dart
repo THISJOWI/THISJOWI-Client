@@ -331,7 +331,7 @@ class _LdapRegisterFormState extends State<LdapRegisterForm>
                 child: SelectableText(
                   termsContent,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
                     fontSize: 14,
                     height: 1.6,
                   ),

@@ -67,7 +67,7 @@ class ThisjowiAutofillService : AutofillService() {
 
         // Create presentation for the autofill suggestion
         val presentation = RemoteViews(packageName, android.R.layout.simple_list_item_1).apply {
-            setTextViewText(android.R.id.text1, "THISJOWI - Tap to autofill")
+            setTextViewText(android.R.id.text1, "THISECURE - Tap to autofill")
         }
 
         val responseBuilder = FillResponse.Builder()

@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/core/service_locator.dart';
 import 'package:thisjowi/data/models/password_entry.dart';
 import 'package:thisjowi/data/models/note_entry.dart';
@@ -131,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Make THISJOWI your primary password manager to automatically fill in data in all your applications.'
+                  'Make THISECURE your primary password manager to automatically fill in data in all your applications.'
                       .i18n,
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -621,14 +620,16 @@ SafeArea(
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 16.0),
-                  child: LiquidGlass.container(
-                    context: context,
-                    blur: 10,
-                    opacity: 0.5,
-                    borderRadius: 25,
-                    padding: EdgeInsets.zero,
-                    showBorder: false,
-                    child: TextField(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: TextField(
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
                       decoration: InputDecoration(
@@ -663,6 +664,8 @@ SafeArea(
                     ),
                   ),
                 ),
+              ),
+              ),
                 // Content
                 Expanded(
                   child: _isLoading
@@ -778,18 +781,22 @@ SafeArea(
   }
 
   Widget _buildPasswordItem(PasswordEntry entry) {
-    return LiquidGlass.container(
-      context: context,
-      blur: 10,
-      opacity: 0.5,
-      borderRadius: 20,
+    return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-      padding: EdgeInsets.zero,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => _showPasswordDetails(entry),
-          borderRadius: BorderRadius.circular(20),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            decoration: BoxDecoration(
+              color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _showPasswordDetails(entry),
+                borderRadius: BorderRadius.circular(20),
           child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 16.0),
@@ -859,33 +866,40 @@ SafeArea(
                 ),
               ),
             ),
-          );
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildNoteItem(Note note) {
-    return LiquidGlass.container(
-      context: context,
-      blur: 10,
-      opacity: 0.5,
-      borderRadius: 20,
+    return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-      padding: EdgeInsets.zero,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () async {
-            final edited = await Navigator.push<bool>(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditNoteScreen(
-                  notesRepository: _notesRepository,
-                  note: note,
-                ),
-              ),
-            );
-            if (edited == true) _loadData();
-          },
-          borderRadius: BorderRadius.circular(20),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            decoration: BoxDecoration(
+              color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () async {
+                  final edited = await Navigator.push<bool>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditNoteScreen(
+                        notesRepository: _notesRepository,
+                        note: note,
+                      ),
+                    ),
+                  );
+                  if (edited == true) _loadData();
+                },
+                borderRadius: BorderRadius.circular(20),
           child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 16.0),
@@ -936,7 +950,10 @@ SafeArea(
                 ),
               ),
             ),
-          );
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildEmptyState() {

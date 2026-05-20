@@ -205,7 +205,6 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
                   // ListView - cada línea con su TextField
                   Expanded(
                     child: Padding(

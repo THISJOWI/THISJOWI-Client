@@ -101,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     final authenticated = await _biometricService.authenticate(
-      localizedReason: 'Authenticate to access ThisJowi'.tr(context),
+      localizedReason: 'Authenticate to access THISECURE'.tr(context),
     );
 
     if (authenticated && mounted) {
@@ -425,8 +425,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             padding: const EdgeInsets.all(32.0),
                             decoration: BoxDecoration(
                               color: isDark
-                                  ? const Color(0xFF1E1E1E).withValues(alpha: 0.6)
-                                  : Colors.white.withValues(alpha: 0.8),
+                                  ? const Color(0xFF2A2A2A).withValues(alpha: 0.85)
+                                  : Colors.white.withValues(alpha: 0.85),
                               borderRadius: BorderRadius.circular(30),
                               border: Border.all(
                                 color: isDark

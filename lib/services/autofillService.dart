@@ -152,7 +152,7 @@ class AutofillService {
         return AutofillStatus(
           isSupported: true,
           isEnabled: true,
-          message: 'THISJOWI está configurado como tu gestor de contraseñas',
+          message: 'THISECURE está configurado como tu gestor de contraseñas',
           actionText: 'Cambiar configuración',
         );
       } else {
@@ -160,7 +160,7 @@ class AutofillService {
           isSupported: true,
           isEnabled: false,
           message:
-              'Activa THISJOWI como tu gestor de contraseñas para autorellenar en otras apps',
+              'Activa THISECURE como tu gestor de contraseñas para autorellenar en otras apps',
           actionText: 'Activar autofill',
         );
       }
@@ -170,7 +170,7 @@ class AutofillService {
         isEnabled:
             false, // We can't check on iOS, so we prompt user to check/enable
         message:
-            'Para usar autofill, ve a Ajustes > Contraseñas > Autorrellenar contraseñas y activa THISJOWI',
+            'Para usar autofill, ve a Ajustes > Contraseñas > Autorrellenar contraseñas y activa THISECURE',
         actionText: 'Configurar',
       );
     }

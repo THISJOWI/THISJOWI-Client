@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
@@ -7,7 +8,6 @@ import 'package:thisjowi/data/models/password_entry.dart';
 import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/components/button.dart';
 import 'package:thisjowi/components/error_bar.dart';
-import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'EditPasswordScreen.dart';
 
@@ -367,14 +367,16 @@ class _PasswordScreenState extends State<PasswordScreen> {
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-              child: LiquidGlass.container(
-                context: context,
-                blur: 10,
-                opacity: 0.5,
-                borderRadius: 25,
-                padding: EdgeInsets.zero,
-                showBorder: false,
-                child: TextField(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: TextField(
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
                         decoration: InputDecoration(
@@ -407,7 +409,9 @@ class _PasswordScreenState extends State<PasswordScreen> {
                         },
                       ),
                     ),
+                    ),
                   ),
+                ),
             Expanded(
               child: _isLoading
                   ? Center(
@@ -421,14 +425,18 @@ class _PasswordScreenState extends State<PasswordScreen> {
                           itemCount: _passwords.length,
                           itemBuilder: (context, index) {
                             final entry = _passwords[index];
-                            return LiquidGlass.container(
-                              context: context,
-                              blur: 10,
-                              opacity: 0.5,
-                              borderRadius: 12,
+                            return Container(
                               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                              padding: EdgeInsets.zero,
-                              child: Material(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Material(
                                 color: Colors.transparent,
                                 child: InkWell(
                                     onTap: () => _showPasswordDetails(entry),
@@ -509,7 +517,10 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                     ),
                                   ),
                                 ),
-                              );
+                                  ),
+                                ),
+                              ),
+                            );
                             },
                         ),
             ),

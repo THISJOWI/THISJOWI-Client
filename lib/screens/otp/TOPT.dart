@@ -1,6 +1,6 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:thisjowi/core/providers/otp_provider.dart';
@@ -178,6 +178,7 @@ Widget build(BuildContext context) {
           builder: (context, otpProvider, _) {
             return Stack(
               children: [
+                Container(color: Theme.of(context).scaffoldBackgroundColor),
                 SafeArea(
                   child: Column(
                     children: [
@@ -205,14 +206,16 @@ Widget build(BuildContext context) {
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 16.0),
-                        child: LiquidGlass.container(
-                          context: context,
-                          blur: 10,
-                          opacity: 0.5,
-                          borderRadius: 25,
-                          padding: EdgeInsets.zero,
-                          showBorder: false,
-                          child: TextField(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              child: TextField(
                             onChanged: (value) {
                               otpProvider.setSearchQuery(value);
                             },
@@ -247,6 +250,8 @@ Widget build(BuildContext context) {
                           ),
                         ),
                       ),
+                    ),
+                  ),
 
                       // List
                       Expanded(
@@ -495,13 +500,18 @@ class _OtpCardState extends State<_OtpCard>
       );
     }
 
-    return LiquidGlass.container(
-      context: context,
-      blur: 10,
-      opacity: 0.5,
-      borderRadius: 16,
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Material(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            decoration: BoxDecoration(
+              color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: widget.onCopy,
@@ -517,7 +527,7 @@ class _OtpCardState extends State<_OtpCard>
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+                        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Center(
@@ -629,6 +639,9 @@ class _OtpCardState extends State<_OtpCard>
               ],
             ),
           ),
+        ),
+      ),
+      ),
         ),
       ),
     );

@@ -113,9 +113,9 @@ class AndroidAutofillService implements PlatformAutofillService {
   Future<String> getStatusMessage() async {
     final enabled = await isEnabled();
     if (enabled) {
-      return 'THISJOWI está activo como gestor de contraseñas';
+      return 'THISECURE está activo como gestor de contraseñas';
     } else {
-      return 'Activa THISJOWI en Configuración > Sistema > Autofill';
+      return 'Activa THISECURE en Configuración > Sistema > Autofill';
     }
   }
 }
@@ -171,7 +171,7 @@ class IOSAutofillService implements PlatformAutofillService {
 
   @override
   Future<String> getStatusMessage() async {
-    return 'Para usar autofill, ve a Ajustes > Contraseñas > Autorrellenar contraseñas y activa THISJOWI';
+    return 'Para usar autofill, ve a Ajustes > Contraseñas > Autorrellenar contraseñas y activa THISECURE';
   }
 }
 
@@ -215,7 +215,7 @@ class MacOSAutofillService implements PlatformAutofillService {
 
   @override
   Future<String> getStatusMessage() async {
-    return 'Para usar autofill, ve a Preferencias del Sistema > Contraseñas y activa THISJOWI';
+    return 'Para usar autofill, ve a Preferencias del Sistema > Contraseñas y activa THISECURE';
   }
 }
 
@@ -262,7 +262,7 @@ class WindowsAutofillService implements PlatformAutofillService {
 
   @override
   Future<String> getStatusMessage() async {
-    return 'THISJOWI puede guardar contraseñas en Windows Credential Manager';
+    return 'THISECURE puede guardar contraseñas en Windows Credential Manager';
   }
 }
 
@@ -308,7 +308,7 @@ class LinuxAutofillService implements PlatformAutofillService {
 
   @override
   Future<String> getStatusMessage() async {
-    return 'Instala la extensión de navegador de THISJOWI para autofill';
+    return 'Instala la extensión de navegador de THISECURE para autofill';
   }
 }
 
@@ -354,7 +354,7 @@ class WebAutofillService implements PlatformAutofillService {
 
   @override
   Future<String> getStatusMessage() async {
-    return 'Instala la extensión de navegador de THISJOWI para autofill';
+    return 'Instala la extensión de navegador de THISECURE para autofill';
   }
 }
 

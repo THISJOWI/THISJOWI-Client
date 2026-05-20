@@ -353,9 +353,9 @@ class _RegisterFormState extends State<RegisterForm>
       barrierDismissible: false,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: AlertDialog(
-            backgroundColor: isDark ? const Color(0xFF1E1E1E).withValues(alpha: 0.95) : Colors.white.withValues(alpha: 0.95),
+            backgroundColor: isDark ? const Color(0xFF2A2A2A).withValues(alpha: 0.85) : Colors.white.withValues(alpha: 0.85),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(28),
               side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08)),
@@ -1123,7 +1123,7 @@ class _RegisterFormState extends State<RegisterForm>
                   gradient: LinearGradient(
                     colors: widget.accountType == 'Business'
                         ? [const Color(0xFFFFA726), const Color(0xFFFFB74D)]
-                        : [const Color(0xFF5B8DEF), const Color(0xFF7B9FE8)],
+                        : [const Color(0xFF7A5C3A), const Color(0xFF9A7C5A)],
                   ),
                 ),
                 child: Icon(

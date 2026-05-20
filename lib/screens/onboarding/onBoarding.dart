@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:thisjowi/components/liquid_glass.dart';
+import 'dart:ui';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/core/api.dart';
 
@@ -135,7 +135,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   List<Widget> _buildPages(BuildContext context) {
     List<Widget> pages = [
       _buildIntroPage(OnboardingPage(
-        title: 'Welcome to THISJOWI'.i18n,
+        title: 'Welcome to THISECURE'.i18n,
         description: 'Your productivity secured manager'.i18n,
         icon: Icons.lock_person_rounded,
         color: Theme.of(context).colorScheme.primary,
@@ -465,7 +465,7 @@ Widget _buildIntroPage(OnboardingPage page) {
             const SizedBox(height: 40),
             _buildSelectionCard(
               title: "Cloud".i18n,
-              description: "Hosted by ThisJowi. Secure and managed.".i18n,
+              description: "Hosted by THISECURE. Secure and managed.".i18n,
               icon: Icons.cloud_queue,
               isSelected: _hostingMode == 'cloud',
               onTap: () {
@@ -636,7 +636,7 @@ Widget _buildIntroPage(OnboardingPage page) {
                 const SizedBox(height: 40),
                 _buildSelectionCard(
                   title: "Create Account".i18n,
-                  description: "New to ThisJowi? Sign up here.".i18n,
+                  description: "New to THISECURE? Sign up here.".i18n,
                   icon: Icons.person_add_outlined,
                   isSelected: false,
                   onTap: () {
@@ -668,13 +668,16 @@ Widget _buildIntroPage(OnboardingPage page) {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    return LiquidGlass.container(
-      context: context,
-      blur: 10,
-      opacity: 0.4,
-      borderRadius: 15,
-      padding: EdgeInsets.zero,
-      child: GestureDetector(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(15),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          decoration: BoxDecoration(
+            color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: GestureDetector(
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -727,6 +730,8 @@ Widget _buildIntroPage(OnboardingPage page) {
             ],
           ),
         ),
+      ),
+      ),
       ),
     );
   }

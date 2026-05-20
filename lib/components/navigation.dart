@@ -143,7 +143,19 @@ class Navigation extends State<MyBottomNavigation>
         }
 
         return GlassBackdropScope(
-          child: Scaffold(
+          child: AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Brightness.light
+                      : Brightness.dark,
+              statusBarBrightness:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Brightness.dark
+                      : Brightness.light,
+            ),
+            child: Scaffold(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             extendBody: true,
             extendBodyBehindAppBar: true,
@@ -197,12 +209,13 @@ class Navigation extends State<MyBottomNavigation>
               spacing: 8,
               glassSettings: const LiquidGlassSettings(
                 thickness: 30,
-                blur: 20,
+                blur: 60,
                 refractiveIndex: 1.59,
               ),
               showIndicator: true,
             ),
           ),
+        ),
         );
       },
     );
@@ -257,7 +270,7 @@ class _DesktopLayout extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        'THISJOWI',
+                        'THISECURE',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 20,
