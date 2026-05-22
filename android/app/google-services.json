@@ -1,26 +1,51 @@
 {
   "project_info": {
-    "project_number": "809934418722",
-    "project_id": "thi-e6684",
-    "storage_bucket": "thi-e6684.firebasestorage.app"
+    "project_number": "874520303548",
+    "project_id": "thisjowi",
+    "storage_bucket": "thisjowi.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:809934418722:android:e909d7171d03a4f980ab7b",
+        "mobilesdk_app_id": "1:874520303548:android:303ea72a56cc3934adbdb9",
         "android_client_info": {
           "package_name": "com.thisjowi.thisecure"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "874520303548-qr6ks6tt3tqd2rnpljuq9n0nlhst192j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.thisjowi.thisecure",
+            "certificate_hash": "31d28b4cc9d18acb4313c758f54900c6b62b7e2f"
+          }
+        },
+        {
+          "client_id": "874520303548-j16i68ti94ojt2r4jaqu1ainbrsutdgi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyAkdzGWpwTd1uzbID45LnMhccDEC_MLGA4"
+          "current_key": "AIzaSyBf-MtyfRrhJ5UksMP-761S8sOZc0_iw9g"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "874520303548-j16i68ti94ojt2r4jaqu1ainbrsutdgi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "874520303548-914qta0s68na91gvohb2etr5r7khv51h.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "uk.thisjowi.thisjowi"
+              }
+            }
+          ]
         }
       }
     }

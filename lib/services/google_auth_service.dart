@@ -32,7 +32,7 @@ class GoogleAuthService extends BaseService {
     return GoogleSignIn(
       scopes: ['email', 'profile'],
       clientId: Platform.isAndroid
-          ? '874520303548-le6pq4merb2168869p6jfhmfj7ku968o.apps.googleusercontent.com'
+          ? '874520303548-j16i68ti94ojt2r4jaqu1ainbrsutdgi.apps.googleusercontent.com'
           : Platform.isWindows || Platform.isLinux
               ? '874520303548-le6pq4merb2168869p6jfhmfj7ku968o.apps.googleusercontent.com'
               : null,
@@ -78,13 +78,6 @@ class GoogleAuthService extends BaseService {
       }
 
       logInfo('Usuario Google: ${googleUser.email}');
-
-      final String? authCode = googleUser.serverAuthCode;
-      logInfo('Server Auth Code obtenido: ${authCode != null}');
-
-      if (authCode != null) {
-        return _sendToBackend(code: authCode, email: googleUser.email);
-      }
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
