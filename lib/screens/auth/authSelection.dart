@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:thisjowi/components/auth_method_selector.dart';
+import 'package:thisjowi/components/navigation.dart';
 import 'package:thisjowi/services/google_auth_service.dart';
 import 'login.dart';
 import 'ldapLogin.dart';
@@ -28,7 +29,11 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
       await _googleAuthService.login();
       if (!mounted) return;
       setState(() => _isLoading = false);
-      Navigator.of(context).pushReplacementNamed('/home');
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
+        (route) => false,
+      );
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);

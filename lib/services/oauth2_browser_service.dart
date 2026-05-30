@@ -1,39 +1,35 @@
 import 'dart:async';
 
-import 'package:app_links/app_links.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+import 'package:thisjowi/utils/app_logger.dart';
 
 class OAuth2BrowserService {
-  /// Opens [authUrl] in the system browser and waits for the callback
+  /// Opens [authUrl] in an in-app browser modal and waits for the callback
   /// to arrive via the custom URL scheme defined in [expectedScheme].
   ///
-  /// Uses app_links uriLinkStream to capture the deep link. The first
-  /// listener on the stream automatically receives any pending initial
-  /// link, so getInitialLink() is not needed.
+  /// Uses ASWebAuthenticationSession on iOS/macOS and Chrome Custom Tabs
+  /// on Android — no app switching or deep link interception needed.
   static Future<Uri> authenticate({
     required Uri authUrl,
     String expectedScheme = 'thisjowi',
-    Duration timeout = const Duration(minutes: 2),
+    Duration timeout = const Duration(seconds: 90),
   }) async {
-    final appLinks = AppLinks();
-    final completer = Completer<Uri>();
-
-    final sub = appLinks.uriLinkStream.listen((uri) {
-      if (uri.scheme == expectedScheme && !completer.isCompleted) {
-        completer.complete(uri);
-      }
-    });
-
-    final launched = await launchUrl(authUrl, mode: LaunchMode.externalApplication);
-    if (!launched) {
-      await sub.cancel();
-      throw Exception('No se pudo abrir el navegador');
-    }
+    appLog.i('OAuth2BrowserService: opening auth modal: $authUrl');
 
     try {
-      return await completer.future.timeout(timeout);
-    } finally {
-      await sub.cancel();
+      final result = await FlutterWebAuth2.authenticate(
+        url: authUrl.toString(),
+        callbackUrlScheme: expectedScheme,
+      ).timeout(timeout);
+
+      appLog.i('OAuth2BrowserService: callback received: $result');
+      return Uri.parse(result);
+    } on TimeoutException {
+      appLog.w('OAuth2BrowserService: timeout waiting for callback');
+      rethrow;
+    } catch (e) {
+      appLog.w('OAuth2BrowserService: auth error: $e');
+      rethrow;
     }
   }
 }
