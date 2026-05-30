@@ -8,6 +8,7 @@ import 'package:thisjowi/data/models/password_entry.dart';
 import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/components/button.dart';
 import 'package:thisjowi/components/error_bar.dart';
+import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'EditPasswordScreen.dart';
 
@@ -86,9 +87,19 @@ class _PasswordScreenState extends State<PasswordScreen> {
   Future<bool> _showDeleteConfirmation(PasswordEntry entry) async {
     return await showDialog<bool>(
           context: context,
-          builder: (context) => AlertDialog(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            title: Text('Delete password?'.i18n,
+          builder: (context) => BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: AlertDialog(
+              backgroundColor: Theme.of(context).cardColor.withValues(alpha: 0.85),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.black.withValues(alpha: 0.08),
+                ),
+              ),
+              title: Text('Delete password?'.i18n,
                 style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             content: Text('Are you sure you want to delete "${entry.title}"?',
                 style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
@@ -103,6 +114,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                 child: Text('Delete'.i18n, style: TextStyle(color: Colors.red)),
               ),
             ],
+          ),
           ),
         ) ??
         false;
@@ -134,14 +146,11 @@ class _PasswordScreenState extends State<PasswordScreen> {
       barrierColor: Colors.black.withValues(alpha: 0.5),
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => Dialog(
-          backgroundColor: Theme.of(context).cardColor,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.all(20),
           child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
+            child: LiquidGlass.wrap(
+              Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -319,6 +328,9 @@ class _PasswordScreenState extends State<PasswordScreen> {
                   ),
                 ],
               ),
+              context,
+              padding: const EdgeInsets.all(24),
+              borderRadius: 20,
             ),
           ),
         ),
@@ -372,15 +384,18 @@ class _PasswordScreenState extends State<PasswordScreen> {
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    child: TextField(
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
-                        decoration: InputDecoration(
-                          hintText: 'Search passwords'.i18n,
+                      decoration: BoxDecoration(
+                        color: (Theme.of(context).brightness == Brightness.dark
+                            ? Color.lerp(Theme.of(context).scaffoldBackgroundColor, Colors.white, 0.12)!
+                            : Color.lerp(Theme.of(context).scaffoldBackgroundColor, Colors.black, 0.06)!)
+                            .withValues(alpha: 0.85),
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: TextField(
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                          decoration: InputDecoration(
+                            hintText: 'Search passwords'.i18n,
                           hintStyle: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                               fontSize: 16),

@@ -79,10 +79,20 @@ class _NotesScreenState extends State<NotesScreen> {
   Future<bool> _showDeleteConfirmation(Note note) async {
     return await showDialog<bool>(
           context: context,
-          builder: (context) => AlertDialog(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            title: Text(
-              'Delete Note?'.tr(context),
+          builder: (context) => BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: AlertDialog(
+              backgroundColor: Theme.of(context).cardColor.withValues(alpha: 0.85),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.black.withValues(alpha: 0.08),
+                ),
+              ),
+              title: Text(
+                'Delete Note?'.tr(context),
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
             content: Text(
@@ -105,6 +115,7 @@ class _NotesScreenState extends State<NotesScreen> {
                 ),
               ),
             ],
+          ),
           ),
         ) ??
         false;
@@ -226,18 +237,21 @@ class _NotesScreenState extends State<NotesScreen> {
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                         child: Container(
-                          decoration: BoxDecoration(
-                            color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: SizedBox(
-                        height: 36,
-                        child: TextField(
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface, fontSize: 17),
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                          hintText: 'Search'.tr(context),
+                            decoration: BoxDecoration(
+                              color: (Theme.of(context).brightness == Brightness.dark
+                                  ? Color.lerp(Theme.of(context).scaffoldBackgroundColor, Colors.white, 0.12)!
+                                  : Color.lerp(Theme.of(context).scaffoldBackgroundColor, Colors.black, 0.06)!)
+                                  .withValues(alpha: 0.85),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: SizedBox(
+                          height: 36,
+                          child: TextField(
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface, fontSize: 17),
+                          textAlignVertical: TextAlignVertical.center,
+                          decoration: InputDecoration(
+                            hintText: 'Search'.tr(context),
                           hintStyle: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               fontSize: 17),

@@ -117,9 +117,19 @@ class _OtpScreenState extends State<OtpScreen> with WidgetsBindingObserver {
   Future<void> _deleteEntry(OtpEntry entry) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).cardColor,
-        title: Text('Delete OTP?'.tr(context),
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: AlertDialog(
+          backgroundColor: Theme.of(context).cardColor.withValues(alpha: 0.85),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.black.withValues(alpha: 0.08),
+            ),
+          ),
+          title: Text('Delete OTP?'.tr(context),
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         content: Text(
           'Are you sure you want to delete "${entry.issuer.isNotEmpty ? entry.issuer : entry.name}"?',
@@ -137,6 +147,7 @@ class _OtpScreenState extends State<OtpScreen> with WidgetsBindingObserver {
                 style: const TextStyle(color: Colors.red)),
           ),
         ],
+      ),
       ),
     );
 

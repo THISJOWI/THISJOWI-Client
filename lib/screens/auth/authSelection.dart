@@ -122,7 +122,7 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                           ),
                         );
                       },
-                      onGoogleTap: _isLoading ? null : _handleGoogleLogin,
+                      onGoogleTap: !_isLoading ? _handleGoogleLogin : null,
                     ),
                     if (_isLoading)
                       Padding(

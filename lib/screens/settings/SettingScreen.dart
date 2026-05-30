@@ -10,6 +10,7 @@ import 'package:thisjowi/services/profile_service.dart';
 import 'package:thisjowi/services/biometricService.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/components/country_selector.dart';
+import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/screens/organization/LdapConfigScreen.dart';
 import 'package:thisjowi/data/models/auth_user.dart';
@@ -201,12 +202,9 @@ class _SettingScreenState extends State<SettingScreen> {
         child: SizedBox(
           width: 400,
           child: Dialog(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
+            backgroundColor: Colors.transparent,
+            child: LiquidGlass.wrap(
+              Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
@@ -285,6 +283,9 @@ class _SettingScreenState extends State<SettingScreen> {
                   ),
                 ],
               ),
+              context,
+              padding: EdgeInsets.all(24),
+              borderRadius: 16,
             ),
           ),
         ),
@@ -315,12 +316,9 @@ class _SettingScreenState extends State<SettingScreen> {
           child: SizedBox(
             width: 400,
             child: Dialog(
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
+              backgroundColor: Colors.transparent,
+              child: LiquidGlass.wrap(
+                Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
@@ -487,6 +485,9 @@ class _SettingScreenState extends State<SettingScreen> {
                     ),
                   ],
                 ),
+                context,
+                padding: EdgeInsets.all(24),
+                borderRadius: 16,
               ),
             ),
           ),
@@ -528,12 +529,9 @@ class _SettingScreenState extends State<SettingScreen> {
           child: SizedBox(
             width: 400,
             child: Dialog(
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
+              backgroundColor: Colors.transparent,
+              child: LiquidGlass.wrap(
+                Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
@@ -633,6 +631,9 @@ class _SettingScreenState extends State<SettingScreen> {
                     ),
                   ],
                 ),
+                context,
+                padding: EdgeInsets.all(24),
+                borderRadius: 16,
               ),
             ),
           ),
@@ -742,57 +743,59 @@ class _SettingScreenState extends State<SettingScreen> {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Container(
+        backgroundColor: Colors.transparent,
+        child: SizedBox(
           width: 400,
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Select Country'.i18n,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 24),
-              CountrySelector(
-                initialValue: _currentProfile?.country,
-                onCountrySelected: (country) async {
-                  if (country == null) return;
-                  try {
-                    await _profileService.updateProfileFields(
-                      country: country,
-                    );
-                    if (!mounted) return;
-                    Navigator.pop(context);
-                    ErrorSnackBar.showSuccess(context, 'Country updated'.i18n);
-                    await _loadCurrentUser();
-                  } catch (e) {
-                    if (!mounted) return;
-                    ErrorSnackBar.show(context, 'Error: $e');
-                  }
-                },
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text('Cancel'.i18n,
-                        style: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7))),
+          child: LiquidGlass.wrap(
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Select Country'.i18n,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 24),
+                CountrySelector(
+                  initialValue: _currentProfile?.country,
+                  onCountrySelected: (country) async {
+                    if (country == null) return;
+                    try {
+                      await _profileService.updateProfileFields(
+                        country: country,
+                      );
+                      if (!mounted) return;
+                      Navigator.pop(context);
+                      ErrorSnackBar.showSuccess(context, 'Country updated'.i18n);
+                      await _loadCurrentUser();
+                    } catch (e) {
+                      if (!mounted) return;
+                      ErrorSnackBar.show(context, 'Error: $e');
+                    }
+                  },
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('Cancel'.i18n,
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.7))),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            context,
+            padding: EdgeInsets.all(24),
           ),
         ),
       ),
@@ -804,57 +807,84 @@ class _SettingScreenState extends State<SettingScreen> {
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          title: Text('Account Type'.i18n,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: ['Business', 'Community']
-                .map((type) => RadioListTile<String>(
-                      title: Text(type,
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface)),
-                      value: type,
-                      groupValue: accountType,
-                      activeColor: Theme.of(context).colorScheme.primary,
-                      onChanged: (value) => setState(() => accountType = value),
-                    ))
-                .toList(),
+        builder: (context, setState) => Center(
+          child: SizedBox(
+            width: 400,
+            child: Dialog(
+              backgroundColor: Colors.transparent,
+              child: LiquidGlass.wrap(
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Account Type'.i18n,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: ['Business', 'Community']
+                          .map((type) => RadioListTile<String>(
+                                title: Text(type,
+                                    style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onSurface)),
+                                value: type,
+                                groupValue: accountType,
+                                activeColor: Theme.of(context).colorScheme.primary,
+                                onChanged: (value) => setState(() => accountType = value),
+                              ))
+                          .toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('Cancel'.i18n,
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.7))),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          onPressed: () async {
+                            if (accountType == null) return;
+                            try {
+                              await _profileService.updateProfileFields(
+                                accountType: accountType,
+                              );
+                              if (!mounted) return;
+                              Navigator.pop(context);
+                              ErrorSnackBar.showSuccess(
+                                  context, 'Account Type updated'.i18n);
+                              await _loadCurrentUser();
+                            } catch (e) {
+                              if (!mounted) return;
+                              ErrorSnackBar.show(context, 'Error: $e');
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              foregroundColor: Theme.of(context).colorScheme.onPrimary),
+                          child: Text('Save'.i18n),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                context,
+                padding: const EdgeInsets.all(24),
+                borderRadius: 16,
+              ),
+            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'.i18n,
-                  style: TextStyle(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.7))),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (accountType == null) return;
-                try {
-                  await _profileService.updateProfileFields(
-                    accountType: accountType,
-                  );
-                  if (!mounted) return;
-                  Navigator.pop(context);
-                  ErrorSnackBar.showSuccess(
-                      context, 'Account Type updated'.i18n);
-                  await _loadCurrentUser();
-                } catch (e) {
-                  if (!mounted) return;
-                  ErrorSnackBar.show(context, 'Error: $e');
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary),
-              child: Text('Save'.i18n),
-            ),
-          ],
         ),
       ),
     );
@@ -865,57 +895,84 @@ class _SettingScreenState extends State<SettingScreen> {
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          title: Text('Hosting Mode'.i18n,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: ['Cloud', 'Self-Hosted']
-                .map((mode) => RadioListTile<String>(
-                      title: Text(mode,
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface)),
-                      value: mode,
-                      groupValue: hostingMode,
-                      activeColor: Theme.of(context).colorScheme.primary,
-                      onChanged: (value) => setState(() => hostingMode = value),
-                    ))
-                .toList(),
+        builder: (context, setState) => Center(
+          child: SizedBox(
+            width: 400,
+            child: Dialog(
+              backgroundColor: Colors.transparent,
+              child: LiquidGlass.wrap(
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Hosting Mode'.i18n,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: ['Cloud', 'Self-Hosted']
+                          .map((mode) => RadioListTile<String>(
+                                title: Text(mode,
+                                    style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onSurface)),
+                                value: mode,
+                                groupValue: hostingMode,
+                                activeColor: Theme.of(context).colorScheme.primary,
+                                onChanged: (value) => setState(() => hostingMode = value),
+                              ))
+                          .toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('Cancel'.i18n,
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.7))),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          onPressed: () async {
+                            if (hostingMode == null) return;
+                            try {
+                              await _profileService.updateProfileFields(
+                                hostingMode: hostingMode,
+                              );
+                              if (!mounted) return;
+                              Navigator.pop(context);
+                              ErrorSnackBar.showSuccess(
+                                  context, 'Hosting Mode updated'.i18n);
+                              await _loadCurrentUser();
+                            } catch (e) {
+                              if (!mounted) return;
+                              ErrorSnackBar.show(context, 'Error: $e');
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              foregroundColor: Theme.of(context).colorScheme.onPrimary),
+                          child: Text('Save'.i18n),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                context,
+                padding: const EdgeInsets.all(24),
+                borderRadius: 16,
+              ),
+            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'.i18n,
-                  style: TextStyle(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.7))),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (hostingMode == null) return;
-                try {
-                  await _profileService.updateProfileFields(
-                    hostingMode: hostingMode,
-                  );
-                  if (!mounted) return;
-                  Navigator.pop(context);
-                  ErrorSnackBar.showSuccess(
-                      context, 'Hosting Mode updated'.i18n);
-                  await _loadCurrentUser();
-                } catch (e) {
-                  if (!mounted) return;
-                  ErrorSnackBar.show(context, 'Error: $e');
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary),
-              child: Text('Save'.i18n),
-            ),
-          ],
         ),
       ),
     );
@@ -930,18 +987,15 @@ class _SettingScreenState extends State<SettingScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => Dialog(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Container(
+          backgroundColor: Colors.transparent,
+          child: SizedBox(
             width: 400,
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Edit Full Name'.i18n,
+            child: LiquidGlass.wrap(
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Edit Full Name'.i18n,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 20,
@@ -1048,7 +1102,10 @@ class _SettingScreenState extends State<SettingScreen> {
                 ),
               ],
             ),
+            context,
+            padding: EdgeInsets.all(24),
           ),
+        ),
         ),
       ),
     );
@@ -1103,11 +1160,9 @@ class _SettingScreenState extends State<SettingScreen> {
   void _showAvatarOptions() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => SafeArea(
+      backgroundColor: Colors.transparent,
+      builder: (context) => LiquidGlass.wrap(
+        SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Column(
@@ -1168,11 +1223,14 @@ class _SettingScreenState extends State<SettingScreen> {
                     _deleteAvatar();
                   },
                 ),
-            ],
+              ],
+            ),
           ),
         ),
+        context,
+        borderRadius: 20,
       ),
-    );
+      );
   }
 
   @override

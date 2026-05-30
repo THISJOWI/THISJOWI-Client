@@ -37,9 +37,8 @@ dependencies:
   flutter_quill: ^11.5.0
   cryptography: ^2.5.0
   flutter_secure_storage: ^10.0.0
-  google_sign_in: ^6.2.1
+  oauth2: ^2.0.3
   app_links: ^6.4.0
-  flutter_web_auth_2: ^5.0.2
 
   liquid_glass_widgets: ^0.9.0
   image_picker: ^1.1.2

@@ -638,11 +638,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SocialLoginButton(
-                              imagePath: 'assets/google_logo.png',
-                              color: Colors.red,
-                              onTap: _handleGoogleLogin,
-                            ),
+                                    SocialLoginButton(
+                                imagePath: 'assets/google_logo.png',
+                                color: Colors.red,
+                                onTap: _handleGoogleLogin,
+                              ),
                             const SizedBox(width: 20),
                             SocialLoginButton(
                               imagePath: 'assets/github_logo.png',

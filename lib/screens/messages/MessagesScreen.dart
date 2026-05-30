@@ -132,15 +132,18 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                         child: Container(
-                          decoration: BoxDecoration(
-                            color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: TextField(
-                            style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
-                            decoration: InputDecoration(
-                              hintText: 'Search'.tr(context),
+                            decoration: BoxDecoration(
+                              color: (Theme.of(context).brightness == Brightness.dark
+                                  ? Color.lerp(Theme.of(context).scaffoldBackgroundColor, Colors.white, 0.12)!
+                                  : Color.lerp(Theme.of(context).scaffoldBackgroundColor, Colors.black, 0.06)!)
+                                  .withValues(alpha: 0.85),
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            child: TextField(
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                              decoration: InputDecoration(
+                                hintText: 'Search'.tr(context),
                               hintStyle: TextStyle(
                                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                                   fontSize: 16),

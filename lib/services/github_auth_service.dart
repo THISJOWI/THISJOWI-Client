@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:thisjowi/core/api.dart';
@@ -12,20 +11,9 @@ import 'package:thisjowi/data/local/secure_storage_service.dart';
 import 'package:thisjowi/services/base_service.dart';
 import 'package:thisjowi/services/cryptoService.dart';
 import 'package:thisjowi/services/token_manager.dart';
+import 'package:thisjowi/services/oauth2_browser_service.dart';
 
 class GithubAuthService extends BaseService {
-  static final GithubAuthService _instance = GithubAuthService._internal();
-  factory GithubAuthService() => _instance;
-  GithubAuthService._internal() : super('GithubAuthService');
-
-  final TokenManager _tokenManager = TokenManager();
-  final CryptoService _cryptoService = CryptoService();
-  final SecureStorageService _secureStorage = SecureStorageService();
-
-  static const String _clientId = 'Ov23lilKdhbjWe8OZhYe';
-  static const String _redirectUri = 'thisjowi://callback';
-  static const String _scope = 'user:email';
-
   @override
   void validateResponse(http.Response response) {
     switch (response.statusCode) {
@@ -49,27 +37,33 @@ class GithubAuthService extends BaseService {
     }
   }
 
+  static final GithubAuthService _instance = GithubAuthService._internal();
+  factory GithubAuthService() => _instance;
+  GithubAuthService._internal() : super('GithubAuthService');
+
+  final TokenManager _tokenManager = TokenManager();
+  final CryptoService _cryptoService = CryptoService();
+  final SecureStorageService _secureStorage = SecureStorageService();
+
+  static const String _clientId = 'Ov23lilKdhbjWe8OZhYe';
+  static const String _scope = 'user:email';
+  static const String _redirectUri =
+      'https://api.thisjowi.com/v1/auth/github/callback';
+
   Future<AuthUser> login() async {
-    logInfo('Iniciando login GitHub OAuth');
+    logInfo('Iniciando login GitHub OAuth2');
 
     try {
-      final authUrl = Uri.https('github.com', '/login/oauth/authorize', {
-        'client_id': _clientId,
-        'redirect_uri': _redirectUri,
-        'scope': _scope,
-      });
-
-      logInfo('Abriendo GitHub OAuth URL: $authUrl');
-
-      final result = await FlutterWebAuth2.authenticate(
-        url: authUrl.toString(),
-        callbackUrlScheme: 'thisjowi',
+      final authUrl = Uri.parse(
+        'https://github.com/login/oauth/authorize'
+        '?client_id=$_clientId'
+        '&redirect_uri=$_redirectUri'
+        '&scope=$_scope',
       );
 
-      logInfo('Callback recibido: $result');
+      final callback = await OAuth2BrowserService.authenticate(authUrl: authUrl);
 
-      final uri = Uri.parse(result);
-      final code = uri.queryParameters['code'];
+      final code = callback.queryParameters['code'];
 
       if (code == null || code.isEmpty) {
         throw AuthException(
@@ -77,6 +71,8 @@ class GithubAuthService extends BaseService {
           code: 'NO_AUTH_CODE',
         );
       }
+
+      logInfo('Authorization code obtenido');
 
       return _sendToBackend(code: code);
     } on AuthException {

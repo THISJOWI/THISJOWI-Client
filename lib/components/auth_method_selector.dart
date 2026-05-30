@@ -70,7 +70,8 @@ class AuthMethodSelector extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          if (onGoogleTap != null) const SizedBox(height: 12),
+          if (onGoogleTap != null)
           GestureDetector(
               onTap: onGoogleTap,
               child: ClipRRect(

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../services/autofillService.dart';
 
@@ -46,8 +47,19 @@ class _AutofillSettingsCardState extends State<AutofillSettingsCard> {
   void _showIOSInstructions() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Configurar AutoFill en iOS'),
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: AlertDialog(
+          backgroundColor: Theme.of(context).cardColor.withValues(alpha: 0.85),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.black.withValues(alpha: 0.08),
+            ),
+          ),
+          title: const Text('Configurar AutoFill en iOS'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,6 +80,7 @@ class _AutofillSettingsCardState extends State<AutofillSettingsCard> {
             child: const Text('Entendido'),
           ),
         ],
+      ),
       ),
     );
   }

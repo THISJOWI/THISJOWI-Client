@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:thisjowi/core/api.dart';
@@ -11,34 +9,10 @@ import 'package:thisjowi/data/local/secure_storage_service.dart';
 import 'package:thisjowi/services/base_service.dart';
 import 'package:thisjowi/services/cryptoService.dart';
 import 'package:thisjowi/services/token_manager.dart';
+import 'package:thisjowi/services/oauth2_browser_service.dart';
 import 'package:thisjowi/core/exceptions/auth_exceptions.dart';
 
 class GoogleAuthService extends BaseService {
-  static final GoogleAuthService _instance = GoogleAuthService._internal();
-  factory GoogleAuthService() => _instance;
-  GoogleAuthService._internal() : super('GoogleAuthService');
-
-  final TokenManager _tokenManager = TokenManager();
-  final CryptoService _cryptoService = CryptoService();
-  final SecureStorageService _secureStorage = SecureStorageService();
-
-  late final GoogleSignIn _googleSignIn;
-
-  final StreamController<AuthUser?> _authStreamController =
-      StreamController<AuthUser?>.broadcast();
-  Stream<AuthUser?> get onAuthComplete => _authStreamController.stream;
-
-  GoogleSignIn _initGoogleSignIn() {
-    return GoogleSignIn(
-      scopes: ['email', 'profile'],
-      clientId: Platform.isAndroid
-          ? '874520303548-j16i68ti94ojt2r4jaqu1ainbrsutdgi.apps.googleusercontent.com'
-          : Platform.isWindows || Platform.isLinux
-              ? '874520303548-le6pq4merb2168869p6jfhmfj7ku968o.apps.googleusercontent.com'
-              : null,
-    );
-  }
-
   @override
   void validateResponse(http.Response response) {
     switch (response.statusCode) {
@@ -62,81 +36,61 @@ class GoogleAuthService extends BaseService {
     }
   }
 
+  static final GoogleAuthService _instance = GoogleAuthService._internal();
+  factory GoogleAuthService() => _instance;
+  GoogleAuthService._internal() : super('GoogleAuthService');
+
+  final TokenManager _tokenManager = TokenManager();
+  final CryptoService _cryptoService = CryptoService();
+  final SecureStorageService _secureStorage = SecureStorageService();
+
+  final StreamController<AuthUser?> _authStreamController =
+      StreamController<AuthUser?>.broadcast();
+  Stream<AuthUser?> get onAuthComplete => _authStreamController.stream;
+
   Future<AuthUser> login() async {
-    logInfo('Iniciando login Google SDK');
+    logInfo('Iniciando login Google OAuth2 (backend flow)');
 
     try {
-      _googleSignIn = _initGoogleSignIn();
+      final loginUrl = Uri.parse('${ApiConfig.baseUrl}/v1/auth/login/google');
+      final loginRes = await http.get(loginUrl).timeout(const Duration(seconds: 10));
 
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        logInfo('Google sign in cancelado por usuario');
+      String authUrlString;
+      if (loginRes.statusCode == 200) {
+        final body = jsonDecode(loginRes.body) as Map<String, dynamic>;
+        authUrlString = body['authorizationUri'] as String? ?? '';
+        if (authUrlString.isNotEmpty && !authUrlString.startsWith('http')) {
+          authUrlString = '${ApiConfig.baseUrl}$authUrlString';
+        }
+      } else {
+        authUrlString = '${ApiConfig.baseUrl}/oauth2/authorization/google';
+      }
+
+      final authUrl = Uri.parse(authUrlString);
+      final callback = await OAuth2BrowserService.authenticate(authUrl: authUrl);
+
+      final token = callback.queryParameters['token'];
+      final userId = callback.queryParameters['userId'];
+      final email = callback.queryParameters['email'];
+      final name = callback.queryParameters['name'];
+      final picture = callback.queryParameters['picture'];
+
+      if (token == null || token.isEmpty) {
         throw AuthException(
-          message: 'Inicio de sesion cancelado',
-          code: 'CANCELLED',
+          message: 'No se recibio el token de autenticacion',
+          code: 'NO_TOKEN',
         );
       }
 
-      logInfo('Usuario Google: ${googleUser.email}');
+      logInfo('Callback OAuth2 recibido: userId=$userId, email=$email');
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      final String? idToken = googleAuth.idToken;
-      logInfo('ID Token obtenido: ${idToken != null}');
-
-      if (idToken == null) {
-        throw AuthException(
-          message: 'No se pudo obtener credenciales de Google',
-          code: 'NO_CREDENTIALS',
-        );
-      }
-
-      return _sendToBackend(token: idToken, email: googleUser.email);
-    } on AuthException {
-      rethrow;
-    } catch (e, stackTrace) {
-      logError('Error en login Google', e, stackTrace);
-      throw AuthException(
-        message: 'Error al iniciar sesion con Google',
-        code: 'GOOGLE_LOGIN_ERROR',
-        details: e,
-      );
-    }
-  }
-
-  Future<AuthUser> _sendToBackend({
-    String? code,
-    String? token,
-    required String email,
-  }) async {
-    logInfo('Enviando a backend: code=${code != null}, token=${token != null}');
-
-    try {
-      final bodyMap = <String, String>{};
-      if (code != null) bodyMap['code'] = code;
-      if (token != null) bodyMap['token'] = token;
-
-      // Usar raw http como la impl original que funcionaba
-      final uri = Uri.parse('${ApiConfig.authUrl}/google');
-      final res = await http
-          .post(
-            uri,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(bodyMap),
-          )
-          .timeout(const Duration(seconds: 30));
-
-      if (res.statusCode != 200 && res.statusCode != 201) {
-        final msg = _parseError(res.body);
-        throw AuthException(
-          message: msg,
-          code: 'BACKEND_ERROR',
-        );
-      }
-
-      final body = jsonDecode(res.body) as Map<String, dynamic>;
-      final authUser = AuthUser.fromJson(body);
+      final authUser = AuthUser.fromJson({
+        'token': token,
+        'userId': userId ?? '',
+        'email': email ?? '',
+        'name': name ?? '',
+        'picture': picture ?? '',
+      });
 
       await _tokenManager.setToken(
         authUser.token,
@@ -152,28 +106,13 @@ class GoogleAuthService extends BaseService {
       return authUser;
     } on AuthException {
       rethrow;
-    } on SocketException catch (e) {
-      logWarning('Network error: $e');
-      throw NetworkException(
-        message: 'Error de conexion',
-        details: e,
-      );
     } catch (e, stackTrace) {
-      logError('Error enviando token a backend', e, stackTrace);
+      logError('Error en login Google', e, stackTrace);
       throw AuthException(
-        message: 'Error al autenticar con servidor',
-        code: 'BACKEND_ERROR',
+        message: 'Error al iniciar sesion con Google',
+        code: 'GOOGLE_LOGIN_ERROR',
         details: e,
       );
-    }
-  }
-
-  String _parseError(String body) {
-    try {
-      final json = jsonDecode(body) as Map<String, dynamic>;
-      return json['message'] ?? json['error'] ?? 'Error del servidor';
-    } catch (_) {
-      return 'Error del servidor';
     }
   }
 

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:http/http.dart' as http;
 import 'package:thisjowi/components/country_selector.dart';
 import 'package:thisjowi/core/exceptions/auth_exceptions.dart';
@@ -191,13 +192,15 @@ class _RegisterFormState extends State<RegisterForm>
     final textColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08)),
-        ),
-        title: Row(
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: AlertDialog(
+          backgroundColor: Theme.of(context).cardColor.withValues(alpha: 0.85),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+            side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08)),
+          ),
+          title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
@@ -266,6 +269,7 @@ class _RegisterFormState extends State<RegisterForm>
             ),
           ),
         ],
+      ),
       ),
     );
   }
@@ -355,7 +359,7 @@ class _RegisterFormState extends State<RegisterForm>
         builder: (context, setDialogState) => BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: AlertDialog(
-            backgroundColor: isDark ? const Color(0xFF2A2A2A).withValues(alpha: 0.85) : Colors.white.withValues(alpha: 0.85),
+            backgroundColor: Theme.of(context).cardColor.withValues(alpha: 0.85),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(28),
               side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08)),

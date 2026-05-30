@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:thisjowi/core/providers/otp_provider.dart';
 import 'package:thisjowi/core/service_locator.dart';
 import 'package:thisjowi/components/error_bar.dart';
+import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/services/otpService.dart';
 import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
@@ -90,19 +91,14 @@ class GlobalActions {
     // Show Dialog
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-            child: Container(
-              decoration: BoxDecoration(
-                color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
+      builder: (context) => Center(
+        child: SizedBox(
+          width: 400,
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: LiquidGlass.wrap(
+              Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
@@ -161,6 +157,15 @@ class GlobalActions {
                   ),
                 ],
               ),
+              context,
+              borderRadius: 16,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                ),
+              ],
             ),
           ),
         ),

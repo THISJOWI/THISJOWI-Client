@@ -9,6 +9,7 @@ import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/data/repository/notes_repository.dart';
 import 'package:thisjowi/components/button.dart';
 import 'package:thisjowi/components/error_bar.dart';
+import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
 import 'package:thisjowi/i18n/translations.dart';
@@ -87,113 +88,107 @@ class _HomeScreenState extends State<HomeScreen> {
       barrierDismissible: true,
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E).withValues(alpha: 0.9),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  blurRadius: 20,
-                  spreadRadius: 5,
+        child: LiquidGlass.wrap(
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
                 ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.security_rounded,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 48,
-                  ),
+                child: Icon(
+                  Icons.security_rounded,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 48,
                 ),
-                const SizedBox(height: 24),
-                Text(
-                  'Password Manager'.i18n,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Password Manager'.i18n,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  'Make THISECURE your primary password manager to automatically fill in data in all your applications.'
-                      .i18n,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                    fontSize: 15,
-                    height: 1.5,
-                  ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Make THISECURE your primary password manager to automatically fill in data in all your applications.'
+                    .i18n,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  fontSize: 15,
+                  height: 1.5,
                 ),
-                const SizedBox(height: 32),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () async {
-                          final prefs = await SharedPreferences.getInstance();
-                          await prefs.setBool('autofill_prompt_shown', true);
-                          if (context.mounted) Navigator.pop(context);
-                        },
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        child: Text(
-                          'Later'.i18n,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+              ),
+              const SizedBox(height: 32),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setBool('autofill_prompt_shown', true);
+                        if (context.mounted) Navigator.pop(context);
+                      },
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: Text(
+                        'Later'.i18n,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          final prefs = await SharedPreferences.getInstance();
-                          await prefs.setBool('autofill_prompt_shown', true);
-                          if (context.mounted) Navigator.pop(context);
-                          AutofillService().openAutofillSettings();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setBool('autofill_prompt_shown', true);
+                        if (context.mounted) Navigator.pop(context);
+                        AutofillService().openAutofillSettings();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
-                          'Configure'.i18n,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'Configure'.i18n,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
+          context,
+          padding: const EdgeInsets.all(24),
+          borderRadius: 24,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.5),
+              blurRadius: 20,
+              spreadRadius: 5,
+            ),
+          ],
         ),
       ),
     );
@@ -310,9 +305,19 @@ _isLoading = false;
 Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
     return await showDialog<bool>(
           context: context,
-          builder: (context) => AlertDialog(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            title: Text('Delete password?'.i18n,
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: AlertDialog(
+          backgroundColor: Theme.of(context).cardColor.withValues(alpha: 0.85),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.black.withValues(alpha: 0.08),
+            ),
+          ),
+          title: Text('Delete password?'.i18n,
                 style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             content: Text(
                 '${'Are you sure you want to delete'.i18n} "${entry.title}"?',
@@ -329,7 +334,8 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
               ),
             ],
           ),
-        ) ??
+        ),
+      ) ??
         false;
   }
 
@@ -353,9 +359,19 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
   Future<bool> _showDeleteNoteConfirmation(Note note) async {
     return await showDialog<bool>(
           context: context,
-          builder: (context) => AlertDialog(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            title: Text('Delete Note?'.i18n,
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: AlertDialog(
+          backgroundColor: Theme.of(context).cardColor.withValues(alpha: 0.85),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.black.withValues(alpha: 0.08),
+            ),
+          ),
+          title: Text('Delete Note?'.i18n,
                 style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             content: Text(
                 '${'Are you sure you want to delete'.i18n} "${note.title}"?',
@@ -372,7 +388,8 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
               ),
             ],
           ),
-        ) ??
+        ),
+      ) ??
         false;
   }
 
@@ -406,17 +423,14 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
       barrierColor: Colors.black.withValues(alpha: 0.5),
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => Dialog(
-          backgroundColor: Theme.of(context).cardColor,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: Colors.transparent,
           insetPadding:
               const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 340),
             child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
+              child: LiquidGlass.wrap(
+                Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -571,9 +585,12 @@ Future<bool> _showDeletePasswordConfirmation(PasswordEntry entry) async {
                     ),
                   ],
                 ),
-              ),
+              context,
+              padding: const EdgeInsets.all(24),
+              borderRadius: 20,
             ),
           ),
+        ),
         ),
       ),
     );
@@ -626,14 +643,17 @@ SafeArea(
                       filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+                          color: (Theme.of(context).brightness == Brightness.dark
+                              ? Color.lerp(Theme.of(context).scaffoldBackgroundColor, Colors.white, 0.12)!
+                              : Color.lerp(Theme.of(context).scaffoldBackgroundColor, Colors.black, 0.06)!)
+                              .withValues(alpha: 0.85),
                           borderRadius: BorderRadius.circular(25),
                         ),
                         child: TextField(
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
-                      decoration: InputDecoration(
-                        hintText: 'Search'.i18n,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                        decoration: InputDecoration(
+                          hintText: 'Search'.i18n,
                         hintStyle: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                             fontSize: 16),
