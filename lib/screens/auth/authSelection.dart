@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:thisjowi/components/auth_method_selector.dart';
 import 'package:thisjowi/components/navigation.dart';
 import 'package:thisjowi/services/google_auth_service.dart';
+import 'package:thisjowi/services/microsoft_auth_service.dart';
 import 'login.dart';
 import 'ldapLogin.dart';
 import 'samlLogin.dart';
@@ -15,11 +16,13 @@ class AuthSelectionScreen extends StatefulWidget {
 
 class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
   final GoogleAuthService _googleAuthService = GoogleAuthService();
+  final MicrosoftAuthService _microsoftAuthService = MicrosoftAuthService();
   bool _isLoading = false;
 
   @override
   void dispose() {
     _googleAuthService.dispose();
+    _microsoftAuthService.dispose();
     super.dispose();
   }
 
@@ -27,6 +30,29 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
     setState(() => _isLoading = true);
     try {
       await _googleAuthService.login();
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceFirst('Exception: ', '')),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleMicrosoftLogin() async {
+    setState(() => _isLoading = true);
+    try {
+      await _microsoftAuthService.login();
       if (!mounted) return;
       setState(() => _isLoading = false);
       if (!mounted) return;
@@ -128,6 +154,7 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                         );
                       },
                       onGoogleTap: !_isLoading ? _handleGoogleLogin : null,
+                      onMicrosoftTap: !_isLoading ? _handleMicrosoftLogin : null,
                     ),
                     if (_isLoading)
                       Padding(

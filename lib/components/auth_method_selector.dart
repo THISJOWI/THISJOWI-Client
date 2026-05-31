@@ -6,6 +6,7 @@ class AuthMethodSelector extends StatelessWidget {
   final VoidCallback onRegularTap;
   final VoidCallback? onSamlTap;
   final VoidCallback? onGoogleTap;
+  final VoidCallback? onMicrosoftTap;
 
   const AuthMethodSelector({
     super.key,
@@ -13,6 +14,7 @@ class AuthMethodSelector extends StatelessWidget {
     required this.onRegularTap,
     this.onSamlTap,
     this.onGoogleTap,
+    this.onMicrosoftTap,
   });
 
   @override
@@ -96,6 +98,44 @@ class AuthMethodSelector extends StatelessWidget {
                           const SizedBox(width: 12),
                           Text(
                             'Continuar con Google',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              )),
+          if (onMicrosoftTap != null) const SizedBox(height: 12),
+          if (onMicrosoftTap != null)
+          GestureDetector(
+              onTap: onMicrosoftTap,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.window,
+                            size: 24,
+                            color: const Color(0xFF00A4EF),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Continuar con Microsoft',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,

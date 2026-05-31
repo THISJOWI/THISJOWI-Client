@@ -7,6 +7,7 @@ import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/services/biometricService.dart';
 import 'package:thisjowi/services/google_auth_service.dart';
 import 'package:thisjowi/services/github_auth_service.dart';
+import 'package:thisjowi/services/microsoft_auth_service.dart';
 import 'package:thisjowi/services/token_manager.dart';
 import 'package:thisjowi/services/offline_auth_service.dart';
 import 'package:thisjowi/components/social_login_button.dart';
@@ -36,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TokenManager _tokenManager = TokenManager();
   final GoogleAuthService _googleAuthService = GoogleAuthService();
   final GithubAuthService _githubAuthService = GithubAuthService();
+  final MicrosoftAuthService _microsoftAuthService = MicrosoftAuthService();
   bool _isLoading = false;
   bool _hasSavedSession = false;
   bool _biometricAvailable = false;
@@ -69,6 +71,23 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
     try {
       await _githubAuthService.login();
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ErrorSnackBar.show(context, e.toString().replaceFirst('Exception: ', ''));
+    }
+  }
+
+  Future<void> _handleMicrosoftLogin() async {
+    setState(() => _isLoading = true);
+    try {
+      await _microsoftAuthService.login();
       if (!mounted) return;
       setState(() => _isLoading = false);
       Navigator.of(context).pushAndRemoveUntil(
@@ -648,6 +667,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               imagePath: 'assets/github_logo.png',
                               color: Colors.black,
                               onTap: _handleGithubLogin,
+                            ),
+                            const SizedBox(width: 20),
+                            SocialLoginButton(
+                              icon: Icons.window,
+                              color: const Color(0xFF00A4EF),
+                              onTap: _handleMicrosoftLogin,
                             ),
                             if (_biometricAvailable) ...[
                               const SizedBox(width: 20),
