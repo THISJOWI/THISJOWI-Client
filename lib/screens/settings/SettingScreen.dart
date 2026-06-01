@@ -11,11 +11,14 @@ import 'package:thisjowi/services/biometricService.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/components/country_selector.dart';
 import 'package:thisjowi/components/liquid_glass.dart';
+import 'package:thisjowi/core/api.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/screens/organization/LdapConfigScreen.dart';
 import 'package:thisjowi/data/models/auth_user.dart';
 import 'package:thisjowi/data/models/profile_user.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -38,6 +41,7 @@ class _SettingScreenState extends State<SettingScreen> {
   String _biometricType = 'Biometric';
   AuthUser? _currentAuthUser;
   ProfileUser? _currentProfile;
+  String? _serverUrl;
 
   @override
   void initState() {
@@ -49,6 +53,7 @@ class _SettingScreenState extends State<SettingScreen> {
     await Future.wait([
       _loadBiometricStatus(),
       _loadCurrentUser(),
+      _loadHostingConfig(),
     ]);
   }
 
@@ -66,6 +71,14 @@ class _SettingScreenState extends State<SettingScreen> {
 
     if (mounted) {
       setState(() => _currentAuthUser = authUser);
+    }
+  }
+
+  Future<void> _loadHostingConfig() async {
+    final prefs = await SharedPreferences.getInstance();
+    final url = prefs.getString('custom_api_url');
+    if (mounted) {
+      setState(() => _serverUrl = url);
     }
   }
 
@@ -891,7 +904,12 @@ class _SettingScreenState extends State<SettingScreen> {
   }
 
   void _showEditHostingModeDialog() {
-    String? hostingMode;
+    String? hostingMode = _currentAuthUser?.hostingMode ?? 'Cloud';
+    final urlController = TextEditingController(text: _serverUrl ?? '');
+    bool testing = false;
+    String? testResult;
+    bool? testSuccess;
+
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -905,7 +923,8 @@ class _SettingScreenState extends State<SettingScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Hosting Mode'.i18n,
+                    Text(
+                      'Hosting Mode'.i18n,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 18,
@@ -917,51 +936,244 @@ class _SettingScreenState extends State<SettingScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: ['Cloud', 'Self-Hosted']
                           .map((mode) => RadioListTile<String>(
-                                title: Text(mode,
-                                    style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onSurface)),
+                                title: Text(
+                                  mode,
+                                  style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface),
+                                ),
                                 value: mode,
                                 groupValue: hostingMode,
                                 activeColor: Theme.of(context).colorScheme.primary,
-                                onChanged: (value) => setState(() => hostingMode = value),
+                                onChanged: (value) {
+                                  setState(() => hostingMode = value);
+                                },
                               ))
                           .toList(),
                     ),
-                    const SizedBox(height: 16),
+                    if (hostingMode == 'Self-Hosted') ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.1),
+                          ),
+                        ),
+                        child: TextField(
+                          controller: urlController,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 16),
+                          decoration: InputDecoration(
+                            labelText: 'Server URL'.i18n,
+                            hintText: 'https://mi-servidor.com',
+                            hintStyle: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.3),
+                            ),
+                            labelStyle: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.6),
+                              fontSize: 14,
+                            ),
+                            prefixIcon: Icon(
+                              Icons.link,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.6),
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: testing
+                              ? null
+                              : () async {
+                                  setState(() {
+                                    testing = true;
+                                    testResult = null;
+                                    testSuccess = null;
+                                  });
+                                  final url = urlController.text.trim();
+                                  if (url.isEmpty) {
+                                    setState(() {
+                                      testing = false;
+                                      testResult = 'Enter a server URL';
+                                      testSuccess = false;
+                                    });
+                                    return;
+                                  }
+                                  try {
+                                    final testUrl = url.endsWith('/')
+                                        ? '${url}v1/health'
+                                        : '$url/v1/health';
+                                    final response = await http
+                                        .get(Uri.parse(testUrl))
+                                        .timeout(const Duration(seconds: 10));
+                                    setState(() {
+                                      testSuccess =
+                                          response.statusCode == 200;
+                                      testResult = response.statusCode == 200
+                                          ? 'Connection successful'.i18n
+                                          : '${'Connection failed'.i18n} (${response.statusCode})';
+                                    });
+                                  } catch (e) {
+                                    setState(() {
+                                      testSuccess = false;
+                                      testResult =
+                                          '${'Connection failed'.i18n}: $e';
+                                    });
+                                  } finally {
+                                    if (context.mounted) {
+                                      setState(() => testing = false);
+                                    }
+                                  }
+                                },
+                          icon: Icon(
+                            testing
+                                ? Icons.hourglass_top
+                                : Icons.wifi_find,
+                            size: 20,
+                          ),
+                          label: Text(
+                            testing
+                                ? 'Testing connection...'.i18n
+                                : 'Test Connection'.i18n,
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
+                          ),
+                        ),
+                      ),
+                      if (testResult != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Row(
+                            children: [
+                              Icon(
+                                testSuccess == true
+                                    ? Icons.check_circle
+                                    : Icons.error,
+                                size: 16,
+                                color: testSuccess == true
+                                    ? Colors.green
+                                    : Colors.red,
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  testResult!,
+                                  style: TextStyle(
+                                    color: testSuccess == true
+                                        ? Colors.green
+                                        : Colors.red,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                    const SizedBox(height: 20),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text('Cancel'.i18n,
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: TextButton.styleFrom(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              'Cancel'.i18n,
                               style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withValues(alpha: 0.7))),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.6),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
                         ),
                         const SizedBox(width: 12),
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (hostingMode == null) return;
-                            try {
-                              await _profileService.updateProfileFields(
-                                hostingMode: hostingMode,
-                              );
-                              if (!mounted) return;
-                              Navigator.pop(context);
-                              ErrorSnackBar.showSuccess(
-                                  context, 'Hosting Mode updated'.i18n);
-                              await _loadCurrentUser();
-                            } catch (e) {
-                              if (!mounted) return;
-                              ErrorSnackBar.show(context, 'Error: $e');
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.primary,
-                              foregroundColor: Theme.of(context).colorScheme.onPrimary),
-                          child: Text('Save'.i18n),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              if (hostingMode == null) return;
+                              try {
+                                await _profileService.updateProfileFields(
+                                  hostingMode: hostingMode,
+                                );
+                                if (hostingMode == 'Self-Hosted') {
+                                  final url = urlController.text.trim();
+                                  if (url.isNotEmpty) {
+                                    await ApiConfig.saveManualBaseUrl(url);
+                                    if (mounted) {
+                                      setState(() => _serverUrl = url);
+                                    }
+                                  }
+                                } else {
+                                  ApiConfig.clearManualBaseUrl();
+                                  if (mounted) {
+                                    setState(() => _serverUrl = null);
+                                  }
+                                }
+                                if (!context.mounted) return;
+                                Navigator.pop(context);
+                                ErrorSnackBar.showSuccess(
+                                    context, 'Hosting Mode updated'.i18n);
+                                await _loadCurrentUser();
+                              } catch (e) {
+                                if (!context.mounted) return;
+                                ErrorSnackBar.show(context, 'Error: $e');
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.onPrimary,
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: Text('Save'.i18n),
+                          ),
                         ),
                       ],
                     ),
@@ -1388,20 +1600,33 @@ class _SettingScreenState extends State<SettingScreen> {
                         onTap: _showEditCountryDialog,
                       ),
 
-                      // Account Type
-                      _buildSettingItem(
-                        icon: Icons.business,
-                        title: 'Account Type'.i18n,
-                        subtitle:
-                            _currentProfile?.accountType ?? 'Not set'.i18n,
-                        onTap: _showEditAccountTypeDialog,
-                      ),
-
                       // Hosting Mode
                       _buildSettingItem(
-                        icon: Icons.cloud_queue,
+                        icon: Icons.dns,
                         title: 'Hosting Mode'.i18n,
-                        subtitle: _currentProfile?.hostingMode ?? 'Cloud'.i18n,
+                        subtitle: _currentAuthUser?.hostingMode ?? 'Cloud',
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              _currentAuthUser?.hostingMode ?? 'Cloud',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                                fontSize: 12,
+                              ),
+                            ),
+                            if (_serverUrl != null && _serverUrl!.isNotEmpty)
+                              Text(
+                                _serverUrl!,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                                  fontSize: 11,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                          ],
+                        ),
                         onTap: _showEditHostingModeDialog,
                       ),
 

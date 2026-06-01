@@ -80,6 +80,9 @@ debugPrint('🔧 API: $baseUrl');
 /// Permite sobreescribir manualmente la URL base (útil para testing)
   static String? _manualBaseUrl;
 
+  /// Returns the manually set base URL, if any
+  static String? get manualBaseUrl => _manualBaseUrl;
+
   static Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     final savedUrl = prefs.getString('custom_api_url');
