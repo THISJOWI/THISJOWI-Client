@@ -66,47 +66,6 @@ class AccountService extends BaseService {
     }
   }
 
-  Future<void> updateHostingMode(String hostingMode) async {
-    logInfo('Updating hosting mode to: $hostingMode');
-    try {
-      final userId = await tokenManager.getUserId();
-      if (userId == null) {
-        throw AccountException(
-          message: 'No hay usuario autenticado',
-          code: 'NO_USER',
-        );
-      }
-
-      final response = await apiClient.patch(
-        '/v1/accounts/$userId',
-        body: {'hostingMode': hostingMode},
-        requiresAuth: true,
-      );
-
-      if (response.statusCode == 200) {
-        logInfo('Hosting mode updated successfully');
-        return;
-      }
-
-      final json = parseJsonBody(response);
-      final message = json['message'] ?? 'Error al actualizar modo de hosting';
-      throw AccountException(
-        message: message,
-        code: 'HOSTING_MODE_UPDATE_FAILED',
-        details: json,
-      );
-    } on AccountException {
-      rethrow;
-    } catch (e, stackTrace) {
-      logError('Error updating hosting mode', e, stackTrace);
-      throw AccountException(
-        message: 'Error al actualizar modo de hosting: $e',
-        code: 'HOSTING_MODE_ERROR',
-        details: e.toString(),
-      );
-    }
-  }
-
   Future<void> deleteAccount(String password) async {
     logInfo('Deleting account');
     try {
