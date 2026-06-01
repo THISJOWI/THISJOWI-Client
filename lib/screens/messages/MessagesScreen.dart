@@ -112,7 +112,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             color: Theme.of(context).colorScheme.primary, size: 28),
                         const SizedBox(width: 12),
                         Text(
-                          'Messages'.tr(context),
+                          'Messages'.i18n,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 24,
@@ -143,7 +143,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                               style: TextStyle(
                                   color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
                               decoration: InputDecoration(
-                                hintText: 'Search'.tr(context),
+                                hintText: 'Search'.i18n,
                               hintStyle: TextStyle(
                                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                                   fontSize: 16),
@@ -261,7 +261,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
             const SizedBox(height: 16),
             Text(
-              'No encontramos resultados'.tr(context),
+              'No encontramos resultados'.i18n,
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
             ),
           ],
@@ -280,7 +280,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           return Padding(
             padding: const EdgeInsets.fromLTRB(24, 20, 24, 10),
             child: Text(
-              item.toUpperCase().tr(context),
+              item.toUpperCase().i18n,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
                 fontSize: 12,
