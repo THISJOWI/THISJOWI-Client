@@ -21,6 +21,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   void initState() {
     super.initState();
     _codeController.addListener(_onCodeChanged);
+    _resendCode();
   }
 
   @override
@@ -41,7 +42,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     final code = _codeController.text.trim();
     if (code.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor ingresa el código')),
+        const SnackBar(content: Text('Please enter the code')),
       );
       return;
     }
@@ -63,7 +64,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
       if (response.statusCode == 200 && body['success'] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Correo verificado exitosamente')),
+          const SnackBar(content: Text('Email verified successfully')),
         );
         
         Navigator.pushReplacement(
@@ -72,7 +73,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(body['message'] ?? 'Error al verificar código')),
+          SnackBar(content: Text(body['message'] ?? 'Error verifying code')),
         );
       }
     } catch (e) {
@@ -108,11 +109,11 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
       if (response.statusCode == 200 && body['success'] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Código reenviado exitosamente')),
+          const SnackBar(content: Text('Code resent successfully')),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(body['message'] ?? 'Error al reenviar código')),
+          SnackBar(content: Text(body['message'] ?? 'Error resending code')),
         );
       }
     } catch (e) {
@@ -219,7 +220,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       const SizedBox(height: 32),
                       
                       Text(
-                        'Verifica tu correo',
+                        'Verify your email',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 28,
@@ -230,7 +231,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Hemos enviado un código de verificación a tu correo electrónico: ${widget.email}. Ingrésalo a continuación para continuar.',
+                        'We sent a verification code to ${widget.email}. Enter it below to continue.',
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.6),
                           fontSize: 15,
@@ -298,52 +299,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                     contentPadding: const EdgeInsets.symmetric(vertical: 20),
                                   ),
                                 ),
-                                
-                                const SizedBox(height: 32),
-                                
-                                Container(
-                                  width: double.infinity,
-                                  height: 56,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                    gradient: LinearGradient(
-                                      colors: [Theme.of(context).colorScheme.secondary, Theme.of(context).colorScheme.tertiary],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 6),
-                                      ),
-                                    ],
-                                  ),
-                                  child: ElevatedButton(
-                                    onPressed: _isLoading ? null : _verifyCode,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.transparent,
-                                      shadowColor: Colors.transparent,
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                    ),
-                                    child: _isLoading 
-                                      ? const SizedBox(
-                                          height: 24, 
-                                          width: 24, 
-                                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
-                                        )
-                                      : const Text(
-                                          'Verificar Código',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                  ),
-                                ),
                               ],
                             ),
                           ),
@@ -355,7 +310,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       TextButton(
                         onPressed: _isLoading ? null : _resendCode,
                         child: Text(
-                          '¿No recibiste el código? Reenviar',
+                          "Didn't receive the code? Resend",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary,
                             fontWeight: FontWeight.w600,
