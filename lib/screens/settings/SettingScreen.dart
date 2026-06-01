@@ -1035,6 +1035,12 @@ class _SettingScreenState extends State<SettingScreen> {
                                           ? 'Connection successful'.i18n
                                           : '${'Connection failed'.i18n} (${response.statusCode})';
                                     });
+                                  } on HandshakeException catch (_) {
+                                    setState(() {
+                                      testSuccess = false;
+                                      testResult =
+                                          'SSL certificate error. Self-signed certificates are common in self-hosted servers. You can still save this URL.';
+                                    });
                                   } catch (e) {
                                     setState(() {
                                       testSuccess = false;
