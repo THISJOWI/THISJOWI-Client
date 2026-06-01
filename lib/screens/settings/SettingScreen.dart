@@ -1023,18 +1023,27 @@ class _SettingScreenState extends State<SettingScreen> {
                                   }
                                   try {
                                     final testUrl = url.endsWith('/')
-                                        ? '${url}v1/health'
-                                        : '$url/v1/health';
+                                        ? '${url}v1/auth/me'
+                                        : '$url/v1/auth/me';
                                     final response = await http
                                         .get(Uri.parse(testUrl))
                                         .timeout(const Duration(seconds: 10));
-                                    setState(() {
-                                      testSuccess =
-                                          response.statusCode == 200;
-                                      testResult = response.statusCode == 200
-                                          ? 'Connection successful'.i18n
-                                          : '${'Connection failed'.i18n} (${response.statusCode})';
-                                    });
+                                    if (response.statusCode == 200 || response.statusCode == 401) {
+                                      setState(() {
+                                        testSuccess = true;
+                                        testResult = 'Connection successful'.i18n;
+                                      });
+                                    } else if (response.statusCode == 301 || response.statusCode == 302) {
+                                      setState(() {
+                                        testSuccess = false;
+                                        testResult = 'Server redirects to HTTPS. Try using https:// instead of http://';
+                                      });
+                                    } else {
+                                      setState(() {
+                                        testSuccess = false;
+                                        testResult = '${'Connection failed'.i18n} (${response.statusCode})';
+                                      });
+                                    }
                                   } on HandshakeException catch (_) {
                                     setState(() {
                                       testSuccess = false;
