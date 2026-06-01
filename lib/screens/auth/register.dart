@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/i18n/translations.dart';
-import 'package:thisjowi/screens/auth/register_flow.dart';
+import 'package:thisjowi/screens/auth/registerForm.dart';
 
 import 'package:thisjowi/components/navigation.dart';
 import 'package:thisjowi/screens/auth/emailVerification.dart';
@@ -54,9 +54,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Usar el nuevo flujo de registro interactivo
-    return RegisterFlowScreen(
-      isEmbedded: widget.isEmbedded,
+    return RegisterForm(
+      accountType: 'Community',
       onSuccess: _handleSuccess,
     );
   }

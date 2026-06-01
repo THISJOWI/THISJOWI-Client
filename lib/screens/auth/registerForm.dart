@@ -11,16 +11,16 @@ import 'package:thisjowi/i18n/translations.dart';
 
 class RegisterForm extends StatefulWidget {
   final Function(Map<String, dynamic> result) onSuccess;
-  final VoidCallback onBack;
+  final VoidCallback? onBack;
   final String accountType;
   final String hostingMode;
 
   const RegisterForm({
     super.key,
     required this.onSuccess,
-    required this.onBack,
+    this.onBack,
     required this.accountType,
-    required this.hostingMode,
+    this.hostingMode = 'Cloud',
   });
 
   @override

@@ -15,8 +15,7 @@ import 'package:thisjowi/components/navigation.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/i18n/translationService.dart';
 import 'package:thisjowi/screens/auth/forgotPassword.dart';
-import 'package:thisjowi/services/ldapAuthService.dart';
-import 'package:thisjowi/services/samlAuthService.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -30,8 +29,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _passwordFocusNode = FocusNode();
   final BiometricService _biometricService = BiometricService();
-  final LdapAuthService _ldapAuthService = LdapAuthService();
-  final SamlAuthService _samlAuthService = SamlAuthService();
   final AuthService _authService = AuthService();
   final OfflineAuthService _offlineAuthService = OfflineAuthService();
   final TokenManager _tokenManager = TokenManager();
@@ -145,79 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   /// Login automático con LDAP cuando el dominio del email lo tiene habilitado
-  Future<void> _handleLdapLogin(
-      String email, String password, String domain) async {
-    final username = email.split('@')[0];
 
-    setState(() => _isLoading = true);
-
-    try {
-      final result = await _ldapAuthService.loginWithLdap(
-        domain: domain,
-        username: username,
-        password: password,
-      );
-
-      if (result['success'] == true && mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const MyBottomNavigation()),
-          (route) => false,
-        );
-      } else if (mounted) {
-        setState(() => _isLoading = false);
-        ErrorSnackBar.show(context,
-            result['message'] ?? 'LDAP authentication failed'.tr(context));
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        String errorMsg = e.toString().replaceFirst('Exception: ', '');
-        ErrorSnackBar.show(context, errorMsg);
-      }
-    }
-  }
-
-  /// Verificar si el dominio tiene SAML habilitado
-  Future<bool> _isSamlEnabledForDomain(String domain) async {
-    return await _samlAuthService.isSamlEnabledForDomain(domain);
-  }
-
-  /// Login automático con SAML cuando el dominio lo tiene habilitado
-  Future<void> _handleSamlLogin(String domain) async {
-    setState(() => _isLoading = true);
-
-    try {
-      final config = await _samlAuthService.getSamlConfigForDomain(domain);
-      if (config == null || mounted) {
-        setState(() => _isLoading = false);
-        ErrorSnackBar.show(context, 'SAML no configurado para este dominio');
-        return;
-      }
-
-      // Abrir navegador/WebView para login con el IdP
-      final idpUrl = config['idpLoginUrl'] ?? config['loginUrl'];
-      if (idpUrl == null && mounted) {
-        setState(() => _isLoading = false);
-        ErrorSnackBar.show(context, 'URL de login SAML no disponible');
-        return;
-      }
-
-      // Abrir al IdP para autenticación
-      // El usuario hace login ahí, y retorna con SAML response
-      // Por ahora, mostrar mensaje de configuración necesaria
-      if (mounted) {
-        setState(() => _isLoading = false);
-        ErrorSnackBar.show(
-            context, 'Usa el botón de SSO empresarial para login con SAML');
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        String errorMsg = e.toString().replaceFirst('Exception: ', '');
-        ErrorSnackBar.show(context, errorMsg);
-      }
-    }
-  }
 
   Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
@@ -227,28 +152,6 @@ class _LoginScreenState extends State<LoginScreen> {
       ErrorSnackBar.show(
           context, 'Please complete email and password'.tr(context));
       return;
-    }
-
-    // Verificar si el email tiene un dominio con LDAP habilitado
-    if (email.contains('@')) {
-      final domain = email.split('@')[1];
-      final isLdapEnabled =
-          await _ldapAuthService.isLdapEnabledForDomain(domain);
-
-      if (!mounted) return;
-
-      // Verificar si el dominio tiene SAML habilitado
-      final isSamlEnabled = await _isSamlEnabledForDomain(domain);
-      if (isSamlEnabled) {
-        // Para SAML, necesitamos redirigir al IdP, no hacer login aquí
-        await _handleSamlLogin(domain);
-        return;
-      }
-
-      if (isLdapEnabled) {
-        await _handleLdapLogin(email, password, domain);
-        return;
-      }
     }
 
     setState(() => _isLoading = true);

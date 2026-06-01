@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class AuthMethodSelector extends StatelessWidget {
-  final VoidCallback onLdapTap;
+  final VoidCallback? onLdapTap;
   final VoidCallback onRegularTap;
   final VoidCallback? onSamlTap;
   final VoidCallback? onGoogleTap;
@@ -10,7 +10,7 @@ class AuthMethodSelector extends StatelessWidget {
 
   const AuthMethodSelector({
     super.key,
-    required this.onLdapTap,
+    this.onLdapTap,
     required this.onRegularTap,
     this.onSamlTap,
     this.onGoogleTap,
@@ -49,17 +49,18 @@ class AuthMethodSelector extends StatelessWidget {
           ],
           Row(
             children: [
-              Expanded(
-                child: _buildOption(
-                  context: context,
-                  onTap: onLdapTap,
-                  icon: Icons.business,
-                  title: 'LDAP Corporativo',
-                  subtitle: 'Cuenta empresarial',
-                  accentColor: Theme.of(context).colorScheme.tertiary,
+              if (onLdapTap != null)
+                Expanded(
+                  child: _buildOption(
+                    context: context,
+                    onTap: onLdapTap!,
+                    icon: Icons.business,
+                    title: 'LDAP Corporativo',
+                    subtitle: 'Cuenta empresarial',
+                    accentColor: Theme.of(context).colorScheme.tertiary,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
+              if (onLdapTap != null) const SizedBox(width: 12),
               Expanded(
                 child: _buildOption(
                   context: context,

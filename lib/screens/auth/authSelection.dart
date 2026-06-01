@@ -4,8 +4,6 @@ import 'package:thisjowi/components/navigation.dart';
 import 'package:thisjowi/services/google_auth_service.dart';
 import 'package:thisjowi/services/microsoft_auth_service.dart';
 import 'login.dart';
-import 'ldapLogin.dart';
-import 'samlLogin.dart';
 
 class AuthSelectionScreen extends StatefulWidget {
   const AuthSelectionScreen({super.key});
@@ -132,24 +130,10 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                     ),
                     const SizedBox(height: 40),
                     AuthMethodSelector(
-                      onLdapTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const LdapLoginScreen(),
-                          ),
-                        );
-                      },
                       onRegularTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (_) => const LoginScreen(),
-                          ),
-                        );
-                      },
-                      onSamlTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const SamlLoginScreen(),
                           ),
                         );
                       },
