@@ -946,7 +946,157 @@ extension Localization on String {
   {
     "en": "no_results",
     "es": "No se encontraron resultados",
-  };
+  } +
+
+// ==================== SYSTEM SETTINGS ====================
+{
+  "en": "System",
+  "es": "Sistema",
+} +
+{
+  "en": "System Settings",
+  "es": "Ajustes del Sistema",
+} +
+{
+  "en": "OS-level settings and permissions for THISECURE",
+  "es": "Configuraciones y permisos a nivel de SO para THISECURE",
+} +
+{
+  "en": "Default Password Manager",
+  "es": "Gestor de contraseñas principal",
+} +
+{
+  "en": "Password Manager Status",
+  "es": "Estado del gestor de contraseñas",
+} +
+{
+  "en": "Set THISECURE as your system's default password manager to autofill credentials across all apps",
+  "es": "Configura THISECURE como gestor de contraseñas principal para autorellenar credenciales en todas las apps",
+} +
+{
+  "en": "THISECURE is your default password manager",
+  "es": "THISECURE es tu gestor de contraseñas principal",
+} +
+{
+  "en": "Open system autofill settings",
+  "es": "Abrir ajustes de autofill del sistema",
+} +
+{
+  "en": "THISECURE is not the default password manager",
+  "es": "THISECURE no es el gestor de contraseñas principal",
+} +
+{
+  "en": "Autofill not supported on this device",
+  "es": "Autofill no soportado en este dispositivo",
+} +
+{
+  "en": "App Permissions",
+  "es": "Permisos de la app",
+} +
+{
+  "en": "Open App Settings",
+  "es": "Abrir Ajustes de la App",
+} +
+{
+  "en": "Manage THISECURE permissions in system settings",
+  "es": "Gestionar permisos de THISECURE en ajustes del sistema",
+} +
+{
+  "en": "Notifications",
+  "es": "Notificaciones",
+} +
+{
+  "en": "Granted",
+  "es": "Concedido",
+} +
+{
+  "en": "Denied",
+  "es": "Denegado",
+} +
+{
+  "en": "Unknown",
+  "es": "Desconocido",
+} +
+{
+  "en": "Autofill Service",
+  "es": "Servicio de Autofill",
+} +
+{
+  "en": "Active",
+  "es": "Activo",
+} +
+{
+  "en": "Inactive",
+  "es": "Inactivo",
+} +
+{
+  "en": "Biometric Permission",
+  "es": "Permiso biométrico",
+} +
+{
+  "en": "Platform",
+  "es": "Plataforma",
+} +
+{
+  "en": "Available",
+  "es": "Disponible",
+} +
+{
+  "en": "Not available",
+  "es": "No disponible",
+} +
+{
+  "en": "Enable THISECURE as your autofill provider in system settings",
+  "es": "Activa THISECURE como proveedor de autofill en los ajustes del sistema",
+} +
+{
+  "en": "On Android, go to Settings > Passwords & accounts > Autofill service",
+  "es": "En Android, ve a Ajustes > Contraseñas y cuentas > Servicio de autofill",
+} +
+{
+  "en": "On iOS, go to Settings > Passwords > AutoFill Passwords",
+  "es": "En iOS, ve a Ajustes > Contraseñas > Autorrellenar contraseñas",
+} +
+{
+  "en": "On macOS, go to System Settings > Passwords",
+  "es": "En macOS, ve a Ajustes del Sistema > Contraseñas",
+} +
+{
+  "en": "Open System Settings",
+  "es": "Abrir Ajustes del Sistema",
+} +
+{
+  "en": "App Group Sharing",
+  "es": "Compartir entre apps",
+} +
+{
+  "en": "Share credentials with iOS/macOS credential provider extension",
+  "es": "Compartir credenciales con la extensión de proveedor de iOS/macOS",
+} +
+{
+  "en": "Credential Provider Extension",
+  "es": "Extensión de proveedor de credenciales",
+} +
+{
+  "en": "Required for system-wide autofill on iOS and macOS",
+  "es": "Necesario para autofill en todo el sistema en iOS y macOS",
+} +
+{
+  "en": "System Permissions",
+  "es": "Permisos del Sistema",
+} +
+{
+  "en": "Open system notification settings",
+  "es": "Abrir ajustes de notificaciones",
+} +
+{
+  "en": "Notification permission",
+  "es": "Permiso de notificaciones",
+} +
+{
+  "en": "Checking system settings...",
+  "es": "Verificando configuración del sistema...",
+};
 
 String get i18n => localize(this, _t);
 
