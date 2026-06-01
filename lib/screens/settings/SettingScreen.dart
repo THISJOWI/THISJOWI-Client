@@ -1133,9 +1133,10 @@ class _SettingScreenState extends State<SettingScreen> {
                             onPressed: () async {
                               if (hostingMode == null) return;
                               try {
-                                await _profileService.updateProfileFields(
-                                  hostingMode: hostingMode,
-                                );
+                                final backendMode = hostingMode == 'Self-Hosted'
+                                    ? 'SELF_HOSTED'
+                                    : 'CLOUD';
+                                await _accountService.updateHostingMode(backendMode);
                                 if (hostingMode == 'Self-Hosted') {
                                   final url = urlController.text.trim();
                                   if (url.isNotEmpty) {
