@@ -13,7 +13,7 @@ import 'package:thisjowi/services/offline_auth_service.dart';
 import 'package:thisjowi/components/social_login_button.dart';
 import 'package:thisjowi/components/navigation.dart';
 import 'package:thisjowi/components/error_bar.dart';
-import 'package:thisjowi/i18n/translationService.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/screens/auth/forgotPassword.dart';
 
 
@@ -117,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     final authenticated = await _biometricService.authenticate(
-      localizedReason: 'Authenticate to access THISECURE'.tr(context),
+      localizedReason: 'Authenticate to access THISECURE'.i18n,
     );
 
     if (authenticated && mounted) {
@@ -128,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       if (mounted) {
         setState(() => _isLoading = false);
-        ErrorSnackBar.show(context, 'Authentication failed'.tr(context));
+        ErrorSnackBar.show(context, 'Authentication failed'.i18n);
       }
     }
   }
@@ -150,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       ErrorSnackBar.show(
-          context, 'Please complete email and password'.tr(context));
+          context, 'Please complete email and password'.i18n);
       return;
     }
 
@@ -183,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
-      ErrorSnackBar.show(context, 'Login failed'.tr(context));
+      ErrorSnackBar.show(context, 'Login failed'.i18n);
     }
   }
 
@@ -198,8 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() => _isLoading = false);
         ErrorSnackBar.show(
           context,
-          'No hay conexión al servidor y el usuario no existe localmente'
-              .tr(context),
+          'No server connection and user does not exist locally'.i18n
         );
         return;
       }
@@ -220,15 +219,15 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() => _isLoading = false);
         ErrorSnackBar.show(
           context,
-          'Contraseña incorrecta para usuario local'.tr(context),
+          'Incorrect password for local user'.i18n,
         );
       }
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
-      ErrorSnackBar.show(
+        ErrorSnackBar.show(
         context,
-        'Error en login offline: $e'.tr(context),
+        "Offline login error: %s".i18n.fill([e.toString()]),
       );
     }
   }
@@ -318,7 +317,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 32),
 
                       Text(
-                        "Welcome Back".tr(context),
+                        "Welcome Back".i18n,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 32,
@@ -329,7 +328,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        "Sign in to continue".tr(context),
+                        "Sign in to continue".i18n,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
@@ -381,7 +380,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         size: 20),
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 20, horizontal: 20),
-                                    labelText: "Email".tr(context),
+                                    labelText: "Email".i18n,
                                     labelStyle: TextStyle(
                                         color: isDark
                                             ? AppColors.text.withValues(alpha: 0.5)
@@ -440,7 +439,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         });
                                       },
                                     ),
-                                    labelText: "Password".tr(context),
+                                    labelText: "Password".i18n,
                                     labelStyle: TextStyle(
                                         color: isDark
                                             ? AppColors.text.withValues(alpha: 0.5)
@@ -480,7 +479,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       );
                                     },
                                     child: Text(
-                                      'Forgot Password?'.tr(context),
+                                      'Forgot Password?'.i18n,
                                       style: TextStyle(
                                         color: isDark
                                             ? AppColors.text.withValues(alpha: 0.7)
@@ -537,7 +536,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             ),
                                           )
                                         : Text(
-                                            "Sign In".tr(context),
+                                            "Sign In".i18n,
                                             style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
@@ -613,7 +612,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Don't have an account? ".tr(context),
+                            "Don't have an account? ".i18n,
                             style: TextStyle(
                                 color: isDark
                                     ? AppColors.text.withValues(alpha: 0.6)
@@ -624,7 +623,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             onTap: () => Navigator.pushReplacementNamed(
                                 context, '/register'),
                             child: Text(
-                              "Sign Up".tr(context),
+                              "Sign Up".i18n,
                               style: TextStyle(
                                 color: isDark ? Colors.white : Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.bold,

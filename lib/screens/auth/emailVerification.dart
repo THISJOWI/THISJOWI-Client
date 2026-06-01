@@ -21,7 +21,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   void initState() {
     super.initState();
     _codeController.addListener(_onCodeChanged);
-    _resendCode();
+    _sendVerificationCode();
   }
 
   @override
@@ -91,7 +91,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     }
   }
 
-  void _resendCode() async {
+  void _sendVerificationCode() async {
     setState(() {
       _isLoading = true;
     });
@@ -108,9 +108,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       final body = jsonDecode(response.body);
 
       if (response.statusCode == 200 && body['success'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Code resent successfully')),
-        );
+        // Code sent successfully
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(body['message'] ?? 'Error resending code')),
@@ -308,9 +306,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       const SizedBox(height: 24),
                       
                       TextButton(
-                        onPressed: _isLoading ? null : _resendCode,
+                        onPressed: _isLoading ? null : _sendVerificationCode,
                         child: Text(
-                          "Didn't receive the code? Resend",
+                          "Send code again",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary,
                             fontWeight: FontWeight.w600,

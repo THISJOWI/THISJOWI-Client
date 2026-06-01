@@ -449,6 +449,112 @@ extension Localization on String {
         "es": "Base de datos eliminada. Reinicia la aplicación.",
       } +
 
+      // ==================== OTP ====================
+      {
+        "en": "Code copied",
+        "es": "Código copiado",
+      } +
+      {
+        "en": "Add OTP",
+        "es": "Añadir OTP",
+      } +
+      {
+        "en": "Account name",
+        "es": "Nombre de cuenta",
+      } +
+      {
+        "en": "Issuer",
+        "es": "Emisor",
+      } +
+      {
+        "en": "Secret key",
+        "es": "Clave secreta",
+      } +
+      {
+        "en": "Name and secret are required",
+        "es": "Nombre y clave son requeridos",
+      } +
+      {
+        "en": "Invalid secret key",
+        "es": "Clave secreta inválida",
+      } +
+      {
+        "en": "OTP added",
+        "es": "OTP añadido",
+      } +
+      {
+        "en": "Import OTP URI",
+        "es": "Importar URI OTP",
+      } +
+      {
+        "en": "Paste the otpauth:// URI from your authenticator app",
+        "es": "Pega la URI otpauth:// de tu app autenticadora",
+      } +
+      {
+        "en": "OTP URI",
+        "es": "URI OTP",
+      } +
+      {
+        "en": "Import",
+        "es": "Importar",
+      } +
+      {
+        "en": "Invalid OTP URI",
+        "es": "URI OTP inválida",
+      } +
+      {
+        "en": "OTP imported",
+        "es": "OTP importado",
+      } +
+      {
+        "en": "Delete OTP?",
+        "es": "¿Eliminar OTP?",
+      } +
+      {
+        "en": "Are you sure you want to delete",
+        "es": "¿Estás seguro de que deseas eliminar",
+      } +
+      {
+        "en": "OTP deleted",
+        "es": "OTP eliminado",
+      } +
+      {
+        "en": "Authenticator",
+        "es": "Autenticador",
+      } +
+      {
+        "en": "Import URI",
+        "es": "Importar URI",
+      } +
+      {
+        "en": "Scan QR",
+        "es": "Escanear QR",
+      } +
+      {
+        "en": "No OTP entries yet",
+        "es": "Aún no hay entradas OTP",
+      } +
+      {
+        "en": "Add your first authenticator code",
+        "es": "Añade tu primer código de autenticación",
+      } +
+      {
+        "en": "Add manually",
+        "es": "Añadir manualmente",
+      } +
+      {
+        "en": "Tap to copy",
+        "es": "Toca para copiar",
+      } +
+      {
+        "en": "Invalid OTP Entry",
+        "es": "Entrada OTP inválida",
+      } +
+      {
+        "en": "Secret key is corrupted",
+        "es": "La clave secreta está corrupta",
+      } +
+
       // ==================== SYNC ====================
       {
         "en": "Syncing in background...",
@@ -540,6 +646,106 @@ extension Localization on String {
         "en": "Forgot Password?",
         "es": "¿Olvidaste tu contraseña?",
       } +
+      {
+        "en": "Congrats! Account created successfully",
+        "es": "¡Felicidades! Cuenta creada exitosamente",
+      } +
+      {
+        "en": "Please enter your email",
+        "es": "Por favor ingresa tu correo",
+      } +
+      {
+        "en": "OTP sent to your email",
+        "es": "OTP enviado a tu correo",
+      } +
+      {
+        "en": "An error occurred",
+        "es": "Ocurrió un error",
+      } +
+      {
+        "en": "Send OTP",
+        "es": "Enviar OTP",
+      } +
+      {
+        "en": "Please enter the code",
+        "es": "Por favor ingresa el código",
+      } +
+      {
+        "en": "Code verified. Set new password.",
+        "es": "Código verificado. Establece nueva contraseña.",
+      } +
+      {
+        "en": "Invalid code",
+        "es": "Código inválido",
+      } +
+      {
+        "en": "Connection error",
+        "es": "Error de conexión",
+      } +
+      {
+        "en": "Please enter new password",
+        "es": "Por favor ingresa la nueva contraseña",
+      } +
+      {
+        "en": "Passwords do not match",
+        "es": "Las contraseñas no coinciden",
+      } +
+      {
+        "en": "Password reset successfully",
+        "es": "Contraseña restablecida exitosamente",
+      } +
+      {
+        "en": "Failed to reset password",
+        "es": "Error al restablecer la contraseña",
+      } +
+      {
+        "en": "Set New Password",
+        "es": "Establecer nueva contraseña",
+      } +
+      {
+        "en": "Verification Code",
+        "es": "Código de verificación",
+      } +
+      {
+        "en": "Please enter your new password.",
+        "es": "Por favor ingresa tu nueva contraseña.",
+      } +
+      {
+        "en": "We sent a verification code to your email.",
+        "es": "Enviamos un código de verificación a tu correo.",
+      } +
+      {
+        "en": "Verify Code",
+        "es": "Verificar código",
+      } +
+      {
+        "en": "Reset Password",
+        "es": "Restablecer contraseña",
+      } +
+      {
+        "en": "Incorrect password for local user",
+        "es": "Contraseña incorrecta para usuario local",
+      } +
+      {
+        "en": "Offline login error: %s",
+        "es": "Error en login offline: %s",
+      } +
+      {
+        "en": "No results found",
+        "es": "No encontramos resultados",
+      } +
+      {
+        "en": "No server connection and user does not exist locally",
+        "es": "No hay conexión al servidor y el usuario no existe localmente",
+      } +
+      {
+        "en": "Conversations",
+        "es": "Conversaciones",
+      } +
+      {
+        "en": "Find someone",
+        "es": "Encuentra a alguien",
+      } +
 
       // ==================== NOTES ADDITIONAL ====================
       {
@@ -569,6 +775,18 @@ extension Localization on String {
       {
         "en": "Error loading notes",
         "es": "Error al cargar notas",
+      } +
+      {
+        "en": "No Content",
+        "es": "Sin contenido",
+      } +
+      {
+        "en": "No Title",
+        "es": "Sin título",
+      } +
+      {
+        "en": "Done",
+        "es": "Hecho",
       } +
 
       // ==================== PASSWORDS ADDITIONAL ====================

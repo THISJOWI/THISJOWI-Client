@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:thisjowi/i18n/translationService.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/services/token_manager.dart';
 import 'package:thisjowi/services/messageService.dart';
 import 'package:thisjowi/data/models/message.dart';
