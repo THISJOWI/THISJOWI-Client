@@ -638,124 +638,180 @@ class _RegisterFormState extends State<RegisterForm>
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: constraints.maxHeight,
-              maxWidth: 340,
-            ),
-            child: IntrinsicHeight(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildLogo(),
-                  const SizedBox(height: 32),
-                  _buildTitle(),
-                  const SizedBox(height: 32),
-                  _buildSelectionSummary(),
-                  const SizedBox(height: 32),
-                  _buildAnimatedField(
-                    index: 0,
-                    child: _buildTextField(
-                      controller: _fullNameController,
-                      focusNode: _fullNameFocusNode,
-                      icon: Icons.person_outline,
-                      label: "Full Name".i18n,
-                      isFocused: _focusedField == 0,
-                      textInputAction: TextInputAction.next,
-                      onSubmitted: () => _emailFocusNode.requestFocus(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildAnimatedField(
-                    index: 1,
-                    child: _buildTextField(
-                      controller: _emailController,
-                      focusNode: _emailFocusNode,
-                      icon: Icons.email_outlined,
-                      label: "Email".i18n,
-                      isFocused: _focusedField == 1,
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      onSubmitted: () => _passwordFocusNode.requestFocus(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildAnimatedField(
-                    index: 2,
-                    child: _buildPasswordField(),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildAnimatedField(
-                    index: 3,
-                    child: CountrySelector(
-                      initialValue: _selectedCountry,
-                      onCountrySelected: (country) {
-                        setState(() => _selectedCountry = country);
-                      },
-                    ),
-                  ),
-                  if (widget.accountType == 'Business') ...[
-                    const SizedBox(height: 16),
-                    _buildAnimatedField(
-                      index: 4,
-                      child: _buildTextField(
-                        controller: _ldapUrlController,
-                        focusNode: _ldapUrlFocusNode,
-                        icon: Icons.account_tree_outlined,
-                        label: "LDAP URL".i18n,
-                        hint: "ldaps://ldap.company.com".i18n,
-                        isFocused: _focusedField == 4,
-                        textInputAction: TextInputAction.next,
-                        onSubmitted: () {
-                          if (widget.hostingMode == 'SelfHosted') {
-                            _serverUrlFocusNode.requestFocus();
-                          }
-                        },
-                      ),
-                    ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Scaffold(
+      backgroundColor: isDark ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
+      body: Stack(
+        children: [
+          Positioned(
+            top: -100,
+            right: -100,
+            child: Container(
+              width: 400,
+              height: 400,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                    Colors.transparent,
                   ],
-                  if (widget.hostingMode == 'SelfHosted') ...[
-                    const SizedBox(height: 16),
-                    _buildAnimatedField(
-                      index: widget.accountType == 'Business' ? 5 : 4,
-                      child: _buildTextField(
-                        controller: _serverUrlController,
-                        focusNode: _serverUrlFocusNode,
-                        icon: Icons.link,
-                        label: "Server URL".i18n,
-                        hint: "https://your-server.com".i18n,
-                        isFocused: _focusedField == 3,
-                        textInputAction: TextInputAction.done,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildAnimatedField(
-                      index: widget.accountType == 'Business' ? 6 : 5,
-                      child: _buildConnectionButton(),
-                    ),
-                  ],
-                  const SizedBox(height: 24),
-                  _buildAnimatedField(
-                    index: _getTermsCheckboxIndex(),
-                    child: _buildTermsCheckbox(),
-                  ),
-                  const SizedBox(height: 32),
-                  _buildAnimatedField(
-                    index: _getCreateButtonIndex(),
-                    child: _buildCreateButton(),
-                  ),
-                  const SizedBox(height: 24),
-                ],
+                ),
               ),
             ),
           ),
-        );
-      },
+          Positioned(
+            bottom: -50,
+            left: -50,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+            child: Container(color: Colors.transparent),
+          ),
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 380),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+                              blurRadius: 40,
+                              spreadRadius: 0,
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.person_add_rounded,
+                          size: 70,
+                          color: isDark ? Colors.white : Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        'Create Account'.i18n,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 32,
+                          color: isDark ? Colors.white : Theme.of(context).colorScheme.onSurface,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Sign up to get started'.i18n,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: isDark ? Colors.white.withValues(alpha: 0.6) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      if (widget.accountType.isNotEmpty) ...[
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              widget.accountType == 'Business' ? 'Business Account' : 'Personal Account',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                          child: Container(
+                            padding: const EdgeInsets.all(32),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF2A2A2A).withValues(alpha: 0.85) : Colors.white.withValues(alpha: 0.85),
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.08),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: (isDark ? Colors.black : Colors.black).withValues(alpha: isDark ? 0.2 : 0.08),
+                                  blurRadius: 30,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                _buildTextField(
+                                  controller: _fullNameController,
+                                  focusNode: _fullNameFocusNode,
+                                  icon: Icons.person_outline,
+                                  label: 'Full Name'.i18n,
+                                ),
+                                const SizedBox(height: 16),
+                                _buildTextField(
+                                  controller: _emailController,
+                                  focusNode: _emailFocusNode,
+                                  icon: Icons.email_outlined,
+                                  label: 'Email'.i18n,
+                                  keyboardType: TextInputType.emailAddress,
+                                ),
+                                const SizedBox(height: 16),
+                                _buildPasswordField(),
+                                const SizedBox(height: 16),
+                                CountrySelector(
+                                  initialValue: _selectedCountry,
+                                  onCountrySelected: (country) {
+                                    setState(() => _selectedCountry = country);
+                                  },
+                                ),
+                                const SizedBox(height: 24),
+                                _buildTermsCheckbox(),
+                                const SizedBox(height: 24),
+                                _buildCreateButton(),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -824,7 +880,7 @@ class _RegisterFormState extends State<RegisterForm>
     required IconData icon,
     required String label,
     String? hint,
-    required bool isFocused,
+    bool isFocused = false,
     TextInputType? keyboardType,
     TextInputAction? textInputAction,
     VoidCallback? onSubmitted,
