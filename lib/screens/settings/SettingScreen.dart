@@ -28,8 +28,10 @@ class _SettingScreenState extends State<SettingScreen> {
   final AccountService _accountService = AccountService();
   final ProfileService _profileService = ProfileService();
   final BiometricService _biometricService = BiometricService();
+  final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  bool _obscureCurrentPassword = true;
   bool _obscureNewPassword = true;
   bool _obscureConfirmPassword = true;
   bool _biometricEnabled = false;
@@ -560,6 +562,14 @@ class _SettingScreenState extends State<SettingScreen> {
                     ),
                     const SizedBox(height: 24),
                     _buildPasswordField(
+                      controller: _currentPasswordController,
+                      label: 'Current Password'.i18n,
+                      obscure: _obscureCurrentPassword,
+                      onVisibilityToggle: () => setState(
+                          () => _obscureCurrentPassword = !_obscureCurrentPassword),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildPasswordField(
                       controller: _newPasswordController,
                       label: 'New Password'.i18n,
                       obscure: _obscureNewPassword,
@@ -580,6 +590,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         Expanded(
                           child: TextButton(
                             onPressed: () {
+                              _currentPasswordController.clear();
                               _newPasswordController.clear();
                               _confirmPasswordController.clear();
                               Navigator.pop(context);
@@ -699,10 +710,16 @@ class _SettingScreenState extends State<SettingScreen> {
   }
 
   void _handleChangePassword() async {
+    final currentPassword = _currentPasswordController.text;
     final newPassword = _newPasswordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
-    // New password and confirmation are required
+    // All fields are required
+    if (currentPassword.isEmpty) {
+      ErrorSnackBar.show(context, 'Current password is required'.i18n);
+      return;
+    }
+
     if (newPassword.isEmpty || confirmPassword.isEmpty) {
       ErrorSnackBar.show(context, 'Please complete the new password'.i18n);
       return;
@@ -720,11 +737,11 @@ class _SettingScreenState extends State<SettingScreen> {
     }
 
     try {
-      // Use AccountService for password change
-      await _accountService.changePassword('', newPassword, confirmPassword);
+      await _accountService.changePassword(currentPassword, newPassword, confirmPassword);
       if (!mounted) return;
 
       // Clear the text fields and close the dialog
+      _currentPasswordController.clear();
       _newPasswordController.clear();
       _confirmPasswordController.clear();
       Navigator.pop(context);

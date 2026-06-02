@@ -45,24 +45,68 @@ class AccountService extends BaseService {
   }
 
   Future<void> changePassword(
-    String oldPassword,
+    String currentPassword,
     String newPassword,
     String confirmPassword,
   ) async {
     logInfo('Changing password');
     try {
-      await apiClient.post(
+      final response = await apiClient.post(
         '/v1/auth/change-password',
         body: {
-          'oldPassword': oldPassword,
+          'currentPassword': currentPassword,
           'newPassword': newPassword,
           'confirmPassword': confirmPassword,
         },
       );
-      logInfo('Password changed successfully');
+
+      if (response.statusCode == 200) {
+        logInfo('Password changed successfully');
+        return;
+      }
+
+      final json = parseJsonBody(response);
+      final message = json['message'] ?? 'Error al cambiar la contrasena';
+
+      logWarning('Password change rejected: ${response.statusCode} — $message');
+
+      if (response.statusCode == 400) {
+        if (message.contains('Current password is incorrect') ||
+            message.contains('incorrect')) {
+          throw InvalidCurrentPasswordException(message: message, details: json);
+        }
+        if (message.contains('password must') ||
+            message.contains('uppercase') ||
+            message.contains('lowercase') ||
+            message.contains('digit') ||
+            message.contains('special') ||
+            message.contains('at least 8')) {
+          throw InvalidNewPasswordException(message: message, details: json);
+        }
+        throw PasswordChangeException(message: message, details: json);
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        throw AccountException(
+          message: message,
+          code: response.statusCode == 401 ? 'UNAUTHORIZED' : 'FORBIDDEN',
+          details: json,
+        );
+      } else if (response.statusCode >= 500) {
+        throw AccountServerException(
+          statusCode: response.statusCode,
+          message: message,
+          details: json,
+        );
+      } else {
+        throw PasswordChangeException(message: message, details: json);
+      }
+    } on AccountException {
+      rethrow;
     } catch (e, stackTrace) {
       logError('Change password failed', e, stackTrace);
-      rethrow;
+      throw PasswordChangeException(
+        message: 'Error al cambiar la contrasena',
+        details: e.toString(),
+      );
     }
   }
 
