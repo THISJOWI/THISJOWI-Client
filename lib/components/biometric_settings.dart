@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/services/biometricService.dart';
 
 /// Widget to configure biometric app lock settings
@@ -44,14 +45,14 @@ class _BiometricLockSettingsState extends State<BiometricLockSettings> {
     if (enabled) {
       // Verify biometric before enabling
       final success = await _biometricService.authenticate(
-        localizedReason: 'Verifica tu identidad para activar el bloqueo biométrico',
+        localizedReason: 'Verify your identity to enable biometric lock'.i18n,
       );
       
       if (!success) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('No se pudo verificar tu identidad'),
+            SnackBar(
+              content: Text('Could not verify your identity'.i18n),
               backgroundColor: Colors.red,
             ),
           );
@@ -69,8 +70,8 @@ class _BiometricLockSettingsState extends State<BiometricLockSettings> {
         SnackBar(
           content: Text(
             enabled 
-                ? 'Bloqueo con $_biometricTypeName activado'
-                : 'Bloqueo con $_biometricTypeName desactivado',
+                ? "Lock with %s enabled".i18n.fill([_biometricTypeName])
+                : "Lock with %s disabled".i18n.fill([_biometricTypeName]),
           ),
           backgroundColor: enabled ? Colors.green : Colors.orange,
         ),
@@ -91,13 +92,13 @@ class _BiometricLockSettingsState extends State<BiometricLockSettings> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const ListTile(
-        leading: SizedBox(
+      return ListTile(
+        leading: const SizedBox(
           width: 24,
           height: 24,
           child: CircularProgressIndicator(strokeWidth: 2),
         ),
-        title: Text('Cargando...'),
+        title: Text('Loading...'.i18n),
       );
     }
 
@@ -108,13 +109,13 @@ class _BiometricLockSettingsState extends State<BiometricLockSettings> {
           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
         ),
         title: Text(
-          'Bloqueo biométrico',
+          'Biometric lock'.i18n,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
           ),
         ),
         subtitle: Text(
-          'No disponible en este dispositivo',
+          'Not available on this device'.i18n,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
             fontSize: 12,
@@ -129,15 +130,15 @@ class _BiometricLockSettingsState extends State<BiometricLockSettings> {
         color: _isLockEnabled ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
       ),
       title: Text(
-        'Bloquear con $_biometricTypeName',
+        'Lock with %s'.i18n.fill([_biometricTypeName]),
         style: TextStyle(
           color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
       subtitle: Text(
         _isLockEnabled 
-            ? 'Se pedirá $_biometricTypeName al abrir la app'
-            : 'La app se abrirá sin verificación',
+            ? "%s will be required when opening the app".i18n.fill([_biometricTypeName])
+            : 'The app will open without verification'.i18n,
         style: TextStyle(
           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           fontSize: 12,
@@ -192,14 +193,14 @@ class _BiometricLockSettingsCardState extends State<BiometricLockSettingsCard> {
   Future<void> _toggleBiometricLock(bool enabled) async {
     if (enabled) {
       final success = await _biometricService.authenticate(
-        localizedReason: 'Verifica tu identidad para activar el bloqueo biométrico',
+        localizedReason: 'Verify your identity to enable biometric lock'.i18n,
       );
       
       if (!success) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('No se pudo verificar tu identidad'),
+            SnackBar(
+              content: Text('Could not verify your identity'.i18n),
               backgroundColor: Colors.red,
             ),
           );
@@ -259,7 +260,7 @@ class _BiometricLockSettingsCardState extends State<BiometricLockSettingsCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Bloqueo con $_biometricTypeName',
+                    "Lock with %s".i18n.fill([_biometricTypeName]),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -269,8 +270,8 @@ class _BiometricLockSettingsCardState extends State<BiometricLockSettingsCard> {
                   const SizedBox(height: 4),
                   Text(
                     _isLockEnabled 
-                        ? 'Activado'
-                        : 'Desactivado',
+                        ? 'Enabled'.i18n
+                        : 'Disabled'.i18n,
                     style: TextStyle(
                       fontSize: 12,
                       color: _isLockEnabled ? Colors.green : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),

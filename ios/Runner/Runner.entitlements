@@ -5,6 +5,11 @@
 	<key>keychain-access-groups</key>
 	<array>
 		<string>$(AppIdentifierPrefix)uk.thisjowi.thisjowi</string>
+		<string>$(AppIdentifierPrefix)group.com.thisjowi.thisecure</string>
+	</array>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.thisjowi.thisecure</string>
 	</array>
 </dict>
 </plist>

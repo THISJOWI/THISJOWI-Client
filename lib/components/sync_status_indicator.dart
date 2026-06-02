@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import '../services/connectivityService.dart';
 
 /// Widget to display connectivity and sync status

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/services/biometricService.dart';
 
 /// Screen that prompts user for biometric authentication
@@ -82,7 +83,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
 
     try {
       final success = await _biometricService.authenticate(
-        localizedReason: 'Verifica tu identidad para acceder a THISECURE',
+        localizedReason: 'Verify your identity to access THISECURE'.i18n,
       );
 
       if (mounted) {
@@ -91,7 +92,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
         } else {
           setState(() {
             _isAuthenticating = false;
-            _errorMessage = 'No se pudo verificar tu identidad';
+            _errorMessage = 'Could not verify your identity'.i18n;
           });
         }
       }
@@ -99,7 +100,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
       if (mounted) {
         setState(() {
           _isAuthenticating = false;
-          _errorMessage = 'Error de autenticación';
+          _errorMessage = 'Authentication error'.i18n;
         });
       }
     }
@@ -163,7 +164,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                   
                   // Title
                   Text(
-                    'Bienvenido de nuevo',
+                    'Welcome back'.i18n,
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -175,7 +176,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                   
                   // Subtitle
                   Text(
-                    'Usa $_biometricTypeName para desbloquear',
+                    "Use %s to unlock".i18n.fill([_biometricTypeName]),
                     style: TextStyle(
                       fontSize: 16,
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
@@ -241,8 +242,8 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                           : Icon(_getBiometricIcon()),
                       label: Text(
                         _isAuthenticating
-                            ? 'Verificando...'
-                            : 'Usar $_biometricTypeName',
+                            ? 'Verifying...'.i18n
+                            : "Use %s".i18n.fill([_biometricTypeName]),
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -265,7 +266,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen>
                   TextButton(
                     onPressed: _isAuthenticating ? null : widget.onSkipped,
                     child: Text(
-                      'Usar contraseña',
+                      'Use password'.i18n,
                       style: TextStyle(
                         fontSize: 14,
                         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),

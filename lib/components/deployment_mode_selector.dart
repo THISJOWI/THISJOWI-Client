@@ -147,7 +147,7 @@ class _DeploymentModeSelectorState extends State<DeploymentModeSelector>
       child: Column(
         children: [
           Text(
-            'Modo de Despliegue'.i18n,
+            'Deployment Mode'.i18n,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 32,
@@ -158,7 +158,7 @@ class _DeploymentModeSelectorState extends State<DeploymentModeSelector>
           ),
           const SizedBox(height: 8),
           Text(
-            'Elige cómo alojar tus datos'.i18n,
+            'Choose how to host your data'.i18n,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,

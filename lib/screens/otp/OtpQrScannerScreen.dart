@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:thisjowi/core/providers/otp_provider.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/components/error_bar.dart';
 
 class OtpQrScannerScreen extends StatefulWidget {
@@ -33,7 +34,7 @@ class _OtpQrScannerScreenState extends State<OtpQrScannerScreen> {
       final success = await context.read<OtpProvider>().addOtpFromUri(code);
       if (mounted) {
         if (success) {
-          ErrorSnackBar.showSuccess(context, 'OTP added');
+          ErrorSnackBar.showSuccess(context, 'OTP added'.i18n);
           Navigator.pop(context, true);
         } else {
           ErrorSnackBar.show(	context, context.read<OtpProvider>().errorMessage);
@@ -42,7 +43,7 @@ class _OtpQrScannerScreenState extends State<OtpQrScannerScreen> {
       }
     } else {
       if (mounted) {
-        ErrorSnackBar.show(context, 'Invalid QR');
+        ErrorSnackBar.show(context, 'Invalid QR'.i18n);
         Navigator.pop(context, false);
       }
     }
@@ -68,7 +69,7 @@ class _OtpQrScannerScreenState extends State<OtpQrScannerScreen> {
             errorBuilder: (context, error) {
               return Center(
                 child: Text(
-                  'Error: ${error.errorCode}',
+                  "Error: %s".i18n.fill([error.errorCode.toString()]),
                   style: const TextStyle(color: Colors.white),
                 ),
               );
@@ -106,8 +107,8 @@ class _OtpQrScannerScreenState extends State<OtpQrScannerScreen> {
                   ),
                 ),
                 const Spacer(),
-                const Text(
-                  "Scan QR Code",
+                Text(
+                  "Scan QR Code".i18n,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,

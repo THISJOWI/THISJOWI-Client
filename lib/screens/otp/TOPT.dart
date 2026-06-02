@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:thisjowi/core/providers/otp_provider.dart';
 import 'package:thisjowi/data/models/otp_entry.dart';
-import 'package:thisjowi/i18n/translationService.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/services/otpService.dart';
 import 'package:thisjowi/components/error_bar.dart';
@@ -91,14 +90,14 @@ class _OtpScreenState extends State<OtpScreen> with WidgetsBindingObserver {
 
       if (!mounted) return;
       try {
-        ErrorSnackBar.showSuccess(context, 'Code copied'.tr(context));
+        ErrorSnackBar.showSuccess(context, 'Code copied'.i18n);
       } catch (e) {
         // Widget may have been deactivated
       }
     } catch (e) {
       if (!mounted) return;
       try {
-        ErrorSnackBar.show(context, 'Invalid secret key'.tr(context));
+        ErrorSnackBar.show(context, 'Invalid secret key'.i18n);
       } catch (e) {
         // Widget may have been deactivated
       }
@@ -129,7 +128,7 @@ class _OtpScreenState extends State<OtpScreen> with WidgetsBindingObserver {
                   : Colors.black.withValues(alpha: 0.08),
             ),
           ),
-          title: Text('Delete OTP?'.tr(context),
+          title: Text('Delete OTP?'.i18n,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         content: Text(
           'Are you sure you want to delete "${entry.issuer.isNotEmpty ? entry.issuer : entry.name}"?',
@@ -138,12 +137,12 @@ class _OtpScreenState extends State<OtpScreen> with WidgetsBindingObserver {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'.tr(context),
+            child: Text('Cancel'.i18n,
                 style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Delete'.tr(context),
+            child: Text('Delete'.i18n,
                 style: const TextStyle(color: Colors.red)),
           ),
         ],
@@ -161,7 +160,7 @@ class _OtpScreenState extends State<OtpScreen> with WidgetsBindingObserver {
 
       try {
         if (success) {
-          ErrorSnackBar.showSuccess(context, 'OTP deleted'.tr(context));
+          ErrorSnackBar.showSuccess(context, 'OTP deleted'.i18n);
         } else {
           ErrorSnackBar.show(context, _otpProvider.errorMessage);
         }
@@ -202,7 +201,7 @@ Widget build(BuildContext context) {
                                 color: Theme.of(context).colorScheme.primary, size: 28),
                             const SizedBox(width: 12),
                             Text(
-                              'Authenticator'.tr(context),
+                              'Authenticator'.i18n,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 24,
@@ -328,7 +327,7 @@ Widget build(BuildContext context) {
           ),
           const SizedBox(height: 16),
           Text(
-            'No OTP entries yet'.tr(context),
+            'No OTP entries yet'.i18n,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
               fontSize: 18,
@@ -336,7 +335,7 @@ Widget build(BuildContext context) {
           ),
           const SizedBox(height: 8),
           Text(
-            'Add your first authenticator code'.tr(context),
+            'Add your first authenticator code'.i18n,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
               fontSize: 14,
@@ -480,7 +479,7 @@ class _OtpCardState extends State<_OtpCard>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Invalid OTP Entry'.tr(context),
+                      'Invalid OTP Entry'.i18n,
                       style: const TextStyle(
                         color: Colors.red,
                         fontSize: 16,
@@ -488,7 +487,7 @@ class _OtpCardState extends State<_OtpCard>
                       ),
                     ),
                     Text(
-                      'Secret key is corrupted'.tr(context),
+                      'Secret key is corrupted'.i18n,
                       style: TextStyle(
                         color: Colors.red.withValues(alpha: 0.7),
                         fontSize: 13,
@@ -639,7 +638,7 @@ class _OtpCardState extends State<_OtpCard>
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Tap to copy'.tr(context),
+                      'Tap to copy'.i18n,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                         fontSize: 12,

@@ -37,6 +37,7 @@ class _SettingScreenState extends State<SettingScreen> {
   String _biometricType = 'Biometric';
   AuthUser? _currentAuthUser;
   ProfileUser? _currentProfile;
+  int _avatarCacheBuster = 0;
 
   @override
   void initState() {
@@ -919,7 +920,9 @@ class _SettingScreenState extends State<SettingScreen> {
                         foregroundColor:
                             Theme.of(context).colorScheme.onPrimary,
                       ),
-                      child: Text('Save'.i18n),
+                      child: Text('Save'.i18n,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ],
                 ),
@@ -950,6 +953,7 @@ class _SettingScreenState extends State<SettingScreen> {
       await _profileService.uploadAvatar(imageFile);
 
       if (!mounted) return;
+      setState(() => _avatarCacheBuster++);
       ErrorSnackBar.showSuccess(context, 'Avatar updated'.i18n);
       await _loadCurrentUser();
     } on InvalidAvatarException catch (e) {
@@ -970,6 +974,7 @@ class _SettingScreenState extends State<SettingScreen> {
         try {
           await _profileService.deleteAvatar();
           if (!mounted) return;
+          setState(() => _avatarCacheBuster++);
           ErrorSnackBar.showSuccess(context, 'Avatar removed'.i18n);
           await _loadCurrentUser();
         } catch (e) {
@@ -1127,7 +1132,8 @@ class _SettingScreenState extends State<SettingScreen> {
                                     _currentProfile!.avatarUrl!.isNotEmpty
                                 ? DecorationImage(
                                     image: NetworkImage(
-                                        _currentProfile!.avatarUrl!),
+                                      '${_currentProfile!.avatarUrl!}${_currentProfile!.avatarUrl!.contains('?') ? '&' : '?'}cb=$_avatarCacheBuster',
+                                    ),
                                     fit: BoxFit.cover,
                                   )
                                 : null,
@@ -1256,7 +1262,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       _buildSettingItem(
                         icon: Icons.info_outline,
                         title: 'Application Version'.i18n,
-                        subtitle: 'Development Version',
+                        subtitle: 'Development Version'.i18n,
                       ),
 
                       // Account & Privacy

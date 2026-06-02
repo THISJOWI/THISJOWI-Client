@@ -1023,6 +1023,10 @@ extension Localization on String {
         "es": "Atributo de Email",
       } +
       {
+        "en": "Full Name",
+        "es": "Nombre completo",
+      } +
+      {
         "en": "Full Name Attribute",
         "es": "Atributo de Nombre Completo",
       } +
@@ -1314,7 +1318,732 @@ extension Localization on String {
 {
   "en": "Checking system settings...",
   "es": "Verificando configuración del sistema...",
+} +
+
+// ==================== MISSING UI STRINGS ====================
+{
+  "en": "Please enter the code",
+  "es": "Por favor ingresa el código",
+} +
+{
+  "en": "Email verified successfully",
+  "es": "Correo verificado exitosamente",
+} +
+{
+  "en": "Error verifying code",
+  "es": "Error al verificar código",
+} +
+{
+  "en": "Error resending code",
+  "es": "Error al reenviar código",
+} +
+{
+  "en": "Verify your email",
+  "es": "Verifica tu correo",
+} +
+{
+  "en": "We sent a verification code to %s. Enter it below to continue.",
+  "es": "Enviamos un código de verificación a %s. Ingrésalo abajo para continuar.",
+} +
+{
+  "en": "Send code again",
+  "es": "Enviar código nuevamente",
+} +
+{
+  "en": "Secure password manager",
+  "es": "Administrador de contraseñas seguro",
+} +
+{
+  "en": "How do I know which one to choose?",
+  "es": "¿Cómo sé cuál elegir?",
+} +
+{
+  "en": "All rights reserved.",
+  "es": "Todos los derechos reservados.",
+} +
+{
+  "en": "Verify your identity to access THISECURE",
+  "es": "Verifica tu identidad para acceder a THISECURE",
+} +
+{
+  "en": "Could not verify your identity",
+  "es": "No se pudo verificar tu identidad",
+} +
+{
+  "en": "Authentication error",
+  "es": "Error de autenticación",
+} +
+{
+  "en": "Welcome back",
+  "es": "Bienvenido de nuevo",
+} +
+{
+  "en": "Use %s to unlock",
+  "es": "Usa %s para desbloquear",
+} +
+{
+  "en": "Verifying...",
+  "es": "Verificando...",
+} +
+{
+  "en": "Use password",
+  "es": "Usar contraseña",
+} +
+{
+  "en": "Account created!",
+  "es": "¡Cuenta creada!",
+} +
+{
+  "en": "New password",
+  "es": "Nueva contraseña",
+} +
+{
+  "en": "Password saved successfully",
+  "es": "Contraseña guardada correctamente",
+} +
+{
+  "en": "Save password?",
+  "es": "¿Guardar contraseña?",
+} +
+{
+  "en": "THISECURE can save this password for you",
+  "es": "THISECURE puede guardar esta contraseña para ti",
+} +
+{
+  "en": "Title is required",
+  "es": "El título es requerido",
+} +
+{
+  "en": "User / Email",
+  "es": "Usuario / Email",
+} +
+{
+  "en": "User is required",
+  "es": "El usuario es requerido",
+} +
+{
+  "en": "Password is required",
+  "es": "La contraseña es requerida",
+} +
+{
+  "en": "Website / App",
+  "es": "Sitio web / App",
+} +
+{
+  "en": "Notes (optional)",
+  "es": "Notas (opcional)",
+} +
+{
+  "en": "Invalid QR",
+  "es": "QR inválido",
+} +
+{
+  "en": "Scan QR Code",
+  "es": "Escanear código QR",
+} +
+{
+  "en": "Copy message",
+  "es": "Copiar mensaje",
+} +
+{
+  "en": "Message copied!",
+  "es": "¡Mensaje copiado!",
+} +
+{
+  "en": "Delete message",
+  "es": "Eliminar mensaje",
+} +
+{
+  "en": "Delete message?",
+  "es": "¿Eliminar mensaje?",
+} +
+{
+  "en": "This action cannot be undone and the message will disappear for everyone.",
+  "es": "Esta acción no se puede deshacer y el mensaje desaparecerá para todos.",
+} +
+{
+  "en": "Encrypted",
+  "es": "Cifrado",
+} +
+{
+  "en": "Not encrypted",
+  "es": "No cifrado",
+} +
+{
+  "en": "Start the conversation!",
+  "es": "¡Inicia la conversación!",
+} +
+{
+  "en": "Debug & Sync",
+  "es": "Debug y Sincronización",
+} +
+{
+  "en": "Danger Zone",
+  "es": "Zona de peligro",
+} +
+{
+  "en": "Delete Local Database",
+  "es": "Eliminar base de datos local",
+} +
+{
+  "en": "Error loading passwords",
+  "es": "Error al cargar contraseñas",
+} +
+{
+  "en": "Error deleting",
+  "es": "Error al eliminar",
+} +
+{
+  "en": "Development Version",
+  "es": "Versión de desarrollo",
+} +
+{
+  "en": "Error loading logs",
+  "es": "Error al cargar logs",
+} +
+{
+  "en": "Error reading log",
+  "es": "Error al leer log",
+} +
+{
+  "en": "Clear All Logs?",
+  "es": "¿Limpiar todos los logs?",
+} +
+{
+  "en": "This will delete all log files. This action cannot be undone.",
+  "es": "Esto eliminará todos los archivos de log. Esta acción no se puede deshacer.",
+} +
+{
+  "en": "Clear",
+  "es": "Limpiar",
+} +
+{
+  "en": "All logs cleared",
+  "es": "Todos los logs limpiados",
+} +
+{
+  "en": "Log copied to clipboard",
+  "es": "Log copiado al portapapeles",
+} +
+{
+  "en": "Application Logs",
+  "es": "Logs de la aplicación",
+} +
+{
+  "en": "Copy to clipboard",
+  "es": "Copiar al portapapeles",
+} +
+{
+  "en": "Clear all logs",
+  "es": "Limpiar todos los logs",
+} +
+{
+  "en": "Refresh",
+  "es": "Actualizar",
+} +
+{
+  "en": "Log Files",
+  "es": "Archivos de log",
+} +
+{
+  "en": "No log files",
+  "es": "Sin archivos de log",
+} +
+{
+  "en": "Filter logs...",
+  "es": "Filtrar logs...",
+} +
+{
+  "en": "All Levels",
+  "es": "Todos los niveles",
+} +
+{
+  "en": "Select a log file to view",
+  "es": "Selecciona un archivo de log para ver",
+} +
+{
+  "en": "No matching logs",
+  "es": "Sin logs que coincidan",
+} +
+{
+  "en": "%s entries",
+  "es": "%s entradas",
+} +
+{
+  "en": "File: %s",
+  "es": "Archivo: %s",
+} +
+{
+  "en": "Select how you want to sign in",
+  "es": "Selecciona cómo deseas ingresar",
+} +
+{
+  "en": "Enterprise SSO",
+  "es": "SSO Empresarial",
+} +
+{
+  "en": "Corporate LDAP",
+  "es": "LDAP Corporativo",
+} +
+{
+  "en": "Enterprise account",
+  "es": "Cuenta empresarial",
+} +
+{
+  "en": "Regular Account",
+  "es": "Cuenta Regular",
+} +
+{
+  "en": "Email and password",
+  "es": "Email y contraseña",
+} +
+{
+  "en": "Continue with Google",
+  "es": "Continuar con Google",
+} +
+{
+  "en": "Continue with Microsoft",
+  "es": "Continuar con Microsoft",
+} +
+{
+  "en": "Configure AutoFill on iOS",
+  "es": "Configurar AutoFill en iOS",
+} +
+{
+  "en": "To enable THISECURE as password manager:",
+  "es": "Para activar THISECURE como gestor de contraseñas:",
+} +
+{
+  "en": "Got it",
+  "es": "Entendido",
+} +
+{
+  "en": "Password autofill",
+  "es": "Autorellenado de contraseñas",
+} +
+{
+  "en": "Select password",
+  "es": "Seleccionar contraseña",
+} +
+{
+  "en": "Autofill for:",
+  "es": "Autorellenar para:",
+} +
+{
+  "en": "Search password...",
+  "es": "Buscar contraseña...",
+} +
+{
+  "en": "No passwords found",
+  "es": "No se encontraron contraseñas",
+} +
+{
+  "en": "LDAP User",
+  "es": "Usuario LDAP",
+} +
+{
+  "en": "Organization ID",
+  "es": "ID Organización",
+} +
+{
+  "en": "Authenticated via LDAP",
+  "es": "Autenticado vía LDAP",
+} +
+{
+  "en": "Copied to clipboard",
+  "es": "Copiado al portapapeles",
+} +
+{
+  "en": "Working offline. Changes will sync when connection is restored.",
+  "es": "Trabajando sin conexión. Los cambios se sincronizarán cuando se restablezca la conexión.",
+} +
+{
+  "en": "Synced %s items",
+  "es": "Sincronizados %s elementos",
+} +
+{
+  "en": "Sync completed",
+  "es": "Sincronización completada",
+} +
+{
+  "en": "Sync failed: %s",
+  "es": "Error de sincronización: %s",
+} +
+{
+  "en": "Working offline",
+  "es": "Trabajando sin conexión",
+} +
+{
+  "en": "Back online - syncing...",
+  "es": "De vuelta en línea - sincronizando...",
+} +
+{
+  "en": "Appearance",
+  "es": "Apariencia",
+} +
+{
+  "en": "Follows device settings",
+  "es": "Sigue la configuración del dispositivo",
+} +
+{
+  "en": "Light",
+  "es": "Claro",
+} +
+{
+  "en": "Always light theme",
+  "es": "Tema claro siempre activo",
+} +
+{
+  "en": "Dark",
+  "es": "Oscuro",
+} +
+{
+  "en": "Always dark theme",
+  "es": "Tema oscuro siempre activo",
+} +
+{
+  "en": "Switch to light mode",
+  "es": "Cambiar a modo claro",
+} +
+{
+  "en": "Switch to dark mode",
+  "es": "Cambiar a modo oscuro",
+} +
+{
+  "en": "Theme",
+  "es": "Tema",
+} +
+{
+  "en": "Biometric lock",
+  "es": "Bloqueo biométrico",
+} +
+{
+  "en": "Not available on this device",
+  "es": "No disponible en este dispositivo",
+} +
+{
+  "en": "Lock with %s",
+  "es": "Bloquear con %s",
+} +
+{
+  "en": "The app will open without verification",
+  "es": "La app se abrirá sin verificación",
+} +
+{
+  "en": "Enabled",
+  "es": "Activado",
+} +
+{
+  "en": "Disabled",
+  "es": "Desactivado",
+} +
+{
+  "en": "Touch the sensor",
+  "es": "Toca el sensor",
+} +
+{
+  "en": "Look at the camera",
+  "es": "Mira a la cámara",
+} +
+{
+  "en": "Use biometrics to unlock",
+  "es": "Usa biometría para desbloquear",
+} +
+{
+  "en": "Try Again",
+  "es": "Intentar de nuevo",
+} +
+{
+  "en": "Biometric Auth",
+  "es": "Autenticación biométrica",
+} +
+{
+  "en": "Initializing...",
+  "es": "Inicializando...",
+} +
+{
+  "en": "Place your finger on the sensor",
+  "es": "Coloca tu dedo en el sensor",
+} +
+{
+  "en": "Use face or fingerprint",
+  "es": "Usa rostro o huella",
+} +
+{
+  "en": "Waiting for biometrics...",
+  "es": "Esperando biometría...",
+} +
+{
+  "en": "Touch to authenticate",
+  "es": "Toca para autenticar",
+} +
+{
+  "en": "Authenticate",
+  "es": "Autenticar",
+} +
+{
+  "en": "Authenticated",
+  "es": "Autenticado",
+} +
+{
+  "en": "No country found at this location",
+  "es": "No se encontró país en esta ubicación",
+} +
+{
+  "en": "Select Country",
+  "es": "Seleccionar país",
+} +
+{
+  "en": "Selected: %s",
+  "es": "Seleccionado: %s",
+} +
+{
+  "en": "Tap 'Confirm' to use this country",
+  "es": "Toca 'Confirmar' para usar este país",
+} +
+{
+  "en": "Could not load LDAP users",
+  "es": "No se pudieron cargar usuarios LDAP",
+} +
+{
+  "en": "New Message",
+  "es": "Nuevo mensaje",
+} +
+{
+  "en": "Enter email of the recipient",
+  "es": "Ingresa el correo del destinatario",
+} +
+{
+  "en": "Select a contact or enter an email",
+  "es": "Selecciona un contacto o ingresa un correo",
+} +
+{
+  "en": "or type email",
+  "es": "o escribe un correo",
+} +
+{
+  "en": "Start Chat",
+  "es": "Iniciar chat",
+} +
+{
+  "en": "Failed to initialize",
+  "es": "Error al inicializar",
+} +
+{
+  "en": "%s will be required when opening the app",
+  "es": "Se pedirá %s al abrir la app",
+} +
+{
+  "en": "THISECURE Secured",
+  "es": "THISECURE Seguro",
+} +
+{
+  "en": "1. Open the Settings app",
+  "es": "1. Abre la app de Configuración",
+} +
+{
+  "en": "2. Go to \"Passwords\"",
+  "es": "2. Ve a 'Contraseñas'",
+} +
+{
+  "en": "3. Tap \"AutoFill Passwords\"",
+  "es": "3. Toca 'Autorrellenar contraseñas'",
+} +
+{
+  "en": "4. Enable \"THISECURE\"",
+  "es": "4. Activa 'THISECURE'",
+} +
+{
+  "en": "After this, THISECURE can suggest passwords in Safari and other apps.",
+  "es": "Después de esto, THISECURE puede sugerir contraseñas en Safari y otras apps.",
+} +
+{
+  "en": "Are you sure you want to remove your profile picture?",
+  "es": "¿Estás seguro de que deseas eliminar tu foto de perfil?",
+} +
+{
+  "en": "Autofill for",
+  "es": "Autorellenar para",
+} +
+{
+  "en": "Autofill passwords",
+  "es": "Autorrellenado de contraseñas",
+} +
+{
+  "en": "Avatar removed",
+  "es": "Avatar eliminado",
+} +
+{
+  "en": "Avatar updated",
+  "es": "Avatar actualizado",
+} +
+{
+  "en": "Business",
+  "es": "Business",
+} +
+{
+  "en": "Choose Account Type",
+  "es": "Elige tu tipo de cuenta",
+} +
+{
+  "en": "Choose from Gallery",
+  "es": "Elegir de la galería",
+} +
+{
+  "en": "Cloud",
+  "es": "Cloud",
+} +
+{
+  "en": "Community",
+  "es": "Community",
+} +
+{
+  "en": "Continue",
+  "es": "Continuar",
+} +
+{
+  "en": "Country",
+  "es": "País",
+} +
+{
+  "en": "Country updated",
+  "es": "País actualizado",
+} +
+{
+  "en": "Delete Avatar",
+  "es": "Eliminar avatar",
+} +
+{
+  "en": "Do you want to save credentials for",
+  "es": "¿Quieres guardar las credenciales para",
+} +
+{
+  "en": "Edit Full Name",
+  "es": "Editar nombre completo",
+} +
+{
+  "en": "Enter your self-hosted server URL",
+  "es": "Ingresa la URL de tu servidor",
+} +
+{
+  "en": "Error saving note",
+  "es": "Error al guardar nota",
+} +
+{
+  "en": "For personal use. Free forever.",
+  "es": "Para uso personal. Gratis para siempre.",
+} +
+{
+  "en": "For teams and organizations.",
+  "es": "Para equipos y organizaciones.",
+} +
+{
+  "en": "Full name cannot be empty",
+  "es": "El nombre no puede estar vacío",
+} +
+{
+  "en": "Full name updated",
+  "es": "Nombre completo actualizado",
+} +
+{
+  "en": "Host on your own server. Full control.",
+  "es": "Aloja en tu propio servidor. Control total.",
+} +
+{
+  "en": "Hosted by THISECURE. Secure and managed.",
+  "es": "Alojado por THISECURE. Seguro y gestionado.",
+} +
+{
+  "en": "Lock with %s disabled",
+  "es": "Bloqueo con %s desactivado",
+} +
+{
+  "en": "Lock with %s enabled",
+  "es": "Bloqueo con %s activado",
+} +
+{
+  "en": "Log In",
+  "es": "Iniciar sesión",
+} +
+{
+  "en": "New to THISECURE? Sign up here.",
+  "es": "¿Nuevo en THISECURE? Regístrate aquí.",
+} +
+{
+  "en": "No matching passwords found",
+  "es": "No se encontraron contraseñas",
+} +
+{
+  "en": "Not set",
+  "es": "No establecido",
+} +
+{
+  "en": "Please select your country from the map",
+  "es": "Selecciona tu país en el mapa",
+} +
+{
+  "en": "Profile Picture",
+  "es": "Foto de perfil",
+} +
+{
+  "en": "Remove Photo",
+  "es": "Eliminar foto",
+} +
+{
+  "en": "Select Hosting Mode",
+  "es": "Seleccionar modo de hosting",
+} +
+{
+  "en": "Server Configuration",
+  "es": "Configuración del servidor",
+} +
+{
+  "en": "Server URL (e.g. https://api.myserver.com)",
+  "es": "URL del servidor (ej. https://api.miservidor.com)",
+} +
+{
+  "en": "t have an LDAP account, create a regular account with your email.",
+  "es": "Si no tienes una cuenta LDAP, crea una cuenta regular con tu email.",
+} +
+{
+  "en": "v1.0.2",
+  "es": "v1.0.2",
+} +
+{
+  "en": "Authentication Settings",
+  "es": "Configuración de autenticación",
+} +
+{
+  "en": "How do you want to authenticate users?",
+  "es": "¿Cómo deseas autenticar a los usuarios?",
+} +
+{
+  "en": "Deployment Mode",
+  "es": "Modo de Despliegue",
+} +
+{
+  "en": "Choose how to host your data",
+  "es": "Elige cómo alojar tus datos",
+} +
+{
+  "en": "Choose the account type",
+  "es": "Elige el tipo de cuenta",
+} +
+{
+  "en": "Note",
+  "es": "Nota",
+} +
+{
+  "en": "Start typing...",
+  "es": "Empezar a escribir...",
+} +
+{
+  "en": "Add Password",
+  "es": "Agregar contraseña",
 };
+
+
+
 
 String get i18n => localize(this, _t);
 

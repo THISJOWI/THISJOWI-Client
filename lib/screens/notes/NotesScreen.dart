@@ -6,7 +6,7 @@ import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/core/service_locator.dart';
 import 'package:thisjowi/data/models/note_entry.dart';
 import 'package:thisjowi/data/repository/notes_repository.dart';
-import 'package:thisjowi/i18n/translationService.dart';
+import 'package:thisjowi/i18n/translations.dart';
 
 import 'EditNoteScreen.dart';
 
@@ -55,7 +55,7 @@ class _NotesScreenState extends State<NotesScreen> {
         if (mounted) {
           try {
             ErrorSnackBar.show(
-                context, result['message'] ?? 'Error loading notes'.tr(context));
+                context, result['message'] ?? 'Error loading notes'.i18n);
           } catch (snackBarError) {
             debugPrint('Error showing snackbar: $snackBarError');
           }
@@ -92,25 +92,25 @@ class _NotesScreenState extends State<NotesScreen> {
                 ),
               ),
               title: Text(
-                'Delete Note?'.tr(context),
+                'Delete Note?'.i18n,
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
             content: Text(
-              '${'Are you sure you want to delete'.tr(context)} "${note.title}"?',
+              '${'Are you sure you want to delete'.i18n} "${note.title}"?',
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
                 child: Text(
-                  'Cancel'.tr(context),
+                  'Cancel'.i18n,
                   style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 ),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
                 child: Text(
-                  'Delete'.tr(context),
+                  'Delete'.i18n,
                   style: const TextStyle(color: Colors.red),
                 ),
               ),
@@ -157,7 +157,7 @@ class _NotesScreenState extends State<NotesScreen> {
         if (mounted) {
           try {
             ErrorSnackBar.show(
-                context, result['message'] ?? 'Error deleting note'.tr(context));
+                context, result['message'] ?? 'Error deleting note'.i18n);
           } catch (snackBarError) {
             debugPrint('Error showing snackbar: $snackBarError');
           }
@@ -169,7 +169,7 @@ class _NotesScreenState extends State<NotesScreen> {
       if (!mounted) return;
       debugPrint('Error deleting note: $e');
       try {
-        ErrorSnackBar.show(context, '${'Error deleting note'.tr(context)}: $e');
+        ErrorSnackBar.show(context, '${'Error deleting note'.i18n}: $e');
       } catch (snackBarError) {
         debugPrint('Error showing snackbar: $snackBarError');
       }
@@ -193,7 +193,7 @@ class _NotesScreenState extends State<NotesScreen> {
 
   String _getPreviewText(String content) {
     try {
-      if (content.isEmpty) return 'No Content'.tr(context);
+      if (content.isEmpty) return 'No Content'.i18n;
       // Intenta decodificar JSON Delta
       final json = jsonDecode(content);
       final doc = Document.fromJson(json);
@@ -216,7 +216,7 @@ class _NotesScreenState extends State<NotesScreen> {
                 SliverAppBar.large(
                   backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                   title: Text(
-                    'Notes'.tr(context),
+                    'Notes'.i18n,
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
                   ),
@@ -251,7 +251,7 @@ class _NotesScreenState extends State<NotesScreen> {
                               color: Theme.of(context).colorScheme.onSurface, fontSize: 17),
                           textAlignVertical: TextAlignVertical.center,
                           decoration: InputDecoration(
-                            hintText: 'Search'.tr(context),
+                            hintText: 'Search'.i18n,
                           hintStyle: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               fontSize: 17),
@@ -298,7 +298,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   SliverFillRemaining(
                     child: Center(
                       child: Text(
-                        'No have notes yet'.tr(context),
+                        'No have notes yet'.i18n,
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             fontSize: 16),
@@ -363,7 +363,7 @@ class _NotesScreenState extends State<NotesScreen> {
                                     Text(
                                       note.title.isNotEmpty
                                           ? note.title
-                                          : 'No Title'.tr(context),
+                                          : 'No Title'.i18n,
                                       style: TextStyle(
                                         color: Theme.of(context).colorScheme.onSurface,
                                         fontWeight: FontWeight.bold,
@@ -437,7 +437,7 @@ class _NotesScreenState extends State<NotesScreen> {
                   const Spacer(),
                   // Contador de notas
                   Text(
-                    '${_notes.length} ${'Notes'.tr(context)}',
+                    '${_notes.length} ${'Notes'.i18n}',
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 11),
                   ),

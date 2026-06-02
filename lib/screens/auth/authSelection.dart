@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:thisjowi/components/auth_method_selector.dart';
 import 'package:thisjowi/components/navigation.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/services/google_auth_service.dart';
 import 'package:thisjowi/services/microsoft_auth_service.dart';
 import 'login.dart';
@@ -118,7 +119,7 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Administrador de contraseñas seguro',
+                            'Secure password manager'.i18n,
                             style: TextStyle(
                               fontSize: 14,
                               color: cs.onSurface.withValues(alpha: 0.6),
@@ -165,7 +166,7 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
-                                  '¿Cómo sé cuál elegir?',
+                                  'How do I know which one to choose?'.i18n,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: cs.primary,
@@ -176,7 +177,7 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Usa LDAP Corporativo si tu empresa está registrada en THISECURE. Usa SSO Empresarial si tu empresa usa Azure AD u otro proveedor SAML. Si no tienes una cuenta LDAP, crea una cuenta regular con tu email.',
+                            'Use Corporate LDAP if your company is registered with THISECURE. Use Enterprise SSO if your company uses Azure AD or another SAML provider. If you don\'t have an LDAP account, create a regular account with your email.'.i18n,
                             style: TextStyle(
                               fontSize: 13,
                               color: cs.onSurface.withValues(alpha: 0.7),
@@ -193,7 +194,7 @@ class _AuthSelectionScreenState extends State<AuthSelectionScreen> {
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Text(
-                '© 2026 THISECURE. Todos los derechos reservados.',
+                '© 2026 THISECURE. All rights reserved.'.i18n,
                 style: TextStyle(
                   fontSize: 12,
                   color: cs.onSurface.withValues(alpha: 0.4),

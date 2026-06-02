@@ -119,46 +119,49 @@ class MainApp extends StatelessWidget {
       child: KeyboardEventFix(
         child: Consumer<ThemeProvider>(
           builder: (context, themeProvider, _) {
-            return _SystemUIUpdater(
-              child: MaterialApp(
-                debugShowCheckedModeBanner: false,
-                title: "THISECURE",
-                localizationsDelegates: const [
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                supportedLocales: const [
-                  Locale('en'),
-                  Locale('es'),
-                ],
-                localeResolutionCallback: (locale, supportedLocales) {
-                  if (locale != null && locale.languageCode == 'es') {
-                    return const Locale('es');
-                  }
-                  return const Locale('en');
-                },
-                builder: (context, child) => PrivacyOverlay(
-                  child: I18n(
-                    initialLocale: const Locale('en'),
-                    child: child!
-                  ),
-                ),
-                themeMode: themeProvider.flutterThemeMode,
-                theme: AppTheme.getLightTheme(),
-                darkTheme: AppTheme.getDarkTheme(),
-                routes: {
-                  '/authSelection': (context) => const AuthSelectionScreen(),
-                  '/login': (context) => const LoginScreen(),
-                  '/register': (context) => const RegisterScreen(),
-                  '/onboarding': (context) => const OnboardingScreen(),
-                  '/otp/qrscan': (context) => const OtpQrScannerScreen(),
-                },
-                home: const SplashScreen(),
-              ),
+            return I18n(
+              child: _AppCore(themeProvider: themeProvider),
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+class _AppCore extends StatelessWidget {
+  final ThemeProvider themeProvider;
+
+  const _AppCore({required this.themeProvider});
+
+  @override
+  Widget build(BuildContext context) {
+    return _SystemUIUpdater(
+      child: MaterialApp(
+        locale: I18n.locale,
+        debugShowCheckedModeBanner: false,
+        title: "THISECURE",
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'),
+          Locale('es'),
+        ],
+        builder: (context, child) => PrivacyOverlay(child: child!),
+        themeMode: themeProvider.flutterThemeMode,
+        theme: AppTheme.getLightTheme(),
+        darkTheme: AppTheme.getDarkTheme(),
+        routes: {
+          '/authSelection': (context) => const AuthSelectionScreen(),
+          '/login': (context) => const LoginScreen(),
+          '/register': (context) => const RegisterScreen(),
+          '/onboarding': (context) => const OnboardingScreen(),
+          '/otp/qrscan': (context) => const OtpQrScannerScreen(),
+        },
+        home: const SplashScreen(),
       ),
     );
   }

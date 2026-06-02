@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:thisjowi/i18n/translations.dart';
 
 class ExpandableActionButton extends StatefulWidget {
   final VoidCallback onCreatePassword;
@@ -161,7 +162,7 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
           _buildOptionButton(
             onTap: _handleCreateOtp,
             icon: Icons.security_rounded,
-            label: 'OTP',
+            label: 'OTP'.i18n,
             bottomPadding: 185.0,
           ),
         // Option: Create Password
@@ -169,7 +170,7 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
           _buildOptionButton(
             onTap: _handleCreatePassword,
             icon: Icons.key_rounded,
-            label: 'Contraseña',
+            label: 'Password'.i18n,
             bottomPadding: 130.0,
           ),
         // Option: Create Note
@@ -177,7 +178,7 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
           _buildOptionButton(
             onTap: _handleCreateNote,
             icon: Icons.description_outlined,
-            label: 'Nota',
+            label: 'Note'.i18n,
             bottomPadding: 75.0,
           ),
         // Main FAB button - Pill shape
@@ -222,7 +223,7 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
                         child: _isExpanded
                             ? const SizedBox.shrink()
                             : Text(
-                                'Crear',
+                                'Create'.i18n,
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.onSurface,
                                   fontSize: 15,

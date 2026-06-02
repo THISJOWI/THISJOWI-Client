@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/components/error_bar.dart';
-import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/screens/auth/register_flow.dart';
 
 import 'package:thisjowi/components/navigation.dart';
@@ -30,25 +28,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Show success and navigate immediately
-    if (mounted) {
-      ErrorSnackBar.showSuccess(context, 'Account created!'.i18n);
+    if (!mounted) return;
 
-      // Check if we have a token (auto-login successful)
-      if (token != null && token.isNotEmpty) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MyBottomNavigation()),
-        );
-      } else {
-        // Navigate to email verification screen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => EmailVerificationScreen(email: email),
+    if (token != null && token.isNotEmpty) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MyBottomNavigation()),
+      );
+    } else {
+      final password = result['password'] as String?;
+      final fullName = result['fullName'] as String?;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EmailVerificationScreen(
+            email: email,
+            password: password ?? '',
+            fullName: fullName,
+            onBack: () => Navigator.pushNamedAndRemoveUntil(
+              context, '/login', (route) => false,
+            ),
           ),
-        );
-      }
+        ),
+      );
     }
   }
 

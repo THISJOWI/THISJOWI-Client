@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:thisjowi/components/sync_debug_panel.dart';
 import 'package:thisjowi/data/local/database.dart';
+import 'package:thisjowi/i18n/translations.dart';
 
 /// Pantalla de configuración y debugging
 class DebugScreen extends StatelessWidget {
@@ -13,7 +14,7 @@ class DebugScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Debug & Sync'),
+        title: Text('Debug & Sync'.i18n),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         foregroundColor: Theme.of(context).colorScheme.onSurface,
         elevation: 0,
@@ -40,8 +41,8 @@ class DebugScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Danger Zone',
+            Text(
+              'Danger Zone'.i18n,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -52,7 +53,7 @@ class DebugScreen extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: () => _confirmDeleteDatabase(context),
               icon: const Icon(Icons.delete_forever),
-              label: const Text('Delete Local Database'),
+              label: Text('Delete Local Database'.i18n),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Theme.of(context).colorScheme.onError,
@@ -68,19 +69,19 @@ class DebugScreen extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Database?'),
-        content: const Text(
-          'This will delete all local data. This action cannot be undone.',
+        title: Text('Delete Database?'.i18n),
+        content: Text(
+          'This will delete all local data. This action cannot be undone.'.i18n,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text('Cancel'.i18n),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Yes, Delete All'),
+            child: Text('Yes, Delete All'.i18n),
           ),
         ],
       ),
@@ -90,17 +91,17 @@ class DebugScreen extends StatelessWidget {
       try {
         final db = AppDatabase.instance();
         await db.close();
-        
+
         final dir = await getApplicationSupportDirectory();
         final file = File('${dir.path}/thisjowi_encrypted.sqlite');
         if (await file.exists()) {
           await file.delete();
         }
-        
+
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('✅ Database deleted. Restart the app.'),
+            SnackBar(
+              content: Text('Database deleted. Restart the app.'.i18n),
               backgroundColor: Colors.green,
             ),
           );
@@ -109,7 +110,7 @@ class DebugScreen extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('❌ Error: $e'),
+              content: Text("Error: %s".i18n.fill([e.toString()])),
               backgroundColor: Colors.red,
             ),
           );

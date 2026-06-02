@@ -261,7 +261,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
             const SizedBox(height: 16),
             Text(
-              'No encontramos resultados'.i18n,
+              'No results found'.i18n,
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
             ),
           ],

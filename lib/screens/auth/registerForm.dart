@@ -81,16 +81,10 @@ class _RegisterFormState extends State<RegisterForm> {
     setState(() => _isLoading = true);
 
     try {
-      await _authService.register(
-        email: email,
-        password: password,
-        otp: '',
-        fullName: fullName,
-        accountType: widget.accountType,
-      );
+      await _authService.initiateRegister(email);
       if (!mounted) return;
       setState(() => _isLoading = false);
-      widget.onSuccess({'email': email, 'token': null});
+      widget.onSuccess({'email': email, 'password': password, 'fullName': fullName, 'token': null});
     } on AuthException catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -147,6 +141,18 @@ class _RegisterFormState extends State<RegisterForm> {
             filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
             child: Container(color: Colors.transparent),
           ),
+          if (widget.onBack != null)
+            Positioned(
+              top: 0,
+              left: 0,
+              child: SafeArea(
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  color: isDark ? Colors.white : Theme.of(context).colorScheme.onSurface,
+                  onPressed: widget.onBack,
+                ),
+              ),
+            ),
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),

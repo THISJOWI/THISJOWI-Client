@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:thisjowi/core/exceptions/account_exceptions.dart';
 import 'package:thisjowi/services/account_service.dart';
 import 'package:thisjowi/components/error_bar.dart';
-import 'package:thisjowi/i18n/translationService.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/screens/auth/passwordResetVerification.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -26,7 +26,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   Future<void> _sendOtp() async {
     if (_emailController.text.isEmpty) {
-      ErrorSnackBar.show(context, 'Please enter your email'.tr(context));
+      ErrorSnackBar.show(context, 'Please enter your email'.i18n);
       return;
     }
 
@@ -38,7 +38,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('OTP sent to your email'.tr(context))),
+          SnackBar(content: Text('OTP sent to your email'.i18n)),
         );
         // Navigate to OTP verification screen
         Navigator.push(
@@ -57,7 +57,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ErrorSnackBar.show(context, 'An error occurred'.tr(context));
+        ErrorSnackBar.show(context, 'An error occurred'.i18n);
       }
     }
   }
@@ -153,7 +153,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       const SizedBox(height: 32),
 
                       Text(
-                        'Forgot Password?'.tr(context),
+                        'Forgot Password?'.i18n,
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -165,7 +165,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       const SizedBox(height: 16),
                       Text(
                         'Enter your email address to receive a verification code.'
-                            .tr(context),
+                            .i18n,
                         style: TextStyle(
                           fontSize: 15,
                           color: textColor.withValues(alpha: 0.6),
@@ -196,7 +196,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   controller: _emailController,
                                   style: TextStyle(color: textColor),
                                   decoration: InputDecoration(
-                                    labelText: 'Email'.tr(context),
+                                    labelText: 'Email'.i18n,
                                     labelStyle: TextStyle(
                                         color: textColor
                                             .withValues(alpha: 0.5)),
@@ -264,7 +264,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                                 strokeWidth: 2),
                                           )
                                         : Text(
-                                            'Send OTP'.tr(context),
+                                            'Send OTP'.i18n,
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,

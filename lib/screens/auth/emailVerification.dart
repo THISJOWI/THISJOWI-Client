@@ -1,13 +1,27 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:thisjowi/components/navigation.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:thisjowi/core/api.dart';
+import 'package:thisjowi/data/models/auth_user.dart';
+import 'package:thisjowi/services/token_manager.dart';
+import 'package:thisjowi/services/profile_service.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   final String email;
-  const EmailVerificationScreen({super.key, required this.email});
+  final String password;
+  final String? fullName;
+  final VoidCallback? onBack;
+
+  const EmailVerificationScreen({
+    super.key,
+    required this.email,
+    required this.password,
+    this.fullName,
+    this.onBack,
+  });
 
   @override
   State<EmailVerificationScreen> createState() => _EmailVerificationScreenState();
@@ -21,7 +35,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   void initState() {
     super.initState();
     _codeController.addListener(_onCodeChanged);
-    _sendVerificationCode();
   }
 
   @override
@@ -42,7 +55,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     final code = _codeController.text.trim();
     if (code.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter the code')),
+        SnackBar(content: Text('Please enter the code'.i18n)),
       );
       return;
     }
@@ -55,7 +68,11 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       final response = await http.post(
         Uri.parse('${ApiConfig.authUrl}/verify-email'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': widget.email, 'code': code}),
+        body: jsonEncode({
+          'email': widget.email,
+          'code': code,
+          'password': widget.password,
+        }),
       );
 
       if (!mounted) return;
@@ -63,8 +80,23 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       final body = jsonDecode(response.body);
 
       if (response.statusCode == 200 && body['success'] == true) {
+        final authUser = AuthUser.fromJson(body);
+        final tokenManager = TokenManager();
+        await tokenManager.setToken(authUser.token);
+        await tokenManager.setUserId(authUser.id);
+
+        if (widget.fullName != null && widget.fullName!.isNotEmpty) {
+          try {
+            await ProfileService().updateProfileFields(
+              fullName: widget.fullName,
+            );
+          } catch (_) {}
+        }
+
+        if (!mounted) return;
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Email verified successfully')),
+          SnackBar(content: Text('Email verified successfully'.i18n)),
         );
         
         Navigator.pushReplacement(
@@ -73,13 +105,13 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(body['message'] ?? 'Error verifying code')),
+          SnackBar(content: Text(body['message'] ?? 'Error verifying code'.i18n)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error de conexión: $e')),
+          SnackBar(content: Text("Connection error: %s".i18n.fill([e.toString()]))),
         );
       }
     } finally {
@@ -98,7 +130,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('${ApiConfig.authUrl}/resend-verification'),
+        Uri.parse('${ApiConfig.authUrl}/initiate-register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': widget.email}),
       );
@@ -111,13 +143,13 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         // Code sent successfully
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(body['message'] ?? 'Error resending code')),
+          SnackBar(content: Text(body['message'] ?? 'Error resending code'.i18n)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error de conexión: $e')),
+          SnackBar(content: Text("Connection error: %s".i18n.fill([e.toString()]))),
         );
       }
     } finally {
@@ -139,7 +171,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: widget.onBack ?? () => Navigator.of(context).pop(),
         ),
       ),
       body: Stack(
@@ -218,7 +250,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       const SizedBox(height: 32),
                       
                       Text(
-                        'Verify your email',
+                        'Verify your email'.i18n,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 28,
@@ -229,7 +261,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'We sent a verification code to ${widget.email}. Enter it below to continue.',
+                        "We sent a verification code to %s. Enter it below to continue.".i18n.fill([widget.email]),
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.6),
                           fontSize: 15,
@@ -308,7 +340,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       TextButton(
                         onPressed: _isLoading ? null : _sendVerificationCode,
                         child: Text(
-                          "Send code again",
+                          "Send code again".i18n,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary,
                             fontWeight: FontWeight.w600,

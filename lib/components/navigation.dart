@@ -2,12 +2,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/screens/otp/TOPT.dart';
 import 'package:thisjowi/screens/home/HomeScreen.dart';
 import 'package:thisjowi/screens/settings/SettingScreen.dart';
 import 'package:thisjowi/screens/messages/MessagesScreen.dart';
 import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/services/autofillSaveHandler.dart';
+import 'package:thisjowi/services/passwordService.dart';
 
 final GlobalKey<Navigation> bottomNavigationKey = GlobalKey<Navigation>();
 
@@ -61,6 +63,8 @@ class Navigation extends State<MyBottomNavigation>
         _buildNavItems();
       });
       _autofillHandler.startMonitoring(context);
+      // Sync passwords with iOS autofill extension after login
+      PasswordService().syncWithAutofill();
     }
   }
 
@@ -77,23 +81,23 @@ class Navigation extends State<MyBottomNavigation>
     _navItems = [
       _NavItem(
         icon: Icons.house_rounded,
-        label: 'Home',
+        label: 'Home'.i18n,
         index: 0,
       ),
       if (_isBusinessAccount)
         _NavItem(
           icon: Icons.chat_bubble_rounded,
-          label: 'Messages',
+          label: 'Messages'.i18n,
           index: 1,
         ),
       _NavItem(
         icon: Icons.shield_rounded,
-        label: 'OTP',
+        label: 'OTP'.i18n,
         index: _isBusinessAccount ? 2 : 1,
       ),
       _NavItem(
         icon: Icons.settings_rounded,
-        label: 'Settings',
+        label: 'Settings'.i18n,
         index: _isBusinessAccount ? 3 : 2,
       ),
     ];
@@ -289,10 +293,10 @@ class _DesktopLayout extends StatelessWidget {
                       onTap: () => onItemSelected(item.index),
                     )),
                 const Spacer(),
-                const Padding(
-                  padding: EdgeInsets.all(16),
+                Padding(
+                  padding: const EdgeInsets.all(16),
                   child: Text(
-                    'v1.0.2',
+                    'v1.0.2'.i18n,
                     style: TextStyle(
                       color: Colors.white38,
                       fontSize: 12,

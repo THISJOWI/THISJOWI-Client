@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import '../services/autofillService.dart';
 
 /// Widget to display autofill status and allow configuration
@@ -59,19 +60,19 @@ class _AutofillSettingsCardState extends State<AutofillSettingsCard> {
                   : Colors.black.withValues(alpha: 0.08),
             ),
           ),
-          title: const Text('Configurar AutoFill en iOS'),
-        content: const Column(
+          title: Text('Configure AutoFill on iOS'.i18n),
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Para activar THISECURE como gestor de contraseñas:'),
-            SizedBox(height: 16),
-            Text('1. Abre la app de Ajustes'),
-            Text('2. Ve a "Contraseñas"'),
-            Text('3. Toca "Autorrellenar contraseñas"'),
-            Text('4. Activa "THISECURE"'),
-            SizedBox(height: 16),
-            Text('Después de esto, THISECURE podrá sugerir contraseñas en Safari y otras apps.'),
+            Text('To enable THISECURE as a password manager:'.i18n),
+            const SizedBox(height: 16),
+            Text('1. Open the Settings app'.i18n),
+            Text('2. Go to "Passwords"'.i18n),
+            Text('3. Tap "AutoFill Passwords"'.i18n),
+            Text('4. Enable "THISECURE"'.i18n),
+            const SizedBox(height: 16),
+            Text('After this, THISECURE can suggest passwords in Safari and other apps.'.i18n),
           ],
         ),
         actions: [
@@ -122,7 +123,7 @@ class _AutofillSettingsCardState extends State<AutofillSettingsCard> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Autorellenado de contraseñas',
+                    'Autofill passwords'.i18n,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -135,8 +136,8 @@ class _AutofillSettingsCardState extends State<AutofillSettingsCard> {
                       color: Colors.green.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Text(
-                      'Activo',
+                    child: Text(
+                      'Active'.i18n,
                       style: TextStyle(
                         color: Colors.green,
                         fontSize: 12,
@@ -224,7 +225,7 @@ class _AutofillPasswordPickerState extends State<AutofillPasswordPicker> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Seleccionar contraseña'),
+        title: Text('Select password'.i18n),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: widget.onCancel,
@@ -248,7 +249,7 @@ class _AutofillPasswordPickerState extends State<AutofillPasswordPicker> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Autorellenar para:',
+                        'Autofill for:'.i18n,
                         style: theme.textTheme.bodySmall,
                       ),
                       Text(
@@ -269,7 +270,7 @@ class _AutofillPasswordPickerState extends State<AutofillPasswordPicker> {
             padding: const EdgeInsets.all(16),
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Buscar contraseña...',
+                hintText: 'Search password...'.i18n,
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -294,7 +295,7 @@ class _AutofillPasswordPickerState extends State<AutofillPasswordPicker> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No se encontraron contraseñas',
+                          'No passwords found'.i18n,
                           style: theme.textTheme.bodyLarge?.copyWith(
                             color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                           ),
@@ -317,7 +318,7 @@ class _AutofillPasswordPickerState extends State<AutofillPasswordPicker> {
                             ),
                           ),
                         ),
-                        title: Text(password['title'] ?? 'Sin título'),
+                        title: Text(password['title'] ?? 'No Title'.i18n),
                         subtitle: Text(password['username'] ?? ''),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () {

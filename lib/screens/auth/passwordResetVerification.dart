@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:thisjowi/core/api.dart';
-import 'package:thisjowi/i18n/translationService.dart';
+import 'package:thisjowi/i18n/translations.dart';
 
 class PasswordResetVerificationScreen extends StatefulWidget {
   final String email;
@@ -49,7 +49,7 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
     final code = _codeController.text.trim();
     if (code.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter the code'.tr(context))),
+        SnackBar(content: Text('Please enter the code'.i18n)),
       );
       return;
     }
@@ -71,20 +71,20 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
         });
         if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Code verified. Set new password.'.tr(context))),
+                SnackBar(content: Text('Code verified. Set new password.'.i18n)),
             );
         }
       } else {
         if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(body['message'] ?? 'Invalid code'.tr(context))),
+                SnackBar(content: Text(body['message'] ?? 'Invalid code'.i18n)),
             );
         }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Connection error'.tr(context))),
+            SnackBar(content: Text('Connection error'.i18n)),
         );
       }
     } finally {
@@ -102,14 +102,14 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
 
     if (newPassword.isEmpty || confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter new password'.tr(context))),
+        SnackBar(content: Text('Please enter new password'.i18n)),
       );
       return;
     }
 
     if (newPassword != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Passwords do not match'.tr(context))),
+        SnackBar(content: Text('Passwords do not match'.i18n)),
       );
       return;
     }
@@ -132,7 +132,7 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
       if (response.statusCode == 200 && body['success'] == true) {
         if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Password reset successfully'.tr(context))),
+                SnackBar(content: Text('Password reset successfully'.i18n)),
             );
             // Navigate to login or home
             Navigator.popUntil(context, (route) => route.isFirst);
@@ -140,14 +140,14 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
       } else {
         if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(body['message'] ?? 'Failed to reset password'.tr(context))),
+                SnackBar(content: Text(body['message'] ?? 'Failed to reset password'.i18n)),
             );
         }
       }
     } catch (e) {
        if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Connection error'.tr(context))),
+            SnackBar(content: Text('Connection error'.i18n)),
         );
        }
     } finally {
@@ -246,7 +246,7 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                         const SizedBox(height: 32),
 
                          Text(
-                          _isVerified ? 'Set New Password'.tr(context) : 'Verification Code'.tr(context),
+                          _isVerified ? 'Set New Password'.i18n : 'Verification Code'.i18n,
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -258,8 +258,8 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                         const SizedBox(height: 16),
                          Text(
                           _isVerified 
-                             ? 'Please enter your new password.'.tr(context)
-                             : 'We sent a verification code to your email.'.tr(context),
+                             ? 'Please enter your new password.'.i18n
+                             : 'We sent a verification code to your email.'.i18n,
                           style: TextStyle(
                             fontSize: 15,
                             color: Colors.white.withValues(alpha: 0.6),
@@ -362,7 +362,7 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                                                   child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
                                                 )
                                               : Text(
-                                                  'Verify Code'.tr(context),
+                                                  'Verify Code'.i18n,
                                                   style: const TextStyle(
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.bold,
@@ -398,7 +398,7 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                                         style: TextStyle(color: Colors.white),
                                         obscureText: _obscurePassword,
                                         decoration: InputDecoration(
-                                          labelText: 'New Password'.tr(context),
+                                          labelText: 'New Password'.i18n,
                                           labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
                                           prefixIcon: Icon(Icons.lock_outline, color: Colors.white.withValues(alpha: 0.7), size: 20),
                                           suffixIcon: IconButton(
@@ -428,7 +428,7 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                                         style: TextStyle(color: Colors.white),
                                         obscureText: _obscurePassword,
                                         decoration: InputDecoration(
-                                          labelText: 'Confirm Password'.tr(context),
+                                          labelText: 'Confirm Password'.i18n,
                                           labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
                                           prefixIcon: Icon(Icons.lock_outline, color: Colors.white.withValues(alpha: 0.7), size: 20),
                                           enabledBorder: OutlineInputBorder(
@@ -479,7 +479,7 @@ class _PasswordResetVerificationScreenState extends State<PasswordResetVerificat
                                                   child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
                                                 )
                                               : Text(
-                                                  'Reset Password'.tr(context),
+                                                  'Reset Password'.i18n,
                                                   style: const TextStyle(
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.bold,

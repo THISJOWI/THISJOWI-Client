@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/utils/app_logger.dart';
 
 /// Pantalla para visualizar logs de la aplicación
@@ -39,7 +40,7 @@ class _LogsScreenState extends State<LogsScreen> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading logs: $e')),
+          SnackBar(content: Text("Error loading logs: %s".i18n.fill([e.toString()]))),
         );
       }
     }
@@ -58,7 +59,7 @@ class _LogsScreenState extends State<LogsScreen> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error reading log: $e')),
+          SnackBar(content: Text("Error reading log: %s".i18n.fill([e.toString()]))),
         );
       }
     }
@@ -69,19 +70,19 @@ class _LogsScreenState extends State<LogsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        title: Text('Clear All Logs?', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+        title: Text('Clear All Logs?'.i18n, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         content: Text(
-          'This will delete all log files. This action cannot be undone.',
+          'This will delete all log files. This action cannot be undone.'.i18n,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+            child: Text('Cancel'.i18n, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Clear', style: TextStyle(color: Colors.red)),
+            child: Text('Clear'.i18n, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -96,7 +97,7 @@ class _LogsScreenState extends State<LogsScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('All logs cleared')),
+          SnackBar(content: Text('All logs cleared'.i18n)),
         );
       }
     }
@@ -108,7 +109,7 @@ class _LogsScreenState extends State<LogsScreen> {
     await Clipboard.setData(ClipboardData(text: _selectedLogContent!));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Log copied to clipboard')),
+        SnackBar(content: Text('Log copied to clipboard'.i18n)),
       );
     }
   }
@@ -178,23 +179,23 @@ class _LogsScreenState extends State<LogsScreen> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         foregroundColor: Theme.of(context).colorScheme.onSurface,
-        title: const Text('Application Logs'),
+        title: Text('Application Logs'.i18n),
         actions: [
           if (_selectedLogContent != null)
             IconButton(
               icon: const Icon(Icons.copy),
               onPressed: _shareLogFile,
-              tooltip: 'Copy to clipboard',
+              tooltip: 'Copy to clipboard'.i18n,
             ),
           IconButton(
             icon: const Icon(Icons.delete_sweep),
             onPressed: _clearAllLogs,
-            tooltip: 'Clear all logs',
+            tooltip: 'Clear all logs'.i18n,
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadLogFiles,
-            tooltip: 'Refresh',
+            tooltip: 'Refresh'.i18n,
           ),
         ],
       ),
@@ -215,7 +216,7 @@ class _LogsScreenState extends State<LogsScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         child: Text(
-                          'Log Files',
+                          'Log Files'.i18n,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
@@ -226,8 +227,8 @@ class _LogsScreenState extends State<LogsScreen> {
                       Expanded(
                         child: _logFiles.isEmpty
                             ? Center(
-                                child: Text(
-                                  'No log files',
+                                  child: Text(
+                                    'No log files'.i18n,
                                   style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                                 ),
                               )
@@ -275,7 +276,7 @@ class _LogsScreenState extends State<LogsScreen> {
                               child: TextField(
                                 style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                                 decoration: InputDecoration(
-                                  hintText: 'Filter logs...',
+                                  hintText: 'Filter logs...'.i18n,
                                   hintStyle: TextStyle(
                                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                                   ),
@@ -303,13 +304,13 @@ class _LogsScreenState extends State<LogsScreen> {
                               dropdownColor: Theme.of(context).scaffoldBackgroundColor,
                               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                               hint: Text(
-                                'All Levels',
+                                'All Levels'.i18n,
                                 style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                               ),
                               items: [
-                                const DropdownMenuItem(
+                                DropdownMenuItem(
                                   value: null,
-                                  child: Text('All Levels'),
+                                  child: Text('All Levels'.i18n),
                                 ),
                                 ...LogLevel.values.map((level) => DropdownMenuItem(
                                       value: level,
@@ -326,7 +327,7 @@ class _LogsScreenState extends State<LogsScreen> {
                         child: _selectedLogContent == null
                             ? Center(
                                 child: Text(
-                                  'Select a log file to view',
+                                  'Select a log file to view'.i18n,
                                   style: TextStyle(
                                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                                   ),
@@ -335,7 +336,7 @@ class _LogsScreenState extends State<LogsScreen> {
                             : filteredLines.isEmpty
                                 ? Center(
                                     child: Text(
-                                      'No matching logs',
+                                      'No matching logs'.i18n,
                                       style: TextStyle(
                                         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                                       ),
@@ -368,7 +369,7 @@ class _LogsScreenState extends State<LogsScreen> {
                         child: Row(
                           children: [
                             Text(
-                              '${filteredLines.length} entries',
+                              "%s entries".i18n.fill([filteredLines.length.toString()]),
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                 fontSize: 12,
@@ -377,7 +378,7 @@ class _LogsScreenState extends State<LogsScreen> {
                             if (_selectedFile != null) ...[
                               const SizedBox(width: 16),
                               Text(
-                                'File: ${_selectedFile!.path.split('/').last}',
+                                "File: %s".i18n.fill([_selectedFile!.path.split('/').last]),
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                   fontSize: 12,

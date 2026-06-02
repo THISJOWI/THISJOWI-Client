@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import 'package:thisjowi/core/exceptions/profile_exceptions.dart';
 import 'package:thisjowi/data/models/profile_user.dart';
@@ -198,12 +200,21 @@ final TokenManager _tokenManager = TokenManager();
         '/v1/profiles/$userId/avatar',
         file: imageFile,
         fieldName: 'avatar',
+        contentType: MediaType('image', 'jpeg'),
         requiresAuth: true,
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
+        final errorBody = await response.stream.bytesToString();
+        String serverMessage;
+        try {
+          final json = jsonDecode(errorBody);
+          serverMessage = json['message'] ?? json['error'] ?? errorBody;
+        } catch (_) {
+          serverMessage = errorBody.isNotEmpty ? errorBody : 'Error ${response.statusCode}';
+        }
         throw AvatarUploadException(
-          message: 'Error al subir avatar: ${response.statusCode}',
+          message: 'Error al subir avatar: $serverMessage',
         );
       }
 

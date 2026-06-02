@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:thisjowi/i18n/translations.dart';
 
 class PrivacyOverlay extends StatefulWidget {
   final Widget child;
@@ -64,7 +65,7 @@ class _PrivacyOverlayState extends State<PrivacyOverlay> with WidgetsBindingObse
                       Icon(Icons.lock_outline_rounded, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                       const SizedBox(height: 16),
                       Text(
-                        "THISECURE Secured",
+                        "THISECURE Secured".i18n,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                           fontSize: 18,

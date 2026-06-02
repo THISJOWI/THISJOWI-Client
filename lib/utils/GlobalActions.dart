@@ -6,28 +6,192 @@ import 'package:thisjowi/core/service_locator.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/services/otpService.dart';
-import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
 import 'package:thisjowi/utils/DialogUtils.dart';
-// import 'package:thisjowi/i18n/translations.dart';
-// Using a naive translation helper for now to avoid compilation errors if imports differ
-// Logic matches what was in TOPT.dart and HomeScreen.dart
+import 'package:thisjowi/i18n/translations.dart';
 
 class GlobalActions {
   static Future<void> createPassword(BuildContext context,
       {VoidCallback? onSuccess}) async {
     final sl = ServiceLocator();
     final repository = sl.passwordsRepository;
-    final created = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditPasswordScreen(
-          passwordsRepository: repository,
+
+    final titleController = TextEditingController();
+    final usernameController = TextEditingController();
+    final passwordController = TextEditingController();
+    final websiteController = TextEditingController();
+    bool obscurePassword = true;
+
+    Widget buildField({
+      required TextEditingController controller,
+      required String label,
+      IconData? icon,
+      bool isPassword = false,
+      bool obscure = false,
+      VoidCallback? onToggleObscure,
+    }) {
+      return TextField(
+        controller: controller,
+        obscureText: obscure,
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: icon != null
+              ? Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 20)
+              : null,
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    obscure ? Icons.visibility_off : Icons.visibility,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    size: 20,
+                  ),
+                  onPressed: onToggleObscure,
+                )
+              : null,
+          labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+          ),
+          filled: true,
+          fillColor: Theme.of(context).scaffoldBackgroundColor,
+        ),
+      );
+    }
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => Center(
+          child: SizedBox(
+            width: 400,
+            child: Dialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              child: LiquidGlass.wrap(
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                      child: Text('Add Password'.i18n,
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.w600)),
+                    ),
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            buildField(
+                              controller: titleController,
+                              label: 'Title'.i18n,
+                              icon: Icons.title,
+                            ),
+                            const SizedBox(height: 16),
+                            buildField(
+                              controller: usernameController,
+                              label: 'Username'.i18n,
+                              icon: Icons.person,
+                            ),
+                            const SizedBox(height: 16),
+                            buildField(
+                              controller: passwordController,
+                              label: 'Password'.i18n,
+                              icon: Icons.lock,
+                              isPassword: true,
+                              obscure: obscurePassword,
+                              onToggleObscure: () => setDialogState(() => obscurePassword = !obscurePassword),
+                            ),
+                            const SizedBox(height: 16),
+                            buildField(
+                              controller: websiteController,
+                              label: 'Website'.i18n,
+                              icon: Icons.link,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red.withValues(alpha: 0.8),
+                              foregroundColor: Colors.white,
+                            ),
+                            onPressed: () => Navigator.pop(context, false),
+                            child: Text('Cancel'.i18n),
+                          ),
+                          const SizedBox(width: 12),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                            onPressed: () => Navigator.pop(context, true),
+                            child: Text('Add'.i18n),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                context,
+                borderRadius: 16,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 20,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
-    if (created == true && onSuccess != null) {
-      onSuccess();
+
+    if (result == true) {
+      final title = titleController.text.trim();
+      final password = passwordController.text.trim();
+
+      if (title.isEmpty || password.isEmpty) {
+        if (context.mounted) {
+          ErrorSnackBar.show(context, 'Title and password are required'.i18n);
+        }
+        return;
+      }
+
+      if (context.mounted) {
+        final data = {
+          'title': title,
+          'username': usernameController.text.trim(),
+          'password': password,
+          'website': websiteController.text.trim(),
+        };
+        final saveResult = await repository.addPassword(data);
+
+        if (saveResult['success'] == true) {
+          ErrorSnackBar.showSuccess(context, 'Password added'.i18n);
+          if (onSuccess != null) onSuccess();
+        } else {
+          if (context.mounted) {
+            ErrorSnackBar.show(context, saveResult['message'] ?? 'Error saving password'.i18n);
+          }
+        }
+      }
     }
   }
 
@@ -103,7 +267,7 @@ class GlobalActions {
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-                    child: Text('Add OTP',
+                    child: Text('Add OTP'.i18n,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.w600)),
                   ),
                   const SizedBox(height: 8),
@@ -115,42 +279,47 @@ class GlobalActions {
                         children: [
                           buildTextField(
                             controller: nameController,
-                            label: 'Account name',
+                            label: 'Account name'.i18n,
                             hint: 'user@example.com',
                           ),
                           const SizedBox(height: 16),
                           buildTextField(
                             controller: issuerController,
-                            label: 'Issuer',
+                            label: 'Issuer'.i18n,
                             hint: 'Google, GitHub...',
                           ),
                           const SizedBox(height: 16),
                           buildTextField(
                             controller: secretController,
-                            label: 'Secret key',
+                            label: 'Secret key'.i18n,
                             hint: 'JBSWY3DPEHPK3PXP',
                           ),
                         ],
                       ),
                     ),
                   ),
+                  const SizedBox(height: 24),
                   Padding(
-                    padding: const EdgeInsets.only(right: 8, bottom: 8),
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        TextButton(
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red.withValues(alpha: 0.8),
+                            foregroundColor: Colors.white,
+                          ),
                           onPressed: () => Navigator.pop(context, false),
-                          child: Text('Cancel',
-                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
+                          child: Text('Cancel'.i18n),
                         ),
+                        const SizedBox(width: 12),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Theme.of(context).colorScheme.primary,
                             foregroundColor: Theme.of(context).colorScheme.onPrimary,
                           ),
                           onPressed: () => Navigator.pop(context, true),
-                          child: const Text('Add'),
+                          child: Text('Add'.i18n),
                         ),
                       ],
                     ),
@@ -178,13 +347,13 @@ class GlobalActions {
 
       if (name.isEmpty || secret.isEmpty) {
         if (context.mounted) {
-          ErrorSnackBar.show(context, 'Name and secret are required');
+          ErrorSnackBar.show(context, 'Name and secret are required'.i18n);
         }
         return;
       }
 
       if (!otpService.isValidSecret(secret)) {
-        if (context.mounted) ErrorSnackBar.show(context, 'Invalid secret key');
+        if (context.mounted) ErrorSnackBar.show(context, 'Invalid secret key'.i18n);
         return;
       }
 
@@ -198,7 +367,7 @@ class GlobalActions {
         });
 
         if (success) {
-          ErrorSnackBar.showSuccess(context, 'OTP added');
+          ErrorSnackBar.showSuccess(context, 'OTP added'.i18n);
           if (onSuccess != null) onSuccess();
         } else {
           ErrorSnackBar.show(context, otpProvider.errorMessage);

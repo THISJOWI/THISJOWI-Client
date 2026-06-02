@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:thisjowi/core/theme_provider.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import 'package:provider/provider.dart';
 
 /// Widget selector de tema con opciones: Sistema, Claro, Oscuro
@@ -36,8 +37,8 @@ class ThemeSelectorWidget extends StatelessWidget {
                 context,
                 themeProvider,
                 ThemeModeOption.system,
-                'Sistema',
-                'Sigue la configuración del dispositivo',
+                'System'.i18n,
+                'Follows device settings'.i18n,
                 Icons.brightness_auto,
               ),
               Divider(
@@ -50,8 +51,8 @@ class ThemeSelectorWidget extends StatelessWidget {
                 context,
                 themeProvider,
                 ThemeModeOption.light,
-                'Claro',
-                'Tema claro siempre activo',
+                'Light'.i18n,
+                'Always light theme'.i18n,
                 Icons.light_mode,
               ),
               Divider(
@@ -64,8 +65,8 @@ class ThemeSelectorWidget extends StatelessWidget {
                 context,
                 themeProvider,
                 ThemeModeOption.dark,
-                'Oscuro',
-                'Tema oscuro siempre activo',
+                'Dark'.i18n,
+                'Always dark theme'.i18n,
                 Icons.dark_mode,
               ),
             ],
@@ -161,8 +162,8 @@ class ThemeToggleButton extends StatelessWidget {
             : Icons.dark_mode,
       ),
       tooltip: themeProvider.isDarkMode(context) 
-          ? 'Cambiar a modo claro'
-          : 'Cambiar a modo oscuro',
+          ? 'Switch to light mode'.i18n
+          : 'Switch to dark mode'.i18n,
     );
   }
 }
@@ -177,7 +178,7 @@ class ThemeSettingsTile extends StatelessWidget {
     
     return ListTile(
       leading: Icon(themeProvider.getThemeModeIcon()),
-      title: const Text('Tema'),
+      title: Text('Theme'.i18n),
       subtitle: Text(themeProvider.getThemeModeText()),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {

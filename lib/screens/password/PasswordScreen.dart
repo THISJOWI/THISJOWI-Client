@@ -80,7 +80,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
         _isLoading = false;
       });
       ErrorSnackBar.show(
-          context, result['message'] ?? 'Error loading passwords');
+          context, result['message'] ?? 'Error loading passwords'.i18n);
     }
   }
 
@@ -135,7 +135,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
       });
       ErrorSnackBar.showSuccess(context, 'Password deleted'.i18n);
     } else {
-      ErrorSnackBar.show(context, result['message'] ?? 'Error deleting');
+      ErrorSnackBar.show(context, result['message'] ?? 'Error deleting'.i18n);
     }
   }
 

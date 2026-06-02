@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/data/models/note_entry.dart';
-import 'package:thisjowi/i18n/translationService.dart';
+import 'package:thisjowi/i18n/translations.dart';
 
 import '../../data/repository/notes_repository.dart';
-import '../../i18n/translations.dart';
 
 class EditNoteScreen extends StatefulWidget {
   final NotesRepository notesRepository;
@@ -161,7 +160,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 8),
                       child: Text(
-                        'Done'.tr(context),
+                        'Done'.i18n,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                           fontSize: 17,
@@ -299,7 +298,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                                         enabledBorder: InputBorder.none,
                                         filled: false,
                                         fillColor: Colors.transparent,
-                                        hintText: 'Start typing...',
+                                        hintText: 'Start typing...'.i18n,
                                         hintStyle: TextStyle(
                                           color: Theme.of(context)
                                               .colorScheme

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:thisjowi/core/api.dart';
 import 'package:thisjowi/services/token_manager.dart';
 
@@ -214,13 +215,18 @@ class ApiClient {
     String endpoint, {
     required File file,
     required String fieldName,
+    MediaType? contentType,
     Map<String, String>? additionalFields,
     bool requiresAuth = true,
     Duration? timeout,
   }) async {
-    final requestHeaders = requiresAuth 
-        ? await _authHeaders 
-        : _baseHeaders;
+    final requestHeaders = <String, String>{};
+    if (requiresAuth) {
+      final token = await _tokenManager.getToken();
+      if (token != null && token.isNotEmpty) {
+        requestHeaders['Authorization'] = 'Bearer $token';
+      }
+    }
 
     final url = Uri.parse('${ApiConfig.baseUrl}$endpoint');
     final request = http.MultipartRequest('POST', url);
@@ -231,6 +237,7 @@ class ApiClient {
     request.files.add(await http.MultipartFile.fromPath(
       fieldName,
       file.path,
+      contentType: contentType,
     ));
     
     // Agregar campos adicionales

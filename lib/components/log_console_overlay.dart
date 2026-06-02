@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/utils/app_logger.dart';
 
 /// Overlay flotante para mostrar logs en tiempo real durante desarrollo

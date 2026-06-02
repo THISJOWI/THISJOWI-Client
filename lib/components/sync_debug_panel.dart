@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import '../data/local/database.dart';
 import '../services/connectivityService.dart';
 

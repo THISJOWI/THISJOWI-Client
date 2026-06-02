@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:thisjowi/components/account_type_selector.dart';
 import 'package:thisjowi/screens/auth/registerForm.dart';
@@ -47,8 +46,9 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: isDark ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: _step == 0
             ? AccountTypeSelector(

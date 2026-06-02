@@ -145,7 +145,7 @@ class _LdapSelectorState extends State<LdapSelector>
       child: Column(
         children: [
           Text(
-            'Configuración de autenticación'.i18n,
+            'Authentication Settings'.i18n,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 28,
@@ -156,7 +156,7 @@ class _LdapSelectorState extends State<LdapSelector>
           ),
           const SizedBox(height: 8),
           Text(
-            '¿Cómo deseas autenticar a los usuarios?'.i18n,
+            'How do you want to authenticate users?'.i18n,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,

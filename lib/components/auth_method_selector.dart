@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:thisjowi/i18n/translations.dart';
 
 class AuthMethodSelector extends StatelessWidget {
   final VoidCallback? onLdapTap;
@@ -24,7 +25,7 @@ class AuthMethodSelector extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Selecciona cómo deseas ingresar',
+            'Select how you want to sign in'.i18n,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -41,8 +42,8 @@ class AuthMethodSelector extends StatelessWidget {
               context: context,
               onTap: onSamlTap!,
               icon: Icons.shield_outlined,
-              title: 'SSO Empresarial',
-              subtitle: 'SAML / Azure AD',
+              title: 'Enterprise SSO'.i18n,
+              subtitle: 'SAML / Azure AD'.i18n,
               accentColor: Theme.of(context).colorScheme.primary,
             ),
             const SizedBox(height: 12),
@@ -55,8 +56,8 @@ class AuthMethodSelector extends StatelessWidget {
                     context: context,
                     onTap: onLdapTap!,
                     icon: Icons.business,
-                    title: 'LDAP Corporativo',
-                    subtitle: 'Cuenta empresarial',
+                    title: 'Corporate LDAP'.i18n,
+                    subtitle: 'Enterprise account'.i18n,
                     accentColor: Theme.of(context).colorScheme.tertiary,
                   ),
                 ),
@@ -66,8 +67,8 @@ class AuthMethodSelector extends StatelessWidget {
                   context: context,
                   onTap: onRegularTap,
                   icon: Icons.person,
-                  title: 'Cuenta Regular',
-                  subtitle: 'Email y contraseña',
+                  title: 'Regular Account'.i18n,
+                  subtitle: 'Email and password'.i18n,
                   accentColor: Theme.of(context).colorScheme.secondary,
                 ),
               ),
@@ -98,7 +99,7 @@ class AuthMethodSelector extends StatelessWidget {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            'Continuar con Google',
+                            'Continue with Google'.i18n,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -136,7 +137,7 @@ class AuthMethodSelector extends StatelessWidget {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            'Continuar con Microsoft',
+                            'Continue with Microsoft'.i18n,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,

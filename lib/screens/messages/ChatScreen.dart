@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/services/token_manager.dart';
 import 'package:thisjowi/services/messageService.dart';
 import 'package:thisjowi/data/models/message.dart';
@@ -247,14 +248,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 ListTile(
                   leading:
                       Icon(Icons.copy_rounded, color: Theme.of(context).colorScheme.primary),
-                  title: Text('Copiar mensaje',
+                  title: Text('Copy message'.i18n,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: msg.content));
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text('¡Mensaje copiado!'),
+                        content: Text('Message copied!'.i18n),
                         behavior: SnackBarBehavior.floating,
                         backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.9),
                         shape: RoundedRectangleBorder(
@@ -267,7 +268,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ListTile(
                     leading: const Icon(Icons.delete_sweep_rounded,
                         color: Colors.red),
-                    title: const Text('Eliminar mensaje',
+                    title: Text('Delete message'.i18n,
                         style: TextStyle(color: Colors.red)),
                     onTap: () {
                       Navigator.pop(context);
@@ -322,7 +323,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  '¿Eliminar mensaje?',
+                  'Delete message?'.i18n,
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 20,
@@ -332,7 +333,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: Text(
-                    'Esta acción no se puede deshacer y el mensaje desaparecerá para todos.',
+                    'This action cannot be undone and the message will disappear for everyone.'.i18n,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 14),
@@ -351,7 +352,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15)),
                           ),
-                          child: Text('Cancelar',
+                          child: Text('Cancel'.i18n,
                               style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                         ),
                       ),
@@ -370,7 +371,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15)),
                           ),
-                          child: const Text('Eliminar',
+                          child: Text('Delete'.i18n,
                               style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ),
@@ -415,7 +416,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  _isE2EEAvailable ? 'Cifrado' : 'No cifrado',
+                  _isE2EEAvailable ? 'Encrypted'.i18n : 'Not encrypted'.i18n,
                   style: TextStyle(
                     color: _isE2EEAvailable ? Theme.of(context).colorScheme.primary : Colors.orange,
                     fontSize: 10,
@@ -449,7 +450,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
                 : _messages.isEmpty
                     ? Center(
-                        child: Text('Start the conversation!',
+                        child: Text('Start the conversation!'.i18n,
                             style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5))))
                     : ListView.builder(

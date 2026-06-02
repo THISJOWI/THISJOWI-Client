@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/services/passwordService.dart';
 import 'package:thisjowi/services/token_manager.dart';
 import 'package:uuid/uuid.dart';
@@ -54,7 +55,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
     } else if (widget.packageName != null) {
       _titleController.text = _extractAppName(widget.packageName!);
     } else {
-      _titleController.text = 'Nueva contraseña';
+      _titleController.text = 'New password'.i18n;
     }
   }
 
@@ -124,17 +125,17 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
         Navigator.of(context).pop(true); // Return true to indicate success
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Contraseña guardada correctamente'),
+          SnackBar(
+            content: Text('Password saved successfully'.i18n),
             backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content:
-                Text(result['message'] ?? 'Error al guardar la contraseña'),
+                Text(result['message'] ?? 'Error saving password'.i18n),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 3),
           ),
@@ -145,7 +146,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error: $e'),
+          content: Text("Error: %s".i18n.fill([e.toString()])),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 3),
         ),
@@ -207,7 +208,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '¿Guardar contraseña?',
+                            'Save password?'.i18n,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 20,
@@ -216,7 +217,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'THISECURE puede guardar esta contraseña para ti',
+                            'THISECURE can save this password for you'.i18n,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               fontSize: 14,
@@ -232,11 +233,11 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                 // Title field
                 _buildTextField(
                   controller: _titleController,
-                  label: 'Título',
+                  label: 'Title'.i18n,
                   icon: Icons.title,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'El título es requerido';
+                      return 'Title is required'.i18n;
                     }
                     return null;
                   },
@@ -246,11 +247,11 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                 // Username field
                 _buildTextField(
                   controller: _usernameController,
-                  label: 'Usuario / Email',
+                  label: 'User / Email'.i18n,
                   icon: Icons.person_outline,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'El usuario es requerido';
+                      return 'User is required'.i18n;
                     }
                     return null;
                   },
@@ -260,7 +261,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                 // Password field
                 _buildTextField(
                   controller: _passwordController,
-                  label: 'Contraseña',
+                  label: 'Password'.i18n,
                   icon: Icons.lock_outline,
                   obscureText: _obscurePassword,
                   suffixIcon: IconButton(
@@ -278,7 +279,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'La contraseña es requerida';
+                      return 'Password is required'.i18n;
                     }
                     return null;
                   },
@@ -288,7 +289,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                 // Website/App field
                 _buildTextField(
                   controller: _websiteController,
-                  label: 'Sitio web / App',
+                  label: 'Website / App'.i18n,
                   icon: Icons.language,
                   validator: (value) {
                     // Optional field
@@ -300,7 +301,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                 // Notes field
                 _buildTextField(
                   controller: _notesController,
-                  label: 'Notas (opcional)',
+                  label: 'Notes (optional)'.i18n,
                   icon: Icons.notes,
                   maxLines: 3,
                   validator: (value) {
@@ -321,7 +322,7 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                               Navigator.of(context).pop(false);
                             },
                       child: Text(
-                        'Cancelar',
+                        'Cancel'.i18n,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                           fontSize: 16,
@@ -352,8 +353,8 @@ class _SavePasswordDialogState extends State<SavePasswordDialog> {
                                     AlwaysStoppedAnimation<Color>(Colors.white),
                               ),
                             )
-                          : const Text(
-                              'Guardar',
+                          : Text(
+                              'Save'.i18n,
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,

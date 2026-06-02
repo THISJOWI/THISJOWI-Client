@@ -13,7 +13,6 @@ import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
 import 'package:thisjowi/i18n/translations.dart';
-import 'package:thisjowi/i18n/translationService.dart';
 import 'package:thisjowi/utils/GlobalActions.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -991,7 +990,7 @@ SafeArea(
           ),
           const SizedBox(height: 16),
           Text(
-            'No data yet'.tr(context),
+            'No data yet'.i18n,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
               fontSize: 18,
@@ -999,7 +998,7 @@ SafeArea(
           ),
           const SizedBox(height: 8),
           Text(
-            'Add your first password or note'.tr(context),
+            'Add your first password or note'.i18n,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
               fontSize: 14,

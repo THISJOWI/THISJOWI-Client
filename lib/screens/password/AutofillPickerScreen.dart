@@ -45,9 +45,9 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
       return;
     }
 
-    final success = await _biometricService.authenticate(
-      localizedReason: 'Autentícate para autorrellenar contraseñas',
-    );
+      final success = await _biometricService.authenticate(
+        localizedReason: 'Verify your identity to access THISECURE'.i18n,
+      );
 
     if (success) {
       if (mounted) {
@@ -363,7 +363,7 @@ class _AutofillPickerScreenState extends State<AutofillPickerScreen> {
               width: double.infinity,
               child: TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('Cancelar'.i18n,
+                child: Text('Cancel'.i18n,
                     style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
               ),
             ),
