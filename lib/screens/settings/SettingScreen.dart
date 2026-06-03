@@ -8,6 +8,9 @@ import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/services/account_service.dart';
 import 'package:thisjowi/services/profile_service.dart';
 import 'package:thisjowi/services/biometricService.dart';
+import 'package:thisjowi/core/providers/sync_provider.dart';
+import 'package:thisjowi/utils/app_logger.dart';
+import 'package:provider/provider.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/components/country_selector.dart';
 import 'package:thisjowi/components/liquid_glass.dart';
@@ -41,10 +44,78 @@ class _SettingScreenState extends State<SettingScreen> {
   ProfileUser? _currentProfile;
   int _avatarCacheBuster = 0;
 
+  // Cross-device sync tracking
+  DateTime? _lastProfileCheck;
+  DateTime? _lastAccountCheck;
+  bool _profileUpdatePending = false;
+  bool _accountUpdatePending = false;
+
   @override
   void initState() {
     super.initState();
     _loadInitialData();
+
+    // Subscribe to SyncProvider changes for cross-device real-time updates
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<SyncProvider>().addListener(_onSyncProviderChanged);
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _processPendingSyncUpdates();
+  }
+
+  /// Called when SyncProvider notifies (SSE event received)
+  void _onSyncProviderChanged() {
+    if (!mounted) return;
+
+    final syncProvider = context.read<SyncProvider>();
+
+    if (syncProvider.profileLastUpdated != null &&
+        (_lastProfileCheck == null || syncProvider.profileLastUpdated!.isAfter(_lastProfileCheck!))) {
+      _profileUpdatePending = true;
+    }
+
+    if (syncProvider.accountLastUpdated != null &&
+        (_lastAccountCheck == null || syncProvider.accountLastUpdated!.isAfter(_lastAccountCheck!))) {
+      _accountUpdatePending = true;
+    }
+
+    _processPendingSyncUpdates();
+  }
+
+  /// Process pending sync updates. Called from didChangeDependencies (when widget becomes visible)
+  /// or from _onSyncProviderChanged (when already visible).
+  void _processPendingSyncUpdates() {
+    if (!mounted) return;
+
+    bool profileChanged = false;
+    bool accountChanged = false;
+
+    if (_profileUpdatePending) {
+      _profileUpdatePending = false;
+      final syncProvider = context.read<SyncProvider>();
+      _lastProfileCheck = syncProvider.profileLastUpdated;
+      profileChanged = true;
+      appLog.i('SettingScreen: processing pending profile update');
+    }
+
+    if (_accountUpdatePending) {
+      _accountUpdatePending = false;
+      final syncProvider = context.read<SyncProvider>();
+      _lastAccountCheck = syncProvider.accountLastUpdated;
+      accountChanged = true;
+      appLog.i('SettingScreen: processing pending account update');
+    }
+
+    if (profileChanged || accountChanged) {
+      if (profileChanged) setState(() => _avatarCacheBuster++);
+      _loadCurrentUser();
+    }
   }
 
   Future<void> _loadInitialData() async {
@@ -1080,6 +1151,10 @@ class _SettingScreenState extends State<SettingScreen> {
 
   @override
   void dispose() {
+    try {
+      context.read<SyncProvider>().removeListener(_onSyncProviderChanged);
+    } catch (_) {}
+
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();

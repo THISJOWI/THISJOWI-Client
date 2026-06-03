@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/core/service_locator.dart';
+import 'package:thisjowi/core/providers/sync_provider.dart';
 import 'package:thisjowi/data/models/note_entry.dart';
 import 'package:thisjowi/data/repository/notes_repository.dart';
 import 'package:thisjowi/i18n/translations.dart';
+import 'package:provider/provider.dart';
 
 import 'EditNoteScreen.dart';
 
@@ -22,6 +24,7 @@ class _NotesScreenState extends State<NotesScreen> {
   List<Note> _notes = [];
   bool _isLoading = true;
   String _searchQuery = '';
+  VoidCallback? _syncListener;
 
   @override
   void initState() {
@@ -30,6 +33,21 @@ class _NotesScreenState extends State<NotesScreen> {
     final sl = ServiceLocator();
     _notesRepository = sl.notesRepository;
     _loadNotes();
+    _listenToSyncEvents();
+  }
+
+  void _listenToSyncEvents() {
+    try {
+      final syncProvider = context.read<SyncProvider>();
+      _syncListener = () {
+        if (syncProvider.lastEventInfo.startsWith('note/')) {
+          _loadNotes();
+        }
+      };
+      syncProvider.addListener(_syncListener!);
+    } catch (_) {
+      // SyncProvider might not be available in tests
+    }
   }
 
   Future<void> _loadNotes() async {
@@ -457,5 +475,16 @@ class _NotesScreenState extends State<NotesScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    if (_syncListener != null) {
+      try {
+        context.read<SyncProvider>().removeListener(_syncListener!);
+      } catch (_) {}
+      _syncListener = null;
+    }
+    super.dispose();
   }
 }

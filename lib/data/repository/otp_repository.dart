@@ -1,5 +1,6 @@
 import 'package:uuid/uuid.dart';
 import 'package:thisjowi/data/models/otp_entry.dart' as model;
+import 'package:thisjowi/utils/app_logger.dart';
 import '../local/database.dart';
 import '../../services/otpApiService.dart';
 import '../../services/connectivityService.dart';
@@ -474,6 +475,32 @@ class OtpRepository {
       }
     } catch (e) {
       print('Pending sync failed: $e');
+    }
+  }
+
+  /// Apply a remote change received via SSE
+  Future<void> applyRemoteChange(Map<String, dynamic> payload) async {
+    final serverId = payload['id']?.toString();
+    if (serverId == null || serverId.isEmpty) return;
+
+    try {
+      // Events are metadata-only (id, issuer, label). Fetch full data
+      // from server to get secret, digits, period, algorithm, type, etc.
+      await _syncFromServer();
+    } catch (e) {
+      appLog.e('OtpRepository.applyRemoteChange failed', error: e);
+    }
+  }
+
+  /// Delete a local entry by server ID (from SSE deleted event)
+  Future<void> deleteLocalById(String serverId) async {
+    try {
+      final existing = await _db.otpDao.getOtpEntryByServerId(serverId);
+      if (existing != null) {
+        await _db.otpDao.hardDeleteOtpEntry(existing['id']);
+      }
+    } catch (e) {
+      appLog.e('OtpRepository.deleteLocalById failed', error: e);
     }
   }
 

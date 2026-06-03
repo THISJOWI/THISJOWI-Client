@@ -8,6 +8,7 @@ import 'package:thisjowi/core/api.dart';
 import 'package:thisjowi/core/env_loader.dart';
 import 'package:thisjowi/core/theme_provider.dart';
 import 'package:thisjowi/core/providers/otp_provider.dart';
+import 'package:thisjowi/core/providers/sync_provider.dart';
 import 'package:thisjowi/screens/auth/login.dart';
 import 'package:thisjowi/screens/auth/register.dart';
 import 'package:thisjowi/screens/auth/authSelection.dart';
@@ -77,6 +78,11 @@ class _KeyboardEventFixState extends State<KeyboardEventFix> {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   // Inicializar sistema de logging
   await AppLogger.initialize();
   appLog.i('🚀 App starting...');
@@ -115,6 +121,7 @@ class MainApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => OtpProvider()),
+        ChangeNotifierProvider(create: (_) => SyncProvider()),
       ],
       child: KeyboardEventFix(
         child: Consumer<ThemeProvider>(

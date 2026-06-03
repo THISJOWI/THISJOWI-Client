@@ -6,6 +6,7 @@ library;
 import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/data/repository/notes_repository.dart';
 import 'package:thisjowi/data/repository/otp_repository.dart';
+import 'package:thisjowi/data/repository/profile_repository.dart';
 
 class ServiceLocator {
   static final ServiceLocator _instance = ServiceLocator._internal();
@@ -13,6 +14,7 @@ class ServiceLocator {
   late final PasswordsRepository _passwordsRepository;
   late final NotesRepository _notesRepository;
   late final OtpRepository _otpRepository;
+  late final ProfileRepository _profileRepository;
 
   factory ServiceLocator() {
     return _instance;
@@ -26,6 +28,7 @@ class ServiceLocator {
     _passwordsRepository = PasswordsRepository();
     _notesRepository = NotesRepository();
     _otpRepository = OtpRepository();
+    _profileRepository = ProfileRepository();
   }
 
   /// Get the singleton instance of PasswordsRepository
@@ -36,4 +39,7 @@ class ServiceLocator {
 
   /// Get the singleton instance of OtpRepository
   OtpRepository get otpRepository => _otpRepository;
+
+  /// Get the singleton instance of ProfileRepository
+  ProfileRepository get profileRepository => _profileRepository;
 }

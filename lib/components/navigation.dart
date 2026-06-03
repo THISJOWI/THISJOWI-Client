@@ -8,6 +8,8 @@ import 'package:thisjowi/screens/home/HomeScreen.dart';
 import 'package:thisjowi/screens/settings/SettingScreen.dart';
 import 'package:thisjowi/screens/messages/MessagesScreen.dart';
 import 'package:thisjowi/services/auth_service.dart';
+import 'package:provider/provider.dart';
+import 'package:thisjowi/core/providers/sync_provider.dart';
 import 'package:thisjowi/services/autofillSaveHandler.dart';
 import 'package:thisjowi/services/passwordService.dart';
 
@@ -48,6 +50,9 @@ class Navigation extends State<MyBottomNavigation>
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed && mounted) {
       _autofillHandler.checkNow(context);
+      context.read<SyncProvider>().start();
+    } else if (state == AppLifecycleState.paused) {
+      context.read<SyncProvider>().stop();
     }
   }
 
@@ -65,6 +70,11 @@ class Navigation extends State<MyBottomNavigation>
       _autofillHandler.startMonitoring(context);
       // Sync passwords with iOS autofill extension after login
       PasswordService().syncWithAutofill();
+
+      // Start real-time SSE sync connection
+      if (mounted) {
+        context.read<SyncProvider>().start();
+      }
     }
   }
 

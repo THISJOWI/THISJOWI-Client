@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:thisjowi/core/providers/otp_provider.dart';
+import 'package:thisjowi/core/providers/sync_provider.dart';
 import 'package:thisjowi/data/models/otp_entry.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/services/otpService.dart';
@@ -21,6 +22,7 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen> with WidgetsBindingObserver {
   final OtpService _otpService = OtpService();
   late OtpProvider _otpProvider;
+  VoidCallback? _syncListener;
 
   @override
   void initState() {
@@ -31,10 +33,23 @@ class _OtpScreenState extends State<OtpScreen> with WidgetsBindingObserver {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadOtpData();
-      _otpProvider.startAutoRefresh(
-        refreshInterval: const Duration(seconds: 5),
-      );
+      _listenToSyncEvents();
+      _otpProvider.startAutoRefresh();
     });
+  }
+
+  void _listenToSyncEvents() {
+    try {
+      final syncProvider = context.read<SyncProvider>();
+      _syncListener = () {
+        if (syncProvider.lastEventInfo.startsWith('otp/')) {
+          _otpProvider.silentRefresh();
+        }
+      };
+      syncProvider.addListener(_syncListener!);
+    } catch (_) {
+      // SyncProvider might not be available in tests
+    }
   }
 
   @override
@@ -43,14 +58,17 @@ class _OtpScreenState extends State<OtpScreen> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed && mounted) {
       _loadOtpData();
       try {
-        _otpProvider.startAutoRefresh(
-          refreshInterval: const Duration(seconds: 5),
-        );
+        _listenToSyncEvents();
+        _otpProvider.startAutoRefresh();
       } catch (e) {
         // Widget may have been deactivated
       }
     } else if (state == AppLifecycleState.paused && mounted) {
       try {
+        if (_syncListener != null) {
+          context.read<SyncProvider>().removeListener(_syncListener!);
+          _syncListener = null;
+        }
         _otpProvider.stopAutoRefresh();
       } catch (e) {
         // Widget may have been deactivated
@@ -71,6 +89,12 @@ class _OtpScreenState extends State<OtpScreen> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    if (_syncListener != null) {
+      try {
+        context.read<SyncProvider>().removeListener(_syncListener!);
+      } catch (_) {}
+      _syncListener = null;
+    }
     _otpProvider.stopAutoRefresh();
     super.dispose();
   }

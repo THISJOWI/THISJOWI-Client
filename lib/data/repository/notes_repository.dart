@@ -1,5 +1,6 @@
 import 'package:uuid/uuid.dart';
 import 'package:thisjowi/data/models/note_entry.dart' as models;
+import 'package:thisjowi/utils/app_logger.dart';
 import '../local/database.dart';
 import '../../services/notesService.dart';
 import '../../services/connectivityService.dart';
@@ -337,6 +338,36 @@ class NotesRepository {
       print('Background deletion sync failed: $e');
     } finally {
       _syncingIds.remove(localId);
+    }
+  }
+
+  /// Apply a remote change received via SSE
+  Future<void> applyRemoteChange(Map<String, dynamic> payload) async {
+    final serverId = payload['id']?.toString();
+    if (serverId == null || serverId.isEmpty) return;
+
+    try {
+      // Events are metadata-only (id, title). Fetch full data from server
+      // to get content, timestamps, etc. _syncFromServer handles insert,
+      // update, and pending-match logic correctly.
+      await _syncFromServer();
+    } catch (e) {
+      appLog.e('NotesRepository.applyRemoteChange failed', error: e);
+    }
+  }
+
+  /// Delete a local note by server ID (from SSE deleted event)
+  Future<void> deleteLocalById(String serverId) async {
+    try {
+      final serverIdInt = int.tryParse(serverId);
+      if (serverIdInt == null) return;
+
+      final existing = await _db.notesDao.getNoteByServerId(serverIdInt);
+      if (existing != null) {
+        await _db.notesDao.hardDeleteNote(existing['localId']);
+      }
+    } catch (e) {
+      appLog.e('NotesRepository.deleteLocalById failed', error: e);
     }
   }
 

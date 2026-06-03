@@ -13,7 +13,6 @@ class OtpProvider extends ChangeNotifier {
   String _searchQuery = '';
   Timer? _autoRefreshTimer;
   Timer? _searchDebounceTimer;
-  DateTime? _lastRefresh;
 
   OtpProvider() {
     final sl = ServiceLocator();
@@ -133,42 +132,38 @@ class OtpProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Start auto-refresh of OTP entries (useful when screen is active)
-  /// This ensures that if OTPs are created in other screens, they'll be picked up
-  void startAutoRefresh({Duration refreshInterval = const Duration(seconds: 3)}) {
-    if (_autoRefreshTimer != null && _autoRefreshTimer!.isActive) {
-      return; // Already running
-    }
-
-    _autoRefreshTimer = Timer.periodic(refreshInterval, (_) async {
-      // Only refresh if not already loading and if enough time has passed
-      if (!_isLoading) {
-        final now = DateTime.now();
-        if (_lastRefresh == null || 
-            now.difference(_lastRefresh!).inSeconds >= refreshInterval.inSeconds) {
-          _lastRefresh = now;
-          // Load silently without showing loading spinner
-          final result = await _repository.getAllOtpEntries();
-          if (result['success'] == true) {
-            var entries = result['data'] as List<OtpEntry>? ?? [];
-            
-            // Deduplicate
-            final seenSecrets = <String>{};
-            final uniqueEntries = <OtpEntry>[];
-            for (final entry in entries) {
-              if (!seenSecrets.contains(entry.secret)) {
-                seenSecrets.add(entry.secret);
-                uniqueEntries.add(entry);
-              }
-            }
-            
-            // Only notify if entries changed
-            if (_entriesChanged(uniqueEntries)) {
-              _entries = uniqueEntries;
-              notifyListeners();
-            }
-          }
+  /// Silent refresh triggered by SSE sync events.
+  /// Unlike [loadEntries], this does not show a loading spinner.
+  Future<void> silentRefresh() async {
+    if (_isLoading) return;
+    final result = await _repository.getAllOtpEntries();
+    if (result['success'] == true) {
+      var entries = result['data'] as List<OtpEntry>? ?? [];
+      final seenSecrets = <String>{};
+      final uniqueEntries = <OtpEntry>[];
+      for (final entry in entries) {
+        if (!seenSecrets.contains(entry.secret)) {
+          seenSecrets.add(entry.secret);
+          uniqueEntries.add(entry);
         }
+      }
+      if (_entriesChanged(uniqueEntries)) {
+        _entries = uniqueEntries;
+        notifyListeners();
+      }
+    }
+  }
+
+  /// Start auto-refresh of OTP entries (fallback when SSE is not connected).
+  /// The 3s polling is kept for backward compatibility when real-time sync
+  /// is unavailable, but the interval is increased to 30s to reduce overhead.
+  void startAutoRefresh({Duration refreshInterval = const Duration(seconds: 30)}) {
+    if (_autoRefreshTimer != null && _autoRefreshTimer!.isActive) {
+      return;
+    }
+    _autoRefreshTimer = Timer.periodic(refreshInterval, (_) async {
+      if (!_isLoading) {
+        await silentRefresh();
       }
     });
   }

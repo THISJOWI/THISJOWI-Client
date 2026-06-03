@@ -5,6 +5,7 @@ import 'dao/notes.dart';
 import 'dao/passwords.dart';
 import 'dao/otp.dart';
 import 'dao/offline_auth.dart';
+import 'dao/profile_dao.dart';
 import 'package:thisjowi/data/local/dao/syncQueue.dart';
 
 part 'database.g.dart';
@@ -102,10 +103,26 @@ class OfflineUsers extends Table {
   Set<Column> get primaryKey => {email};
 }
 
+class Profiles extends Table {
+  TextColumn get userId => text()();
+  TextColumn get fullName => text().nullable()();
+  TextColumn get country => text().nullable()();
+  TextColumn get avatarUrl => text().nullable()();
+  TextColumn get birthDate => text().nullable()();
+  TextColumn get publicKey => text().nullable()();
+  TextColumn get preferences => text().nullable()();
+  TextColumn get accountType => text().nullable()();
+  TextColumn get hostingMode => text().nullable()();
+  TextColumn get updatedAt => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {userId};
+}
+
 /// Database class using Drift - compatible with all platforms
 @DriftDatabase(
-    tables: [Notes, Passwords, SyncQueue, OfflineUsers, OtpEntries, Users],
-    daos: [NotesDao, PasswordsDao, OtpDao, OfflineAuthDao, SyncQueueDao])
+    tables: [Notes, Passwords, SyncQueue, OfflineUsers, OtpEntries, Users, Profiles],
+    daos: [NotesDao, PasswordsDao, OtpDao, OfflineAuthDao, SyncQueueDao, ProfileDao])
 class AppDatabase extends _$AppDatabase {
   static final AppDatabase _instance = AppDatabase();
   factory AppDatabase.instance() => _instance;
@@ -113,7 +130,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration {
@@ -139,6 +156,9 @@ class AppDatabase extends _$AppDatabase {
         }
         if (from < 6) {
           await m.createTable(offlineUsers);
+        }
+        if (from < 7) {
+          await m.createTable(profiles);
         }
       },
     );

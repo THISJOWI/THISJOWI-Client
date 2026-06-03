@@ -10,12 +10,14 @@ import 'package:thisjowi/data/repository/notes_repository.dart';
 import 'package:thisjowi/components/button.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/components/liquid_glass.dart';
+import 'package:thisjowi/core/providers/sync_provider.dart';
 import 'package:thisjowi/screens/password/EditPasswordScreen.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/utils/GlobalActions.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'package:thisjowi/services/autofillService.dart';
 
 /// Debounce helper for search queries
@@ -48,10 +50,17 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Note> _notes = [];
   bool _isLoading = true;
   String _searchQuery = '';
+  VoidCallback? _syncListener;
 
   @override
   void dispose() {
     _searchDebounce.dispose();
+    if (_syncListener != null) {
+      try {
+        context.read<SyncProvider>().removeListener(_syncListener!);
+      } catch (_) {}
+      _syncListener = null;
+    }
     super.dispose();
   }
 
@@ -61,6 +70,22 @@ class _HomeScreenState extends State<HomeScreen> {
     _initRepositories();
     _loadData();
     _checkAutofill();
+    _listenToSyncEvents();
+  }
+
+  void _listenToSyncEvents() {
+    try {
+      final syncProvider = context.read<SyncProvider>();
+      _syncListener = () {
+        final info = syncProvider.lastEventInfo;
+        if (info.startsWith('password/') || info.startsWith('note/')) {
+          _loadData();
+        }
+      };
+      syncProvider.addListener(_syncListener!);
+    } catch (_) {
+      // SyncProvider might not be available in tests
+    }
   }
 
   Future<void> _checkAutofill() async {

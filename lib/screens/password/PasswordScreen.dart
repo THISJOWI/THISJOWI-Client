@@ -9,7 +9,9 @@ import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/components/button.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/components/liquid_glass.dart';
+import 'package:thisjowi/core/providers/sync_provider.dart';
 import 'package:thisjowi/i18n/translations.dart';
+import 'package:provider/provider.dart';
 import 'EditPasswordScreen.dart';
 
 /// Debounce helper for search queries
@@ -40,6 +42,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
   List<PasswordEntry> _passwords = [];
   bool _isLoading = true;
   String _searchQuery = '';
+  VoidCallback? _syncListener;
 
   @override
   void initState() {
@@ -48,11 +51,32 @@ class _PasswordScreenState extends State<PasswordScreen> {
     final sl = ServiceLocator();
     _passwordsRepository = sl.passwordsRepository;
     _loadPasswords();
+    _listenToSyncEvents();
+  }
+
+  void _listenToSyncEvents() {
+    try {
+      final syncProvider = context.read<SyncProvider>();
+      _syncListener = () {
+        if (syncProvider.lastEventInfo.startsWith('password/')) {
+          _loadPasswords();
+        }
+      };
+      syncProvider.addListener(_syncListener!);
+    } catch (_) {
+      // SyncProvider might not be available in tests
+    }
   }
 
   @override
   void dispose() {
     _searchDebounce.dispose();
+    if (_syncListener != null) {
+      try {
+        context.read<SyncProvider>().removeListener(_syncListener!);
+      } catch (_) {}
+      _syncListener = null;
+    }
     super.dispose();
   }
 

@@ -3060,6 +3060,529 @@ class UsersCompanion extends UpdateCompanion<User> {
   }
 }
 
+class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ProfilesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+      'user_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _fullNameMeta =
+      const VerificationMeta('fullName');
+  @override
+  late final GeneratedColumn<String> fullName = GeneratedColumn<String>(
+      'full_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _countryMeta =
+      const VerificationMeta('country');
+  @override
+  late final GeneratedColumn<String> country = GeneratedColumn<String>(
+      'country', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _avatarUrlMeta =
+      const VerificationMeta('avatarUrl');
+  @override
+  late final GeneratedColumn<String> avatarUrl = GeneratedColumn<String>(
+      'avatar_url', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _birthDateMeta =
+      const VerificationMeta('birthDate');
+  @override
+  late final GeneratedColumn<String> birthDate = GeneratedColumn<String>(
+      'birth_date', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _publicKeyMeta =
+      const VerificationMeta('publicKey');
+  @override
+  late final GeneratedColumn<String> publicKey = GeneratedColumn<String>(
+      'public_key', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _preferencesMeta =
+      const VerificationMeta('preferences');
+  @override
+  late final GeneratedColumn<String> preferences = GeneratedColumn<String>(
+      'preferences', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _accountTypeMeta =
+      const VerificationMeta('accountType');
+  @override
+  late final GeneratedColumn<String> accountType = GeneratedColumn<String>(
+      'account_type', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _hostingModeMeta =
+      const VerificationMeta('hostingMode');
+  @override
+  late final GeneratedColumn<String> hostingMode = GeneratedColumn<String>(
+      'hosting_mode', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+      'updated_at', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        userId,
+        fullName,
+        country,
+        avatarUrl,
+        birthDate,
+        publicKey,
+        preferences,
+        accountType,
+        hostingMode,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'profiles';
+  @override
+  VerificationContext validateIntegrity(Insertable<Profile> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('full_name')) {
+      context.handle(_fullNameMeta,
+          fullName.isAcceptableOrUnknown(data['full_name']!, _fullNameMeta));
+    }
+    if (data.containsKey('country')) {
+      context.handle(_countryMeta,
+          country.isAcceptableOrUnknown(data['country']!, _countryMeta));
+    }
+    if (data.containsKey('avatar_url')) {
+      context.handle(_avatarUrlMeta,
+          avatarUrl.isAcceptableOrUnknown(data['avatar_url']!, _avatarUrlMeta));
+    }
+    if (data.containsKey('birth_date')) {
+      context.handle(_birthDateMeta,
+          birthDate.isAcceptableOrUnknown(data['birth_date']!, _birthDateMeta));
+    }
+    if (data.containsKey('public_key')) {
+      context.handle(_publicKeyMeta,
+          publicKey.isAcceptableOrUnknown(data['public_key']!, _publicKeyMeta));
+    }
+    if (data.containsKey('preferences')) {
+      context.handle(
+          _preferencesMeta,
+          preferences.isAcceptableOrUnknown(
+              data['preferences']!, _preferencesMeta));
+    }
+    if (data.containsKey('account_type')) {
+      context.handle(
+          _accountTypeMeta,
+          accountType.isAcceptableOrUnknown(
+              data['account_type']!, _accountTypeMeta));
+    }
+    if (data.containsKey('hosting_mode')) {
+      context.handle(
+          _hostingModeMeta,
+          hostingMode.isAcceptableOrUnknown(
+              data['hosting_mode']!, _hostingModeMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {userId};
+  @override
+  Profile map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Profile(
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
+      fullName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}full_name']),
+      country: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}country']),
+      avatarUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}avatar_url']),
+      birthDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}birth_date']),
+      publicKey: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}public_key']),
+      preferences: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}preferences']),
+      accountType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}account_type']),
+      hostingMode: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}hosting_mode']),
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}updated_at']),
+    );
+  }
+
+  @override
+  $ProfilesTable createAlias(String alias) {
+    return $ProfilesTable(attachedDatabase, alias);
+  }
+}
+
+class Profile extends DataClass implements Insertable<Profile> {
+  final String userId;
+  final String? fullName;
+  final String? country;
+  final String? avatarUrl;
+  final String? birthDate;
+  final String? publicKey;
+  final String? preferences;
+  final String? accountType;
+  final String? hostingMode;
+  final String? updatedAt;
+  const Profile(
+      {required this.userId,
+      this.fullName,
+      this.country,
+      this.avatarUrl,
+      this.birthDate,
+      this.publicKey,
+      this.preferences,
+      this.accountType,
+      this.hostingMode,
+      this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['user_id'] = Variable<String>(userId);
+    if (!nullToAbsent || fullName != null) {
+      map['full_name'] = Variable<String>(fullName);
+    }
+    if (!nullToAbsent || country != null) {
+      map['country'] = Variable<String>(country);
+    }
+    if (!nullToAbsent || avatarUrl != null) {
+      map['avatar_url'] = Variable<String>(avatarUrl);
+    }
+    if (!nullToAbsent || birthDate != null) {
+      map['birth_date'] = Variable<String>(birthDate);
+    }
+    if (!nullToAbsent || publicKey != null) {
+      map['public_key'] = Variable<String>(publicKey);
+    }
+    if (!nullToAbsent || preferences != null) {
+      map['preferences'] = Variable<String>(preferences);
+    }
+    if (!nullToAbsent || accountType != null) {
+      map['account_type'] = Variable<String>(accountType);
+    }
+    if (!nullToAbsent || hostingMode != null) {
+      map['hosting_mode'] = Variable<String>(hostingMode);
+    }
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<String>(updatedAt);
+    }
+    return map;
+  }
+
+  ProfilesCompanion toCompanion(bool nullToAbsent) {
+    return ProfilesCompanion(
+      userId: Value(userId),
+      fullName: fullName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fullName),
+      country: country == null && nullToAbsent
+          ? const Value.absent()
+          : Value(country),
+      avatarUrl: avatarUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(avatarUrl),
+      birthDate: birthDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(birthDate),
+      publicKey: publicKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(publicKey),
+      preferences: preferences == null && nullToAbsent
+          ? const Value.absent()
+          : Value(preferences),
+      accountType: accountType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accountType),
+      hostingMode: hostingMode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(hostingMode),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+    );
+  }
+
+  factory Profile.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Profile(
+      userId: serializer.fromJson<String>(json['userId']),
+      fullName: serializer.fromJson<String?>(json['fullName']),
+      country: serializer.fromJson<String?>(json['country']),
+      avatarUrl: serializer.fromJson<String?>(json['avatarUrl']),
+      birthDate: serializer.fromJson<String?>(json['birthDate']),
+      publicKey: serializer.fromJson<String?>(json['publicKey']),
+      preferences: serializer.fromJson<String?>(json['preferences']),
+      accountType: serializer.fromJson<String?>(json['accountType']),
+      hostingMode: serializer.fromJson<String?>(json['hostingMode']),
+      updatedAt: serializer.fromJson<String?>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'userId': serializer.toJson<String>(userId),
+      'fullName': serializer.toJson<String?>(fullName),
+      'country': serializer.toJson<String?>(country),
+      'avatarUrl': serializer.toJson<String?>(avatarUrl),
+      'birthDate': serializer.toJson<String?>(birthDate),
+      'publicKey': serializer.toJson<String?>(publicKey),
+      'preferences': serializer.toJson<String?>(preferences),
+      'accountType': serializer.toJson<String?>(accountType),
+      'hostingMode': serializer.toJson<String?>(hostingMode),
+      'updatedAt': serializer.toJson<String?>(updatedAt),
+    };
+  }
+
+  Profile copyWith(
+          {String? userId,
+          Value<String?> fullName = const Value.absent(),
+          Value<String?> country = const Value.absent(),
+          Value<String?> avatarUrl = const Value.absent(),
+          Value<String?> birthDate = const Value.absent(),
+          Value<String?> publicKey = const Value.absent(),
+          Value<String?> preferences = const Value.absent(),
+          Value<String?> accountType = const Value.absent(),
+          Value<String?> hostingMode = const Value.absent(),
+          Value<String?> updatedAt = const Value.absent()}) =>
+      Profile(
+        userId: userId ?? this.userId,
+        fullName: fullName.present ? fullName.value : this.fullName,
+        country: country.present ? country.value : this.country,
+        avatarUrl: avatarUrl.present ? avatarUrl.value : this.avatarUrl,
+        birthDate: birthDate.present ? birthDate.value : this.birthDate,
+        publicKey: publicKey.present ? publicKey.value : this.publicKey,
+        preferences: preferences.present ? preferences.value : this.preferences,
+        accountType: accountType.present ? accountType.value : this.accountType,
+        hostingMode: hostingMode.present ? hostingMode.value : this.hostingMode,
+        updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+      );
+  Profile copyWithCompanion(ProfilesCompanion data) {
+    return Profile(
+      userId: data.userId.present ? data.userId.value : this.userId,
+      fullName: data.fullName.present ? data.fullName.value : this.fullName,
+      country: data.country.present ? data.country.value : this.country,
+      avatarUrl: data.avatarUrl.present ? data.avatarUrl.value : this.avatarUrl,
+      birthDate: data.birthDate.present ? data.birthDate.value : this.birthDate,
+      publicKey: data.publicKey.present ? data.publicKey.value : this.publicKey,
+      preferences:
+          data.preferences.present ? data.preferences.value : this.preferences,
+      accountType:
+          data.accountType.present ? data.accountType.value : this.accountType,
+      hostingMode:
+          data.hostingMode.present ? data.hostingMode.value : this.hostingMode,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Profile(')
+          ..write('userId: $userId, ')
+          ..write('fullName: $fullName, ')
+          ..write('country: $country, ')
+          ..write('avatarUrl: $avatarUrl, ')
+          ..write('birthDate: $birthDate, ')
+          ..write('publicKey: $publicKey, ')
+          ..write('preferences: $preferences, ')
+          ..write('accountType: $accountType, ')
+          ..write('hostingMode: $hostingMode, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(userId, fullName, country, avatarUrl,
+      birthDate, publicKey, preferences, accountType, hostingMode, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Profile &&
+          other.userId == this.userId &&
+          other.fullName == this.fullName &&
+          other.country == this.country &&
+          other.avatarUrl == this.avatarUrl &&
+          other.birthDate == this.birthDate &&
+          other.publicKey == this.publicKey &&
+          other.preferences == this.preferences &&
+          other.accountType == this.accountType &&
+          other.hostingMode == this.hostingMode &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ProfilesCompanion extends UpdateCompanion<Profile> {
+  final Value<String> userId;
+  final Value<String?> fullName;
+  final Value<String?> country;
+  final Value<String?> avatarUrl;
+  final Value<String?> birthDate;
+  final Value<String?> publicKey;
+  final Value<String?> preferences;
+  final Value<String?> accountType;
+  final Value<String?> hostingMode;
+  final Value<String?> updatedAt;
+  final Value<int> rowid;
+  const ProfilesCompanion({
+    this.userId = const Value.absent(),
+    this.fullName = const Value.absent(),
+    this.country = const Value.absent(),
+    this.avatarUrl = const Value.absent(),
+    this.birthDate = const Value.absent(),
+    this.publicKey = const Value.absent(),
+    this.preferences = const Value.absent(),
+    this.accountType = const Value.absent(),
+    this.hostingMode = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ProfilesCompanion.insert({
+    required String userId,
+    this.fullName = const Value.absent(),
+    this.country = const Value.absent(),
+    this.avatarUrl = const Value.absent(),
+    this.birthDate = const Value.absent(),
+    this.publicKey = const Value.absent(),
+    this.preferences = const Value.absent(),
+    this.accountType = const Value.absent(),
+    this.hostingMode = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : userId = Value(userId);
+  static Insertable<Profile> custom({
+    Expression<String>? userId,
+    Expression<String>? fullName,
+    Expression<String>? country,
+    Expression<String>? avatarUrl,
+    Expression<String>? birthDate,
+    Expression<String>? publicKey,
+    Expression<String>? preferences,
+    Expression<String>? accountType,
+    Expression<String>? hostingMode,
+    Expression<String>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (userId != null) 'user_id': userId,
+      if (fullName != null) 'full_name': fullName,
+      if (country != null) 'country': country,
+      if (avatarUrl != null) 'avatar_url': avatarUrl,
+      if (birthDate != null) 'birth_date': birthDate,
+      if (publicKey != null) 'public_key': publicKey,
+      if (preferences != null) 'preferences': preferences,
+      if (accountType != null) 'account_type': accountType,
+      if (hostingMode != null) 'hosting_mode': hostingMode,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ProfilesCompanion copyWith(
+      {Value<String>? userId,
+      Value<String?>? fullName,
+      Value<String?>? country,
+      Value<String?>? avatarUrl,
+      Value<String?>? birthDate,
+      Value<String?>? publicKey,
+      Value<String?>? preferences,
+      Value<String?>? accountType,
+      Value<String?>? hostingMode,
+      Value<String?>? updatedAt,
+      Value<int>? rowid}) {
+    return ProfilesCompanion(
+      userId: userId ?? this.userId,
+      fullName: fullName ?? this.fullName,
+      country: country ?? this.country,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      birthDate: birthDate ?? this.birthDate,
+      publicKey: publicKey ?? this.publicKey,
+      preferences: preferences ?? this.preferences,
+      accountType: accountType ?? this.accountType,
+      hostingMode: hostingMode ?? this.hostingMode,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (fullName.present) {
+      map['full_name'] = Variable<String>(fullName.value);
+    }
+    if (country.present) {
+      map['country'] = Variable<String>(country.value);
+    }
+    if (avatarUrl.present) {
+      map['avatar_url'] = Variable<String>(avatarUrl.value);
+    }
+    if (birthDate.present) {
+      map['birth_date'] = Variable<String>(birthDate.value);
+    }
+    if (publicKey.present) {
+      map['public_key'] = Variable<String>(publicKey.value);
+    }
+    if (preferences.present) {
+      map['preferences'] = Variable<String>(preferences.value);
+    }
+    if (accountType.present) {
+      map['account_type'] = Variable<String>(accountType.value);
+    }
+    if (hostingMode.present) {
+      map['hosting_mode'] = Variable<String>(hostingMode.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProfilesCompanion(')
+          ..write('userId: $userId, ')
+          ..write('fullName: $fullName, ')
+          ..write('country: $country, ')
+          ..write('avatarUrl: $avatarUrl, ')
+          ..write('birthDate: $birthDate, ')
+          ..write('publicKey: $publicKey, ')
+          ..write('preferences: $preferences, ')
+          ..write('accountType: $accountType, ')
+          ..write('hostingMode: $hostingMode, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3069,18 +3592,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $OfflineUsersTable offlineUsers = $OfflineUsersTable(this);
   late final $OtpEntriesTable otpEntries = $OtpEntriesTable(this);
   late final $UsersTable users = $UsersTable(this);
+  late final $ProfilesTable profiles = $ProfilesTable(this);
   late final NotesDao notesDao = NotesDao(this as AppDatabase);
   late final PasswordsDao passwordsDao = PasswordsDao(this as AppDatabase);
   late final OtpDao otpDao = OtpDao(this as AppDatabase);
   late final OfflineAuthDao offlineAuthDao =
       OfflineAuthDao(this as AppDatabase);
   late final SyncQueueDao syncQueueDao = SyncQueueDao(this as AppDatabase);
+  late final ProfileDao profileDao = ProfileDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [notes, passwords, syncQueue, offlineUsers, otpEntries, users];
+      [notes, passwords, syncQueue, offlineUsers, otpEntries, users, profiles];
 }
 
 typedef $$NotesTableCreateCompanionBuilder = NotesCompanion Function({
@@ -4528,6 +5053,246 @@ typedef $$UsersTableProcessedTableManager = ProcessedTableManager<
     (User, BaseReferences<_$AppDatabase, $UsersTable, User>),
     User,
     PrefetchHooks Function()>;
+typedef $$ProfilesTableCreateCompanionBuilder = ProfilesCompanion Function({
+  required String userId,
+  Value<String?> fullName,
+  Value<String?> country,
+  Value<String?> avatarUrl,
+  Value<String?> birthDate,
+  Value<String?> publicKey,
+  Value<String?> preferences,
+  Value<String?> accountType,
+  Value<String?> hostingMode,
+  Value<String?> updatedAt,
+  Value<int> rowid,
+});
+typedef $$ProfilesTableUpdateCompanionBuilder = ProfilesCompanion Function({
+  Value<String> userId,
+  Value<String?> fullName,
+  Value<String?> country,
+  Value<String?> avatarUrl,
+  Value<String?> birthDate,
+  Value<String?> publicKey,
+  Value<String?> preferences,
+  Value<String?> accountType,
+  Value<String?> hostingMode,
+  Value<String?> updatedAt,
+  Value<int> rowid,
+});
+
+class $$ProfilesTableFilterComposer
+    extends Composer<_$AppDatabase, $ProfilesTable> {
+  $$ProfilesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get fullName => $composableBuilder(
+      column: $table.fullName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get country => $composableBuilder(
+      column: $table.country, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get avatarUrl => $composableBuilder(
+      column: $table.avatarUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get birthDate => $composableBuilder(
+      column: $table.birthDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get publicKey => $composableBuilder(
+      column: $table.publicKey, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get preferences => $composableBuilder(
+      column: $table.preferences, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get accountType => $composableBuilder(
+      column: $table.accountType, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get hostingMode => $composableBuilder(
+      column: $table.hostingMode, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$ProfilesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ProfilesTable> {
+  $$ProfilesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get fullName => $composableBuilder(
+      column: $table.fullName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get country => $composableBuilder(
+      column: $table.country, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get avatarUrl => $composableBuilder(
+      column: $table.avatarUrl, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get birthDate => $composableBuilder(
+      column: $table.birthDate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get publicKey => $composableBuilder(
+      column: $table.publicKey, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get preferences => $composableBuilder(
+      column: $table.preferences, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get accountType => $composableBuilder(
+      column: $table.accountType, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get hostingMode => $composableBuilder(
+      column: $table.hostingMode, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$ProfilesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ProfilesTable> {
+  $$ProfilesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get fullName =>
+      $composableBuilder(column: $table.fullName, builder: (column) => column);
+
+  GeneratedColumn<String> get country =>
+      $composableBuilder(column: $table.country, builder: (column) => column);
+
+  GeneratedColumn<String> get avatarUrl =>
+      $composableBuilder(column: $table.avatarUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get birthDate =>
+      $composableBuilder(column: $table.birthDate, builder: (column) => column);
+
+  GeneratedColumn<String> get publicKey =>
+      $composableBuilder(column: $table.publicKey, builder: (column) => column);
+
+  GeneratedColumn<String> get preferences => $composableBuilder(
+      column: $table.preferences, builder: (column) => column);
+
+  GeneratedColumn<String> get accountType => $composableBuilder(
+      column: $table.accountType, builder: (column) => column);
+
+  GeneratedColumn<String> get hostingMode => $composableBuilder(
+      column: $table.hostingMode, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$ProfilesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ProfilesTable,
+    Profile,
+    $$ProfilesTableFilterComposer,
+    $$ProfilesTableOrderingComposer,
+    $$ProfilesTableAnnotationComposer,
+    $$ProfilesTableCreateCompanionBuilder,
+    $$ProfilesTableUpdateCompanionBuilder,
+    (Profile, BaseReferences<_$AppDatabase, $ProfilesTable, Profile>),
+    Profile,
+    PrefetchHooks Function()> {
+  $$ProfilesTableTableManager(_$AppDatabase db, $ProfilesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ProfilesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ProfilesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ProfilesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> userId = const Value.absent(),
+            Value<String?> fullName = const Value.absent(),
+            Value<String?> country = const Value.absent(),
+            Value<String?> avatarUrl = const Value.absent(),
+            Value<String?> birthDate = const Value.absent(),
+            Value<String?> publicKey = const Value.absent(),
+            Value<String?> preferences = const Value.absent(),
+            Value<String?> accountType = const Value.absent(),
+            Value<String?> hostingMode = const Value.absent(),
+            Value<String?> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ProfilesCompanion(
+            userId: userId,
+            fullName: fullName,
+            country: country,
+            avatarUrl: avatarUrl,
+            birthDate: birthDate,
+            publicKey: publicKey,
+            preferences: preferences,
+            accountType: accountType,
+            hostingMode: hostingMode,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String userId,
+            Value<String?> fullName = const Value.absent(),
+            Value<String?> country = const Value.absent(),
+            Value<String?> avatarUrl = const Value.absent(),
+            Value<String?> birthDate = const Value.absent(),
+            Value<String?> publicKey = const Value.absent(),
+            Value<String?> preferences = const Value.absent(),
+            Value<String?> accountType = const Value.absent(),
+            Value<String?> hostingMode = const Value.absent(),
+            Value<String?> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ProfilesCompanion.insert(
+            userId: userId,
+            fullName: fullName,
+            country: country,
+            avatarUrl: avatarUrl,
+            birthDate: birthDate,
+            publicKey: publicKey,
+            preferences: preferences,
+            accountType: accountType,
+            hostingMode: hostingMode,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$ProfilesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ProfilesTable,
+    Profile,
+    $$ProfilesTableFilterComposer,
+    $$ProfilesTableOrderingComposer,
+    $$ProfilesTableAnnotationComposer,
+    $$ProfilesTableCreateCompanionBuilder,
+    $$ProfilesTableUpdateCompanionBuilder,
+    (Profile, BaseReferences<_$AppDatabase, $ProfilesTable, Profile>),
+    Profile,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4544,4 +5309,6 @@ class $AppDatabaseManager {
       $$OtpEntriesTableTableManager(_db, _db.otpEntries);
   $$UsersTableTableManager get users =>
       $$UsersTableTableManager(_db, _db.users);
+  $$ProfilesTableTableManager get profiles =>
+      $$ProfilesTableTableManager(_db, _db.profiles);
 }

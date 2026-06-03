@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:thisjowi/core/providers/sync_provider.dart';
 import '../data/local/database.dart';
 import '../data/local/secure_storage_service.dart';
 
@@ -26,7 +27,8 @@ class LogoutService {
   /// 5. Close database connection
   Future<void> logout() async {
     try {
-      // 1. Stop sync service (Disabled)
+      // 1. Stop real-time sync connection
+      SyncProvider.instance.stop();
 
       // 2. Clear local database
       final db = AppDatabase.instance();
@@ -35,6 +37,7 @@ class LogoutService {
       await db.delete(db.otpEntries).go();
       await db.delete(db.users).go();
       await db.delete(db.syncQueue).go();
+      await db.delete(db.profiles).go();
 
       // Don't close the database instance as it's a singleton and might be used again if user logs back in
       // await db.close();

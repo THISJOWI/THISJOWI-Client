@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/services/token_manager.dart';
 import 'package:thisjowi/services/messageService.dart';
+import 'package:thisjowi/services/sync_service.dart';
 import 'package:thisjowi/data/models/message.dart';
 import 'package:thisjowi/services/cryptoService.dart';
 
@@ -23,7 +24,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final TokenManager _tokenManager = TokenManager();
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  Timer? _pollingTimer;
+  StreamSubscription? _syncSub;
 
   List<Message> _messages = [];
   bool _isLoading = true;
@@ -36,20 +37,24 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     _initUser();
-    _startPolling();
+    _listenToSyncEvents();
   }
 
-  void _startPolling() {
-    _pollingTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      if (mounted && !_isLoading) {
-        _loadMessages(isPolling: true);
+  /// Listen to SSE sync events for new messages in this conversation
+  void _listenToSyncEvents() {
+    _syncSub = SyncService().events.listen((event) {
+      if (event.serviceName == 'message') {
+        final conversationId = event.payload['conversationId']?.toString();
+        if (conversationId == widget.conversation.id && mounted && !_isLoading) {
+          _loadMessages(isPolling: true);
+        }
       }
     });
   }
 
   @override
   void dispose() {
-    _pollingTimer?.cancel();
+    _syncSub?.cancel();
     _textController.dispose();
     _scrollController.dispose();
     super.dispose();

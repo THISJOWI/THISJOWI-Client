@@ -1,5 +1,6 @@
 import 'package:uuid/uuid.dart';
 import 'package:thisjowi/data/models/password_entry.dart';
+import 'package:thisjowi/utils/app_logger.dart';
 import '../local/database.dart';
 import '../../services/passwordService.dart';
 import '../../services/connectivityService.dart';
@@ -344,6 +345,37 @@ class PasswordsRepository {
       print('Background password deletion sync failed: $e');
     } finally {
       _syncingIds.remove(localId);
+    }
+  }
+
+  /// Apply a remote change received via SSE
+  Future<void> applyRemoteChange(Map<String, dynamic> payload) async {
+    final serverId = payload['id']?.toString();
+    if (serverId == null || serverId.isEmpty) return;
+
+    try {
+      // Events are metadata-only (id, title, website). Fetch full data
+      // from server to get username, password, notes, etc.
+      await _syncFromServer();
+    } catch (e) {
+      appLog.e('PasswordsRepository.applyRemoteChange failed', error: e);
+    }
+  }
+
+  /// Delete a local password by server ID (from SSE deleted event)
+  Future<void> deleteLocalById(String serverId) async {
+    try {
+      final allLocal = await _db.passwordsDao.getAllPasswords(includeDeleted: true);
+      final existing = allLocal.firstWhere(
+        (p) => p['serverId'] == serverId,
+        orElse: () => <String, dynamic>{},
+      );
+
+      if (existing.isNotEmpty) {
+        await _db.passwordsDao.hardDeletePassword(existing['id']);
+      }
+    } catch (e) {
+      appLog.e('PasswordsRepository.deleteLocalById failed', error: e);
     }
   }
 
