@@ -7,6 +7,7 @@ import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/services/otpService.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
+import 'package:thisjowi/screens/otp/OtpQrScannerScreen.dart';
 import 'package:thisjowi/utils/DialogUtils.dart';
 import 'package:thisjowi/i18n/translations.dart';
 
@@ -299,6 +300,32 @@ class GlobalActions {
                     ),
                   ),
                   const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Theme.of(context).colorScheme.onSurface,
+                          side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        icon: const Icon(Icons.qr_code_scanner, size: 20),
+                        label: Text('Scan QR'.i18n),
+                        onPressed: () async {
+                          final scanned = await Navigator.push<bool>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const OtpQrScannerScreen(),
+                            ),
+                          );
+                          if (scanned == true) {
+                            Navigator.of(context, rootNavigator: true).pop(true);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
                     child: Row(
