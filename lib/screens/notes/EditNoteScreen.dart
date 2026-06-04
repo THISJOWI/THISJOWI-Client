@@ -82,7 +82,11 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     final insert = ops[0]['insert'];
     if (insert is! String || insert != ' ') return;
 
-    _checkShortcut();
+    _isProcessing = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkShortcut();
+      _isProcessing = false;
+    });
   }
 
   void _checkShortcut() {
@@ -102,12 +106,10 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   }
 
   void _applyShortcut(String pattern, Attribute attr) {
-    _isProcessing = true;
     final offset = _quillController.selection.baseOffset;
     _quillController.replaceText(
         offset - pattern.length, pattern.length, '', null);
     _quillController.formatSelection(attr);
-    _isProcessing = false;
   }
 
   @override
