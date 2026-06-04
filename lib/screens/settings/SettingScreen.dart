@@ -193,10 +193,6 @@ class _SettingScreenState extends State<SettingScreen> {
     VoidCallback? onTap,
     bool isWarning = false,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final glassColor = (isDark ? const Color(0xFF2A2A2A) : Colors.white)
-        .withValues(alpha: 0.85);
-
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -204,7 +200,7 @@ class _SettingScreenState extends State<SettingScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           decoration: BoxDecoration(
-            color: glassColor,
+            color: Colors.transparent,
             border: Border(
               bottom: BorderSide(
                 color: Theme.of(context)

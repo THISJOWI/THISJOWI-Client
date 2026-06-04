@@ -25,75 +25,63 @@ class EditNoteScreen extends StatefulWidget {
 }
 
 class _EditNoteScreenState extends State<EditNoteScreen> {
+  final _titleController = TextEditingController();
   late final QuillController _quillController;
   late final FocusNode _quillFocusNode;
   late final ScrollController _quillScrollController;
   StreamSubscription? _docSub;
   bool _isProcessing = false;
   bool _isLoading = false;
-  bool _titleFormatted = false;
 
   @override
   void initState() {
     super.initState();
     _quillFocusNode = FocusNode();
     _quillScrollController = ScrollController();
-    _quillController = _buildQuillController();
+
+    if (widget.note != null) {
+      _titleController.text = widget.note!.title;
+      _quillController = _buildBodyController(widget.note!.content);
+    } else {
+      _quillController = QuillController.basic();
+    }
+
     _docSub = _quillController.document.changes.listen(_onDocChange);
   }
 
-  QuillController _buildQuillController() {
-    final note = widget.note;
-    if (note == null) return QuillController.basic();
+  QuillController _buildBodyController(String content) {
+    if (content.isEmpty) return QuillController.basic();
 
     try {
-      if (note.content.isNotEmpty) {
-        final json = jsonDecode(note.content);
-        if (json is List && json.isNotEmpty) {
-          final delta = Delta.fromJson(json);
-          final plain = _plainText(delta);
-          if (plain.trimRight().isNotEmpty) {
-            final controller = QuillController(
-              document: Document.fromDelta(delta),
-              selection: TextSelection.collapsed(
-                  offset: plain.indexOf('\n') + 1),
-            );
-            _formatTitle(controller, plain);
-            return controller;
-          }
+      final json = jsonDecode(content);
+      if (json is List && json.isNotEmpty) {
+        final delta = Delta.fromJson(json);
+        final plain = _deltaPlain(delta);
+        if (plain.trimRight().isNotEmpty) {
+          return QuillController(
+            document: Document.fromDelta(delta),
+            selection: const TextSelection.collapsed(offset: 0),
+          );
         }
       }
     } catch (_) {
-      if (note.content.trim().isNotEmpty) {
+      if (content.trim().isNotEmpty) {
         final delta = Delta();
-        if (note.title.isNotEmpty) {
-          delta.insert('${note.title}\n');
-        }
-        delta.insert(note.content);
-        if (!note.content.endsWith('\n')) {
+        delta.insert(content);
+        if (!content.endsWith('\n')) {
           delta.insert('\n');
         }
-        final controller = QuillController(
+        return QuillController(
           document: Document.fromDelta(delta),
           selection: const TextSelection.collapsed(offset: 0),
         );
-        _formatTitle(controller, _plainText(delta));
-        return controller;
       }
     }
 
-    final delta = Delta();
-    delta.insert('${note.title}\n');
-    delta.insert('\n');
-    final controller = QuillController(
-      document: Document.fromDelta(delta),
-      selection: const TextSelection.collapsed(offset: 0),
-    );
-    _formatTitle(controller, '${note.title}\n');
-    return controller;
+    return QuillController.basic();
   }
 
-  String _plainText(Delta delta) {
+  String _deltaPlain(Delta delta) {
     final sb = StringBuffer();
     for (final op in delta.toJson()) {
       if (op['insert'] is String) sb.write(op['insert'] as String);
@@ -101,26 +89,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     return sb.toString();
   }
 
-  void _formatTitle(QuillController controller, String plain) {
-    final idx = plain.indexOf('\n');
-    if (idx > 0) {
-      controller.formatText(idx, 1, Attribute.h1);
-    }
-    _titleFormatted = true;
-  }
-
   void _onDocChange(DocChange change) {
     if (_isProcessing) return;
-
-    if (!_titleFormatted) {
-      _titleFormatted = true;
-      final plain = _quillController.document.toPlainText();
-      final idx = plain.indexOf('\n');
-      if (idx > 0) {
-        _quillController.formatText(idx, 1, Attribute.h1);
-      }
-      return;
-    }
 
     final ops = change.change.toJson();
     if (ops.length != 1) return;
@@ -162,6 +132,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   @override
   void dispose() {
     _docSub?.cancel();
+    _titleController.dispose();
     _quillController.dispose();
     _quillFocusNode.dispose();
     _quillScrollController.dispose();
@@ -169,18 +140,16 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   }
 
   void _saveNote() async {
-    final plain = _quillController.document.toPlainText().trimRight();
-    if (plain.isEmpty) {
+    if (_titleController.text.trim().isEmpty) {
       if (!mounted) return;
       try {
-        ErrorSnackBar.showWarning(context, 'Please enter a note'.i18n);
+        ErrorSnackBar.showWarning(context, 'Please enter a title'.i18n);
       } catch (e) {
         debugPrint('Error showing snackbar: $e');
       }
       return;
     }
 
-    final title = plain.split('\n').first.trim();
     final contentJson =
         jsonEncode(_quillController.document.toDelta().toJson());
 
@@ -189,7 +158,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
 
     try {
       final note = Note(
-        title: title,
+        title: _titleController.text.trim(),
         content: contentJson,
         id: widget.note?.id,
         localId: widget.note?.localId,
@@ -224,16 +193,14 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   }
 
   Future<void> _saveOnBack() async {
-    final plain = _quillController.document.toPlainText().trimRight();
-    if (plain.isEmpty) return;
+    if (_titleController.text.trim().isEmpty) return;
 
-    final title = plain.split('\n').first.trim();
     final contentJson =
         jsonEncode(_quillController.document.toDelta().toJson());
 
     try {
       final note = Note(
-        title: title,
+        title: _titleController.text.trim(),
         content: contentJson,
         id: widget.note?.id,
         localId: widget.note?.localId,
@@ -252,83 +219,96 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (didPop, result) {
         _saveOnBack();
       },
       child: Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Column(
-        children: [
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back_ios,
-                        color: Theme.of(context).colorScheme.onSurface,
-                        size: 18),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: _isLoading ? null : _saveNote,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
-                      child: Text(
-                        'Done'.i18n,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back_ios,
+                          color: onSurface, size: 18),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: _isLoading
-                ? Center(
-                    child: CircularProgressIndicator(
-                        color: Theme.of(context).colorScheme.primary))
-                : Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-                    child: QuillEditor.basic(
-                      controller: _quillController,
-                      focusNode: _quillFocusNode,
-                      scrollController: _quillScrollController,
-                      config: QuillEditorConfig(
-                        placeholder: 'Start typing...',
-                        padding: EdgeInsets.zero,
-                        customStyles: DefaultStyles(
-                          h1: DefaultTextBlockStyle(
-                            TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              height: 1.2,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            const HorizontalSpacing(0, 0),
-                            const VerticalSpacing(8, 0),
-                            const VerticalSpacing(0, 0),
-                            null,
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: _isLoading ? null : _saveNote,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        child: Text(
+                          'Done'.i18n,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: _isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(
+                            color: Theme.of(context).colorScheme.primary))
+                    : Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                        child: Column(
+                          children: [
+                            TextField(
+                              controller: _titleController,
+                              style: TextStyle(
+                                color: onSurface,
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                height: 1.1,
+                              ),
+                              textInputAction: TextInputAction.next,
+                              onSubmitted: (_) =>
+                                  _quillFocusNode.requestFocus(),
+                              decoration: const InputDecoration(
+                                hintText: 'Title',
+                                border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Expanded(
+                              child: QuillEditor.basic(
+                                controller: _quillController,
+                                focusNode: _quillFocusNode,
+                                scrollController: _quillScrollController,
+                                config: const QuillEditorConfig(
+                                  placeholder: 'Start typing...',
+                                  padding: EdgeInsets.zero,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+              ),
+              _buildToolbar(),
+            ],
           ),
-          _buildToolbar(),
-        ],
+        ),
       ),
-    ),
     );
   }
 
