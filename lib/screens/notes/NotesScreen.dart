@@ -290,7 +290,7 @@ class _NotesScreenState extends State<NotesScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 2.0),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(25),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                         child: Container(
@@ -299,7 +299,12 @@ class _NotesScreenState extends State<NotesScreen> {
                                   ? Color.lerp(Theme.of(context).scaffoldBackgroundColor, Colors.white, 0.12)!
                                   : Color.lerp(Theme.of(context).scaffoldBackgroundColor, Colors.black, 0.06)!)
                                   .withValues(alpha: 0.85),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(25),
+                              border: Border.all(
+                                color: Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white.withValues(alpha: 0.1)
+                                    : Colors.black.withValues(alpha: 0.08),
+                              ),
                             ),
                             child: SizedBox(
                           height: 36,

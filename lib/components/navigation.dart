@@ -221,8 +221,8 @@ class Navigation extends State<MyBottomNavigation>
               barBorderRadius: 28,
               horizontalPadding: 20,
               spacing: 8,
-              glassSettings: const LiquidGlassSettings(
-                thickness: 30,
+              glassSettings: LiquidGlassSettings(
+                thickness: Theme.of(context).brightness == Brightness.dark ? 30 : 60,
                 blur: 60,
                 refractiveIndex: 1.59,
               ),

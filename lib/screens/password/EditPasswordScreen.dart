@@ -1,8 +1,10 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thisjowi/data/models/password_entry.dart';
 import '../../data/repository/passwordsRepository.dart';
 import 'package:thisjowi/components/error_bar.dart';
+import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/i18n/translations.dart';
 
 class EditPasswordScreen extends StatefulWidget {
@@ -150,12 +152,12 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                const SizedBox(height: 16),
-                _buildTextField(
+          child: LiquidGlass.wrap(Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  _buildTextField(
                   controller: _titleController,
                   label: 'Title'.i18n,
                   icon: Icons.title,
@@ -188,9 +190,9 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
                 const SizedBox(height: 40),
                 _buildSaveButton(),
               ],
-            ),
+              ),
+            ), context, padding: const EdgeInsets.all(16)),
           ),
-        ),
       ),
     );
   }
