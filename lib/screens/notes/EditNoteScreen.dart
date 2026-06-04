@@ -31,6 +31,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   StreamSubscription? _docSub;
   bool _isProcessing = false;
   bool _isLoading = false;
+  bool _titleFormatted = false;
 
   @override
   void initState() {
@@ -105,10 +106,16 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     if (idx > 0) {
       controller.formatText(0, idx, Attribute.h1);
     }
+    _titleFormatted = true;
   }
 
   void _onDocChange(DocChange change) {
     if (_isProcessing) return;
+
+    if (!_titleFormatted) {
+      _checkAndFormatTitle();
+      return;
+    }
 
     final ops = change.change.toJson();
     if (ops.length != 1) return;
@@ -120,6 +127,16 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       _checkShortcut();
       _isProcessing = false;
     });
+  }
+
+  void _checkAndFormatTitle() {
+    if (_titleFormatted) return;
+    _titleFormatted = true;
+    final plain = _quillController.document.toPlainText();
+    final idx = plain.indexOf('\n');
+    if (idx > 0) {
+      _quillController.formatText(0, idx, Attribute.h1);
+    }
   }
 
   void _checkShortcut() {
@@ -139,9 +156,12 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
 
   void _applyShortcut(String pattern, Attribute attr) {
     final offset = _quillController.selection.baseOffset;
+    final start = offset - pattern.length;
+    _quillController.replaceText(start, pattern.length, '\n', null);
     _quillController.replaceText(
-        offset - pattern.length, pattern.length, '', null);
-    _quillController.formatSelection(attr);
+        0, 0, '', TextSelection.collapsed(offset: start));
+    _quillController.formatText(0, 0, attr);
+    _quillController.replaceText(start + 1, 1, '', null);
   }
 
   @override
