@@ -81,10 +81,16 @@ class PasswordsRepository {
               continue;
             }
 
-            // Update existing
+            // Update existing, but preserve local username if server returns empty
+            // (handles transition period where existing server records lack username)
+            final serverUsername = item['username'] as String?;
+            final resolvedUsername = (serverUsername != null && serverUsername.isNotEmpty)
+                ? serverUsername
+                : (existingLocal['username'] as String? ?? '');
+
             await _db.passwordsDao.updatePassword(existingLocal['id'], {
               'title': item['title'] ?? '',
-              'username': item['username'] ?? '',
+              'username': resolvedUsername,
               'password': item['password'] ?? '',
               'website': item['website'] ?? '',
               'notes': item['notes'] ?? '',
@@ -94,11 +100,10 @@ class PasswordsRepository {
             });
           } else {
             // Check for pending match
-            // Match by title and username
+            // Match by title only to handle server records that may lack username
             final pendingMatch = allLocalPasswords.firstWhere(
               (p) => (p['syncStatus'] == 'pending' || p['syncStatus'] == 'error' || p['syncStatus'] == 'deleted') && 
-                     p['title'] == (item['title'] ?? '') && 
-                     p['username'] == (item['username'] ?? ''),
+                     p['title'] == (item['title'] ?? ''),
               orElse: () => <String, String?>{},
             );
 
