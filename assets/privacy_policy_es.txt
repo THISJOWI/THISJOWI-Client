@@ -1,0 +1,181 @@
+POLÍTICA DE PRIVACIDAD DE THISECURE
+
+Última actualización: 4 de junio de 2026
+
+Esta Política de Privacidad describe cómo THISECURE ("nosotros" o "nuestro") recopila, utiliza, almacena y protege sus datos personales cuando utiliza nuestra aplicación móvil y servicios relacionados (el "Servicio").
+
+Esta Política está redactada en cumplimiento del Reglamento (UE) 2016/679 (Reglamento General de Protección de Datos o "RGPD") y la Ley Orgánica 3/2018 de Protección de Datos y Garantía de los Derechos Digitales (LOPDGDD).
+
+1. RESPONSABLE DEL TRATAMIENTO
+
+ThisJowi
+Correo electrónico: privacy@thisjowi.uk
+
+Somos el responsable del tratamiento de los datos personales que procesamos en relación con el Servicio.
+
+2. DATOS PERSONALES QUE RECOPILAMOS
+
+2.1. Datos que usted proporciona directamente:
+
+- Dirección de correo electrónico
+- Nombre completo
+- País de residencia
+- Fecha de nacimiento (opcional)
+- Número de teléfono (opcional)
+- Biografía (opcional)
+- Imagen de avatar de perfil (opcional)
+- Tipo de cuenta (Comunidad o Empresa)
+- Preferencia de modo de alojamiento (Nube o Autogestionado)
+
+2.2. Datos generados mediante el uso del Servicio:
+
+- Credenciales de autenticación (contraseña cifrada con BCrypt, tokens JWT, tokens OAuth2)
+- Entradas cifradas del gestor de contraseñas (títulos, nombres de usuario, contraseñas, URLs)
+- Notas cifradas (títulos y contenido)
+- Configuraciones del autenticador OTP/TOTP (semillas, emisores, etiquetas)
+- Mensajes cifrados (contenido, identificadores de emisor/receptor, marcas de tiempo)
+- Claves de cifrado de extremo a extremo (clave pública X25519)
+- Actividad de inicio de sesión (marcas de tiempo, intentos fallidos, eventos de bloqueo)
+- Eventos de sincronización (solo identificadores, no contenido)
+- Datos de suscripción y pago (ID de cliente de Stripe, estado de suscripción)
+- Preferencias de interfaz (tema, idioma, configuración de notificaciones)
+
+2.3. Datos recopilados a través de autenticación de terceros:
+
+Cuando utiliza Google, GitHub o Microsoft para iniciar sesión, recibimos:
+- Dirección de correo electrónico
+- Nombre
+- URL de la foto de perfil
+- Identificador específico del proveedor
+
+3. FINALIDADES Y BASES LEGALES DEL TRATAMIENTO
+
+Finalidad                        | Base Legal (RGPD)
+---------------------------------|-------------------
+Prestación y operación del Servicio | Art. 6.1.b — ejecución contractual
+Autenticación y seguridad        | Art. 6.1.f — interés legítimo
+Gestión de cuenta                | Art. 6.1.b — ejecución contractual
+Procesamiento de suscripciones   | Art. 6.1.b — ejecución contractual
+Atención al cliente              | Art. 6.1.b — ejecución contractual
+Mejora del Servicio              | Art. 6.1.f — interés legítimo
+Cumplimiento legal (fiscal)      | Art. 6.1.c — obligación legal
+
+No utilizamos sus datos personales para toma de decisiones automatizada ni elaboración de perfiles.
+
+4. ALMACENAMIENTO Y CIFRADO DE DATOS
+
+4.1. Cifrado de Extremo a Extremo (E2EE)
+
+Los mensajes intercambiados entre usuarios están protegidos mediante cifrado de extremo a extremo utilizando el protocolo de intercambio de claves X25519 combinado con derivación de clave HKDF y cifrado simétrico AES-256-GCM. No podemos acceder, leer ni descifrar el contenido de sus mensajes.
+
+4.2. Cifrado en el Servidor
+
+Las entradas del gestor de contraseñas y las notas se cifran en reposo en nuestros servidores utilizando AES-256-GCM con claves de 256 bits. Las claves de cifrado son independientes de las claves de autenticación y nunca se comparten con terceros.
+
+4.3. Datos en Reposo
+
+Sus datos se almacenan en múltiples bases de datos seguras:
+- Bases de datos PostgreSQL para cuentas de usuario, perfiles, contraseñas, notas y configuraciones OTP
+- Apache Cassandra para mensajes
+- Redis/KeyDB para datos de sesión temporales y códigos de verificación
+
+4.4. Ubicaciones de Almacenamiento
+
+Nuestra infraestructura está alojada en la Unión Europea. El almacenamiento de objetos Cloudflare R2 (utilizado para avatares) puede procesar datos en los Estados Unidos bajo el EU-US Data Privacy Framework.
+
+5. PLAZOS DE CONSERVACIÓN
+
+Categoría de Datos               | Período de Conservación
+---------------------------------|------------------------
+Datos de cuenta                  | Hasta eliminación de cuenta + 30 días
+Gestor de contraseñas            | Hasta eliminación de cuenta
+Notas                            | Hasta eliminación de cuenta
+Mensajes                         | Hasta eliminación de cuenta
+Configuraciones OTP              | Hasta eliminación de cuenta
+Códigos de verificación (Redis)  | 10-15 minutos (eliminación automática)
+Tokens de sesión temporales      | 24 horas (caducidad del JWT)
+Registros de pago/suscripción   | 5 años (obligación legal fiscal)
+Datos de registro                | 90 días
+
+6. COMPARTICIÓN DE DATOS Y TERCEROS
+
+Solo compartimos sus datos con proveedores de servicios esenciales:
+
+Proveedor de Servicio           | Finalidad                  | Datos Compartidos
+-------------------------------|---------------------------|------------------
+Cloudflare R2                  | Almacenamiento de avatares | Imágenes de avatar
+Stripe                         | Pagos de suscripción      | Datos de pago, ID de cliente
+Google (OAuth2)               | Inicio de sesión social   | Correo, nombre, foto
+GitHub (OAuth2)               | Inicio de sesión social   | Correo, nombre, avatar
+Microsoft (OAuth2)            | Inicio de sesión social   | Correo, nombre, foto
+Docker Hub                    | Registro de contenedores  | Ningún dato personal
+
+No vendemos sus datos personales a terceros. No utilizamos servicios de análisis, publicidad o seguimiento de terceros.
+
+7. TRANSFERENCIAS INTERNACIONALES DE DATOS
+
+Cuando los datos se transfieren fuera del Espacio Económico Europeo (EEE), garantizamos las salvaguardas adecuadas:
+- Certificación EU-US Data Privacy Framework (cuando corresponda)
+- Cláusulas Contractuales Tipo (SCC) adoptadas por la Comisión Europea
+- Decisiones de adecuación de la Comisión Europea
+
+8. SUS DERECHOS
+
+Según el RGPD, usted tiene los siguientes derechos:
+
+8.1. Derecho de Acceso (Art. 15)
+Puede solicitar una copia de todos los datos personales que tenemos sobre usted.
+
+8.2. Derecho de Rectificación (Art. 16)
+Puede corregir datos inexactos o incompletos a través de la configuración de su perfil.
+
+8.3. Derecho de Supresión ("Derecho al Olvido") (Art. 17)
+Puede eliminar su cuenta, lo que eliminará sus datos personales de nuestros sistemas.
+
+8.4. Derecho a la Limitación del Tratamiento (Art. 18)
+Puede solicitar que limitemos cómo utilizamos sus datos.
+
+8.5. Derecho a la Portabilidad de Datos (Art. 20)
+Puede solicitar sus datos en un formato estructurado, de uso común y legible por máquina.
+
+8.6. Derecho de Oposición (Art. 21)
+Puede oponerse al tratamiento basado en interés legítimo.
+
+8.7. Derecho a Retirar el Consentimiento
+Cuando el tratamiento se basa en el consentimiento, puede retirarlo en cualquier momento sin que ello afecte a la licitud del tratamiento previo.
+
+Para ejercer cualquiera de estos derechos, contáctenos en privacy@thisjowi.uk. Responderemos en un plazo de 30 días.
+
+Si no queda satisfecho con nuestra respuesta, tiene derecho a presentar una reclamación ante la Agencia Española de Protección de Datos (AEPD) en www.aepd.es.
+
+9. SEGURIDAD DE LOS DATOS
+
+Implementamos medidas técnicas y organizativas apropiadas para proteger sus datos, incluyendo:
+- Cifrado de extremo a extremo (X25519 + HKDF + AES-256-GCM)
+- Cifrado en reposo en el servidor (AES-256-GCM)
+- Hash de contraseñas con BCrypt
+- Autenticación mediante tokens JWT con firma HMAC-SHA256
+- TLS/HTTPS para todos los datos en tránsito
+- Limitación de velocidad en endpoints de autenticación
+- Bloqueo de cuenta tras intentos fallidos
+- Opción de autenticación biométrica (a nivel de dispositivo)
+
+10. MENORES DE EDAD
+
+El Servicio no está destinado a menores de 16 años. No recopilamos conscientemente datos personales de menores. Si tiene conocimiento de que un menor nos ha proporcionado datos personales, contáctenos inmediatamente.
+
+11. CAMBIOS EN ESTA POLÍTICA
+
+Podemos actualizar esta Política de Privacidad periódicamente. Los cambios materiales se notificarán a través de la aplicación o por correo electrónico al menos 30 días antes de su entrada en vigor.
+
+12. CONTACTO
+
+Delegado de Protección de Datos: privacy@thisjowi.uk
+Servicio: THISECURE
+Última actualización: 4 de junio de 2026
+
+Autoridad de Control:
+Agencia Española de Protección de Datos (AEPD)
+C/ Jorge Juan, 6
+28001 Madrid, España
+www.aepd.es

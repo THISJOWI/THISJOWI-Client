@@ -1,0 +1,56 @@
+POLÍTICA DE COOKIES DE THISECURE
+
+Última actualización: 4 de junio de 2026
+
+Esta Política de Cookies explica cómo THISECURE ("nosotros" o "nuestro") utiliza cookies y tecnologías similares cuando usted utiliza nuestra aplicación móvil y servicios relacionados (el "Servicio").
+
+1. QUÉ SON LAS COOKIES
+
+Las cookies son pequeños archivos de texto que su navegador web o aplicación almacenan en su dispositivo. Se utilizan ampliamente para que los servicios funcionen correctamente, mejorar la experiencia del usuario y recordar preferencias.
+
+2. CÓMO UTILIZAMOS LAS COOKIES
+
+El Servicio opera principalmente como una aplicación móvil y de escritorio y utiliza un mínimo de cookies. Clasificamos las cookies de la siguiente manera:
+
+2.1. Cookies Estrictamente Necesarias (Cookies Técnicas)
+
+Estas cookies son esenciales para el funcionamiento del Servicio y no pueden desactivarse.
+
+Nombre de Cookie          | Finalidad                                   | Duración
+--------------------------|---------------------------------------------|----------
+auth_token                | Gestión de sesión de autenticación          | 24 horas
+refresh_token             | Renovación de token sin reiniciar sesión    | 7 días
+language_preference       | Recordar el idioma seleccionado             | 90 días
+theme_preference          | Recordar el tema de interfaz (claro/oscuro) | 90 días
+
+2.2. Cookies de Preferencia (Cookies Funcionales)
+
+Estas cookies recuerdan las elecciones que usted realiza para proporcionar una experiencia personalizada.
+
+Nombre de Cookie          | Finalidad                                   | Duración
+--------------------------|---------------------------------------------|----------
+onboarding_completed     | Seguimiento de finalización de la guía      | Persistente
+autofill_prompt_shown    | Registrar si se mostró la ayuda de autocompletado | Persistente
+app_open_count           | Contador de aperturas de la aplicación      | Sesión
+
+2.3. Cookies de Terceros
+
+No utilizamos cookies de publicidad, análisis o seguimiento. El Servicio no integra servicios de análisis, redes publicitarias ni píxeles de seguimiento de redes sociales de terceros.
+
+Cuando elige iniciar sesión a través de proveedores OAuth2 (Google, GitHub, Microsoft), dichos proveedores pueden establecer sus propias cookies regidas por sus respectivas políticas de privacidad.
+
+3. CÓMO GESTIONAR LAS COOKIES
+
+Dado que este Servicio es principalmente una aplicación móvil, la gestión de cookies depende de su plataforma:
+
+- iOS/macOS: La configuración de la aplicación puede permitirle restablecer identificadores. La gestión de cookies a nivel de sistema está disponible en los ajustes de Safari.
+- Android: La configuración de cookies puede gestionarse a través de los ajustes de su navegador o WebView.
+- Escritorio: La configuración de su navegador le permite ver, bloquear o eliminar cookies.
+
+4. CAMBIOS EN ESTA POLÍTICA
+
+Podemos actualizar esta Política de Cookies periódicamente. Los cambios se notificarán a través de la aplicación o en nuestro sitio web.
+
+5. CONTACTO
+
+Para preguntas sobre esta Política de Cookies, contáctenos en privacy@thisjowi.uk.

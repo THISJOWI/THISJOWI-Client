@@ -65,6 +65,10 @@ flutter:
     - assets/github_logo_black.png
     - assets/terms_and_conditions.txt
     - assets/terms_and_conditions_es.txt
+    - assets/privacy_policy.txt
+    - assets/privacy_policy_es.txt
+    - assets/cookie_policy.txt
+    - assets/cookie_policy_es.txt
     - .env
 
 flutter_launcher_icons:

@@ -1,0 +1,56 @@
+THISECURE COOKIE POLICY
+
+Last updated: June 4, 2026
+
+This Cookie Policy explains how THISECURE ("we", "us", or "our") uses cookies and similar technologies when you use our mobile application and related services (the "Service").
+
+1. WHAT ARE COOKIES
+
+Cookies are small text files stored on your device by your web browser or application. They are widely used to make services work properly, improve user experience, and remember preferences.
+
+2. HOW WE USE COOKIES
+
+The Service primarily operates as a mobile and desktop application and uses minimal cookies. We classify cookies as follows:
+
+2.1. Strictly Necessary Cookies (Technical Cookies)
+
+These cookies are essential for the Service to function properly and cannot be disabled.
+
+Cookie Name             | Purpose                                      | Duration
+------------------------|----------------------------------------------|----------
+auth_token              | Authentication session management            | 24 hours
+refresh_token           | Token renewal without re-login              | 7 days
+language_preference     | Remember your selected language              | 90 days
+theme_preference        | Remember your UI theme (light/dark)         | 90 days
+
+2.2. Preference Cookies (Functional Cookies)
+
+These cookies remember choices you make to provide a personalized experience.
+
+Cookie Name             | Purpose                                      | Duration
+------------------------|----------------------------------------------|----------
+onboarding_completed   | Track onboarding flow completion             | Persistent
+autofill_prompt_shown  | Remember if autofill prompt was shown        | Persistent
+app_open_count         | Track application launch count               | Session
+
+2.3. Third-Party Cookies
+
+We do not use advertising, analytics, or tracking cookies. The Service does not integrate any third-party analytics, advertising networks, or social media tracking pixels.
+
+When you choose to sign in via OAuth2 providers (Google, GitHub, Microsoft), those providers may set their own cookies governed by their respective privacy policies.
+
+3. HOW TO MANAGE COOKIES
+
+Since this Service is primarily a mobile application, cookie management depends on your platform:
+
+- iOS/macOS: Application settings may allow you to reset identifiers. System-level cookie management is available in Safari settings.
+- Android: Cookie settings can be managed through your browser or WebView settings.
+- Desktop: Your browser settings allow you to view, block, or delete cookies.
+
+4. CHANGES TO THIS POLICY
+
+We may update this Cookie Policy from time to time. Changes will be notified via the application or on our website.
+
+5. CONTACT
+
+For questions about this Cookie Policy, contact us at privacy@thisjowi.uk.

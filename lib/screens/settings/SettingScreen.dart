@@ -17,6 +17,7 @@ import 'package:thisjowi/components/liquid_glass.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:thisjowi/data/models/auth_user.dart';
 import 'package:thisjowi/data/models/profile_user.dart';
+import 'package:thisjowi/screens/settings/LegalDocumentsScreen.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -1355,9 +1356,15 @@ class _SettingScreenState extends State<SettingScreen> {
 
                       // Account & Privacy
                       _buildSettingItem(
-                        icon: Icons.help_outline,
+                        icon: Icons.shield_outlined,
                         title: 'Account & Privacy'.i18n,
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const LegalDocumentsScreen(),
+                            ),
+                          );
+                        },
                       ),
 
                       // Logout

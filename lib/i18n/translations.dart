@@ -345,6 +345,18 @@ extension Localization on String {
       "es": "Cuenta y privacidad",
     } +
     {
+      "en": "Privacy Policy",
+      "es": "Política de Privacidad",
+    } +
+    {
+      "en": "Cookie Policy",
+      "es": "Política de Cookies",
+    } +
+    {
+      "en": "Terms & Conditions",
+      "es": "Términos y Condiciones",
+    } +
+    {
       "en": "Account",
       "es": "Cuenta",
     } +
@@ -633,6 +645,18 @@ extension Localization on String {
       {
         "en": "Create account",
         "es": "Crear cuenta",
+      } +
+      {
+        "en": "I accept the ",
+        "es": "Acepto la ",
+      } +
+      {
+        "en": " and ",
+        "es": " y los ",
+      } +
+      {
+        "en": "You must accept the terms to continue",
+        "es": "Debes aceptar los términos para continuar",
       } +
       {
         "en": "Please complete email and password",

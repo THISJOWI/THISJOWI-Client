@@ -1,0 +1,181 @@
+THISECURE PRIVACY POLICY
+
+Last updated: June 4, 2026
+
+This Privacy Policy describes how THISECURE ("we", "us", or "our") collects, uses, stores, and protects your personal data when you use our mobile application and related services (the "Service").
+
+This Policy is drafted in compliance with Regulation (EU) 2016/679 (General Data Protection Regulation or "GDPR") and the Spanish Organic Law 3/2018 on Data Protection and Digital Rights Guarantee (LOPDGDD).
+
+1. DATA CONTROLLER
+
+ThisJowi
+Email: privacy@thisjowi.uk
+
+We are the data controller for the personal data we process in connection with the Service.
+
+2. PERSONAL DATA WE COLLECT
+
+2.1. Data you provide directly:
+
+- Email address
+- Full name
+- Country of residence
+- Birth date (optional)
+- Phone number (optional)
+- Biography (optional)
+- Profile avatar image (optional)
+- Account type (Community or Business)
+- Hosting mode preference (Cloud or Self-hosted)
+
+2.2. Data generated through use of the Service:
+
+- Authentication credentials (BCrypt-hashed password, JWT tokens, OAuth2 tokens)
+- Encrypted password vault entries (titles, usernames, passwords, website URLs)
+- Encrypted notes (titles and content)
+- OTP/TOTP authenticator configurations (seeds, issuers, labels)
+- Encrypted messages (content, sender/receiver identifiers, timestamps)
+- End-to-end encryption keys (X25519 public key)
+- Login activity (timestamps, failed attempts, lockout events)
+- Sync events (identifiers only, not content)
+- Subscription and payment data (Stripe customer ID, subscription status)
+- UI preferences (theme, language, notification settings)
+
+2.3. Data collected through third-party authentication:
+
+When you use Google, GitHub, or Microsoft to sign in, we receive:
+- Email address
+- Name
+- Profile picture URL
+- Provider-specific identifier
+
+3. PURPOSES AND LEGAL BASES FOR PROCESSING
+
+Purpose                          | Legal Basis (GDPR)
+---------------------------------|--------------------
+Service provision and operation | Art. 6(1)(b) — contract performance
+Authentication and security     | Art. 6(1)(f) — legitimate interest
+Account management              | Art. 6(1)(b) — contract performance
+Subscription processing         | Art. 6(1)(b) — contract performance
+Customer support                | Art. 6(1)(b) — contract performance
+Service improvement             | Art. 6(1)(f) — legitimate interest
+Legal compliance (tax, records) | Art. 6(1)(c) — legal obligation
+
+We do not use your personal data for automated decision-making or profiling.
+
+4. DATA STORAGE AND ENCRYPTION
+
+4.1. End-to-End Encryption (E2EE)
+
+Messages exchanged between users are protected by end-to-end encryption using the X25519 key exchange protocol combined with HKDF key derivation and AES-256-GCM symmetric encryption. We cannot access, read, or decrypt the content of your messages.
+
+4.2. Server-Side Encryption
+
+Password vault entries and notes are encrypted at rest on our servers using AES-256-GCM with 256-bit keys. The encryption keys are separate from authentication keys and are never shared with third parties.
+
+4.3. Data at Rest
+
+Your data is stored across multiple secure databases:
+- PostgreSQL databases for user accounts, profiles, passwords, notes, and OTP configurations
+- Apache Cassandra for messages
+- Redis/KeyDB for temporary session data and verification codes
+
+4.4. Storage Locations
+
+Our infrastructure is hosted in the European Union. Cloudflare R2 object storage (used for avatars) may process data in the United States under the EU-US Data Privacy Framework.
+
+5. DATA RETENTION
+
+Data Category                    | Retention Period
+---------------------------------|------------------
+Account data                     | Until account deletion + 30 days
+Password vault entries           | Until account deletion
+Notes                            | Until account deletion
+Messages                         | Until account deletion or user deletion
+OTP configurations               | Until account deletion
+Verification codes (Redis)       | 10-15 minutes (automatically deleted)
+Temporary session tokens         | 24 hours (JWT expiry)
+Subscription/payment records     | 5 years (legal obligation under tax law)
+Log data                         | 90 days
+
+6. DATA SHARING AND THIRD PARTIES
+
+We share your data only with essential service providers:
+
+Service Provider               | Purpose                  | Data Shared
+-------------------------------|--------------------------|-------------
+Cloudflare R2                  | Avatar image storage     | Avatar images
+Stripe                         | Subscription payments    | Payment data, customer ID
+Google (OAuth2)               | Social login             | Email, name, picture
+GitHub (OAuth2)               | Social login             | Email, name, avatar
+Microsoft (OAuth2)            | Social login             | Email, name, picture
+Docker Hub                    | Container registry       | No personal data
+
+We do not sell your personal data to third parties. We do not use third-party analytics, advertising, or tracking services.
+
+7. INTERNATIONAL DATA TRANSFERS
+
+When data is transferred outside the European Economic Area (EEA), we ensure appropriate safeguards are in place:
+- EU-US Data Privacy Framework certification (where applicable)
+- Standard Contractual Clauses (SCCs) adopted by the European Commission
+- Adequacy decisions by the European Commission
+
+8. YOUR RIGHTS
+
+Under the GDPR, you have the following rights:
+
+8.1. Right of Access (Art. 15)
+You can request a copy of all personal data we hold about you.
+
+8.2. Right to Rectification (Art. 16)
+You can correct inaccurate or incomplete data through your profile settings.
+
+8.3. Right to Erasure ("Right to be Forgotten") (Art. 17)
+You can delete your account, which will remove your personal data from our systems.
+
+8.4. Right to Restrict Processing (Art. 18)
+You can request that we limit how we use your data.
+
+8.5. Right to Data Portability (Art. 20)
+You can request your data in a structured, commonly used, machine-readable format.
+
+8.6. Right to Object (Art. 21)
+You can object to processing based on legitimate interest.
+
+8.7. Right to Withdraw Consent
+Where processing is based on consent, you may withdraw it at any time without affecting the lawfulness of processing before withdrawal.
+
+To exercise any of these rights, contact us at privacy@thisjowi.uk. We will respond within 30 days.
+
+If you are unsatisfied with our response, you have the right to lodge a complaint with the Spanish Data Protection Agency (AEPD) at www.aepd.es.
+
+9. DATA SECURITY
+
+We implement appropriate technical and organizational measures to protect your data, including:
+- End-to-end encryption (X25519 + HKDF + AES-256-GCM)
+- Server-side encryption at rest (AES-256-GCM)
+- BCrypt password hashing
+- JWT token authentication with HMAC-SHA256 signing
+- TLS/HTTPS for all data in transit
+- Rate limiting on authentication endpoints
+- Account lockout after failed login attempts
+- Biometric authentication option (device-level)
+
+10. MINORS
+
+The Service is not intended for individuals under the age of 16. We do not knowingly collect personal data from minors. If you become aware that a minor has provided us with personal data, please contact us immediately.
+
+11. CHANGES TO THIS POLICY
+
+We may update this Privacy Policy from time to time. Material changes will be notified via the application or by email at least 30 days before they take effect.
+
+12. CONTACT
+
+Data Protection Officer: privacy@thisjowi.uk
+Service: THISECURE
+Last updated: June 4, 2026
+
+Supervisory Authority:
+Agencia Española de Protección de Datos (AEPD)
+C/ Jorge Juan, 6
+28001 Madrid, Spain
+www.aepd.es

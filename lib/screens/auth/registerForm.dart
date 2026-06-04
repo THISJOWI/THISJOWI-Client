@@ -5,6 +5,7 @@ import 'package:thisjowi/components/navigation.dart';
 import 'package:thisjowi/components/social_login_button.dart';
 import 'package:thisjowi/core/exceptions/auth_exceptions.dart';
 import 'package:thisjowi/i18n/translations.dart';
+import 'package:thisjowi/screens/settings/LegalDocumentsScreen.dart';
 import 'package:thisjowi/services/auth_service.dart';
 import 'package:thisjowi/services/google_auth_service.dart';
 import 'package:thisjowi/services/github_auth_service.dart';
@@ -39,6 +40,7 @@ class _RegisterFormState extends State<RegisterForm> {
   final MicrosoftAuthService _microsoftAuthService = MicrosoftAuthService();
   bool _isLoading = false;
   bool _obscurePassword = true;
+  bool _acceptedPolicies = false;
 
   @override
   void dispose() {
@@ -75,6 +77,11 @@ class _RegisterFormState extends State<RegisterForm> {
 
     if (fullName.isEmpty || email.isEmpty || password.isEmpty) {
       ErrorSnackBar.show(context, 'Please complete all fields'.i18n);
+      return;
+    }
+
+    if (!_acceptedPolicies) {
+      ErrorSnackBar.show(context, 'You must accept the terms to continue'.i18n);
       return;
     }
 
@@ -331,7 +338,75 @@ class _RegisterFormState extends State<RegisterForm> {
                                     fillColor: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.03),
                                   ),
                                 ),
-                                const SizedBox(height: 20),
+                                const SizedBox(height: 8),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      height: 24,
+                                      width: 24,
+                                      child: Checkbox(
+                                        value: _acceptedPolicies,
+                                        onChanged: (v) => setState(() => _acceptedPolicies = v ?? false),
+                                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () => setState(() => _acceptedPolicies = !_acceptedPolicies),
+                                        child: RichText(
+                                          text: TextSpan(
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: isDark ? Colors.white.withValues(alpha: 0.7) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                                              height: 1.4,
+                                            ),
+                                            children: [
+                                              TextSpan(text: 'I accept the '.i18n),
+                                              WidgetSpan(
+                                                alignment: PlaceholderAlignment.middle,
+                                                child: GestureDetector(
+                                                  onTap: () => Navigator.of(context).push(
+                                                    MaterialPageRoute(builder: (_) => const LegalDocumentsScreen()),
+                                                  ),
+                                                  child: Text(
+                                                    'Privacy Policy'.i18n,
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      color: Theme.of(context).colorScheme.primary,
+                                                      fontWeight: FontWeight.w600,
+                                                      decoration: TextDecoration.underline,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              TextSpan(text: ' and '.i18n),
+                                              WidgetSpan(
+                                                alignment: PlaceholderAlignment.middle,
+                                                child: GestureDetector(
+                                                  onTap: () => Navigator.of(context).push(
+                                                    MaterialPageRoute(builder: (_) => const LegalDocumentsScreen()),
+                                                  ),
+                                                  child: Text(
+                                                    'Terms & Conditions'.i18n,
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      color: Theme.of(context).colorScheme.primary,
+                                                      fontWeight: FontWeight.w600,
+                                                      decoration: TextDecoration.underline,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
                                 Container(
                                   width: double.infinity,
                                   height: 52,

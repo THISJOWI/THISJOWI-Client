@@ -1,12 +1,12 @@
 TÉRMINOS Y CONDICIONES DE USO DE THISECURE
 
-Última actualización: 15 de febrero de 2026
+Última actualización: 4 de junio de 2026
 
 Bienvenido a THISECURE. Estos Términos y Condiciones ("Términos") rigen el uso de nuestra aplicación móvil y servicios relacionados (el "Servicio"). Al registrarse y utilizar THISECURE, usted acepta estar legalmente vinculado por estos Términos.
 
 1. ACEPTACIÓN DE LOS TÉRMINOS
 
-1.1. Al crear una cuenta, acceder o utilizar THISECURE, usted confirma que ha leído, comprendido y acepta estar sujeto a estos Términos y a nuestra Política de Privacidad.
+1.1. Al crear una cuenta, acceder o utilizar THISECURE, usted confirma que ha leído, comprendido y acepta estar sujeto a estos Términos, a nuestra Política de Privacidad y a nuestra Política de Cookies.
 
 1.2. Si no está de acuerdo con estos Términos, no debe utilizar nuestro Servicio.
 
@@ -57,7 +57,7 @@ Bienvenido a THISECURE. Estos Términos y Condiciones ("Términos") rigen el uso
 
 5.3. No podemos acceder, leer ni descifrar sus mensajes, notas o contraseñas cifradas.
 
-5.4. Para más información sobre cómo manejamos sus datos, consulte nuestra Política de Privacidad.
+5.4. Para más información sobre cómo manejamos sus datos, consulte nuestra Política de Privacidad y Política de Cookies.
 
 6. USO ACEPTABLE
 
