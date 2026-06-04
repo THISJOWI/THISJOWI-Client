@@ -21,55 +21,29 @@ class EditNoteScreen extends StatefulWidget {
 
 class _EditNoteScreenState extends State<EditNoteScreen> {
   final _titleController = TextEditingController();
-  late final List<TextEditingController> _lineControllers = [];
-  final _focusNode = FocusNode();
+  final _contentController = TextEditingController();
+  final _contentFocusNode = FocusNode();
   bool _isLoading = false;
-  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
-
-    _scrollController = ScrollController();
-
     if (widget.note != null) {
       _titleController.text = widget.note!.title;
-      _loadContent(widget.note!.content);
-    } else {
-      _lineControllers.add(TextEditingController());
-    }
-  }
-
-  void _loadContent(String content) {
-    try {
-      _lineControllers.clear();
-      if (content.isEmpty) {
-        _lineControllers.add(TextEditingController());
-        return;
-      }
-      final lines = content.split('\n');
-      for (String line in lines) {
-        _lineControllers.add(TextEditingController(text: line));
-      }
-    } catch (e) {
-      debugPrint('Error loading content: $e');
-      _lineControllers.clear();
-      _lineControllers.add(TextEditingController());
+      _contentController.text = widget.note!.content;
     }
   }
 
   @override
   void dispose() {
     _titleController.dispose();
-    for (var controller in _lineControllers) {
-      controller.dispose();
-    }
-    _scrollController.dispose();
+    _contentController.dispose();
+    _contentFocusNode.dispose();
     super.dispose();
   }
 
   void _saveNote() async {
-    if (_titleController.text.isEmpty) {
+    if (_titleController.text.trim().isEmpty) {
       if (mounted) {
         try {
           ErrorSnackBar.showWarning(context, 'Please enter a title'.i18n);
@@ -80,7 +54,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       return;
     }
 
-    final contentText = _lineControllers.map((c) => c.text).join('\n').trim();
+    final contentText = _contentController.text.trim();
     if (contentText.isEmpty) {
       if (!mounted) return;
       try {
@@ -133,11 +107,6 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     }
   }
 
-  // Detectar el formato de la línea
-  bool _isCheckboxLine(String line) {
-    return line.startsWith('◯ ') || line.startsWith('✓ ');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,153 +150,75 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                 ? Center(
                     child: CircularProgressIndicator(
                         color: Theme.of(context).colorScheme.primary))
-                : Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                        child: TextFormField(
-                          controller: _titleController,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            height: 1.0,
-                          ),
-                          textInputAction: TextInputAction.next,
-                          onFieldSubmitted: (_) => _focusNode.requestFocus(),
-                          decoration: InputDecoration(
-                            hintText: 'Title'.i18n,
-                            hintStyle: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withValues(alpha: 0.3),
+                : Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
+                    child: Scrollbar(
+                      child: ListView(
+                        children: [
+                          TextFormField(
+                            controller: _titleController,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                               height: 1.0,
                             ),
-                            border: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            filled: false,
-                            fillColor: Colors.transparent,
-                            isDense: true,
-                            contentPadding: EdgeInsets.zero,
+                            textInputAction: TextInputAction.next,
+                            onFieldSubmitted: (_) =>
+                                _contentFocusNode.requestFocus(),
+                            decoration: InputDecoration(
+                              hintText: 'Title'.i18n,
+                              hintStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.3),
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                height: 1.0,
+                              ),
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              filled: false,
+                              fillColor: Colors.transparent,
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                            ),
                           ),
-                        ),
-                      ),
-                      // ListView - cada línea con su TextField
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                          child: ListView.builder(
-                            controller: _scrollController,
-                            padding: const EdgeInsets.only(top: 8),
-                            itemCount: _lineControllers.length,
-                            itemBuilder: (context, index) {
-                              final controller = _lineControllers[index];
-                              final lineText = controller.text;
-                              bool isCheckboxLine = _isCheckboxLine(lineText);
-                              bool isChecked = lineText.startsWith('✓ ');
-
-                              return Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Checkbox
-                                  if (isCheckboxLine)
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          if (isChecked) {
-                                            controller.text =
-                                                '◯ ${lineText.substring(2)}';
-                                          } else {
-                                            controller.text =
-                                                '✓ ${lineText.substring(2)}';
-                                          }
-                                        });
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 12.0, right: 8.0),
-                                        child: Text(
-                                          isChecked ? '✓' : '◯',
-                                          style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  else
-                                    const SizedBox(width: 0),
-                                  // TextField
-                                  Expanded(
-                                    child: TextField(
-                                      controller: controller,
-                                      maxLines: null,
-                                      keyboardType: TextInputType.multiline,
-                                      textInputAction: TextInputAction.newline,
-                                      onChanged: (value) {
-                                        setState(() {});
-                                      },
-                                      onSubmitted: (value) {
-                                        // Solo crear nueva línea vacía
-                                        if (index ==
-                                            _lineControllers.length - 1) {
-                                          setState(() {
-                                            _lineControllers
-                                                .add(TextEditingController());
-                                          });
-
-                                          Future.delayed(
-                                              const Duration(milliseconds: 100),
-                                              () {
-                                            _scrollController.animateTo(
-                                              _scrollController
-                                                  .position.maxScrollExtent,
-                                              duration: const Duration(
-                                                  milliseconds: 200),
-                                              curve: Curves.easeOut,
-                                            );
-                                          });
-                                        }
-                                      },
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        focusedBorder: InputBorder.none,
-                                        enabledBorder: InputBorder.none,
-                                        filled: false,
-                                        fillColor: Colors.transparent,
-                                        hintText: 'Start typing...'.i18n,
-                                        hintStyle: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface
-                                              .withValues(alpha: 0.3),
-                                          fontSize: 16,
-                                          height: 1.6,
-                                        ),
-                                        contentPadding: EdgeInsets.zero,
-                                      ),
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                        fontSize: 16,
-                                        height: 1.6,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
+                          const SizedBox(height: 8),
+                          TextField(
+                            controller: _contentController,
+                            focusNode: _contentFocusNode,
+                            maxLines: null,
+                            keyboardType: TextInputType.multiline,
+                            textInputAction: TextInputAction.newline,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              filled: false,
+                              fillColor: Colors.transparent,
+                              hintText: 'Start typing...'.i18n,
+                              hintStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.3),
+                                fontSize: 17,
+                              ),
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                            ),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 17,
+                              height: 1.5,
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
           ),
         ],
