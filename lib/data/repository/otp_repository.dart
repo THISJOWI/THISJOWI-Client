@@ -148,13 +148,13 @@ class OtpRepository {
           if (localServerId != null && 
               !serverIds.contains(localServerId)) {
             
-            print('Deleting local OTP ${localEntry['id']} as it was deleted on server');
+            appLog.i('Deleting local OTP ${localEntry['id']} as it was deleted on server');
             await _db.otpDao.hardDeleteOtpEntry(localEntry['id']);
           }
         }
       }
-    } catch (e) {
-      print('Server sync failed: $e');
+    } catch (e, st) {
+      appLog.e('Server sync failed', error: e, stackTrace: st);
     } finally {
       _isSyncing = false;
     }
@@ -206,22 +206,20 @@ class OtpRepository {
       
       if (result['success'] == true && result['data'] != null) {
         final serverEntry = result['data'] as model.OtpEntry;
-        
-        // Update local record with server ID and synced status
+
         await _db.otpDao.updateOtpEntry(localId, {
           'serverId': serverEntry.id,
           'syncStatus': 'synced',
           'lastSyncedAt': DateTime.now().toIso8601String(),
         });
       } else {
-        // Mark as error if sync failed
+        appLog.e('OTP sync failed: ${result['message']}');
         await _db.otpDao.updateOtpEntry(localId, {
           'syncStatus': 'error',
         });
       }
-    } catch (e) {
-      print('Background sync failed: $e');
-      // Mark as error
+    } catch (e, st) {
+      appLog.e('Background sync failed', error: e, stackTrace: st);
       await _db.otpDao.updateOtpEntry(localId, {
         'syncStatus': 'error',
       });
@@ -339,18 +337,18 @@ class OtpRepository {
       final result = await _otpApiService.updateOtpEntry(entry.serverId!, entry);
       
       if (result['success'] == true) {
-        // Update local record as synced
         await _db.otpDao.updateOtpEntry(localId, {
           'syncStatus': 'synced',
           'lastSyncedAt': DateTime.now().toIso8601String(),
         });
       } else {
+        appLog.e('OTP update sync failed: ${result['message']}');
         await _db.otpDao.updateOtpEntry(localId, {
           'syncStatus': 'error',
         });
       }
-    } catch (e) {
-      print('Background update sync failed: $e');
+    } catch (e, st) {
+      appLog.e('Background update sync failed', error: e, stackTrace: st);
       await _db.otpDao.updateOtpEntry(localId, {
         'syncStatus': 'error',
       });
@@ -390,11 +388,12 @@ class OtpRepository {
     try {
       final result = await _otpApiService.deleteOtpEntry(serverId);
       if (result['success'] == true) {
-        // If successful, hard delete locally
         await _db.otpDao.hardDeleteOtpEntry(localId);
+      } else {
+        appLog.e('OTP deletion sync failed: ${result['message']}');
       }
-    } catch (e) {
-      print('Background deletion sync failed: $e');
+    } catch (e, st) {
+      appLog.e('Background deletion sync failed', error: e, stackTrace: st);
     } finally {
       _syncingIds.remove(localId);
     }
@@ -473,22 +472,74 @@ class OtpRepository {
           await _db.otpDao.hardDeleteOtpEntry(entry.id);
         }
       }
-    } catch (e) {
-      print('Pending sync failed: $e');
+    } catch (e, st) {
+      appLog.e('Pending sync failed', error: e, stackTrace: st);
     }
   }
 
-  /// Apply a remote change received via SSE
+  /// Apply a remote change received via SSE.
+  /// Fetches the specific OTP entry from the server by ID and inserts or updates
+  /// the local record. This avoids the race condition of _syncFromServer().
   Future<void> applyRemoteChange(Map<String, dynamic> payload) async {
     final serverId = payload['id']?.toString();
     if (serverId == null || serverId.isEmpty) return;
 
     try {
-      // Events are metadata-only (id, issuer, label). Fetch full data
-      // from server to get secret, digits, period, algorithm, type, etc.
-      await _syncFromServer();
-    } catch (e) {
-      appLog.e('OtpRepository.applyRemoteChange failed', error: e);
+      // Fetch the full OTP entry from the server (metadata-only event)
+      final result = await _otpApiService.getOtpById(serverId);
+      if (result['success'] != true || result['data'] == null) {
+        appLog.w('OtpRepository.applyRemoteChange: failed to fetch OTP $serverId');
+        return;
+      }
+
+      final entry = result['data'] as model.OtpEntry;
+      if (entry.id.isEmpty) return;
+
+      final allLocal = await _db.otpDao.getAllOtpEntries(includeDeleted: true);
+      final existing = allLocal.firstWhere(
+        (e) => e['serverId'] == entry.id,
+        orElse: () => <String, dynamic>{},
+      );
+
+      if (existing.isNotEmpty) {
+        // Update existing local record
+        final updateData = <String, dynamic>{
+          'name': entry.name,
+          'issuer': entry.issuer,
+          'digits': entry.digits,
+          'period': entry.period,
+          'algorithm': entry.algorithm,
+          'type': entry.type,
+          'updatedAt': DateTime.now().toIso8601String(),
+          'syncStatus': 'synced',
+          'lastSyncedAt': DateTime.now().toIso8601String(),
+        };
+        if (entry.secret.isNotEmpty) {
+          updateData['secret'] = entry.secret;
+        }
+        await _db.otpDao.updateOtpEntry(existing['id'], updateData);
+      } else {
+        // Insert new record from server
+        final localId = _uuid.v4();
+        await _db.otpDao.insertOtpEntry({
+          'id': localId,
+          'name': entry.name,
+          'issuer': entry.issuer,
+          'secret': entry.secret,
+          'digits': entry.digits,
+          'period': entry.period,
+          'algorithm': entry.algorithm,
+          'type': entry.type,
+          'userId': await _secureStorageService.getValue('cached_email') ?? '',
+          'createdAt': entry.createdAt.toIso8601String(),
+          'updatedAt': entry.updatedAt.toIso8601String(),
+          'serverId': entry.id,
+          'syncStatus': 'synced',
+          'lastSyncedAt': DateTime.now().toIso8601String(),
+        });
+      }
+    } catch (e, st) {
+      appLog.e('OtpRepository.applyRemoteChange failed', error: e, stackTrace: st);
     }
   }
 
@@ -499,8 +550,8 @@ class OtpRepository {
       if (existing != null) {
         await _db.otpDao.hardDeleteOtpEntry(existing['id']);
       }
-    } catch (e) {
-      appLog.e('OtpRepository.deleteLocalById failed', error: e);
+    } catch (e, st) {
+      appLog.e('OtpRepository.applyRemoteChange failed', error: e, stackTrace: st);
     }
   }
 

@@ -33,6 +33,13 @@ class OtpApiService {
     }
   }
 
+  Map<String, dynamic> _normalizeServerOtp(Map<String, dynamic> json) {
+    if (json['name'] == null && json['email'] != null) {
+      json['name'] = json['email'];
+    }
+    return json;
+  }
+
   /// Fetch all OTP entries
   Future<Map<String, dynamic>> getAllOtpEntries() async {
     try {
@@ -48,10 +55,12 @@ class OtpApiService {
       if (res.statusCode == 200) {
         if (body is List) {
           final entries = body.map((json) {
-            if (json is Map<String, dynamic> && json['secret'] != null) {
-              final mutableJson = Map<String, dynamic>.from(json);
-              mutableJson['secret'] = EncryptionHelper.decrypt(json['secret'].toString());
-              return OtpEntry.fromJson(mutableJson);
+            if (json is Map<String, dynamic>) {
+              final normalized = _normalizeServerOtp(Map<String, dynamic>.from(json));
+              if (normalized['secret'] != null) {
+                normalized['secret'] = EncryptionHelper.decrypt(normalized['secret'].toString());
+              }
+              return OtpEntry.fromJson(normalized);
             }
             return OtpEntry.fromJson(json);
           }).toList();
@@ -86,6 +95,45 @@ class OtpApiService {
     }
   }
 
+  /// Fetch a single OTP entry by ID
+  Future<Map<String, dynamic>> getOtpById(String id) async {
+    try {
+      final headers = await _getHeaders();
+      final uri = Uri.parse('$baseUrl/$id');
+      final res = await http.get(
+        uri,
+        headers: headers,
+      ).timeout(const Duration(seconds: 30));
+
+      final body = _tryDecode(res.body);
+
+      if (res.statusCode == 200) {
+        if (body != null) {
+          final normalized = _normalizeServerOtp(Map<String, dynamic>.from(body));
+          if (normalized['secret'] != null) {
+            normalized['secret'] = EncryptionHelper.decrypt(normalized['secret'].toString());
+          }
+          return {'success': true, 'data': OtpEntry.fromJson(normalized), 'message': 'OTP entry retrieved'};
+        }
+        return {'success': false, 'message': 'Empty response', 'data': null};
+      } else if (res.statusCode == 404) {
+        return {'success': false, 'message': 'OTP entry not found', 'data': null};
+      } else if (res.statusCode == 401) {
+        return {'success': false, 'message': 'Invalid or expired token', 'data': null};
+      } else if (res.statusCode == 403) {
+        return {'success': false, 'message': 'Access denied', 'data': null};
+      } else if (res.statusCode == 500) {
+        return {'success': false, 'message': 'Server error', 'data': null};
+      }
+
+      return {'success': false, 'message': body?['message'] ?? 'Error: ${res.statusCode}', 'data': null};
+    } on TimeoutException {
+      return {'success': false, 'message': 'Connection timeout', 'data': null};
+    } catch (e) {
+      return {'success': false, 'message': 'Failed to fetch OTP entry: $e', 'data': null};
+    }
+  }
+
   /// Create a new OTP entry
   Future<Map<String, dynamic>> createOtpEntry(OtpEntry entry) async {
     try {
@@ -111,11 +159,15 @@ class OtpApiService {
       final body = _tryDecode(res.body);
 
       if (res.statusCode == 200 || res.statusCode == 201) {
-        if (body != null && body['secret'] != null) {
-          body['secret'] = EncryptionHelper.decrypt(body['secret'].toString());
+        if (body != null) {
+          final normalized = _normalizeServerOtp(Map<String, dynamic>.from(body));
+          if (normalized['secret'] != null) {
+            normalized['secret'] = EncryptionHelper.decrypt(normalized['secret'].toString());
+          }
+          final createdEntry = OtpEntry.fromJson(normalized);
+          return {'success': true, 'data': createdEntry};
         }
-        final createdEntry = OtpEntry.fromJson(body);
-        return {'success': true, 'data': createdEntry};
+        return {'success': false, 'message': 'Empty response'};
       } else {
         return {'success': false, 'message': body?['message'] ?? 'Error: ${res.statusCode}'};
       }
@@ -149,11 +201,15 @@ class OtpApiService {
       final body = _tryDecode(res.body);
 
       if (res.statusCode == 200) {
-        if (body != null && body['secret'] != null) {
-          body['secret'] = EncryptionHelper.decrypt(body['secret'].toString());
+        if (body != null) {
+          final normalized = _normalizeServerOtp(Map<String, dynamic>.from(body));
+          if (normalized['secret'] != null) {
+            normalized['secret'] = EncryptionHelper.decrypt(normalized['secret'].toString());
+          }
+          final updatedEntry = OtpEntry.fromJson(normalized);
+          return {'success': true, 'data': updatedEntry};
         }
-        final updatedEntry = OtpEntry.fromJson(body);
-        return {'success': true, 'data': updatedEntry};
+        return {'success': false, 'message': 'Empty response'};
       } else {
         return {'success': false, 'message': body?['message'] ?? 'Error: ${res.statusCode}'};
       }
