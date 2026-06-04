@@ -98,6 +98,9 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       final note = Note(
         title: _titleController.text.trim(),
         content: contentText,
+        id: widget.note?.id,
+        localId: widget.note?.localId,
+        serverId: widget.note?.serverId,
       );
 
       if (widget.note != null) {

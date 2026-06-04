@@ -16,6 +16,7 @@ import 'package:thisjowi/screens/otp/OtpQrScannerScreen.dart';
 import 'package:thisjowi/screens/splash/splash.dart';
 import 'package:thisjowi/screens/onboarding/onBoarding.dart';
 import 'package:thisjowi/components/privacy_overlay.dart';
+import 'package:thisjowi/services/token_manager.dart';
 import 'package:thisjowi/utils/app_logger.dart';
 
 // Workaround for macOS keyboard event bug
@@ -94,6 +95,9 @@ void main() async {
 
   await EnvLoader.load();
   await ApiConfig.init();
+
+  // Inicializar TokenManager para que cargue el token desde el inicio
+  await TokenManager().init();
 
   ApiConfig.printConfig();
 

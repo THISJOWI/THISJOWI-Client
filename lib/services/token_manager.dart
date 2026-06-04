@@ -19,6 +19,9 @@ class TokenManager {
     iOptions: IOSOptions(
       accountName: 'flutter_token',
     ),
+    mOptions: MacOsOptions(
+      accountName: 'flutter_token',
+    ),
   );
 
   // Fallback a SharedPreferences

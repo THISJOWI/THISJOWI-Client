@@ -348,17 +348,63 @@ class PasswordsRepository {
     }
   }
 
-  /// Apply a remote change received via SSE
+  /// Apply a remote change received via SSE.
+  /// Fetches the specific password from the server by ID and inserts or updates
+  /// the local record. This avoids the race condition of _syncFromServer().
   Future<void> applyRemoteChange(Map<String, dynamic> payload) async {
     final serverId = payload['id']?.toString();
     if (serverId == null || serverId.isEmpty) return;
 
     try {
-      // Events are metadata-only (id, title, website). Fetch full data
-      // from server to get username, password, notes, etc.
-      await _syncFromServer();
-    } catch (e) {
-      appLog.e('PasswordsRepository.applyRemoteChange failed', error: e);
+      // Fetch the full password from the server (metadata-only event)
+      final result = await _passwordService.getPasswordById(serverId);
+      if (result['success'] != true || result['data'] == null) {
+        appLog.w('PasswordsRepository.applyRemoteChange: failed to fetch password $serverId');
+        return;
+      }
+
+      final item = result['data'] as Map<String, dynamic>;
+      final id = item['id']?.toString();
+      if (id == null || id.isEmpty) return;
+
+      final allLocal = await _db.passwordsDao.getAllPasswords(includeDeleted: true);
+      final existing = allLocal.firstWhere(
+        (p) => p['serverId'] == id,
+        orElse: () => <String, dynamic>{},
+      );
+
+      if (existing.isNotEmpty) {
+        // Update existing local record
+        await _db.passwordsDao.updatePassword(existing['id'], {
+          'title': item['title'] ?? existing['title'] ?? '',
+          'username': item['username'] ?? existing['username'] ?? '',
+          'password': item['password'] ?? existing['password'] ?? '',
+          'website': item['website'] ?? existing['website'] ?? '',
+          'notes': item['notes'] ?? existing['notes'] ?? '',
+          'updatedAt': DateTime.now().toIso8601String(),
+          'syncStatus': 'synced',
+          'lastSyncedAt': DateTime.now().toIso8601String(),
+        });
+      } else {
+        // Insert new record from server
+        final localId = _uuid.v4();
+        await _db.passwordsDao.insertPassword({
+          'id': localId,
+          'title': item['title'] ?? '',
+          'username': item['username'] ?? '',
+          'password': item['password'] ?? '',
+          'website': item['website'] ?? '',
+          'notes': item['notes'] ?? '',
+          'userId': item['userId']?.toString() ?? '',
+          'createdAt': item['createdAt'] ?? DateTime.now().toIso8601String(),
+          'updatedAt': item['updatedAt'] ?? DateTime.now().toIso8601String(),
+          'serverId': id,
+          'syncStatus': 'synced',
+          'lastSyncedAt': DateTime.now().toIso8601String(),
+        });
+      }
+    } catch (e, st) {
+      appLog.e('PasswordsRepository.applyRemoteChange failed', error: e, stackTrace: st);
     }
   }
 

@@ -81,6 +81,54 @@ class PasswordService {
     }
   }
 
+  /// Fetch a single password by ID
+  Future<Map<String, dynamic>> getPasswordById(String id) async {
+    try {
+      final headers = await _getAuthHeaders();
+      final uri = Uri.parse('$baseUrl/$id');
+      final res = await http.get(
+        uri,
+        headers: headers,
+      ).timeout(const Duration(seconds: 30));
+
+      final body = _tryDecode(res.body);
+
+      if (res.statusCode == 200) {
+        return {
+          'success': true,
+          'data': body,
+          'message': 'Password retrieved successfully'
+        };
+      } else if (res.statusCode == 404) {
+        return {'success': false, 'message': 'Password not found', 'data': null};
+      } else if (res.statusCode == 401) {
+        return {'success': false, 'message': 'Invalid or expired token. Please log in again.', 'data': null};
+      } else if (res.statusCode == 403) {
+        return {'success': false, 'message': 'Access denied.', 'data': null};
+      } else if (res.statusCode == 500) {
+        return {'success': false, 'message': 'Server error. Please try again later.', 'data': null};
+      }
+
+      return {
+        'success': false,
+        'message': body?['message'] ?? 'Error: ${res.statusCode}',
+        'data': null
+      };
+    } on TimeoutException {
+      return {
+        'success': false,
+        'message': 'Connection timeout. Please try again.',
+        'data': null
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Failed to fetch password: $e',
+        'data': null
+      };
+    }
+  }
+
   /// Add a new password
   Future<Map<String, dynamic>> addPassword(Map<String, dynamic> passwordData) async {
     try {
