@@ -8,6 +8,22 @@ import 'package:thisjowi/i18n/translations.dart';
 
 import '../../data/repository/notes_repository.dart';
 
+final _checklistShortcut = SpaceShortcutEvent(
+  character: '[]',
+  handler: (node, controller) {
+    final offset = controller.selection.baseOffset;
+    if (offset < 3) return false;
+    controller.replaceText(offset - 3, 3, '', null);
+    controller.formatSelection(Attribute.unchecked);
+    return true;
+  },
+);
+
+final _spaceShortcuts = [
+  _checklistShortcut,
+  ...standardSpaceShorcutEvents,
+];
+
 class EditNoteScreen extends StatefulWidget {
   final NotesRepository notesRepository;
   final Note? note;
@@ -57,9 +73,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     } catch (_) {}
 
     final doc = Document();
-    final text = content.replaceAll('\n', '\n');
-    if (text.isNotEmpty) {
-      doc.insert(0, text);
+    if (content.isNotEmpty) {
+      doc.insert(0, content);
     }
     return QuillController(
       document: doc,
@@ -153,7 +168,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
           SafeArea(
             bottom: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+              padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
               child: Row(
                 children: [
                   IconButton(
@@ -188,19 +203,19 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                     child: CircularProgressIndicator(
                         color: Theme.of(context).colorScheme.primary))
                 : Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
+                    padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
                     child: Column(
                       children: [
-                        TextFormField(
+                        TextField(
                           controller: _titleController,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 28,
+                            fontSize: 32,
                             fontWeight: FontWeight.bold,
-                            height: 1.0,
+                            height: 1.1,
                           ),
                           textInputAction: TextInputAction.next,
-                          onFieldSubmitted: (_) =>
+                          onSubmitted: (_) =>
                               _quillFocusNode.requestFocus(),
                           decoration: InputDecoration(
                             hintText: 'Title'.i18n,
@@ -208,29 +223,29 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                               color: Theme.of(context)
                                   .colorScheme
                                   .onSurface
-                                  .withValues(alpha: 0.3),
-                              fontSize: 28,
+                                  .withValues(alpha: 0.2),
+                              fontSize: 32,
                               fontWeight: FontWeight.bold,
-                              height: 1.0,
                             ),
                             border: InputBorder.none,
                             focusedBorder: InputBorder.none,
                             enabledBorder: InputBorder.none,
-                            filled: false,
-                            fillColor: Colors.transparent,
                             isDense: true,
                             contentPadding: EdgeInsets.zero,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4),
                         Expanded(
                           child: QuillEditor.basic(
                             controller: _quillController,
                             focusNode: _quillFocusNode,
                             scrollController: _quillScrollController,
-                            config: const QuillEditorConfig(
+                            config: QuillEditorConfig(
                               placeholder: 'Start typing...',
                               padding: EdgeInsets.zero,
+                              spaceShortcutEvents: _spaceShortcuts,
+                              characterShortcutEvents:
+                                  standardCharactersShortcutEvents,
                             ),
                           ),
                         ),
@@ -245,21 +260,22 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   }
 
   Widget _buildToolbar() {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? const Color(0xFF2A2A2A).withValues(alpha: 0.85)
-            : Colors.white.withValues(alpha: 0.85),
+        color: Theme.of(context).scaffoldBackgroundColor,
         border: Border(
           top: BorderSide(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+            color: onSurface.withValues(alpha: 0.06),
           ),
         ),
       ),
       child: QuillSimpleToolbar(
         controller: _quillController,
-        config: const QuillSimpleToolbarConfig(
-          showSearchButton: false,
+        config: QuillSimpleToolbarConfig(
+          multiRowsDisplay: false,
+          showDividers: false,
           showFontFamily: false,
           showFontSize: false,
           showSubscript: false,
@@ -268,17 +284,34 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
           showBackgroundColorButton: false,
           showCodeBlock: false,
           showLink: false,
-          showQuote: true,
-          showListNumbers: true,
-          showListBullets: true,
-          showListCheck: true,
-          showHeaderStyle: true,
+          showSearchButton: false,
+          showQuote: false,
           showIndent: false,
           showDirection: false,
           showLineHeightButton: false,
           showAlignmentButtons: false,
           showSmallButton: false,
-          multiRowsDisplay: false,
+          showStrikeThrough: false,
+          showInlineCode: false,
+          showUndo: true,
+          showRedo: true,
+          showBoldButton: true,
+          showItalicButton: true,
+          showUnderLineButton: true,
+          showHeaderStyle: true,
+          showListNumbers: true,
+          showListBullets: true,
+          showListCheck: true,
+          toolbarSectionSpacing: 2,
+          buttonOptions: QuillSimpleToolbarButtonOptions(
+            base: QuillToolbarBaseButtonOptions(
+              iconTheme: QuillIconTheme(
+                iconButtonUnselectedData: const IconButtonData(
+                  iconSize: 18,
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
