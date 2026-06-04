@@ -11,7 +11,7 @@ import 'token_manager.dart';
 /// Contract:
 /// - getAllNotes() -> Future<Map> { success: bool, data?: List<Note>, message?: String }
 /// - createNote(note) -> Future<Map> { success: bool, data?: Note, message?: String }
-/// - updateNote(title, note) -> Future<Map> { success: bool, data?: Note, message?: String }
+/// - updateNote(id, note) -> Future<Map> { success: bool, data?: Note, message?: String }
 /// - deleteNote(id) -> Future<Map> { success: bool, message?: String }
 /// - searchNotes(title) -> Future<Map> { success: bool, data?: List<Note>, message?: String }
 class NotesService {
@@ -107,10 +107,10 @@ class NotesService {
   }
 
   /// Update a note
-  Future<Map<String, dynamic>> updateNote(String title, Note note) async {
+  Future<Map<String, dynamic>> updateNote(int id, Note note) async {
     try {
       final headers = await _getHeaders();
-      final uri = Uri.parse('$baseUrl/$title');
+      final uri = Uri.parse('$baseUrl/$id');
       final res = await http.put(
         uri,
         headers: headers,
@@ -172,6 +172,41 @@ class NotesService {
       return {'success': false, 'message': 'Connection timeout. Please try again.'};
     } catch (e) {
       return {'success': false, 'message': 'Failed to delete note: $e'};
+    }
+  }
+
+  /// Get a single note by server ID
+  Future<Map<String, dynamic>> getNoteById(int id) async {
+    try {
+      final headers = await _getHeaders();
+      final uri = Uri.parse('$baseUrl/id/$id');
+      final res = await http.get(
+        uri,
+        headers: headers,
+      ).timeout(const Duration(seconds: 30));
+
+      final body = _tryDecode(res.body);
+
+      if (res.statusCode == 200) {
+        if (body != null) {
+          return {'success': true, 'data': Note.fromJson(body)};
+        }
+        return {'success': false, 'message': 'Empty response'};
+      } else if (res.statusCode == 404) {
+        return {'success': false, 'message': 'Note not found'};
+      } else if (res.statusCode == 401) {
+        return {'success': false, 'message': 'Invalid or expired token. Please log in again.'};
+      } else if (res.statusCode == 403) {
+        return {'success': false, 'message': 'Access denied.'};
+      } else if (res.statusCode == 500) {
+        return {'success': false, 'message': 'Server error. Please try again later.'};
+      }
+
+      return {'success': false, 'message': body?['message'] ?? 'Error: ${res.statusCode}'};
+    } on TimeoutException {
+      return {'success': false, 'message': 'Connection timeout. Please try again.'};
+    } catch (e) {
+      return {'success': false, 'message': 'Failed to fetch note: $e'};
     }
   }
 

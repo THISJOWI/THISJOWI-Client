@@ -271,7 +271,7 @@ class NotesRepository {
     _syncingIds.add(localId);
 
     try {
-      final result = await _notesService.updateNote(note.title, note);
+      final result = await _notesService.updateNote(note.serverId!, note);
       
       if (result['success'] == true) {
         // Update local record as synced
@@ -341,18 +341,58 @@ class NotesRepository {
     }
   }
 
-  /// Apply a remote change received via SSE
+  /// Apply a remote change received via SSE.
+  /// Fetches the specific note from the server by ID and inserts or updates
+  /// the local record. This avoids the race condition of _syncFromServer().
   Future<void> applyRemoteChange(Map<String, dynamic> payload) async {
     final serverId = payload['id']?.toString();
     if (serverId == null || serverId.isEmpty) return;
 
     try {
-      // Events are metadata-only (id, title). Fetch full data from server
-      // to get content, timestamps, etc. _syncFromServer handles insert,
-      // update, and pending-match logic correctly.
-      await _syncFromServer();
-    } catch (e) {
-      appLog.e('NotesRepository.applyRemoteChange failed', error: e);
+      final serverIdInt = int.tryParse(serverId);
+      if (serverIdInt == null) return;
+
+      // Fetch the full note from the server (metadata-only event)
+      final result = await _notesService.getNoteById(serverIdInt);
+      if (result['success'] != true || result['data'] == null) {
+        appLog.w('NotesRepository.applyRemoteChange: failed to fetch note $serverId');
+        return;
+      }
+
+      final note = result['data'] as models.Note;
+      if (note.id == null) return;
+
+      final allLocal = await _db.notesDao.getAllNotes(includeDeleted: true);
+      final existing = allLocal.firstWhere(
+        (n) => n['serverId'] == note.id,
+        orElse: () => <String, dynamic>{},
+      );
+
+      if (existing.isNotEmpty) {
+        // Update existing local record
+        await _db.notesDao.updateNote(existing['localId'], {
+          'title': note.title,
+          'content': note.content,
+          'updatedAt': DateTime.now().toIso8601String(),
+          'syncStatus': 'synced',
+          'lastSyncedAt': DateTime.now().toIso8601String(),
+        });
+      } else {
+        // Insert new record from server
+        final localId = _uuid.v4();
+        await _db.notesDao.insertNote({
+          'localId': localId,
+          'title': note.title,
+          'content': note.content,
+          'createdAt': note.createdAt?.toIso8601String() ?? DateTime.now().toIso8601String(),
+          'updatedAt': note.updatedAt?.toIso8601String() ?? DateTime.now().toIso8601String(),
+          'serverId': note.id,
+          'syncStatus': 'synced',
+          'lastSyncedAt': DateTime.now().toIso8601String(),
+        });
+      }
+    } catch (e, st) {
+      appLog.e('NotesRepository.applyRemoteChange failed', error: e, stackTrace: st);
     }
   }
 
