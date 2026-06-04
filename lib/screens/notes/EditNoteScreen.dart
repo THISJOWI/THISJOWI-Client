@@ -31,6 +31,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   StreamSubscription? _docSub;
   bool _isProcessing = false;
   bool _isLoading = false;
+  bool _titleFormatted = false;
 
   @override
   void initState() {
@@ -105,10 +106,13 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     if (idx > 0) {
       controller.formatText(0, idx, Attribute.h1);
     }
+    _titleFormatted = true;
   }
 
   void _onDocChange(DocChange change) {
     if (_isProcessing) return;
+
+    _ensureTitleFormatted();
 
     final ops = change.change.toJson();
     if (ops.length != 1) return;
@@ -120,6 +124,16 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       _checkShortcut();
       _isProcessing = false;
     });
+  }
+
+  void _ensureTitleFormatted() {
+    if (_titleFormatted) return;
+    _titleFormatted = true;
+    final plain = _quillController.document.toPlainText();
+    final idx = plain.indexOf('\n');
+    if (idx > 0) {
+      _quillController.formatText(0, idx, Attribute.h1);
+    }
   }
 
   void _checkShortcut() {
