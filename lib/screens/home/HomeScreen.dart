@@ -884,10 +884,15 @@ SafeArea(
                         icon: Icon(Icons.edit_outlined,
                             color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 20),
                         onPressed: () async {
-                          final edited = await Navigator.push<bool>(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditPasswordScreen(
+                          final edited = await showModalBottomSheet<bool>(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => Padding(
+                              padding: EdgeInsets.only(
+                                bottom: MediaQuery.of(context).viewInsets.bottom,
+                              ),
+                              child: EditPasswordScreen(
                                 passwordsRepository: _passwordsRepository,
                                 passwordEntry: entry,
                               ),

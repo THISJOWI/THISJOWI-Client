@@ -363,10 +363,15 @@ class _PasswordScreenState extends State<PasswordScreen> {
   }
 
   Future<void> _createPassword() async {
-    final created = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditPasswordScreen(
+    final created = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: EditPasswordScreen(
           passwordsRepository: _passwordsRepository,
         ),
       ),
@@ -523,11 +528,15 @@ class _PasswordScreenState extends State<PasswordScreen> {
                                                 size: 20),
                                             onPressed: () async {
                                               final edited =
-                                                  await Navigator.push<bool>(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      EditPasswordScreen(
+                                                  await showModalBottomSheet<bool>(
+                                                context: context,
+                                                isScrollControlled: true,
+                                                backgroundColor: Colors.transparent,
+                                                builder: (context) => Padding(
+                                                  padding: EdgeInsets.only(
+                                                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                                                  ),
+                                                  child: EditPasswordScreen(
                                                     passwordsRepository:
                                                         _passwordsRepository,
                                                     passwordEntry: entry,

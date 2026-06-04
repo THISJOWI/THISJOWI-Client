@@ -32,7 +32,7 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
   final FocusNode _websiteFocusNode = FocusNode();
   bool _isSaving = false;
   bool _showPassword = false;
-  
+
   // Error states for each field
   String? _titleError;
   String? _usernameError;
@@ -137,63 +137,69 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: Text(
-          widget.passwordEntry == null ? 'Add Password'.i18n : 'Edit Password'.i18n,
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-        backgroundColor: Colors.transparent,
-        foregroundColor: Theme.of(context).colorScheme.onSurface,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: LiquidGlass.wrap(Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                  controller: _titleController,
-                  label: 'Title'.i18n,
-                  icon: Icons.title,
-                  nextFocusNode: _usernameFocusNode,
-                  errorText: _titleError,
-                  onChanged: (_) { if (_titleError != null) setState(() => _titleError = null); },
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: LiquidGlass.wrap(Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.passwordEntry == null ? 'Add Password'.i18n : 'Edit Password'.i18n,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 20,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close,
+                          color: Theme.of(context).colorScheme.onSurface),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 _buildTextField(
-                  controller: _usernameController,
-                  label: 'Username'.i18n,
-                  icon: Icons.person,
-                  focusNode: _usernameFocusNode,
-                  nextFocusNode: _passwordFocusNode,
-                  errorText: _usernameError,
-                  onChanged: (_) { if (_usernameError != null) setState(() => _usernameError = null); },
-                ),
-                const SizedBox(height: 16),
-                _buildPasswordField(),
-                const SizedBox(height: 16),
-                _buildTextField(
-                  controller: _websiteController,
-                  label: 'Website'.i18n,
-                  icon: Icons.link,
-                  focusNode: _websiteFocusNode,
-                  isLast: true,
-                  errorText: _websiteError,
-                  onChanged: (_) { if (_websiteError != null) setState(() => _websiteError = null); },
-                ),
-                const SizedBox(height: 40),
-                _buildSaveButton(),
-              ],
+                controller: _titleController,
+                label: 'Title'.i18n,
+                icon: Icons.title,
+                nextFocusNode: _usernameFocusNode,
+                errorText: _titleError,
+                onChanged: (_) { if (_titleError != null) setState(() => _titleError = null); },
               ),
-            ), context, padding: const EdgeInsets.all(16)),
-          ),
-      ),
+              const SizedBox(height: 16),
+              _buildTextField(
+                controller: _usernameController,
+                label: 'Username'.i18n,
+                icon: Icons.person,
+                focusNode: _usernameFocusNode,
+                nextFocusNode: _passwordFocusNode,
+                errorText: _usernameError,
+                onChanged: (_) { if (_usernameError != null) setState(() => _usernameError = null); },
+              ),
+              const SizedBox(height: 16),
+              _buildPasswordField(),
+              const SizedBox(height: 16),
+              _buildTextField(
+                controller: _websiteController,
+                label: 'Website'.i18n,
+                icon: Icons.link,
+                focusNode: _websiteFocusNode,
+                isLast: true,
+                errorText: _websiteError,
+                onChanged: (_) { if (_websiteError != null) setState(() => _websiteError = null); },
+              ),
+              const SizedBox(height: 40),
+              _buildSaveButton(),
+            ],
+            ),
+          ), context, padding: const EdgeInsets.all(16)),
+        ),
     );
   }
 

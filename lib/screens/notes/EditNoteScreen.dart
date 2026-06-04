@@ -265,11 +265,12 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                         child: CircularProgressIndicator(
                             color: Theme.of(context).colorScheme.primary))
                     : Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                        padding: const EdgeInsets.only(top: 24),
                         child: Column(
                           children: [
                             TextField(
                               controller: _titleController,
+                              mouseCursor: SystemMouseCursors.text,
                               style: TextStyle(
                                 color: onSurface,
                                 fontSize: 28,

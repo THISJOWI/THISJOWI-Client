@@ -199,16 +199,8 @@ class _SettingScreenState extends State<SettingScreen> {
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.transparent,
-            border: Border(
-              bottom: BorderSide(
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withValues(alpha: 0.05),
-              ),
-            ),
           ),
           child: Row(
             children: [
