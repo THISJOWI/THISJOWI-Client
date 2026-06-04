@@ -165,6 +165,16 @@ class PasswordsRepository {
     Map<String, dynamic> passwordData,
   ) async {
     try {
+      final existing = await _db.passwordsDao.getAllPasswords();
+      final title = passwordData['title'] ?? '';
+      final dup = existing.any((p) => p['title'] == title);
+      if (dup) {
+        return {
+          'success': false,
+          'message': 'A password with this title already exists'
+        };
+      }
+
       final localId = _uuid.v4();
       final now = DateTime.now();
 

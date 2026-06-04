@@ -163,6 +163,16 @@ class OtpRepository {
   /// Crear una nueva entrada OTP (FAST - saved locally)
   Future<Map<String, dynamic>> addOtpEntry(Map<String, dynamic> entryData) async {
     try {
+      final existing = await _db.otpDao.getAllOtpEntries();
+      final name = entryData['name'] ?? '';
+      final dup = existing.any((o) => o['name'] == name);
+      if (dup) {
+        return {
+          'success': false,
+          'message': 'An OTP entry with this name already exists'
+        };
+      }
+
       final id = _uuid.v4();
       final now = DateTime.now().toIso8601String();
       

@@ -345,7 +345,35 @@ class GlobalActions {
                             backgroundColor: Theme.of(context).colorScheme.primary,
                             foregroundColor: Theme.of(context).colorScheme.onPrimary,
                           ),
-                          onPressed: () => Navigator.pop(context, true),
+                          onPressed: () async {
+                            final name = nameController.text.trim();
+                            final issuer = issuerController.text.trim();
+                            final secret = secretController.text.trim();
+                            if (name.isEmpty || secret.isEmpty) {
+                              ErrorSnackBar.showWarning(context, 'Name and secret are required'.i18n);
+                              return;
+                            }
+                            final provider = context.read<OtpProvider>();
+                            final success = await provider.addOtpEntry({
+                              'name': name,
+                              'issuer': issuer,
+                              'secret': secret,
+                              'type': 'totp',
+                              'algorithm': 'SHA1',
+                              'digits': 6,
+                              'period': 30,
+                            });
+                            if (success) {
+                              onSuccess?.call();
+                              if (context.mounted) Navigator.pop(context, true);
+                            } else {
+                              if (context.mounted) {
+                                ErrorSnackBar.show(context, provider.errorMessage.isNotEmpty
+                                    ? provider.errorMessage
+                                    : 'Error adding OTP'.i18n);
+                              }
+                            }
+                          },
                           child: Text('Add'.i18n),
                         ),
                       ],

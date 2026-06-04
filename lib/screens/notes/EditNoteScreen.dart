@@ -166,10 +166,12 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       );
 
       if (widget.note != null) {
-        await widget.notesRepository
+        final r = await widget.notesRepository
             .updateNote(widget.note!.localId ?? '', note);
+        if (!r['success']) throw Exception(r['message']);
       } else {
-        await widget.notesRepository.createNote(note);
+        final r = await widget.notesRepository.createNote(note);
+        if (!r['success']) throw Exception(r['message']);
       }
 
       if (!mounted) return;
@@ -207,10 +209,12 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
         serverId: widget.note?.serverId,
       );
       if (widget.note != null) {
-        await widget.notesRepository
+        final r = await widget.notesRepository
             .updateNote(widget.note!.localId ?? '', note);
+        if (!r['success']) throw Exception(r['message']);
       } else {
-        await widget.notesRepository.createNote(note);
+        final r = await widget.notesRepository.createNote(note);
+        if (!r['success']) throw Exception(r['message']);
       }
     } catch (e) {
       debugPrint('Error saving note on back: $e');

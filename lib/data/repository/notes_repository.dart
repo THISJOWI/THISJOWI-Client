@@ -149,6 +149,16 @@ class NotesRepository {
   /// Create a new note (FAST - saved locally, synced in background)
   Future<Map<String, dynamic>> createNote(models.Note note) async {
     try {
+      final existing = await _db.notesDao.getAllNotes();
+      final dup = existing.any((n) =>
+          n['title'] == note.title && n['localId'] != note.localId);
+      if (dup) {
+        return {
+          'success': false,
+          'message': 'A note with this title already exists'
+        };
+      }
+
       final localId = _uuid.v4();
       final now = DateTime.now();
 
@@ -226,6 +236,16 @@ class NotesRepository {
   /// Update a note (FAST - saved locally, synced in background)
   Future<Map<String, dynamic>> updateNote(String localId, models.Note note) async {
     try {
+      final existing = await _db.notesDao.getAllNotes();
+      final dup = existing.any((n) =>
+          n['title'] == note.title && n['localId'] != localId);
+      if (dup) {
+        return {
+          'success': false,
+          'message': 'A note with this title already exists'
+        };
+      }
+
       final now = DateTime.now();
 
       final noteData = {
