@@ -104,7 +104,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   void _formatTitle(QuillController controller, String plain) {
     final idx = plain.indexOf('\n');
     if (idx > 0) {
-      controller.formatText(0, idx, Attribute.h1);
+      controller.formatText(idx, 1, Attribute.h1);
     }
     _titleFormatted = true;
   }
@@ -113,7 +113,12 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     if (_isProcessing) return;
 
     if (!_titleFormatted) {
-      _checkAndFormatTitle();
+      _titleFormatted = true;
+      final plain = _quillController.document.toPlainText();
+      final idx = plain.indexOf('\n');
+      if (idx > 0) {
+        _quillController.formatText(idx, 1, Attribute.h1);
+      }
       return;
     }
 
@@ -127,16 +132,6 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       _checkShortcut();
       _isProcessing = false;
     });
-  }
-
-  void _checkAndFormatTitle() {
-    if (_titleFormatted) return;
-    _titleFormatted = true;
-    final plain = _quillController.document.toPlainText();
-    final idx = plain.indexOf('\n');
-    if (idx > 0) {
-      _quillController.formatText(0, idx, Attribute.h1);
-    }
   }
 
   void _checkShortcut() {
@@ -258,11 +253,9 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-        await _saveOnBack();
-        if (mounted) Navigator.of(context).pop(true);
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        _saveOnBack();
       },
       child: Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -278,11 +271,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                     icon: Icon(Icons.arrow_back_ios,
                         color: Theme.of(context).colorScheme.onSurface,
                         size: 18),
-                    onPressed: () {
-                      _saveOnBack().then((_) {
-                        if (mounted) Navigator.pop(context, true);
-                      });
-                    },
+                    onPressed: () => Navigator.pop(context),
                   ),
                   const Spacer(),
                   GestureDetector(
@@ -315,9 +304,23 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                       controller: _quillController,
                       focusNode: _quillFocusNode,
                       scrollController: _quillScrollController,
-                      config: const QuillEditorConfig(
+                      config: QuillEditorConfig(
                         placeholder: 'Start typing...',
                         padding: EdgeInsets.zero,
+                        customStyles: DefaultStyles(
+                          h1: DefaultTextBlockStyle(
+                            TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              height: 1.2,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            const HorizontalSpacing(0, 0),
+                            const VerticalSpacing(8, 0),
+                            const VerticalSpacing(0, 0),
+                            null,
+                          ),
+                        ),
                       ),
                     ),
                   ),

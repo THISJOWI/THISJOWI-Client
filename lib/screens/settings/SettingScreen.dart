@@ -195,7 +195,7 @@ class _SettingScreenState extends State<SettingScreen> {
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final glassColor = (isDark ? const Color(0xFF2A2A2A) : Colors.white)
-        .withValues(alpha: 0.5);
+        .withValues(alpha: 0.85);
 
     return Material(
       color: Colors.transparent,
@@ -205,6 +205,14 @@ class _SettingScreenState extends State<SettingScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           decoration: BoxDecoration(
             color: glassColor,
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.05),
+              ),
+            ),
           ),
           child: Row(
             children: [
