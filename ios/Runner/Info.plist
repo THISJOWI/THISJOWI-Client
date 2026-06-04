@@ -20,6 +20,8 @@
 	<string>thisjowi</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>THISECURE uses Face ID to securely authenticate your access to the app.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>THISECURE uses the camera to scan QR codes for adding OTP authenticator entries.</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
