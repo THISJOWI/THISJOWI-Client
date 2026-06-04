@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -7,22 +8,6 @@ import 'package:thisjowi/data/models/note_entry.dart';
 import 'package:thisjowi/i18n/translations.dart';
 
 import '../../data/repository/notes_repository.dart';
-
-final _checklistShortcut = SpaceShortcutEvent(
-  character: '[]',
-  handler: (node, controller) {
-    final offset = controller.selection.baseOffset;
-    if (offset < 3) return false;
-    controller.replaceText(offset - 3, 3, '', null);
-    controller.formatSelection(Attribute.unchecked);
-    return true;
-  },
-);
-
-final _spaceShortcuts = [
-  _checklistShortcut,
-  ...standardSpaceShorcutEvents,
-];
 
 class EditNoteScreen extends StatefulWidget {
   final NotesRepository notesRepository;
@@ -43,6 +28,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   late final QuillController _quillController;
   late final FocusNode _quillFocusNode;
   late final ScrollController _quillScrollController;
+  StreamSubscription? _docSub;
+  bool _isProcessing = false;
   bool _isLoading = false;
 
   @override
@@ -57,6 +44,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     } else {
       _quillController = QuillController.basic();
     }
+
+    _docSub = _quillController.document.changes.listen(_onDocChange);
   }
 
   QuillController _buildQuillController(String content) {
@@ -82,8 +71,44 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     );
   }
 
+  void _onDocChange(DocChange change) {
+    if (_isProcessing) return;
+
+    final ops = change.change.toJson();
+    if (ops.length != 1) return;
+    final insert = ops[0]['insert'];
+    if (insert is! String || insert != ' ') return;
+
+    _checkShortcut();
+  }
+
+  void _checkShortcut() {
+    final offset = _quillController.selection.baseOffset;
+    if (offset < 2) return;
+
+    final text = _quillController.document.toPlainText();
+    final before = text.substring(0, offset);
+
+    for (final entry in _shortcuts) {
+      final pattern = entry.$1;
+      if (before.endsWith(pattern)) {
+        _applyShortcut(pattern, entry.$2);
+        return;
+      }
+    }
+  }
+
+  void _applyShortcut(String pattern, Attribute attr) {
+    _isProcessing = true;
+    final offset = _quillController.selection.baseOffset;
+    _quillController.replaceText(offset - pattern.length, pattern.length, '', null);
+    _quillController.formatSelection(attr);
+    _isProcessing = false;
+  }
+
   @override
   void dispose() {
+    _docSub?.cancel();
     _titleController.dispose();
     _quillController.dispose();
     _quillFocusNode.dispose();
@@ -240,12 +265,9 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                             controller: _quillController,
                             focusNode: _quillFocusNode,
                             scrollController: _quillScrollController,
-                            config: QuillEditorConfig(
+                            config: const QuillEditorConfig(
                               placeholder: 'Start typing...',
                               padding: EdgeInsets.zero,
-                              spaceShortcutEvents: _spaceShortcuts,
-                              characterShortcutEvents:
-                                  standardCharactersShortcutEvents,
                             ),
                           ),
                         ),
@@ -317,3 +339,12 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     );
   }
 }
+
+const _shortcuts = <(String, Attribute)>[
+  ('[] ', Attribute.unchecked),
+  ('1. ', Attribute.ol),
+  ('- ', Attribute.ul),
+  ('# ', Attribute.h1),
+  ('## ', Attribute.h2),
+  ('### ', Attribute.h3),
+];
