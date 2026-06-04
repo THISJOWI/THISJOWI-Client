@@ -222,8 +222,8 @@ class Navigation extends State<MyBottomNavigation>
               horizontalPadding: 20,
               spacing: 8,
               glassSettings: LiquidGlassSettings(
-                thickness: Theme.of(context).brightness == Brightness.dark ? 30 : 60,
-                blur: 60,
+                thickness: Theme.of(context).brightness == Brightness.dark ? 30 : 80,
+                blur: Theme.of(context).brightness == Brightness.dark ? 60 : 40,
                 refractiveIndex: 1.59,
               ),
               showIndicator: true,

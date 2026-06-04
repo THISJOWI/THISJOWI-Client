@@ -231,34 +231,6 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
           bottom: false,
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.arrow_back_ios,
-                          color: onSurface, size: 18),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: _isLoading ? null : _saveNote,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
-                        child: Text(
-                          'Done'.i18n,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               Expanded(
                 child: _isLoading
                     ? Center(
