@@ -45,50 +45,51 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     final note = widget.note;
     if (note == null) return QuillController.basic();
 
-    final delta = Delta();
-
-    if (note.content.isNotEmpty) {
-      try {
+    try {
+      if (note.content.isNotEmpty) {
         final json = jsonDecode(note.content);
-        if (json is List) {
-          final contentDelta = Delta.fromJson(json);
-          final contentPlain = _deltaPlainText(contentDelta);
-          if (note.title.isNotEmpty &&
-              !contentPlain.startsWith(note.title)) {
-            delta.insert('${note.title}\n', {'heading': 1});
+        if (json is List && json.isNotEmpty) {
+          final delta = Delta.fromJson(json);
+          final plain = _plainText(delta);
+          if (plain.trimRight().isNotEmpty) {
+            return QuillController(
+              document: Document.fromDelta(delta),
+              selection: TextSelection.collapsed(
+                  offset: plain.indexOf('\n') + 1),
+            );
           }
-          delta.concat(contentDelta);
-        } else {
-          if (note.title.isNotEmpty) {
-            delta.insert('${note.title}\n', {'heading': 1});
-          }
-          delta.insert(note.content);
         }
-      } catch (_) {
+      }
+    } catch (_) {
+      if (note.content.trim().isNotEmpty) {
+        final delta = Delta();
         if (note.title.isNotEmpty) {
-          delta.insert('${note.title}\n', {'heading': 1});
+          delta.insert('${note.title}\n');
         }
         delta.insert(note.content);
+        if (!note.content.endsWith('\n')) {
+          delta.insert('\n');
+        }
+        return QuillController(
+          document: Document.fromDelta(delta),
+          selection: const TextSelection.collapsed(offset: 0),
+        );
       }
-    } else if (note.title.isNotEmpty) {
-      delta.insert('${note.title}\n', {'heading': 1});
-      delta.insert('\n');
-    } else {
-      delta.insert('\n');
     }
 
+    final delta = Delta();
+    delta.insert('${note.title}\n');
+    delta.insert('\n');
     return QuillController(
       document: Document.fromDelta(delta),
       selection: const TextSelection.collapsed(offset: 0),
     );
   }
 
-  String _deltaPlainText(Delta delta) {
+  String _plainText(Delta delta) {
     final sb = StringBuffer();
     for (final op in delta.toJson()) {
-      if (op['insert'] is String) {
-        sb.write(op['insert'] as String);
-      }
+      if (op['insert'] is String) sb.write(op['insert'] as String);
     }
     return sb.toString();
   }
@@ -116,9 +117,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     final before = text.substring(0, offset);
 
     for (final entry in _shortcuts) {
-      final pattern = entry.$1;
-      if (before.endsWith(pattern)) {
-        _applyShortcut(pattern, entry.$2);
+      if (before.endsWith(entry.$1)) {
+        _applyShortcut(entry.$1, entry.$2);
         return;
       }
     }
@@ -141,8 +141,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   }
 
   void _saveNote() async {
-    final trimmed = _quillController.document.toPlainText().trimRight();
-    if (trimmed.isEmpty) {
+    final plain = _quillController.document.toPlainText().trimRight();
+    if (plain.isEmpty) {
       if (!mounted) return;
       try {
         ErrorSnackBar.showWarning(context, 'Please enter a note'.i18n);
@@ -152,24 +152,14 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       return;
     }
 
-    final lines = trimmed.split('\n');
-    final title = lines.first.trim();
-    final fullDelta = _quillController.document.toDelta();
-    final titleLen = title.length + 1;
-
-    Delta bodyDelta;
-    if (_deltaLength(fullDelta) > titleLen) {
-      bodyDelta = fullDelta.slice(titleLen);
-    } else {
-      bodyDelta = Delta()..insert('\n');
-    }
+    final title = plain.split('\n').first.trim();
+    final contentJson =
+        jsonEncode(_quillController.document.toDelta().toJson());
 
     if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
-      final contentJson = jsonEncode(bodyDelta.toJson());
-
       final note = Note(
         title: title,
         content: contentJson,
@@ -186,7 +176,6 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       }
 
       if (!mounted) return;
-
       try {
         Navigator.pop(context, true);
       } catch (e) {
@@ -202,20 +191,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
         }
       }
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  int _deltaLength(Delta delta) {
-    var len = 0;
-    for (final op in delta.toJson()) {
-      if (op['insert'] is String) {
-        len += (op['insert'] as String).length;
-      }
-    }
-    return len;
   }
 
   @override
