@@ -52,11 +52,13 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
           final delta = Delta.fromJson(json);
           final plain = _plainText(delta);
           if (plain.trimRight().isNotEmpty) {
-            return QuillController(
+            final controller = QuillController(
               document: Document.fromDelta(delta),
               selection: TextSelection.collapsed(
                   offset: plain.indexOf('\n') + 1),
             );
+            _formatTitle(controller, plain);
+            return controller;
           }
         }
       }
@@ -70,20 +72,24 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
         if (!note.content.endsWith('\n')) {
           delta.insert('\n');
         }
-        return QuillController(
+        final controller = QuillController(
           document: Document.fromDelta(delta),
           selection: const TextSelection.collapsed(offset: 0),
         );
+        _formatTitle(controller, _plainText(delta));
+        return controller;
       }
     }
 
     final delta = Delta();
     delta.insert('${note.title}\n');
     delta.insert('\n');
-    return QuillController(
+    final controller = QuillController(
       document: Document.fromDelta(delta),
       selection: const TextSelection.collapsed(offset: 0),
     );
+    _formatTitle(controller, '${note.title}\n');
+    return controller;
   }
 
   String _plainText(Delta delta) {
@@ -92,6 +98,13 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       if (op['insert'] is String) sb.write(op['insert'] as String);
     }
     return sb.toString();
+  }
+
+  void _formatTitle(QuillController controller, String plain) {
+    final idx = plain.indexOf('\n');
+    if (idx > 0) {
+      controller.formatText(0, idx, Attribute.h1);
+    }
   }
 
   void _onDocChange(DocChange change) {
