@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/data/models/note_entry.dart';
 import 'package:thisjowi/i18n/translations.dart';
@@ -21,24 +24,55 @@ class EditNoteScreen extends StatefulWidget {
 
 class _EditNoteScreenState extends State<EditNoteScreen> {
   final _titleController = TextEditingController();
-  final _contentController = TextEditingController();
-  final _contentFocusNode = FocusNode();
+  late final QuillController _quillController;
+  late final FocusNode _quillFocusNode;
+  late final ScrollController _quillScrollController;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    _quillFocusNode = FocusNode();
+    _quillScrollController = ScrollController();
+
     if (widget.note != null) {
       _titleController.text = widget.note!.title;
-      _contentController.text = widget.note!.content;
+      _quillController = _buildQuillController(widget.note!.content);
+    } else {
+      _quillController = QuillController.basic();
     }
+  }
+
+  QuillController _buildQuillController(String content) {
+    if (content.isEmpty) return QuillController.basic();
+
+    try {
+      final json = jsonDecode(content);
+      if (json is List) {
+        return QuillController(
+          document: Document.fromJson(json),
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+      }
+    } catch (_) {}
+
+    final doc = Document();
+    final text = content.replaceAll('\n', '\n');
+    if (text.isNotEmpty) {
+      doc.insert(0, text);
+    }
+    return QuillController(
+      document: doc,
+      selection: const TextSelection.collapsed(offset: 0),
+    );
   }
 
   @override
   void dispose() {
     _titleController.dispose();
-    _contentController.dispose();
-    _contentFocusNode.dispose();
+    _quillController.dispose();
+    _quillFocusNode.dispose();
+    _quillScrollController.dispose();
     super.dispose();
   }
 
@@ -54,7 +88,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       return;
     }
 
-    final contentText = _contentController.text.trim();
+    final contentText = _quillController.document.toPlainText().trim();
     if (contentText.isEmpty) {
       if (!mounted) return;
       try {
@@ -69,9 +103,12 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     setState(() => _isLoading = true);
 
     try {
+      final contentJson =
+          jsonEncode(_quillController.document.toDelta().toJson());
+
       final note = Note(
         title: _titleController.text.trim(),
-        content: contentText,
+        content: contentJson,
         id: widget.note?.id,
         localId: widget.note?.localId,
         serverId: widget.note?.serverId,
@@ -152,76 +189,97 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                         color: Theme.of(context).colorScheme.primary))
                 : Padding(
                     padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
-                    child: Scrollbar(
-                      child: ListView(
-                        children: [
-                          TextFormField(
-                            controller: _titleController,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _titleController,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            height: 1.0,
+                          ),
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (_) =>
+                              _quillFocusNode.requestFocus(),
+                          decoration: InputDecoration(
+                            hintText: 'Title'.i18n,
+                            hintStyle: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.3),
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                               height: 1.0,
                             ),
-                            textInputAction: TextInputAction.next,
-                            onFieldSubmitted: (_) =>
-                                _contentFocusNode.requestFocus(),
-                            decoration: InputDecoration(
-                              hintText: 'Title'.i18n,
-                              hintStyle: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withValues(alpha: 0.3),
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                height: 1.0,
-                              ),
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              filled: false,
-                              fillColor: Colors.transparent,
-                              isDense: true,
-                              contentPadding: EdgeInsets.zero,
+                            border: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            filled: false,
+                            fillColor: Colors.transparent,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Expanded(
+                          child: QuillEditor.basic(
+                            controller: _quillController,
+                            focusNode: _quillFocusNode,
+                            scrollController: _quillScrollController,
+                            config: const QuillEditorConfig(
+                              placeholder: 'Start typing...',
+                              padding: EdgeInsets.zero,
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          TextField(
-                            controller: _contentController,
-                            focusNode: _contentFocusNode,
-                            maxLines: null,
-                            keyboardType: TextInputType.multiline,
-                            textInputAction: TextInputAction.newline,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              filled: false,
-                              fillColor: Colors.transparent,
-                              hintText: 'Start typing...'.i18n,
-                              hintStyle: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withValues(alpha: 0.3),
-                                fontSize: 17,
-                              ),
-                              contentPadding: EdgeInsets.zero,
-                              isDense: true,
-                            ),
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 17,
-                              height: 1.5,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
           ),
+          _buildToolbar(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildToolbar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF2A2A2A).withValues(alpha: 0.85)
+            : Colors.white.withValues(alpha: 0.85),
+        border: Border(
+          top: BorderSide(
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+          ),
+        ),
+      ),
+      child: QuillSimpleToolbar(
+        controller: _quillController,
+        config: const QuillSimpleToolbarConfig(
+          showSearchButton: false,
+          showFontFamily: false,
+          showFontSize: false,
+          showSubscript: false,
+          showSuperscript: false,
+          showColorButton: false,
+          showBackgroundColorButton: false,
+          showCodeBlock: false,
+          showLink: false,
+          showQuote: true,
+          showListNumbers: true,
+          showListBullets: true,
+          showListCheck: true,
+          showHeaderStyle: true,
+          showIndent: false,
+          showDirection: false,
+          showLineHeightButton: false,
+          showAlignmentButtons: false,
+          showSmallButton: false,
+          multiRowsDisplay: false,
+        ),
       ),
     );
   }

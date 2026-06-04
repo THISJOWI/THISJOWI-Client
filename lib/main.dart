@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:i18n_extension/i18n_extension.dart' show Translations, I18n;
 import 'package:provider/provider.dart';
 import 'package:thisjowi/core/app_theme.dart';
@@ -156,10 +157,12 @@ class _AppCore extends StatelessWidget {
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
+          FlutterQuillLocalizations.delegate,
         ],
-        supportedLocales: const [
-          Locale('en'),
-          Locale('es'),
+        supportedLocales: [
+          const Locale('en'),
+          const Locale('es'),
+          ...FlutterQuillLocalizations.supportedLocales,
         ],
         builder: (context, child) => PrivacyOverlay(child: child!),
         themeMode: themeProvider.flutterThemeMode,
