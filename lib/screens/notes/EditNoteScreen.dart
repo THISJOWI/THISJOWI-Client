@@ -208,9 +208,43 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     }
   }
 
+  Future<void> _saveOnBack() async {
+    final plain = _quillController.document.toPlainText().trimRight();
+    if (plain.isEmpty) return;
+
+    final title = plain.split('\n').first.trim();
+    final contentJson =
+        jsonEncode(_quillController.document.toDelta().toJson());
+
+    try {
+      final note = Note(
+        title: title,
+        content: contentJson,
+        id: widget.note?.id,
+        localId: widget.note?.localId,
+        serverId: widget.note?.serverId,
+      );
+      if (widget.note != null) {
+        await widget.notesRepository
+            .updateNote(widget.note!.localId ?? '', note);
+      } else {
+        await widget.notesRepository.createNote(note);
+      }
+    } catch (e) {
+      debugPrint('Error saving note on back: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        await _saveOnBack();
+        if (mounted) Navigator.of(context).pop(true);
+      },
+      child: Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
@@ -224,7 +258,11 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                     icon: Icon(Icons.arrow_back_ios,
                         color: Theme.of(context).colorScheme.onSurface,
                         size: 18),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      _saveOnBack().then((_) {
+                        if (mounted) Navigator.pop(context, true);
+                      });
+                    },
                   ),
                   const Spacer(),
                   GestureDetector(
@@ -267,6 +305,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
           _buildToolbar(),
         ],
       ),
+    ),
     );
   }
 

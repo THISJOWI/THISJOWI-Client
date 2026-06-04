@@ -10,6 +10,8 @@ import 'package:thisjowi/data/repository/notes_repository.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:provider/provider.dart';
 
+import '../../components/animations/animated_widgets.dart';
+
 import 'EditNoteScreen.dart';
 
 class NotesScreen extends StatefulWidget {
@@ -209,6 +211,43 @@ class _NotesScreenState extends State<NotesScreen> {
     }
   }
 
+  Widget _buildSkeletons() {
+    final color = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08);
+    return ListView.builder(
+      itemCount: 8,
+      padding: const EdgeInsets.only(top: 8),
+      itemBuilder: (context, index) {
+        return ShimmerAnimation(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 150 + (index * 20) % 100,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: 200 + (index * 30) % 80,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   String _getPreviewText(String content) {
     try {
       if (content.isEmpty) return 'No Content'.i18n;
@@ -308,9 +347,7 @@ class _NotesScreenState extends State<NotesScreen> {
               ),
                 if (_isLoading)
                   SliverFillRemaining(
-                    child: Center(
-                        child:
-                            CircularProgressIndicator(color: Theme.of(context).colorScheme.onSurface)),
+                    child: _buildSkeletons(),
                   )
                 else if (_notes.isEmpty)
                   SliverFillRemaining(
