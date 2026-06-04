@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/quill_delta.dart' show Delta;
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/data/models/note_entry.dart';
 import 'package:thisjowi/i18n/translations.dart';
@@ -24,49 +25,51 @@ class EditNoteScreen extends StatefulWidget {
 }
 
 class _EditNoteScreenState extends State<EditNoteScreen> {
-  final _titleController = TextEditingController();
   late final QuillController _quillController;
   late final FocusNode _quillFocusNode;
   late final ScrollController _quillScrollController;
   StreamSubscription? _docSub;
   bool _isProcessing = false;
   bool _isLoading = false;
+  bool _hasTitle = false;
 
   @override
   void initState() {
     super.initState();
     _quillFocusNode = FocusNode();
     _quillScrollController = ScrollController();
-
-    if (widget.note != null) {
-      _titleController.text = widget.note!.title;
-      _quillController = _buildQuillController(widget.note!.content);
-    } else {
-      _quillController = QuillController.basic();
-    }
-
+    _quillController = _buildQuillController();
     _docSub = _quillController.document.changes.listen(_onDocChange);
   }
 
-  QuillController _buildQuillController(String content) {
-    if (content.isEmpty) return QuillController.basic();
+  QuillController _buildQuillController() {
+    final note = widget.note;
+    if (note == null) return QuillController.basic();
 
-    try {
-      final json = jsonDecode(content);
-      if (json is List) {
-        return QuillController(
-          document: Document.fromJson(json),
-          selection: const TextSelection.collapsed(offset: 0),
-        );
-      }
-    } catch (_) {}
-
-    final doc = Document();
-    if (content.isNotEmpty) {
-      doc.insert(0, content);
+    final delta = Delta();
+    if (note.title.isNotEmpty) {
+      delta.insert('${note.title}\n', {'heading': 1});
+      _hasTitle = true;
     }
+
+    if (note.content.isNotEmpty) {
+      try {
+        final json = jsonDecode(note.content);
+        if (json is List) {
+          final contentDelta = Delta.fromJson(json);
+          delta.concat(contentDelta);
+        } else {
+          throw FormatException('not a list');
+        }
+      } catch (_) {
+        delta.insert(note.content);
+      }
+    } else if (note.title.isEmpty) {
+      delta.insert('\n');
+    }
+
     return QuillController(
-      document: doc,
+      document: Document.fromDelta(delta),
       selection: const TextSelection.collapsed(offset: 0),
     );
   }
@@ -101,7 +104,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   void _applyShortcut(String pattern, Attribute attr) {
     _isProcessing = true;
     final offset = _quillController.selection.baseOffset;
-    _quillController.replaceText(offset - pattern.length, pattern.length, '', null);
+    _quillController.replaceText(
+        offset - pattern.length, pattern.length, '', null);
     _quillController.formatSelection(attr);
     _isProcessing = false;
   }
@@ -109,7 +113,6 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   @override
   void dispose() {
     _docSub?.cancel();
-    _titleController.dispose();
     _quillController.dispose();
     _quillFocusNode.dispose();
     _quillScrollController.dispose();
@@ -117,27 +120,19 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   }
 
   void _saveNote() async {
-    if (_titleController.text.trim().isEmpty) {
-      if (mounted) {
-        try {
-          ErrorSnackBar.showWarning(context, 'Please enter a title'.i18n);
-        } catch (e) {
-          debugPrint('Error showing snackbar: $e');
-        }
-      }
-      return;
-    }
-
-    final contentText = _quillController.document.toPlainText().trim();
-    if (contentText.isEmpty) {
+    final plainText = _quillController.document.toPlainText().trim();
+    if (plainText.isEmpty) {
       if (!mounted) return;
       try {
-        ErrorSnackBar.showWarning(context, 'Please enter the content'.i18n);
+        ErrorSnackBar.showWarning(context, 'Please enter a note'.i18n);
       } catch (e) {
         debugPrint('Error showing snackbar: $e');
       }
       return;
     }
+
+    final lines = plainText.split('\n');
+    final title = lines.first.trim();
 
     if (!mounted) return;
     setState(() => _isLoading = true);
@@ -147,7 +142,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
           jsonEncode(_quillController.document.toDelta().toJson());
 
       final note = Note(
-        title: _titleController.text.trim(),
+        title: title,
         content: contentJson,
         id: widget.note?.id,
         localId: widget.note?.localId,
@@ -228,50 +223,15 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                     child: CircularProgressIndicator(
                         color: Theme.of(context).colorScheme.primary))
                 : Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-                    child: Column(
-                      children: [
-                        TextField(
-                          controller: _titleController,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            height: 1.1,
-                          ),
-                          textInputAction: TextInputAction.next,
-                          onSubmitted: (_) =>
-                              _quillFocusNode.requestFocus(),
-                          decoration: InputDecoration(
-                            hintText: 'Title'.i18n,
-                            hintStyle: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withValues(alpha: 0.2),
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            border: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            isDense: true,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Expanded(
-                          child: QuillEditor.basic(
-                            controller: _quillController,
-                            focusNode: _quillFocusNode,
-                            scrollController: _quillScrollController,
-                            config: const QuillEditorConfig(
-                              placeholder: 'Start typing...',
-                              padding: EdgeInsets.zero,
-                            ),
-                          ),
-                        ),
-                      ],
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                    child: QuillEditor.basic(
+                      controller: _quillController,
+                      focusNode: _quillFocusNode,
+                      scrollController: _quillScrollController,
+                      config: const QuillEditorConfig(
+                        placeholder: 'Start typing...',
+                        padding: EdgeInsets.zero,
+                      ),
                     ),
                   ),
           ),
