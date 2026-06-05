@@ -184,9 +184,9 @@ class OtpRepository {
         'syncStatus': 'pending',
       };
       
-      await _db.otpDao.insertOtpEntry(entry);
-      
       final createdEntry = model.OtpEntry.fromJson(entry);
+
+      await _db.otpDao.insertOtpEntry(entry);
 
       // Sync with backend in BACKGROUND (non-blocking)
       if (_connectivityService.isOnline) {

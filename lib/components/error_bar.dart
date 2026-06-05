@@ -34,8 +34,6 @@ class ErrorSnackBar extends StatelessWidget {
     String message, {
     Duration duration = const Duration(seconds: 3),
   }) {
-    // Notifications disabled by user request
-    /*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: SuccessSnackBar(message: message),
@@ -46,7 +44,6 @@ class ErrorSnackBar extends StatelessWidget {
         margin: const EdgeInsets.all(16),
       ),
     );
-    */
   }
 
   static void showInfo(

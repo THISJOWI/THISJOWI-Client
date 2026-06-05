@@ -75,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen>
     }
 
     // Check if biometric lock should be shown
-    // Show if: app has been opened more than once AND user has session AND biometrics are available
+    // Show if: user has session AND biometrics are available AND biometric lock is enabled
     final shouldShowBiometric =
         await _shouldShowBiometricAuth(prefs, appOpenCount);
 
@@ -89,11 +89,6 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<bool> _shouldShowBiometricAuth(
       SharedPreferences prefs, int appOpenCount) async {
-    // Only show if app has been opened more than once
-    if (appOpenCount <= 1) {
-      return false;
-    }
-
     // Check if user has a valid session (token)
     final token = await _authService.getToken();
     if (token == null || token.isEmpty) {

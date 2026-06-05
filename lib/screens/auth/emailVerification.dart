@@ -72,6 +72,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           'email': widget.email,
           'code': code,
           'password': widget.password,
+          if (widget.fullName != null && widget.fullName!.isNotEmpty) 'fullName': widget.fullName,
         }),
       );
 

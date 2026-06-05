@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:thisjowi/components/account_type_selector.dart';
 import 'package:thisjowi/screens/auth/registerForm.dart';
 
 class RegisterFlowScreen extends StatefulWidget {
@@ -17,25 +16,10 @@ class RegisterFlowScreen extends StatefulWidget {
 }
 
 class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
-  int _step = 0;
-  String? _accountType;
-
-  void _selectAccountType(String type) {
-    setState(() {
-      _accountType = type;
-      _step = 1;
-    });
-  }
+  final String _accountType = 'Community';
 
   void _goBack() {
-    if (_step > 0) {
-      setState(() {
-        _step--;
-        if (_step == 0) _accountType = null;
-      });
-    } else {
-      Navigator.of(context).pushReplacementNamed('/login');
-    }
+    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   void _handleSuccess(Map<String, dynamic> result) {
@@ -50,15 +34,11 @@ class _RegisterFlowScreenState extends State<RegisterFlowScreen> {
     return Scaffold(
       backgroundColor: isDark ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
-        child: _step == 0
-            ? AccountTypeSelector(
-                onAccountTypeSelected: _selectAccountType,
-              )
-            : RegisterForm(
-                accountType: _accountType ?? 'Community',
-                onSuccess: _handleSuccess,
-                onBack: _goBack,
-              ),
+        child: RegisterForm(
+          accountType: _accountType,
+          onSuccess: _handleSuccess,
+          onBack: _goBack,
+        ),
       ),
     );
   }

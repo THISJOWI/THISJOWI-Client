@@ -301,12 +301,13 @@ class GlobalActions {
                   ),
                   const SizedBox(height: 24),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Theme.of(context).colorScheme.onSurface,
-                          side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
+                          side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), width: 3),
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         icon: const Icon(Icons.qr_code_scanner, size: 20),
