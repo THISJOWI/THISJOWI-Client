@@ -257,6 +257,48 @@ class PasswordService {
     }
   }
 
+  /// Import passwords in batch
+  Future<Map<String, dynamic>> importPasswords(List<Map<String, dynamic>> passwords) async {
+    try {
+      if (passwords.isEmpty) {
+        return {'success': false, 'message': 'No passwords to import'};
+      }
+
+      final headers = await _getAuthHeaders();
+      final uri = Uri.parse('$baseUrl/import');
+      final res = await http.post(
+        uri,
+        headers: headers,
+        body: jsonEncode(passwords),
+      ).timeout(const Duration(seconds: 60));
+
+      final body = _tryDecode(res.body);
+
+      if (res.statusCode == 200) {
+        return {
+          'success': true,
+          'data': body,
+          'message': 'Passwords imported successfully'
+        };
+      } else if (res.statusCode == 401) {
+        return {'success': false, 'message': 'Invalid or expired token. Please log in again.'};
+      } else if (res.statusCode == 400) {
+        return {'success': false, 'message': body?['error'] ?? 'Invalid data'};
+      } else if (res.statusCode == 500) {
+        return {'success': false, 'message': 'Server error. Please try again later.'};
+      }
+
+      return {
+        'success': false,
+        'message': body?['error'] ?? 'Error: ${res.statusCode}'
+      };
+    } on TimeoutException {
+      return {'success': false, 'message': 'Connection timeout. Please try again.'};
+    } catch (e) {
+      return {'success': false, 'message': 'Failed to import passwords: $e'};
+    }
+  }
+
   /// Sync passwords with iOS AutoFill extension
   /// This is called automatically after add/update/delete operations
   Future<void> _syncPasswordsWithAutofill() async {

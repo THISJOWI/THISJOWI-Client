@@ -242,6 +242,70 @@ extension Localization on String {
         "en": "Error saving password",
         "es": "Error al guardar contraseña",
       } +
+      {
+        "en": "Generate Password",
+        "es": "Generar contraseña",
+      } +
+      {
+        "en": "Password Length",
+        "es": "Longitud",
+      } +
+      {
+        "en": "Uppercase",
+        "es": "Mayúsculas",
+      } +
+      {
+        "en": "Lowercase",
+        "es": "Minúsculas",
+      } +
+      {
+        "en": "Numbers",
+        "es": "Números",
+      } +
+      {
+        "en": "Symbols",
+        "es": "Símbolos",
+      } +
+      {
+        "en": "Regenerate",
+        "es": "Regenerar",
+      } +
+      {
+        "en": "Use Password",
+        "es": "Usar contraseña",
+      } +
+      {
+        "en": "Weak",
+        "es": "Débil",
+      } +
+      {
+        "en": "Fair",
+        "es": "Regular",
+      } +
+      {
+        "en": "Strong",
+        "es": "Fuerte",
+      } +
+      {
+        "en": "Very Strong",
+        "es": "Muy fuerte",
+      } +
+      {
+        "en": "Excellent",
+        "es": "Excelente",
+      } +
+      {
+        "en": "Password generated and copied",
+        "es": "Contraseña generada y copiada",
+      } +
+      {
+        "en": "No characters selected",
+        "es": "Sin caracteres seleccionados",
+      } +
+      {
+        "en": "Empty",
+        "es": "Vacía",
+      } +
 
       // ==================== MESSAGES ====================
       {
@@ -2064,6 +2128,146 @@ extension Localization on String {
 {
   "en": "Add Password",
   "es": "Agregar contraseña",
+} +
+{
+  "en": "Import Passwords",
+  "es": "Importar contraseñas",
+} +
+{
+  "en": "Export Passwords",
+  "es": "Exportar contraseñas",
+} +
+{
+  "en": "Import from file",
+  "es": "Importar desde archivo",
+} +
+{
+  "en": "Export to file",
+  "es": "Exportar a archivo",
+} +
+{
+  "en": "CSV",
+  "es": "CSV",
+} +
+{
+  "en": "JSON",
+  "es": "JSON",
+} +
+{
+  "en": "Compatible with Bitwarden, LastPass, etc.",
+  "es": "Compatible con Bitwarden, LastPass, etc.",
+} +
+{
+  "en": "Full data format",
+  "es": "Formato de datos completo",
+} +
+{
+  "en": "Select a CSV or JSON file",
+  "es": "Selecciona un archivo CSV o JSON",
+} +
+{
+  "en": "Choose file",
+  "es": "Elegir archivo",
+} +
+{
+  "en": "Change file",
+  "es": "Cambiar archivo",
+} +
+{
+  "en": "No passwords found in file",
+  "es": "No se encontraron contraseñas en el archivo",
+} +
+{
+  "en": "Found %s passwords",
+  "es": "Se encontraron %s contraseñas",
+} +
+{
+  "en": "...and %s more",
+  "es": "...y %s más",
+} +
+{
+  "en": "Import",
+  "es": "Importar",
+} +
+{
+  "en": "Import completed",
+  "es": "Importación completada",
+} +
+{
+  "en": "Import Results",
+  "es": "Resultados de importación",
+} +
+{
+  "en": "Imported",
+  "es": "Importadas",
+} +
+{
+  "en": "Skipped (duplicates)",
+  "es": "Omitidas (duplicados)",
+} +
+{
+  "en": "Errors",
+  "es": "Errores",
+} +
+{
+  "en": "Try again",
+  "es": "Intentar de nuevo",
+} +
+{
+  "en": "Export failed",
+  "es": "Error al exportar",
+} +
+{
+  "en": "Import failed",
+  "es": "Error al importar",
+} +
+{
+  "en": "passwords will be exported",
+  "es": "contraseñas se exportarán",
+} +
+{
+  "en": "No passwords to export",
+  "es": "No hay contraseñas para exportar",
+} +
+{
+  "en": "Failed to load passwords",
+  "es": "Error al cargar contraseñas",
+} +
+{
+  "en": "Export",
+  "es": "Exportar",
+} +
+{
+  "en": "Import Notes",
+  "es": "Importar notas",
+} +
+{
+  "en": "Export Notes",
+  "es": "Exportar notas",
+} +
+{
+  "en": "Title and content",
+  "es": "Título y contenido",
+} +
+{
+  "en": "No notes to export",
+  "es": "No hay notas para exportar",
+} +
+{
+  "en": "No notes found in file",
+  "es": "No se encontraron notas en el archivo",
+} +
+{
+  "en": "Found %s notes",
+  "es": "Se encontraron %s notas",
+} +
+{
+  "en": "notes will be exported",
+  "es": "notas se exportarán",
+} +
+{
+  "en": "Failed to load notes",
+  "es": "Error al cargar notas",
 };
 
 

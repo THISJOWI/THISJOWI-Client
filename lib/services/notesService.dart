@@ -210,6 +210,48 @@ class NotesService {
     }
   }
 
+  /// Import notes in batch
+  Future<Map<String, dynamic>> importNotes(List<Map<String, dynamic>> notes) async {
+    try {
+      if (notes.isEmpty) {
+        return {'success': false, 'message': 'No notes to import'};
+      }
+
+      final headers = await _getHeaders();
+      final uri = Uri.parse('$baseUrl/import');
+      final res = await http.post(
+        uri,
+        headers: headers,
+        body: jsonEncode(notes),
+      ).timeout(const Duration(seconds: 60));
+
+      final body = _tryDecode(res.body);
+
+      if (res.statusCode == 200) {
+        return {
+          'success': true,
+          'data': body,
+          'message': 'Notes imported successfully'
+        };
+      } else if (res.statusCode == 401) {
+        return {'success': false, 'message': 'Invalid or expired token. Please log in again.'};
+      } else if (res.statusCode == 400) {
+        return {'success': false, 'message': body?['error'] ?? 'Invalid data'};
+      } else if (res.statusCode == 500) {
+        return {'success': false, 'message': 'Server error. Please try again later.'};
+      }
+
+      return {
+        'success': false,
+        'message': body?['error'] ?? 'Error: ${res.statusCode}'
+      };
+    } on TimeoutException {
+      return {'success': false, 'message': 'Connection timeout. Please try again.'};
+    } catch (e) {
+      return {'success': false, 'message': 'Failed to import notes: $e'};
+    }
+  }
+
   /// Search notes by title
   Future<Map<String, dynamic>> searchNotes(String title) async {
     try {
