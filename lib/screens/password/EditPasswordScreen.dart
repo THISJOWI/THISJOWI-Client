@@ -5,6 +5,7 @@ import 'package:thisjowi/data/models/password_entry.dart';
 import '../../data/repository/passwordsRepository.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/components/liquid_glass.dart';
+import 'package:thisjowi/components/password_generator_dialog.dart';
 import 'package:thisjowi/i18n/translations.dart';
 
 class EditPasswordScreen extends StatefulWidget {
@@ -317,6 +318,18 @@ class _EditPasswordScreenState extends State<EditPasswordScreen> {
               suffixIcon: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              IconButton(
+                icon: Icon(Icons.auto_awesome,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 20),
+                onPressed: () async {
+                  final password = await PasswordGeneratorDialog.show(context);
+                  if (password != null && mounted) {
+                    _passwordController.text = password;
+                  }
+                },
+                constraints: const BoxConstraints(),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+              ),
               IconButton(
                 icon: Icon(
                   _showPassword ? Icons.visibility : Icons.visibility_off,

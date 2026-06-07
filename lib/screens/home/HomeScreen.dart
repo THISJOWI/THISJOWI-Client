@@ -668,9 +668,8 @@ SafeArea(
                       child: Container(
                         decoration: BoxDecoration(
                           color: (Theme.of(context).brightness == Brightness.dark
-                              ? Color.lerp(Theme.of(context).scaffoldBackgroundColor, Colors.white, 0.12)!
-                              : Color.lerp(Theme.of(context).scaffoldBackgroundColor, Colors.black, 0.06)!)
-                              .withValues(alpha: 0.85),
+                              ? const Color(0xFF2A2A2A)
+                              : const Color(0xFFF5F5F5)),
                           borderRadius: BorderRadius.circular(25),
                         ),
                         child: TextField(
@@ -776,6 +775,8 @@ SafeArea(
                   GlobalActions.createNote(context, onSuccess: _loadData),
               onCreateOtp: () => GlobalActions.createOtp(context),
               onCreateMessage: () => GlobalActions.createMessage(context),
+              onCreateGeneratePassword: () =>
+                  GlobalActions.quickGeneratePassword(context),
             ),
           ),
         ],

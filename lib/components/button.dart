@@ -7,6 +7,7 @@ class ExpandableActionButton extends StatefulWidget {
   final VoidCallback onCreateNote;
   final VoidCallback? onCreateOtp;
   final VoidCallback? onCreateMessage;
+  final VoidCallback? onCreateGeneratePassword;
 
   const ExpandableActionButton({
     super.key,
@@ -14,6 +15,7 @@ class ExpandableActionButton extends StatefulWidget {
     required this.onCreateNote,
     this.onCreateOtp,
     this.onCreateMessage,
+    this.onCreateGeneratePassword,
   });
 
   @override
@@ -83,6 +85,16 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
     _animationController?.reverse();
     Future.delayed(const Duration(milliseconds: 150), () {
       if (mounted && widget.onCreateOtp != null) widget.onCreateOtp!();
+    });
+  }
+
+  void _handleGeneratePassword() {
+    setState(() => _isExpanded = false);
+    _animationController?.reverse();
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted && widget.onCreateGeneratePassword != null) {
+        widget.onCreateGeneratePassword!();
+      }
     });
   }
 
@@ -163,6 +175,14 @@ class _ExpandableActionButtonState extends State<ExpandableActionButton>
             onTap: _handleCreateOtp,
             icon: Icons.security_rounded,
             label: 'OTP'.i18n,
+            bottomPadding: 240.0,
+          ),
+        // Option: Generate Password
+        if (_isExpanded && widget.onCreateGeneratePassword != null)
+          _buildOptionButton(
+            onTap: _handleGeneratePassword,
+            icon: Icons.auto_awesome,
+            label: 'Generate Password'.i18n,
             bottomPadding: 185.0,
           ),
         // Option: Create Password

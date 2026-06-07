@@ -9,6 +9,7 @@ import 'package:thisjowi/data/repository/passwordsRepository.dart';
 import 'package:thisjowi/components/button.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/components/liquid_glass.dart';
+import 'package:thisjowi/components/password_generator_dialog.dart';
 import 'package:thisjowi/core/providers/sync_provider.dart';
 import 'package:thisjowi/i18n/translations.dart';
 import 'package:provider/provider.dart';
@@ -381,6 +382,10 @@ class _PasswordScreenState extends State<PasswordScreen> {
     }
   }
 
+  Future<void> _quickGeneratePassword() async {
+    await PasswordGeneratorDialog.show(context);
+  }
+
   Future<void> _createNote() async {
     final sl = ServiceLocator();
     final notesRepository = sl.notesRepository;
@@ -580,6 +585,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
           child: ExpandableActionButton(
             onCreatePassword: _createPassword,
             onCreateNote: _createNote,
+            onCreateGeneratePassword: _quickGeneratePassword,
           ),
         ),
       ],

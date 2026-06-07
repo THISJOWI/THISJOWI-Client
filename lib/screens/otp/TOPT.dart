@@ -246,7 +246,7 @@ Widget build(BuildContext context) {
                             filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: (Theme.of(context).brightness == Brightness.light ? Colors.white : const Color(0xFF2A2A2A)).withValues(alpha: 0.85),
+                                color: (Theme.of(context).brightness == Brightness.light ? const Color(0xFFF5F5F5) : const Color(0xFF2A2A2A)),
                                 borderRadius: BorderRadius.circular(25),
                               ),
                               child: TextField(

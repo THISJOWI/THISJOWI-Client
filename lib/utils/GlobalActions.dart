@@ -5,6 +5,7 @@ import 'package:thisjowi/core/providers/otp_provider.dart';
 import 'package:thisjowi/core/service_locator.dart';
 import 'package:thisjowi/components/error_bar.dart';
 import 'package:thisjowi/components/liquid_glass.dart';
+import 'package:thisjowi/components/password_generator_dialog.dart';
 import 'package:thisjowi/services/otpService.dart';
 import 'package:thisjowi/screens/notes/EditNoteScreen.dart';
 import 'package:thisjowi/screens/otp/OtpQrScannerScreen.dart';
@@ -30,7 +31,33 @@ class GlobalActions {
       bool isPassword = false,
       bool obscure = false,
       VoidCallback? onToggleObscure,
+      VoidCallback? onGenerate,
     }) {
+      final suffixWidgets = <Widget>[];
+      if (isPassword) {
+        suffixWidgets.add(
+          IconButton(
+            icon: Icon(
+              obscure ? Icons.visibility_off : Icons.visibility,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              size: 20,
+            ),
+            onPressed: onToggleObscure,
+          ),
+        );
+      }
+      if (onGenerate != null) {
+        suffixWidgets.add(
+          IconButton(
+            icon: Icon(
+              Icons.auto_awesome,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              size: 20,
+            ),
+            onPressed: onGenerate,
+          ),
+        );
+      }
       return TextField(
         controller: controller,
         obscureText: obscure,
@@ -40,16 +67,12 @@ class GlobalActions {
           prefixIcon: icon != null
               ? Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), size: 20)
               : null,
-          suffixIcon: isPassword
-              ? IconButton(
-                  icon: Icon(
-                    obscure ? Icons.visibility_off : Icons.visibility,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                    size: 20,
-                  ),
-                  onPressed: onToggleObscure,
-                )
-              : null,
+          suffixIcon: suffixWidgets.isEmpty
+              ? null
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: suffixWidgets,
+                ),
           labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -109,6 +132,14 @@ class GlobalActions {
                               isPassword: true,
                               obscure: obscurePassword,
                               onToggleObscure: () => setDialogState(() => obscurePassword = !obscurePassword),
+                              onGenerate: () async {
+                                final generated =
+                                    await PasswordGeneratorDialog.show(context);
+                                if (generated != null && generated.isNotEmpty) {
+                                  passwordController.text = generated;
+                                  setDialogState(() => obscurePassword = false);
+                                }
+                              },
                             ),
                             const SizedBox(height: 16),
                             buildField(
@@ -194,6 +225,10 @@ class GlobalActions {
         }
       }
     }
+  }
+
+  static Future<void> quickGeneratePassword(BuildContext context) async {
+    await PasswordGeneratorDialog.show(context);
   }
 
   static Future<void> createNote(BuildContext context,
