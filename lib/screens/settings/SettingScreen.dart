@@ -19,6 +19,13 @@ import 'package:thisjowi/data/models/auth_user.dart';
 import 'package:thisjowi/data/models/profile_user.dart';
 import 'package:thisjowi/screens/settings/LegalDocumentsScreen.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:thisjowi/core/service_locator.dart';
+import 'package:thisjowi/data/models/password_entry.dart';
+import 'package:thisjowi/data/models/note_entry.dart' as note_models;
+import 'package:thisjowi/components/export_passwords_sheet.dart';
+import 'package:thisjowi/components/import_passwords_dialog.dart';
+import 'package:thisjowi/components/export_notes_sheet.dart';
+import 'package:thisjowi/components/import_notes_dialog.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -579,6 +586,62 @@ class _SettingScreenState extends State<SettingScreen> {
       if (!mounted) return;
       ErrorSnackBar.show(context, '${'Error deleting account'.i18n}: $e');
     }
+  }
+
+  Future<void> _handleExportPasswords() async {
+    final result = await ServiceLocator().passwordsRepository.getAllPasswords();
+    if (!mounted) return;
+
+    if (result['success'] == true && result['data'] != null) {
+      final passwords = result['data'] as List<PasswordEntry>;
+      if (passwords.isEmpty) {
+        ErrorSnackBar.show(context, 'No passwords to export'.i18n);
+        return;
+      }
+
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (_) => ExportPasswordsSheet(passwords: passwords),
+      );
+    } else {
+      ErrorSnackBar.show(context, result['message'] as String? ?? 'Failed to load passwords'.i18n);
+    }
+  }
+
+  void _handleImportPasswords() {
+    showDialog(
+      context: context,
+      builder: (_) => const ImportPasswordsDialog(),
+    );
+  }
+
+  Future<void> _handleExportNotes() async {
+    final result = await ServiceLocator().notesRepository.getAllNotes();
+    if (!mounted) return;
+
+    if (result['success'] == true && result['data'] != null) {
+      final notes = result['data'] as List<note_models.Note>;
+      if (notes.isEmpty) {
+        ErrorSnackBar.show(context, 'No notes to export'.i18n);
+        return;
+      }
+
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (_) => ExportNotesSheet(notes: notes),
+      );
+    } else {
+      ErrorSnackBar.show(context, result['message'] as String? ?? 'Failed to load notes'.i18n);
+    }
+  }
+
+  void _handleImportNotes() {
+    showDialog(
+      context: context,
+      builder: (_) => const ImportNotesDialog(),
+    );
   }
 
   void _handleLogout() {
@@ -1159,20 +1222,11 @@ class _SettingScreenState extends State<SettingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final glassColor = (isDark ? const Color(0xFF2A2A2A) : Colors.white)
-        .withValues(alpha: 0.85);
-
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            color: glassColor,
-            child: Column(
-              children: [
-                  // Header
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Column(
+        children: [
+          // Header
                   Padding(
                     padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 16, 20, 12),
                   child: Row(
@@ -1367,6 +1421,38 @@ class _SettingScreenState extends State<SettingScreen> {
                         },
                       ),
 
+                      // Import Passwords
+                      _buildSettingItem(
+                        icon: Icons.file_download_outlined,
+                        title: 'Import Passwords'.i18n,
+                        subtitle: 'Import from file'.i18n,
+                        onTap: _handleImportPasswords,
+                      ),
+
+                      // Export Passwords
+                      _buildSettingItem(
+                        icon: Icons.file_upload_outlined,
+                        title: 'Export Passwords'.i18n,
+                        subtitle: 'Export to file'.i18n,
+                        onTap: _handleExportPasswords,
+                      ),
+
+                      // Import Notes
+                      _buildSettingItem(
+                        icon: Icons.note_add_outlined,
+                        title: 'Import Notes'.i18n,
+                        subtitle: 'Import from file'.i18n,
+                        onTap: _handleImportNotes,
+                      ),
+
+                      // Export Notes
+                      _buildSettingItem(
+                        icon: Icons.note_alt_outlined,
+                        title: 'Export Notes'.i18n,
+                        subtitle: 'Export to file'.i18n,
+                        onTap: _handleExportNotes,
+                      ),
+
                       // Logout
                       _buildSettingItem(
                         icon: Icons.logout,
@@ -1389,9 +1475,6 @@ class _SettingScreenState extends State<SettingScreen> {
                 ),
               ],
             ),
-          ),
-        ),
-      ),
     );
   }
 }
