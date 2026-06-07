@@ -2268,7 +2268,16 @@ extension Localization on String {
 {
   "en": "Failed to load notes",
   "es": "Error al cargar notas",
+} +
+{
+  "en": "Readable text format",
+  "es": "Formato de texto legible",
+} +
+{
+  "en": "Select a CSV, JSON, or Markdown file",
+  "es": "Selecciona un archivo CSV, JSON o Markdown",
 };
+
 
 
 

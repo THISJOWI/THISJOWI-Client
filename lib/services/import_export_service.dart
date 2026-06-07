@@ -184,11 +184,90 @@ class ImportExportService {
     for (final n in notes) {
       buffer.writeln([
         _csvEncodeField(n.title),
-        _csvEncodeField(n.content),
+        _csvEncodeField(deltaToPlain(n.content)),
       ].join(','));
     }
 
     return buffer.toString();
+  }
+
+  String generateNotesMarkdown(List<Note> notes) {
+    final buffer = StringBuffer();
+
+    for (int i = 0; i < notes.length; i++) {
+      final n = notes[i];
+      buffer.writeln('# ${n.title}');
+      buffer.writeln();
+      buffer.writeln(deltaToPlain(n.content));
+      if (i < notes.length - 1) {
+        buffer.writeln();
+        buffer.writeln('---');
+        buffer.writeln();
+      }
+    }
+
+    return buffer.toString();
+  }
+
+  ImportExportResult parseMarkdown(String mdContent) {
+    final blocks = mdContent.split(RegExp(r'\n---\s*\n'));
+    final items = <Map<String, dynamic>>[];
+
+    for (final block in blocks) {
+      final trimmed = block.trim();
+      if (trimmed.isEmpty) continue;
+
+      final lines = trimmed.split('\n');
+      String title = '';
+      int contentStart = 0;
+
+      // Find first heading as title
+      for (int i = 0; i < lines.length; i++) {
+        final line = lines[i].trim();
+        if (line.startsWith('# ')) {
+          title = line.substring(2).trim();
+          contentStart = i + 1;
+          break;
+        } else if (line.startsWith('## ')) {
+          title = line.substring(3).trim();
+          contentStart = i + 1;
+          break;
+        }
+      }
+
+      // If no heading found, use first non-empty line as title
+      if (title.isEmpty) {
+        for (int i = 0; i < lines.length; i++) {
+          final line = lines[i].trim();
+          if (line.isNotEmpty) {
+            title = line;
+            contentStart = i + 1;
+            break;
+          }
+        }
+      }
+
+      // Content is everything after the title
+      final contentLines = lines.sublist(contentStart);
+      final content = contentLines
+          .map((l) => l)
+          .join('\n')
+          .trim();
+
+      if (title.isNotEmpty || content.isNotEmpty) {
+        items.add({
+          'title': title,
+          'content': content,
+        });
+      }
+    }
+
+    return ImportExportResult(
+      items: items,
+      format: 'md',
+      totalCount: items.length,
+      dataType: 'note',
+    );
   }
 
   String generateNotesJson(List<Note> notes) {
@@ -220,6 +299,56 @@ class ImportExportService {
     return buffer.toString();
   }
 
+  String generatePasswordsMarkdown(List<PasswordEntry> passwords) {
+    final buffer = StringBuffer();
+    buffer.writeln('# Passwords Export');
+    buffer.writeln();
+    buffer.writeln('| # | Title | Website | Username | Password | Notes |');
+    buffer.writeln('|---|-------|---------|----------|----------|-------|');
+
+    for (int i = 0; i < passwords.length; i++) {
+      final p = passwords[i];
+      buffer.writeln(
+        '| ${i + 1} | '
+        '${_mdEscapeCell(p.title)} | '
+        '${_mdEscapeCell(p.website)} | '
+        '${_mdEscapeCell(p.username)} | '
+        '${_mdEscapeCell(p.password)} | '
+        '${_mdEscapeCell(p.notes)} |',
+      );
+    }
+
+    buffer.writeln();
+    buffer.writeln('---');
+    buffer.writeln();
+    buffer.writeln('## Details');
+    buffer.writeln();
+
+    for (final p in passwords) {
+      buffer.writeln('### ${p.title}');
+      buffer.writeln();
+      if (p.website.isNotEmpty) {
+        buffer.writeln('- **Website:** ${p.website}');
+      }
+      if (p.username.isNotEmpty) {
+        buffer.writeln('- **Username:** ${p.username}');
+      }
+      if (p.password.isNotEmpty) {
+        buffer.writeln('- **Password:** `${p.password}`');
+      }
+      if (p.notes.isNotEmpty) {
+        buffer.writeln('- **Notes:** ${p.notes}');
+      }
+      buffer.writeln();
+    }
+
+    return buffer.toString();
+  }
+
+  String _mdEscapeCell(String text) {
+    return text.replaceAll('|', '\\|').replaceAll('\n', ' ');
+  }
+
   String generateJson(List<PasswordEntry> passwords) {
     final data = {
       'version': 1,
@@ -235,10 +364,40 @@ class ImportExportService {
     return const JsonEncoder.withIndent('  ').convert(data);
   }
 
+  /// Convert Quill Delta JSON string to plain text
+  String deltaToPlain(String deltaJson) {
+    try {
+      final json = jsonDecode(deltaJson);
+      if (json is List) {
+        final sb = StringBuffer();
+        for (final op in json) {
+          if (op is Map && op['insert'] is String) {
+            sb.write(op['insert'] as String);
+          }
+        }
+        return sb.toString().trimRight();
+      }
+    } catch (_) {}
+    // Fallback: assume it's already plain text
+    return deltaJson;
+  }
+
+  /// Convert plain text to Quill Delta JSON string
+  String plainToDelta(String plainText) {
+    final text = plainText.replaceAll('\r\n', '\n');
+    final delta = <Map<String, dynamic>>[];
+    if (text.isEmpty) {
+      delta.add({'insert': '\n'});
+    } else {
+      delta.add({'insert': text.endsWith('\n') ? text : '$text\n'});
+    }
+    return jsonEncode(delta);
+  }
+
   Future<PlatformFile?> pickFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['csv', 'json'],
+      allowedExtensions: ['csv', 'json', 'md'],
       allowMultiple: false,
     );
 

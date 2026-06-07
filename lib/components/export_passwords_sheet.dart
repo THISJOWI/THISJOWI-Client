@@ -22,6 +22,10 @@ class ExportPasswordsSheet extends StatelessWidget {
         content = service.generateCsv(passwords);
         filename = 'passwords_export.csv';
         mimeType = 'text/csv';
+      } else if (format == 'md') {
+        content = service.generatePasswordsMarkdown(passwords);
+        filename = 'passwords_export.md';
+        mimeType = 'text/markdown';
       } else {
         content = service.generateJson(passwords);
         filename = 'passwords_export.json';
@@ -104,6 +108,32 @@ class ExportPasswordsSheet extends StatelessWidget {
                   ),
                 ),
                 onTap: () => _export(context, 'csv'),
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.description_outlined,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
+                ),
+                title: Text(
+                  'Markdown',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                subtitle: Text(
+                  'Readable text format'.i18n,
+                  style: TextStyle(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.5),
+                    fontSize: 12,
+                  ),
+                ),
+                onTap: () => _export(context, 'md'),
               ),
               ListTile(
                 leading: Icon(

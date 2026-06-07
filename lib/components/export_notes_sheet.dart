@@ -22,6 +22,10 @@ class ExportNotesSheet extends StatelessWidget {
         content = service.generateNotesCsv(notes);
         filename = 'notes_export.csv';
         mimeType = 'text/csv';
+      } else if (format == 'md') {
+        content = service.generateNotesMarkdown(notes);
+        filename = 'notes_export.md';
+        mimeType = 'text/markdown';
       } else {
         content = service.generateNotesJson(notes);
         filename = 'notes_export.json';
@@ -104,6 +108,32 @@ class ExportNotesSheet extends StatelessWidget {
                   ),
                 ),
                 onTap: () => _export(context, 'csv'),
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.description_outlined,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
+                ),
+                title: Text(
+                  'Markdown',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                subtitle: Text(
+                  'Readable text format'.i18n,
+                  style: TextStyle(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.5),
+                    fontSize: 12,
+                  ),
+                ),
+                onTap: () => _export(context, 'md'),
               ),
               ListTile(
                 leading: Icon(

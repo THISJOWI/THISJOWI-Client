@@ -38,6 +38,8 @@ class _ImportNotesDialogState extends State<ImportNotesDialog> {
       ImportExportResult result;
       if (file.extension == 'csv' || file.name.endsWith('.csv')) {
         result = _importService.parseCsv(content);
+      } else if (file.extension == 'md' || file.name.endsWith('.md')) {
+        result = _importService.parseMarkdown(content);
       } else {
         result = _importService.parseJson(content);
       }
@@ -68,7 +70,15 @@ class _ImportNotesDialogState extends State<ImportNotesDialog> {
     setState(() => _importing = true);
 
     try {
-      final result = await _notesService.importNotes(_result!.items);
+      // Convert plain text content to Quill Delta JSON for the backend
+      final notesToImport = _result!.items.map((item) {
+        return {
+          'title': item['title'] ?? '',
+          'content': _importService.plainToDelta(item['content'] ?? ''),
+        };
+      }).toList();
+
+      final result = await _notesService.importNotes(notesToImport);
 
       if (!mounted) return;
 
@@ -378,7 +388,7 @@ class _ImportNotesDialogState extends State<ImportNotesDialog> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Select a CSV or JSON file'.i18n,
+                        'Select a CSV, JSON, or Markdown file'.i18n,
                         style: TextStyle(
                           color: Theme.of(context)
                               .colorScheme
