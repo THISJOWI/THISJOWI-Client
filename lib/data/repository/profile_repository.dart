@@ -62,28 +62,13 @@ class ProfileRepository {
   }
 
   /// Apply a remote change received via SSE
+  /// Always fetches the full profile from the server to ensure complete data.
   Future<void> applyRemoteChange(Map<String, dynamic> payload) async {
     final userId = payload['userId']?.toString();
     if (userId == null || userId.isEmpty) return;
 
     try {
-      final existing = await _db.profileDao.getProfile(userId);
-      if (existing != null) {
-        await _db.profileDao.upsertProfile({
-          'userId': userId,
-          'fullName': payload['fullName'] ?? existing['fullName'],
-          'country': payload['country'] ?? existing['country'],
-          'avatarUrl': payload['avatarUrl'] ?? existing['avatarUrl'],
-          'birthDate': payload['birthDate'] ?? existing['birthDate'],
-          'publicKey': payload['publicKey'] ?? existing['publicKey'],
-          'preferences': payload['preferences']?.toString() ?? existing['preferences'],
-          'accountType': payload['accountType'] ?? existing['accountType'],
-          'hostingMode': payload['hostingMode'] ?? existing['hostingMode'],
-          'updatedAt': DateTime.now().toIso8601String(),
-        });
-      } else {
-        await syncFromServer(userId);
-      }
+      await syncFromServer(userId);
     } catch (e) {
       appLog.e('ProfileRepository.applyRemoteChange failed', error: e);
     }

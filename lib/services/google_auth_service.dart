@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
@@ -49,35 +48,22 @@ class GoogleAuthService extends BaseService {
   Stream<AuthUser?> get onAuthComplete => _authStreamController.stream;
 
   Future<AuthUser> login() async {
-    logInfo('Iniciando login Google OAuth2 (backend flow)');
+    logInfo('Iniciando login Google OAuth2');
 
     try {
-      final loginUrl = Uri.parse('${ApiConfig.baseUrl}/v1/auth/login/google');
-      final loginRes = await http.get(loginUrl).timeout(const Duration(seconds: 10));
-
-      String authUrlString;
-      if (loginRes.statusCode == 200) {
-        final body = jsonDecode(loginRes.body) as Map<String, dynamic>;
-        authUrlString = body['authorizationUri'] as String? ?? '';
-        if (authUrlString.isNotEmpty && !authUrlString.startsWith('http')) {
-          authUrlString = '${ApiConfig.baseUrl}$authUrlString';
-        }
-      } else {
-        authUrlString = '${ApiConfig.baseUrl}/oauth2/authorization/google';
-      }
-
-      final authUrl = Uri.parse(authUrlString);
+      final authUrl = Uri.parse('${ApiConfig.baseUrl}/v1/auth/login/google');
       final callback = await OAuth2BrowserService.authenticate(authUrl: authUrl);
 
       final token = callback.queryParameters['token'];
       final userId = callback.queryParameters['userId'];
       final email = callback.queryParameters['email'];
       final name = callback.queryParameters['name'];
-      final picture = callback.queryParameters['picture'];
+      final picture = callback.queryParameters['picture'] ?? callback.queryParameters['avatarUrl'];
 
       if (token == null || token.isEmpty) {
+        final error = callback.queryParameters['error'];
         throw AuthException(
-          message: 'No se recibio el token de autenticacion',
+          message: error != null ? 'Error de Google: $error' : 'No se recibio el token de autenticacion',
           code: 'NO_TOKEN',
         );
       }

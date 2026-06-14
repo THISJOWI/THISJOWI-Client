@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
@@ -49,35 +48,31 @@ class MicrosoftAuthService extends BaseService {
   Stream<AuthUser?> get onAuthComplete => _authStreamController.stream;
 
   Future<AuthUser> login() async {
-    logInfo('Iniciando login Microsoft OAuth2 (backend flow)');
+    logInfo('Iniciando login Microsoft OAuth2');
 
     try {
-      final authUrlString = await _getAuthorizationUrl();
-      final authUrl = Uri.parse(authUrlString);
+      final authUrl = Uri.parse('${ApiConfig.baseUrl}/v1/auth/login/microsoft');
       final callback = await OAuth2BrowserService.authenticate(authUrl: authUrl);
 
       logInfo('Callback recibido: ${callback.toString()}');
       logInfo('Query params: ${callback.queryParameters}');
 
-      // Check for errors from backend
-      final error = callback.queryParameters['error'];
-      final errorDescription = callback.queryParameters['error_description'];
-      if (error != null && error.isNotEmpty) {
-        throw AuthException(
-          message: 'Error de Microsoft: ${errorDescription ?? error}',
-          code: 'MICROSOFT_OAUTH_ERROR',
-          details: error,
-        );
-      }
-
-      // Extract token and user info from callback (same pattern as Google)
       final token = callback.queryParameters['token'];
       final userId = callback.queryParameters['userId'];
       final email = callback.queryParameters['email'];
       final name = callback.queryParameters['name'];
-      final picture = callback.queryParameters['picture'];
+      final picture = callback.queryParameters['picture'] ?? callback.queryParameters['avatarUrl'];
 
       if (token == null || token.isEmpty) {
+        final error = callback.queryParameters['error'];
+        final errorDescription = callback.queryParameters['error_description'];
+        if (error != null && error.isNotEmpty) {
+          throw AuthException(
+            message: 'Error de Microsoft: ${errorDescription ?? error}',
+            code: 'MICROSOFT_OAUTH_ERROR',
+            details: error,
+          );
+        }
         throw AuthException(
           message: 'No se recibio el token de autenticacion',
           code: 'NO_TOKEN',
@@ -116,25 +111,6 @@ class MicrosoftAuthService extends BaseService {
         details: e,
       );
     }
-  }
-
-  Future<String> _getAuthorizationUrl() async {
-    final loginUrl = Uri.parse('${ApiConfig.baseUrl}/v1/auth/login/microsoft');
-    final loginRes = await http.get(loginUrl).timeout(const Duration(seconds: 10));
-
-    if (loginRes.statusCode == 200) {
-      final body = jsonDecode(loginRes.body) as Map<String, dynamic>;
-      final uri = body['authorizationUri'] as String? ?? '';
-      if (uri.isNotEmpty) {
-        if (uri.startsWith('http')) {
-          return uri;
-        }
-        return '${ApiConfig.baseUrl}$uri';
-      }
-    }
-
-    // Fallback to Spring Security OAuth2 endpoint if client_id not configured
-    return '${ApiConfig.baseUrl}/oauth2/authorization/microsoft';
   }
 
   void dispose() {

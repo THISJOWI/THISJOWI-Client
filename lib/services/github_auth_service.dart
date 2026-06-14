@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
@@ -45,71 +43,36 @@ class GithubAuthService extends BaseService {
   final CryptoService _cryptoService = CryptoService();
   final SecureStorageService _secureStorage = SecureStorageService();
 
-  static const String _clientId = 'Ov23lilKdhbjWe8OZhYe';
-  static const String _scope = 'user:email';
-  static const String _redirectUri =
-      'https://api.thisjowi.com/v1/auth/github/callback';
-
   Future<AuthUser> login() async {
     logInfo('Iniciando login GitHub OAuth2');
 
     try {
-      final authUrl = Uri.parse(
-        'https://github.com/login/oauth/authorize'
-        '?client_id=$_clientId'
-        '&redirect_uri=$_redirectUri'
-        '&scope=$_scope',
-      );
-
+      final authUrl = Uri.parse('${ApiConfig.baseUrl}/v1/auth/login/github');
       final callback = await OAuth2BrowserService.authenticate(authUrl: authUrl);
 
-      final code = callback.queryParameters['code'];
+      final token = callback.queryParameters['token'];
+      final userId = callback.queryParameters['userId'];
+      final email = callback.queryParameters['email'];
+      final name = callback.queryParameters['name'];
+      final avatarUrl = callback.queryParameters['avatarUrl'] ?? callback.queryParameters['picture'];
 
-      if (code == null || code.isEmpty) {
+      if (token == null || token.isEmpty) {
+        final error = callback.queryParameters['error'];
         throw AuthException(
-          message: 'No se recibio codigo de autorizacion de GitHub',
-          code: 'NO_AUTH_CODE',
+          message: error != null ? 'Error de GitHub: $error' : 'No se recibio el token de autenticacion',
+          code: 'NO_TOKEN',
         );
       }
 
-      logInfo('Authorization code obtenido');
+      logInfo('Callback OAuth2 recibido: userId=$userId, email=$email');
 
-      return _sendToBackend(code: code);
-    } on AuthException {
-      rethrow;
-    } catch (e, stackTrace) {
-      logError('Error en login GitHub', e, stackTrace);
-      throw AuthException(
-        message: 'Error al iniciar sesion con GitHub',
-        code: 'GITHUB_LOGIN_ERROR',
-        details: e,
-      );
-    }
-  }
-
-  Future<AuthUser> _sendToBackend({required String code}) async {
-    logInfo('Enviando codigo GitHub al backend');
-
-    try {
-      final uri = Uri.parse('${ApiConfig.authUrl}/github');
-      final res = await http
-          .post(
-            uri,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({'code': code}),
-          )
-          .timeout(const Duration(seconds: 30));
-
-      if (res.statusCode != 200 && res.statusCode != 201) {
-        final msg = _parseError(res.body);
-        throw AuthException(
-          message: msg,
-          code: 'BACKEND_ERROR',
-        );
-      }
-
-      final body = jsonDecode(res.body) as Map<String, dynamic>;
-      final authUser = AuthUser.fromJson(body);
+      final authUser = AuthUser.fromJson({
+        'token': token,
+        'userId': userId ?? '',
+        'email': email ?? '',
+        'name': name ?? '',
+        'avatarUrl': avatarUrl ?? '',
+      });
 
       await _tokenManager.setToken(
         authUser.token,
@@ -125,28 +88,13 @@ class GithubAuthService extends BaseService {
       return authUser;
     } on AuthException {
       rethrow;
-    } on SocketException catch (e) {
-      logWarning('Network error: $e');
-      throw NetworkException(
-        message: 'Error de conexion',
-        details: e,
-      );
     } catch (e, stackTrace) {
-      logError('Error enviando codigo a backend', e, stackTrace);
+      logError('Error en login GitHub', e, stackTrace);
       throw AuthException(
-        message: 'Error al autenticar con servidor',
-        code: 'BACKEND_ERROR',
+        message: 'Error al iniciar sesion con GitHub',
+        code: 'GITHUB_LOGIN_ERROR',
         details: e,
       );
-    }
-  }
-
-  String _parseError(String body) {
-    try {
-      final json = jsonDecode(body) as Map<String, dynamic>;
-      return json['message'] ?? json['error'] ?? 'Error del servidor';
-    } catch (_) {
-      return 'Error del servidor';
     }
   }
 

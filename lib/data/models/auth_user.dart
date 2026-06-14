@@ -13,6 +13,7 @@ class AuthUser {
   final bool isSamlUser;
   final String? samlNameId;
   final DateTime? lastValidated;
+  final String? avatarUrl;
   final String accountType;
   final String hostingMode;
   final String? serverUrl;
@@ -30,6 +31,7 @@ class AuthUser {
     this.isSamlUser = false,
     this.samlNameId,
     this.lastValidated,
+    this.avatarUrl,
     this.accountType = 'Community',
     this.hostingMode = 'Cloud',
     this.serverUrl,
@@ -72,6 +74,7 @@ class AuthUser {
           false,
       samlNameId: json['samlNameId'] ?? json['saml_name_id'],
       lastValidated: lastValidated,
+      avatarUrl: json['avatarUrl'] ?? json['picture'] ?? json['avatar_url'],
       accountType: json['accountType']?.toString() ??
           json['account_type']?.toString() ??
           'Community',
@@ -99,6 +102,7 @@ class AuthUser {
       'accountType': accountType,
       'hostingMode': hostingMode,
       'serverUrl': serverUrl,
+      'avatarUrl': avatarUrl,
     };
   }
 
@@ -112,10 +116,11 @@ class AuthUser {
     String? orgId,
     String? ldapUsername,
     String? ldapDomain,
-bool? isLdapUser,
+    bool? isLdapUser,
     bool? isSamlUser,
     String? samlNameId,
     DateTime? lastValidated,
+    String? avatarUrl,
     String? accountType,
     String? hostingMode,
     String? serverUrl,
@@ -133,6 +138,7 @@ bool? isLdapUser,
       isSamlUser: isSamlUser ?? this.isSamlUser,
       samlNameId: samlNameId ?? this.samlNameId,
       lastValidated: lastValidated ?? this.lastValidated,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
       accountType: accountType ?? this.accountType,
       hostingMode: hostingMode ?? this.hostingMode,
       serverUrl: serverUrl ?? this.serverUrl,

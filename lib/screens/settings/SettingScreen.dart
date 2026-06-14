@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:thisjowi/core/api.dart';
 import 'package:thisjowi/core/exceptions/account_exceptions.dart';
 import 'package:thisjowi/core/exceptions/profile_exceptions.dart';
 import 'package:thisjowi/services/auth_service.dart';
@@ -1165,7 +1166,9 @@ class _SettingScreenState extends State<SettingScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              ListTile(
+              Material(
+                type: MaterialType.transparency,
+                child: ListTile(
                 leading: Icon(
                   Icons.photo_library,
                   color: Theme.of(context)
@@ -1183,8 +1186,11 @@ class _SettingScreenState extends State<SettingScreen> {
                   _pickAndUploadAvatar();
                 },
               ),
+              ),
               if (_currentProfile?.avatarUrl != null)
-                ListTile(
+                Material(
+                  type: MaterialType.transparency,
+                  child: ListTile(
                   leading: Icon(
                     Icons.delete,
                     color: Theme.of(context).colorScheme.error,
@@ -1199,6 +1205,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     _deleteAvatar();
                   },
                 ),
+              ),
               ],
             ),
           ),
@@ -1275,7 +1282,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                     _currentProfile!.avatarUrl!.isNotEmpty
                                 ? DecorationImage(
                                     image: NetworkImage(
-                                      '${_currentProfile!.avatarUrl!}${_currentProfile!.avatarUrl!.contains('?') ? '&' : '?'}cb=$_avatarCacheBuster',
+                                      '${_currentProfile!.avatarUrl!.startsWith('http') ? '' : ApiConfig.baseUrl}${_currentProfile!.avatarUrl!}${_currentProfile!.avatarUrl!.contains('?') ? '&' : '?'}cb=$_avatarCacheBuster',
                                     ),
                                     fit: BoxFit.cover,
                                   )
